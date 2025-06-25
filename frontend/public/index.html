@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FF6B35" />
+    
+    <!-- Cultural and SEO Meta Tags -->
+    <meta name="description" content="Vimarsh - AI-powered spiritual guidance platform inspired by ancient Indian wisdom and sacred texts" />
+    <meta name="keywords" content="spirituality, wisdom, Krishna, Bhagavad Gita, meditation, yoga, dharma, spiritual guidance, AI" />
+    <meta name="author" content="Vimarsh Team" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Tags for Social Sharing -->
+    <meta property="og:title" content="Vimarsh - AI Spiritual Guidance" />
+    <meta property="og:description" content="Discover ancient wisdom through AI-powered spiritual guidance inspired by Lord Krishna's teachings" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    
+    <!-- Cultural Language Support -->
+    <meta name="google" content="notranslate" />
+    <meta name="format-detection" content="telephone=no" />
+    
+    <!-- Progressive Web App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Vimarsh" />
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Fonts for Sanskrit and Devanagari Support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Cultural CSS Variables -->
+    <style>
+      :root {
+        /* Sacred Color Palette */
+        --saffron-primary: #FF6B35;
+        --saffron-light: #FFB085;
+        --saffron-dark: #E55100;
+        --lotus-white: #FEFEFE;
+        --peacock-blue: #1565C0;
+        --peacock-light: #42A5F5;
+        --peacock-dark: #0D47A1;
+        --sacred-gold: #FFD700;
+        --earth-brown: #5D4037;
+        --forest-green: #388E3C;
+        --sunset-orange: #FF7043;
+        --twilight-purple: #7B1FA2;
+        
+        /* Typography Scales */
+        --font-sanskrit: 'Noto Sans Devanagari', 'Segoe UI', system-ui, sans-serif;
+        --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        --font-heading: 'Crimson Text', 'Times New Roman', serif;
+        
+        /* Sacred Geometry Spacing */
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+        --space-3xl: 4rem;
+        
+        /* Border Radius */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-full: 9999px;
+        
+        /* Shadows */
+        --shadow-soft: 0 2px 8px rgba(255, 107, 53, 0.1);
+        --shadow-medium: 0 4px 16px rgba(255, 107, 53, 0.2);
+        --shadow-strong: 0 8px 32px rgba(255, 107, 53, 0.3);
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: var(--font-body);
+        background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+        color: var(--earth-brown);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+    
+    <title>Vimarsh - AI Spiritual Guidance</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    
+    <script>
+      // Register service worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

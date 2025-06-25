@@ -1,0 +1,161 @@
+[tool.pytest.ini_options]
+# Pytest configuration for Vimarsh backend testing
+minversion = "6.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Markers for test categorization
+markers = [
+    "unit: Unit tests for individual components",
+    "integration: Integration tests for component interactions", 
+    "performance: Performance and load tests",
+    "slow: Tests that take longer than usual",
+    "spiritual: Tests specifically for spiritual content validation",
+    "voice: Tests for voice interface components",
+    "rag: Tests for RAG pipeline components",
+    "llm: Tests for LLM integration components"
+]
+
+# Test execution options
+addopts = [
+    "--strict-markers",
+    "--strict-config", 
+    "--tb=short",
+    "--durations=10",
+    "-ra"
+]
+
+# Async test support
+asyncio_mode = "auto"
+
+# Test discovery patterns
+norecursedirs = ["venv", "__pycache__", ".git", "htmlcov"]
+
+# Warning filters
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore:.*unclosed.*:ResourceWarning"
+]
+
+# Disable cacheprovider for clean runs
+cache_dir = ".pytest_cache"
+
+[tool.coverage.run]
+# Coverage configuration
+source = ["spiritual_guidance", "rag_pipeline", "llm", "voice"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "setup.py",
+    "run_tests.py"
+]
+
+# Include async code coverage
+concurrency = ["thread", "multiprocessing"]
+
+[tool.coverage.report]
+# Coverage reporting
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]
+
+ignore_errors = true
+skip_covered = false
+precision = 2
+show_missing = true
+
+[tool.coverage.html]
+directory = "htmlcov"
+title = "Vimarsh Backend Test Coverage"
+
+[tool.black]
+# Black code formatting
+line-length = 88
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+# Import sorting
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["spiritual_guidance", "rag_pipeline", "llm", "voice", "tests"]
+skip = ["venv", "__pycache__"]
+
+[tool.flake8]
+# Linting configuration
+max-line-length = 88
+extend-ignore = ["E203", "W503", "E501"]
+exclude = [
+    ".git",
+    "__pycache__", 
+    "venv",
+    ".venv",
+    "build",
+    "dist",
+    "*.egg-info"
+]
+per-file-ignores = [
+    "__init__.py:F401",
+    "tests/*:F401,F811"
+]
+
+[tool.mypy]
+# Type checking
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Gradual typing
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "azure.*",
+    "google.*", 
+    "openai.*",
+    "faiss.*",
+    "sentence_transformers.*"
+]
+ignore_missing_imports = true

@@ -1,0 +1,2182 @@
+/* Sacred Harmony Design System */
+
+/* Core Variables */
+:root {
+  /* Sacred Color Palette */
+  --saffron-primary: #FF6B35;
+  --saffron-light: #FFB085;
+  --saffron-dark: #E55100;
+  --lotus-white: #FEFEFE;
+  --peacock-blue: #1565C0;
+  --peacock-light: #42A5F5;
+  --peacock-dark: #0D47A1;
+  --sacred-gold: #FFD700;
+  --earth-brown: #5D4037;
+  --forest-green: #388E3C;
+  --sunset-orange: #FF7043;
+  --twilight-purple: #7B1FA2;
+  
+  /* Neutral Palette */
+  --neutral-50: #FAFAFA;
+  --neutral-100: #F5F5F5;
+  --neutral-200: #EEEEEE;
+  --neutral-300: #E0E0E0;
+  --neutral-400: #BDBDBD;
+  --neutral-500: #9E9E9E;
+  --neutral-600: #757575;
+  --neutral-700: #616161;
+  --neutral-800: #424242;
+  --neutral-900: #212121;
+  
+  /* Typography */
+  --font-sanskrit: 'Noto Sans Devanagari', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-heading: 'Crimson Text', 'Times New Roman', serif;
+  
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  
+  /* Sacred Geometry Spacing */
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;
+  --space-1: 0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2: 0.5rem;
+  --space-2-5: 0.625rem;
+  --space-3: 0.75rem;
+  --space-3-5: 0.875rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 1.75rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Sacred Shadows */
+  --shadow-saffron: 0 4px 16px rgba(255, 107, 53, 0.2);
+  --shadow-peacock: 0 4px 16px rgba(21, 101, 192, 0.2);
+  --shadow-gold: 0 4px 16px rgba(255, 215, 0, 0.3);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
+
+/* Responsive Design System - Mobile First Approach */
+
+/* Breakpoint Variables */
+:root {
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Base mobile styles (default) */
+.spiritual-guidance-interface {
+  padding: 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.spiritual-guidance-interface .flex {
+  flex-direction: column;
+}
+
+.spiritual-guidance-interface .flex h-full {
+  height: auto;
+  min-height: calc(100vh - 2rem);
+}
+
+/* Mobile-first container adjustments */
+.container-narrow {
+  max-width: 100%;
+  padding: 0;
+}
+
+/* Mobile header adjustments */
+.spiritual-guidance-interface .header {
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.spiritual-guidance-interface .header .flex {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.spiritual-guidance-interface .header h1 {
+  font-size: 1.5rem;
+}
+
+/* Mobile input area */
+.spiritual-guidance-interface .input-area {
+  padding: 1rem;
+  gap: 0.75rem;
+}
+
+.spiritual-guidance-interface .input-area .flex {
+  flex-direction: column;
+}
+
+.spiritual-guidance-interface .input-area textarea {
+  min-height: 100px;
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+.spiritual-guidance-interface .input-actions {
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.spiritual-guidance-interface .input-actions button {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Mobile chat area */
+.spiritual-guidance-interface .chat-area {
+  padding: 0.5rem;
+  gap: 1rem;
+}
+
+.spiritual-guidance-interface .message {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+/* Small devices (landscape phones, 475px and up) */
+@media (min-width: 475px) {
+  .spiritual-guidance-interface {
+    padding: 1.5rem;
+  }
+  
+  .spiritual-guidance-interface .input-area textarea {
+    min-height: 120px;
+  }
+  
+  .spiritual-guidance-interface .input-actions {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .spiritual-guidance-interface .input-actions button {
+    width: auto;
+    flex: 1;
+  }
+}
+
+/* Small devices (tablets, 640px and up) */
+@media (min-width: 640px) {
+  .spiritual-guidance-interface {
+    padding: 2rem;
+  }
+  
+  .container-narrow {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .spiritual-guidance-interface .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+  
+  .spiritual-guidance-interface .header .flex {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .spiritual-guidance-interface .header h1 {
+    font-size: 1.875rem;
+  }
+  
+  .spiritual-guidance-interface .input-area {
+    padding: 1.5rem;
+  }
+  
+  .spiritual-guidance-interface .input-area .flex {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+  
+  .spiritual-guidance-interface .input-area textarea {
+    flex: 1;
+    min-height: 80px;
+  }
+  
+  .spiritual-guidance-interface .chat-area {
+    padding: 1rem;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .spiritual-guidance-interface .flex {
+    flex-direction: row;
+  }
+  
+  .spiritual-guidance-interface .flex h-full {
+    height: 100vh;
+  }
+  
+  .container-narrow {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  
+  .spiritual-guidance-interface .message {
+    max-width: 85%;
+  }
+  
+  /* Side panels for history/archive */
+  .conversation-history,
+  .conversation-archive {
+    width: 320px;
+    max-width: 35vw;
+    border-left: 1px solid var(--neutral-200);
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+  .spiritual-guidance-interface {
+    padding: 2rem 0;
+  }
+  
+  .container-narrow {
+    max-width: 48rem;
+    padding: 0 2rem;
+  }
+  
+  .spiritual-guidance-interface .header {
+    padding: 1.5rem 2rem;
+  }
+  
+  .spiritual-guidance-interface .header h1 {
+    font-size: 2.25rem;
+  }
+  
+  .spiritual-guidance-interface .input-area {
+    padding: 2rem;
+  }
+  
+  .spiritual-guidance-interface .chat-area {
+    padding: 1.5rem;
+  }
+  
+  .spiritual-guidance-interface .message {
+    max-width: 80%;
+  }
+  
+  .conversation-history,
+  .conversation-archive {
+    width: 380px;
+    max-width: 30vw;
+  }
+}
+
+/* Extra large devices (large desktops, 1280px and up) */
+@media (min-width: 1280px) {
+  .container-narrow {
+    max-width: 56rem;
+    padding: 0 3rem;
+  }
+  
+  .spiritual-guidance-interface .header {
+    padding: 2rem 3rem;
+  }
+  
+  .spiritual-guidance-interface .input-area {
+    padding: 2.5rem 3rem;
+  }
+  
+  .spiritual-guidance-interface .chat-area {
+    padding: 2rem 3rem;
+  }
+  
+  .conversation-history,
+  .conversation-archive {
+    width: 420px;
+    max-width: 28vw;
+  }
+}
+
+/* 2XL devices (larger desktops, 1536px and up) */
+@media (min-width: 1536px) {
+  .container-narrow {
+    max-width: 64rem;
+    padding: 0 4rem;
+  }
+  
+  .spiritual-guidance-interface .header {
+    padding: 2.5rem 4rem;
+  }
+  
+  .spiritual-guidance-interface .input-area {
+    padding: 3rem 4rem;
+  }
+  
+  .spiritual-guidance-interface .chat-area {
+    padding: 2.5rem 4rem;
+  }
+  
+  .conversation-history,
+  .conversation-archive {
+    width: 480px;
+    max-width: 25vw;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .spiritual-guidance-interface button {
+    min-height: 44px; /* Accessible touch target */
+    min-width: 44px;
+  }
+  
+  .spiritual-guidance-interface .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .spiritual-guidance-interface .session-item {
+    min-height: 48px;
+    padding: 0.75rem;
+  }
+  
+  .spiritual-guidance-interface .archive-item {
+    min-height: 56px;
+    padding: 1rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .spiritual-guidance-interface .sacred-icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Landscape phone optimizations */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .spiritual-guidance-interface {
+    padding: 0.5rem;
+  }
+  
+  .spiritual-guidance-interface .header {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .spiritual-guidance-interface .header h1 {
+    font-size: 1.25rem;
+  }
+  
+  .spiritual-guidance-interface .welcome-section {
+    display: none; /* Hide welcome in landscape to save space */
+  }
+  
+  .spiritual-guidance-interface .input-area {
+    padding: 0.75rem;
+  }
+  
+  .spiritual-guidance-interface .input-area textarea {
+    min-height: 60px;
+  }
+  
+  .spiritual-guidance-interface .chat-area {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+}
+
+/* Print styles for conversation export */
+@media print {
+  .spiritual-guidance-interface {
+    color: black;
+    background: white;
+  }
+  
+  .spiritual-guidance-interface .header,
+  .spiritual-guidance-interface .input-area,
+  .conversation-history,
+  .conversation-archive {
+    display: none;
+  }
+  
+  .spiritual-guidance-interface .chat-area {
+    padding: 0;
+  }
+  
+  .spiritual-guidance-interface .message {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    padding: 1rem;
+  }
+  
+  .spiritual-guidance-interface .sanskrit-text {
+    font-size: 0.9rem;
+  }
+  
+  .spiritual-guidance-interface .citation-card {
+    border: 1px solid #999;
+    background: #f5f5f5;
+  }
+}
+
+/* Accessibility enhancements for different screen sizes */
+@media (max-width: 768px) {
+  .spiritual-guidance-interface .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  .spiritual-guidance-interface [aria-label] {
+    position: relative;
+  }
+  
+  /* Ensure adequate contrast on mobile */
+  .spiritual-guidance-interface .btn-secondary {
+    border-width: 2px;
+  }
+  
+  .spiritual-guidance-interface .text-neutral-600 {
+    color: var(--neutral-700);
+  }
+}
+
+/* Focus improvements for keyboard navigation on all devices */
+.spiritual-guidance-interface *:focus {
+  outline: 2px solid var(--saffron-primary);
+  outline-offset: 2px;
+}
+
+.spiritual-guidance-interface .btn:focus {
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
+}
+
+/* Animation optimizations for mobile */
+@media (prefers-reduced-motion: reduce) {
+  .spiritual-guidance-interface * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Container query support when available */
+@supports (container-type: inline-size) {
+  .spiritual-guidance-interface {
+    container-type: inline-size;
+  }
+  
+  @container (max-width: 600px) {
+    .spiritual-guidance-interface .flex {
+      flex-direction: column;
+    }
+  }
+  
+  @container (min-width: 800px) {
+    .spiritual-guidance-interface .message {
+      max-width: 75%;
+    }
+  }
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--earth-brown);
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+.heading-1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-5xl);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--earth-brown);
+  margin-bottom: var(--space-6);
+}
+
+.heading-2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-4xl);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--earth-brown);
+  margin-bottom: var(--space-5);
+}
+
+.heading-3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--earth-brown);
+  margin-bottom: var(--space-4);
+}
+
+.sanskrit-text {
+  font-family: var(--font-sanskrit);
+  font-size: var(--text-lg);
+  color: var(--peacock-blue);
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.body-text {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--earth-brown);
+}
+
+.caption-text {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--neutral-600);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  min-height: 44px; /* Accessibility: minimum touch target */
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--saffron-primary) 0%, var(--sunset-orange) 100%);
+  color: var(--lotus-white);
+  box-shadow: var(--shadow-saffron);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--saffron-dark) 0%, var(--sunset-orange) 100%);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--lotus-white);
+  color: var(--saffron-primary);
+  border: 2px solid var(--saffron-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--saffron-primary);
+  color: var(--lotus-white);
+}
+
+.btn-peacock {
+  background: linear-gradient(135deg, var(--peacock-blue) 0%, var(--peacock-light) 100%);
+  color: var(--lotus-white);
+  box-shadow: var(--shadow-peacock);
+}
+
+.btn-peacock:hover {
+  background: linear-gradient(135deg, var(--peacock-dark) 0%, var(--peacock-blue) 100%);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  padding: var(--space-3);
+  border-radius: var(--radius-full);
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Cards */
+.card {
+  background: var(--lotus-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-saffron);
+  transform: translateY(-4px);
+}
+
+.card-sacred {
+  background: linear-gradient(135deg, var(--lotus-white) 0%, #FFF8E1 100%);
+  border: 2px solid var(--sacred-gold);
+  box-shadow: var(--shadow-gold);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: var(--space-5);
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--earth-brown);
+  margin-bottom: var(--space-2);
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--neutral-300);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--earth-brown);
+  background: var(--lotus-white);
+  transition: all var(--transition-normal);
+  min-height: 44px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--saffron-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.container-narrow {
+  max-width: 100%;
+  padding: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-4 {
+  gap: var(--space-4);
+}
+
+.gap-6 {
+  gap: var(--space-6);
+}
+
+/* Sacred Patterns */
+.lotus-pattern {
+  background-image: radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(21, 101, 192, 0.1) 0%, transparent 50%);
+}
+
+.mandala-border {
+  border: 3px solid transparent;
+  background: linear-gradient(var(--lotus-white), var(--lotus-white)) padding-box,
+              linear-gradient(45deg, var(--saffron-primary), var(--peacock-blue), var(--sacred-gold)) border-box;
+}
+
+/* Spiritual Elements */
+.om-symbol::before {
+  content: "🕉️";
+  margin-right: var(--space-2);
+}
+
+.lotus-symbol::before {
+  content: "🪷";
+  margin-right: var(--space-2);
+}
+
+/* Voice Interface Styles */
+.voice-interface {
+  padding: var(--space-3);
+  background: linear-gradient(135deg, var(--saffron-light) 0%, var(--sunset-orange) 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--saffron-primary);
+}
+
+.voice-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--peacock-blue);
+  background: var(--lotus-white);
+  color: var(--peacock-blue);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.voice-button:hover {
+  background: var(--peacock-light);
+  color: var(--lotus-white);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-peacock);
+}
+
+.voice-button:active {
+  transform: scale(0.95);
+}
+
+.voice-button.listening {
+  background: var(--saffron-primary);
+  color: var(--lotus-white);
+  border-color: var(--saffron-dark);
+  animation: pulse-voice 2s infinite;
+}
+
+@keyframes pulse-voice {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 53, 0);
+  }
+}
+
+/* Response Display Styles */
+.response-display {
+  position: relative;
+  overflow: hidden;
+}
+
+.response-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--saffron-primary), var(--sacred-gold), var(--lotus-pink-light));
+  opacity: 0.7;
+}
+
+/* Citation Cards */
+.citation-card {
+  transition: all 0.2s ease;
+}
+
+.citation-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.citation-title {
+  transition: color 0.2s ease;
+}
+
+.citation-card:hover .citation-title {
+  color: var(--peacock-dark);
+}
+
+/* Sanskrit Display Enhancements */
+.sanskrit-display {
+  position: relative;
+  overflow: hidden;
+}
+
+.sanskrit-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ff9933' fill-opacity='0.03'%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30v60c-16.569 0-30-13.431-30-30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.sanskrit-text {
+  position: relative;
+  z-index: 1;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.transliteration-text {
+  position: relative;
+  z-index: 1;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+/* Action Button Enhancements */
+.btn-icon {
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon:active {
+  transform: translateY(0);
+}
+
+/* Feedback Button States */
+.btn-icon.feedback-positive {
+  background: linear-gradient(135deg, var(--forest-green)/20, var(--forest-green)/10);
+  color: var(--forest-green);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.btn-icon.feedback-negative {
+  background: linear-gradient(135deg, #dc2626/20, #dc2626/10);
+  color: #dc2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+
+/* Related Verses Section */
+.related-verse-tag {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.related-verse-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 192, 203, 0.3);
+  border-color: var(--lotus-pink-light);
+}
+
+/* Line Clamp Utility */
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Spiritual Authenticity Badge */
+.authenticity-badge {
+  background: linear-gradient(135deg, var(--sacred-gold)/20, var(--saffron-primary)/10);
+  border: 1px solid var(--sacred-gold)/30;
+  border-radius: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--earth-brown);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Persona Avatar Styles */
+.persona-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.persona-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+}
+
+/* Enhanced Citations */
+.citation-preview {
+  animation: expandDown 0.2s ease;
+  transform-origin: top;
+}
+
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* Tag System */
+.response-tag {
+  background: linear-gradient(135deg, var(--lotus-pink-light)/50, var(--lotus-pink-light)/30);
+  border: 1px solid var(--lotus-pink-light);
+  border-radius: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--earth-brown);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .response-display {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .sanskrit-text {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .response-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .response-actions > div {
+    justify-content: center;
+  }
+  
+  .citation-card {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+  .response-display {
+    background: rgba(31, 41, 55, 0.95);
+    border-color: rgba(75, 85, 99, 0.5);
+  }
+  
+  .sanskrit-display {
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.1), rgba(139, 69, 19, 0.1));
+    border-color: rgba(255, 153, 51, 0.3);
+  }
+  
+  .citation-card {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  
+  .response-tag {
+    background: rgba(255, 192, 203, 0.2);
+    border-color: rgba(255, 192, 203, 0.3);
+    color: #e5e7eb;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .response-display {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+  
+  .btn-icon {
+    border: 1px solid currentColor;
+  }
+  
+  .citation-card {
+    border-width: 2px;
+  }
+  
+  .sanskrit-display {
+    border-width: 2px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .response-display {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .response-actions {
+    display: none;
+  }
+  
+  .sanskrit-display {
+    background: transparent !important;
+    border: 1px solid #ccc;
+  }
+  
+  .citation-card {
+    background: transparent !important;
+    border: 1px solid #ccc;
+  }
+}
+
+/* Conversation History Styles */
+.conversation-history {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(to bottom, #fefcf3, #fffdf8);
+  border-left: 1px solid var(--neutral-200);
+}
+
+.conversation-history .session-item {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.conversation-history .session-item:hover {
+  background: var(--neutral-100);
+  border-color: var(--neutral-200);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.conversation-history .session-item.current {
+  background: var(--saffron-light);
+  border-color: var(--saffron-primary);
+  box-shadow: 0 2px 8px rgba(var(--saffron-primary-rgb), 0.1);
+}
+
+.conversation-history .flag {
+  display: inline-block;
+  font-size: 12px;
+}
+
+.conversation-history .flag-en::before {
+  content: '🇺🇸';
+}
+
+.conversation-history .flag-hi::before {
+  content: '🇮🇳';
+}
+
+/* Export buttons */
+.conversation-history .btn-secondary {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--neutral-300);
+  background: white;
+  color: var(--neutral-700);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.conversation-history .btn-secondary:hover:not(:disabled) {
+  background: var(--neutral-50);
+  border-color: var(--neutral-400);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.conversation-history .btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.conversation-history .btn-danger {
+  background: #dc2626;
+  color: white;
+  border: 1px solid #dc2626;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.conversation-history .btn-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+/* Search input styling */
+.conversation-history input[type="text"] {
+  transition: all 0.2s ease;
+}
+
+.conversation-history input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--saffron-primary-rgb), 0.1);
+}
+
+/* Scrollbar styling for conversation list */
+.conversation-history .overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.conversation-history .overflow-y-auto::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+  border-radius: 3px;
+}
+
+.conversation-history .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: 3px;
+}
+
+.conversation-history .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-400);
+}
+
+/* Delete confirmation modal */
+.conversation-history .fixed {
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+.conversation-history .fixed > div {
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive conversation history */
+@media (max-width: 768px) {
+  .conversation-history {
+    border-left: none;
+    border-top: 1px solid var(--neutral-200);
+  }
+  
+  .conversation-history .session-item {
+    padding: 0.75rem;
+  }
+  
+  .conversation-history .btn-secondary,
+  .conversation-history .btn-danger {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Dark mode support for conversation history */
+.dark .conversation-history {
+  background: linear-gradient(to bottom, #1f2937, #111827);
+  border-left-color: #374151;
+}
+
+.dark .conversation-history .session-item:hover {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .conversation-history .btn-secondary {
+  background: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+.dark .conversation-history .btn-secondary:hover:not(:disabled) {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+.dark .conversation-history input[type="text"] {
+  background: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+.dark .conversation-history input[type="text"]::placeholder {
+  color: #9ca3af;
+}
+
+/* Conversation Archive Styles */
+.conversation-archive {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(to bottom, #fefcf3, #fffdf8);
+}
+
+.conversation-archive .archive-item {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.conversation-archive .archive-item:hover {
+  background: var(--neutral-100);
+  border-color: var(--neutral-200);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.conversation-archive .archive-item.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.conversation-archive mark {
+  background: #fef08a;
+  color: #92400e;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+/* Advanced Search Panel */
+.conversation-archive .advanced-search {
+  background: var(--neutral-50);
+  border: 1px solid var(--neutral-200);
+  border-radius: 0.5rem;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bulk Actions Bar */
+.conversation-archive .bulk-actions {
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--neutral-200);
+  padding: 1rem;
+}
+
+.conversation-archive .bulk-actions.has-selection {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+/* Search Results */
+.conversation-archive .search-results {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.conversation-archive .search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.conversation-archive .search-results::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+  border-radius: 3px;
+}
+
+.conversation-archive .search-results::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: 3px;
+}
+
+/* Message Match Highlights */
+.conversation-archive .message-preview {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.conversation-archive .message-preview .match-count {
+  color: #92400e;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.conversation-archive .message-preview .message-snippet {
+  color: var(--neutral-600);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Relevance Score */
+.conversation-archive .relevance-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  background: var(--saffron-light);
+  color: var(--saffron-primary);
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Export Progress */
+.conversation-archive .export-progress {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 1px solid var(--neutral-200);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.conversation-archive .export-progress .spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--neutral-200);
+  border-top: 3px solid var(--saffron-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Topic Tags */
+.conversation-archive .topic-tag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: var(--neutral-200);
+  color: var(--neutral-600);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.conversation-archive .topic-tag:hover {
+  background: var(--saffron-light);
+  color: var(--saffron-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .conversation-archive .bulk-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .conversation-archive .archive-item {
+    padding: 0.75rem;
+  }
+  
+  .conversation-archive .advanced-search {
+    padding: 0.75rem;
+  }
+  
+  .conversation-archive .advanced-search .grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+/* Dark Mode Support */
+.dark .conversation-archive {
+  background: linear-gradient(to bottom, #1f2937, #111827);
+}
+
+.dark .conversation-archive .archive-item:hover {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .conversation-archive .advanced-search {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .conversation-archive .bulk-actions {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .conversation-archive .message-preview {
+  background: #451a03;
+  border-color: #92400e;
+}
+
+.dark .conversation-archive .topic-tag {
+  background: #4b5563;
+  color: #d1d5db;
+}
+
+.dark .conversation-archive .topic-tag:hover {
+  background: var(--saffron-dark);
+  color: white;
+}
+
+/* PWA Components */
+.pwa-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--saffron-primary);
+  color: var(--lotus-white);
+  box-shadow: 0 2px 12px rgba(255, 107, 53, 0.3);
+  animation: slideDown 0.3s ease-out;
+}
+
+.pwa-banner__content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pwa-banner__icon {
+  flex-shrink: 0;
+}
+
+.pwa-banner__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pwa-banner__title {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.pwa-banner__description {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.pwa-banner__button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.pwa-banner__button--primary {
+  background: var(--lotus-white);
+  color: var(--saffron-primary);
+}
+
+.pwa-banner__button--primary:hover {
+  background: var(--ivory-warm);
+  transform: translateY(-1px);
+}
+
+.pwa-banner__button--primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pwa-banner__button--dismiss {
+  background: transparent;
+  color: var(--lotus-white);
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+.pwa-banner__button--dismiss:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.pwa-banner--update {
+  background: var(--peacock-blue);
+}
+
+/* Offline Indicator */
+.offline-indicator {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.offline-indicator__content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.offline-indicator--offline {
+  background: var(--error-red);
+  color: var(--lotus-white);
+}
+
+.offline-indicator--online {
+  background: var(--success-green);
+  color: var(--lotus-white);
+}
+
+/* PWA Status */
+.pwa-status {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.pwa-status__indicators {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pwa-status__badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid currentColor;
+}
+
+.pwa-status__badge--installed {
+  background: var(--success-green);
+  color: var(--lotus-white);
+  border-color: var(--success-green);
+}
+
+.pwa-status__badge--installable {
+  background: var(--saffron-light);
+  color: var(--saffron-dark);
+  border-color: var(--saffron-primary);
+}
+
+.pwa-status__badge--online {
+  background: var(--success-green);
+  color: var(--lotus-white);
+  border-color: var(--success-green);
+}
+
+.pwa-status__badge--offline {
+  background: var(--error-red);
+  color: var(--lotus-white);
+  border-color: var(--error-red);
+}
+
+/* PWA Manager Container */
+.pwa-manager {
+  position: relative;
+}
+
+/* PWA Animations */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(100%);
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* PWA-specific responsive adjustments */
+@media (max-width: 768px) {
+  .pwa-banner__content {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .pwa-banner__text {
+    min-width: 0;
+  }
+
+  .pwa-banner__title {
+    font-size: 0.8125rem;
+  }
+
+  .pwa-banner__description {
+    font-size: 0.6875rem;
+  }
+
+  .pwa-banner__button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .offline-indicator {
+    bottom: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .pwa-status__indicators {
+    justify-content: center;
+  }
+}
+
+/* PWA Display Mode Adjustments */
+@media (display-mode: standalone) {
+  .pwa-banner {
+    top: env(safe-area-inset-top, 0);
+  }
+
+  .spiritual-guidance-interface {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .offline-indicator {
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* PWA Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .pwa-banner {
+    box-shadow: 0 2px 12px rgba(255, 107, 53, 0.4);
+  }
+
+  .offline-indicator {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* PWA Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .pwa-banner,
+  .offline-indicator {
+    animation: none;
+  }
+
+  .pwa-banner__button--primary:hover {
+    transform: none;
+  }
+}
+
+/* PWA Print Styles */
+@media print {
+  .pwa-banner,
+  .offline-indicator,
+  .pwa-status {
+    display: none !important;
+  }
+}
+
+/* Notification Settings */
+.notification-settings {
+  background: var(--lotus-white);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.notification-settings__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--pearl-gray);
+}
+
+.notification-settings__icon {
+  color: var(--saffron-primary);
+  flex-shrink: 0;
+}
+
+.notification-settings__title {
+  flex: 1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--earth-brown);
+  margin: 0;
+}
+
+.notification-settings__close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--earth-brown);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.notification-settings__close:hover {
+  background: var(--pearl-gray);
+}
+
+.notification-settings__section {
+  margin-bottom: 2rem;
+}
+
+.notification-settings__section:last-child {
+  margin-bottom: 0;
+}
+
+.notification-settings__section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--earth-brown);
+  margin-bottom: 1rem;
+}
+
+.notification-settings__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.notification-settings__option:last-child {
+  margin-bottom: 0;
+}
+
+.notification-settings__option-info {
+  flex: 1;
+}
+
+.notification-settings__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--earth-brown);
+  margin-bottom: 0.25rem;
+}
+
+.notification-settings__description {
+  font-size: 0.875rem;
+  color: var(--earth-brown);
+  opacity: 0.7;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notification-settings__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notification-settings__button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.notification-settings__button--primary {
+  background: var(--saffron-primary);
+  color: var(--lotus-white);
+}
+
+.notification-settings__button--primary:hover {
+  background: var(--saffron-light);
+  transform: translateY(-1px);
+}
+
+.notification-settings__button--primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.notification-settings__button--secondary {
+  background: transparent;
+  color: var(--peacock-blue);
+  border: 1px solid var(--peacock-blue);
+}
+
+.notification-settings__button--secondary:hover {
+  background: var(--peacock-blue);
+  color: var(--lotus-white);
+}
+
+.notification-settings__button--secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notification-settings__toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notification-settings__toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--pearl-gray);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.notification-settings__toggle--enabled {
+  background: var(--saffron-primary);
+}
+
+.notification-settings__toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--lotus-white);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notification-settings__toggle--enabled .notification-settings__toggle-slider {
+  transform: translateX(20px);
+}
+
+.notification-settings__status {
+  font-size: 0.875rem;
+  color: var(--earth-brown);
+  font-weight: 500;
+}
+
+.notification-settings__status--error {
+  color: var(--error-red);
+}
+
+.notification-settings__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.notification-settings__checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.notification-settings__checkbox-custom {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--pearl-gray);
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.notification-settings__checkbox:checked + .notification-settings__checkbox-custom {
+  background: var(--saffron-primary);
+  border-color: var(--saffron-primary);
+}
+
+.notification-settings__checkbox:checked + .notification-settings__checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--lotus-white);
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.notification-settings__time-input,
+.notification-settings__select {
+  padding: 0.5rem;
+  border: 1px solid var(--pearl-gray);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background: var(--lotus-white);
+  color: var(--earth-brown);
+  min-width: 120px;
+}
+
+.notification-settings__time-input:focus,
+.notification-settings__select:focus {
+  outline: none;
+  border-color: var(--saffron-primary);
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+}
+
+.notification-settings--unsupported {
+  text-align: center;
+  padding: 2rem;
+  color: var(--earth-brown);
+  opacity: 0.7;
+}
+
+/* A/B Testing Styles for Response Display */
+
+/* Enhanced layout styles */
+.enhanced-layout {
+  padding: 1rem;
+  background: linear-gradient(135deg, #FEFEFE 0%, #F9FAFB 100%);
+}
+
+/* Voice button size variants */
+.voice-button-small {
+  transform: scale(0.8);
+}
+
+.voice-button-medium {
+  transform: scale(1);
+}
+
+.voice-button-large {
+  transform: scale(1.2);
+}
+
+/* Response formatting variants */
+.response-italic {
+  font-style: italic;
+  color: #4B5563;
+}
+
+.response-highlighted {
+  background: linear-gradient(120deg, #FF9933/10 0%, #F59E0B/5 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #FF9933;
+  position: relative;
+}
+
+.response-highlighted::before {
+  content: '"';
+  position: absolute;
+  top: -0.5rem;
+  left: -0.5rem;
+  font-size: 3rem;
+  color: #FF9933;
+  opacity: 0.3;
+}
+
+.response-highlighted::after {
+  content: '"';
+  position: absolute;
+  bottom: -1rem;
+  right: -0.5rem;
+  font-size: 3rem;
+  color: #FF9933;
+  opacity: 0.3;
+}
+
+/* Divine icon container */
+.divine-icon-container {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: linear-gradient(90deg, #1E3A8A/10 0%, #FF9933/10 100%);
+  border-radius: 8px;
+  border: 1px solid #FF9933/20;
+}
+
+/* Citation positioning variants */
+.citations-inline {
+  background: #F9FAFB;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+}
+
+.citations-inline .citation-tag {
+  transition: all 0.2s ease;
+}
+
+.citations-inline .citation-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 153, 51, 0.2);
+}
+
+.citations-bottom {
+  border-top: 2px solid #E5E7EB;
+  padding-top: 1rem;
+}
+
+/* Traditional vs Modern response styling */
+.response-traditional {
+  border-left: 4px solid #1E3A8A;
+  padding-left: 1rem;
+  background: linear-gradient(to right, #1E3A8A/5, transparent);
+}
+
+.response-modern {
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Accessibility improvements for A/B tests */
+@media (prefers-reduced-motion: reduce) {
+  .voice-button-small,
+  .voice-button-medium,
+  .voice-button-large {
+    transform: none;
+  }
+  
+  .citations-inline .citation-tag:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+  .response-highlighted {
+    background: white;
+    border: 2px solid #000;
+  }
+  
+  .divine-icon-container {
+    background: white;
+    border: 2px solid #000;
+  }
+}
