@@ -1,0 +1,292 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.36.1.42791",
+      "templateHash": "8863954634805361921"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "keyVaultUri": {
+      "type": "string",
+      "metadata": {
+        "description": "URI of the Key Vault containing secrets"
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Key Vault"
+      }
+    },
+    "cosmosDbEndpoint": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB endpoint"
+      }
+    },
+    "expertReviewEmail": {
+      "type": "string",
+      "defaultValue": "vedprakash.m@me.com",
+      "metadata": {
+        "description": "Expert review email for spiritual content validation"
+      }
+    }
+  },
+  "variables": {
+    "functionAppName": "vimarsh-functions",
+    "staticWebAppName": "vimarsh-web",
+    "appInsightsName": "vimarsh-insights",
+    "hostingPlanName": "vimarsh-plan"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('appInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "RetentionInDays": 30,
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      },
+      "tags": {
+        "project": "vimarsh",
+        "type": "compute",
+        "costCenter": "beta-testing"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic"
+      },
+      "kind": "functionapp",
+      "properties": {
+        "reserved": true
+      },
+      "tags": {
+        "project": "vimarsh",
+        "type": "compute",
+        "costCenter": "beta-testing"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('functionAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "functionapp,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "reserved": true,
+        "siteConfig": {
+          "linuxFxVersion": "Python|3.11",
+          "pythonVersion": "3.11",
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('@Microsoft.KeyVault(SecretUri={0}secrets/storage-connection-string)', parameters('keyVaultUri'))]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[format('@Microsoft.KeyVault(SecretUri={0}secrets/storage-connection-string)', parameters('keyVaultUri'))]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[variables('functionAppName')]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString]"
+            },
+            {
+              "name": "GEMINI_API_KEY",
+              "value": "[format('@Microsoft.KeyVault(SecretUri={0}secrets/gemini-api-key)', parameters('keyVaultUri'))]"
+            },
+            {
+              "name": "COSMOS_DB_ENDPOINT",
+              "value": "[parameters('cosmosDbEndpoint')]"
+            },
+            {
+              "name": "COSMOS_DB_KEY",
+              "value": "[format('@Microsoft.KeyVault(SecretUri={0}secrets/cosmos-db-key)', parameters('keyVaultUri'))]"
+            },
+            {
+              "name": "EXPERT_REVIEW_EMAIL",
+              "value": "[parameters('expertReviewEmail')]"
+            },
+            {
+              "name": "AZURE_FUNCTIONS_ENVIRONMENT",
+              "value": "production"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            }
+          ],
+          "cors": {
+            "allowedOrigins": [
+              "[format('https://{0}.azurestaticapps.net', variables('staticWebAppName'))]",
+              "http://localhost:3000"
+            ],
+            "supportCredentials": false
+          },
+          "ftpsState": "Disabled",
+          "minTlsVersion": "1.2",
+          "http20Enabled": true,
+          "use32BitWorkerProcess": false
+        },
+        "httpsOnly": true
+      },
+      "tags": {
+        "project": "vimarsh",
+        "type": "compute",
+        "costCenter": "beta-testing"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.Web/sites', variables('functionAppName')), parameters('keyVaultName'), 'Key Vault Secrets User')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-01-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('staticWebAppName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Free",
+        "tier": "Free"
+      },
+      "properties": {
+        "buildProperties": {
+          "appLocation": "/frontend",
+          "apiLocation": "",
+          "outputLocation": "build"
+        },
+        "repositoryUrl": "https://github.com/vedprakash-m/vimarsh",
+        "branch": "main",
+        "stagingEnvironmentPolicy": "Enabled"
+      },
+      "tags": {
+        "project": "vimarsh",
+        "type": "compute",
+        "costCenter": "beta-testing"
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites/config",
+      "apiVersion": "2023-01-01",
+      "name": "[format('{0}/{1}', variables('staticWebAppName'), 'appsettings')]",
+      "properties": {
+        "REACT_APP_API_BASE_URL": "[format('https://{0}/api', reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-01-01').defaultHostName)]",
+        "REACT_APP_APP_INSIGHTS_CONNECTION_STRING": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString]",
+        "REACT_APP_ENVIRONMENT": "production"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
+        "[resourceId('Microsoft.Web/staticSites', variables('staticWebAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Consumption/budgets",
+      "apiVersion": "2023-05-01",
+      "name": "vimarsh-beta-budget",
+      "properties": {
+        "timePeriod": {
+          "startDate": "2024-01-01",
+          "endDate": "2025-12-31"
+        },
+        "timeGrain": "Monthly",
+        "amount": 50,
+        "category": "Cost",
+        "notifications": {
+          "actual_GreaterThan_80_Percent": {
+            "enabled": true,
+            "operator": "GreaterThan",
+            "threshold": 80,
+            "contactEmails": [
+              "[parameters('expertReviewEmail')]"
+            ],
+            "contactRoles": []
+          },
+          "forecast_GreaterThan_100_Percent": {
+            "enabled": true,
+            "operator": "GreaterThan",
+            "threshold": 100,
+            "contactEmails": [
+              "[parameters('expertReviewEmail')]"
+            ],
+            "contactRoles": []
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "functionAppName": {
+      "type": "string",
+      "value": "[variables('functionAppName')]"
+    },
+    "functionAppUrl": {
+      "type": "string",
+      "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-01-01').defaultHostName)]"
+    },
+    "staticWebAppName": {
+      "type": "string",
+      "value": "[variables('staticWebAppName')]"
+    },
+    "staticWebAppUrl": {
+      "type": "string",
+      "value": "[format('https://{0}', reference(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-01-01').defaultHostname)]"
+    },
+    "appInsightsConnectionString": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString]"
+    },
+    "appInsightsName": {
+      "type": "string",
+      "value": "[variables('appInsightsName')]"
+    }
+  }
+}

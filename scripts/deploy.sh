@@ -60,41 +60,52 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Environment-specific configuration
+# Environment-specific configuration with two-resource-group strategy
 case $ENVIRONMENT in
     dev)
-        RESOURCE_GROUP="vimarsh-dev"
+        # Persistent resources (Database, Key Vault, Storage)
+        DB_RESOURCE_GROUP="vimarsh-db-rg"
+        # Compute resources (Functions, Static Web App, Insights)
+        COMPUTE_RESOURCE_GROUP="vimarsh-rg"
         LOCATION="eastus"
-        FUNCTION_APP_NAME="vimarsh-functions-dev"
-        COSMOS_DB_NAME="vimarsh-cosmos-dev"
-        STATIC_WEB_APP_NAME="vimarsh-web-dev"
-        APP_INSIGHTS_NAME="vimarsh-insights-dev"
-        STORAGE_ACCOUNT_NAME="vimarshistoragedev"
+        # Static resource names for idempotency (beta cost optimization)
+        FUNCTION_APP_NAME="vimarsh-functions"
+        COSMOS_DB_NAME="vimarsh-db"
+        STATIC_WEB_APP_NAME="vimarsh-web"
+        APP_INSIGHTS_NAME="vimarsh-insights"
+        STORAGE_ACCOUNT_NAME="vimarshstorage"
+        KEY_VAULT_NAME="vimarsh-kv"
         ;;
     staging)
-        RESOURCE_GROUP="vimarsh-staging"
+        DB_RESOURCE_GROUP="vimarsh-db-rg"
+        COMPUTE_RESOURCE_GROUP="vimarsh-rg"
         LOCATION="eastus"
-        FUNCTION_APP_NAME="vimarsh-functions-staging"
-        COSMOS_DB_NAME="vimarsh-cosmos-staging"
-        STATIC_WEB_APP_NAME="vimarsh-web-staging"
-        APP_INSIGHTS_NAME="vimarsh-insights-staging"
-        STORAGE_ACCOUNT_NAME="vimarshistoragestaging"
+        FUNCTION_APP_NAME="vimarsh-functions"
+        COSMOS_DB_NAME="vimarsh-db"
+        STATIC_WEB_APP_NAME="vimarsh-web"
+        APP_INSIGHTS_NAME="vimarsh-insights"
+        STORAGE_ACCOUNT_NAME="vimarshstorage"
+        KEY_VAULT_NAME="vimarsh-kv"
         ;;
     prod)
-        RESOURCE_GROUP="vimarsh-prod"
+        DB_RESOURCE_GROUP="vimarsh-db-rg"
+        COMPUTE_RESOURCE_GROUP="vimarsh-rg"
         LOCATION="eastus"
-        FUNCTION_APP_NAME="vimarsh-functions-prod"
-        COSMOS_DB_NAME="vimarsh-cosmos-prod"
-        STATIC_WEB_APP_NAME="vimarsh-web-prod"
-        APP_INSIGHTS_NAME="vimarsh-insights-prod"
-        STORAGE_ACCOUNT_NAME="vimarshistorageprod"
+        FUNCTION_APP_NAME="vimarsh-functions"
+        COSMOS_DB_NAME="vimarsh-db"
+        STATIC_WEB_APP_NAME="vimarsh-web"
+        APP_INSIGHTS_NAME="vimarsh-insights"
+        STORAGE_ACCOUNT_NAME="vimarshstorage"
+        KEY_VAULT_NAME="vimarsh-kv"
         ;;
 esac
 
 echo -e "${BLUE}🕉️  Vimarsh Deployment Script${NC}"
 echo -e "${BLUE}Environment: ${YELLOW}$ENVIRONMENT${NC}"
-echo -e "${BLUE}Resource Group: ${YELLOW}$RESOURCE_GROUP${NC}"
+echo -e "${BLUE}DB Resource Group: ${YELLOW}$DB_RESOURCE_GROUP${NC}"
+echo -e "${BLUE}Compute Resource Group: ${YELLOW}$COMPUTE_RESOURCE_GROUP${NC}"
 echo -e "${BLUE}Location: ${YELLOW}$LOCATION${NC}"
+echo -e "${BLUE}Cost Strategy: Two-RG pause/resume optimization${NC}"
 echo ""
 
 # Verify prerequisites
@@ -150,122 +161,82 @@ echo -e "${GREEN}✅ Prerequisites check passed${NC}"
 
 # Function to create Azure infrastructure using Bicep
 create_infrastructure() {
-    echo -e "${BLUE}🏗️  Creating Azure infrastructure using Bicep templates...${NC}"
+    echo -e "${BLUE}🏗️  Creating Azure infrastructure using two-resource-group strategy...${NC}"
 
-    # Create resource group
-    echo "Creating resource group..."
+    # Create persistent resource group (vimarsh-db-rg)
+    echo "Creating persistent resource group (Database, Key Vault, Storage)..."
     az group create \
-        --name "$RESOURCE_GROUP" \
+        --name "$DB_RESOURCE_GROUP" \
         --location "$LOCATION" \
-        --tags project=vimarsh environment="$ENVIRONMENT"
+        --tags project=vimarsh environment="$ENVIRONMENT" type=persistent costStrategy=pause-resume
 
-    # Deploy infrastructure using Bicep template
-    echo "Deploying infrastructure from Bicep template..."
-    if [[ -f "$PROJECT_ROOT/infrastructure/main.bicep" ]]; then
+    # Create compute resource group (vimarsh-rg)  
+    echo "Creating compute resource group (Functions, Web App, Insights)..."
+    az group create \
+        --name "$COMPUTE_RESOURCE_GROUP" \
+        --location "$LOCATION" \
+        --tags project=vimarsh environment="$ENVIRONMENT" type=compute costStrategy=pause-resume
+
+    # Deploy persistent resources (Database, Key Vault, Storage)
+    echo "Deploying persistent resources to $DB_RESOURCE_GROUP..."
+    if [[ -f "$PROJECT_ROOT/infrastructure/persistent.bicep" ]]; then
         az deployment group create \
-            --resource-group "$RESOURCE_GROUP" \
-            --template-file "$PROJECT_ROOT/infrastructure/main.bicep" \
-            --parameters "$PROJECT_ROOT/infrastructure/parameters/$ENVIRONMENT.parameters.json" \
+            --resource-group "$DB_RESOURCE_GROUP" \
+            --template-file "$PROJECT_ROOT/infrastructure/persistent.bicep" \
+            --parameters location="$LOCATION" geminiApiKey="$GEMINI_API_KEY" \
             --output table
-        echo -e "${GREEN}✅ Bicep deployment completed${NC}"
+        echo -e "${GREEN}✅ Persistent resources deployment completed${NC}"
     else
-        echo -e "${YELLOW}⚠️  Bicep template not found, falling back to individual resource creation...${NC}"
-        create_infrastructure_individual_resources
+        echo -e "${RED}❌ Persistent Bicep template not found${NC}"
+        exit 1
     fi
-}
 
-# Function to create individual Azure resources (fallback)
-create_infrastructure_individual_resources() {
+    # Get outputs from persistent deployment for compute resources
+    echo "Getting persistent resource connection strings..."
+    COSMOS_ENDPOINT=$(az cosmosdb show --name "$COSMOS_DB_NAME" --resource-group "$DB_RESOURCE_GROUP" --query documentEndpoint -o tsv)
+    KEY_VAULT_URI=$(az keyvault show --name "$KEY_VAULT_NAME" --resource-group "$DB_RESOURCE_GROUP" --query properties.vaultUri -o tsv)
 
-    # Create storage account
-    echo "Creating storage account..."
-    az storage account create \
-        --name "$STORAGE_ACCOUNT_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --location "$LOCATION" \
-        --sku Standard_LRS \
-        --kind StorageV2
-
-    # Create Application Insights
-    echo "Creating Application Insights..."
-    az monitor app-insights component create \
-        --app "$APP_INSIGHTS_NAME" \
-        --location "$LOCATION" \
-        --resource-group "$RESOURCE_GROUP" \
-        --kind web \
-        --application-type web
-
-    # Create Cosmos DB
-    echo "Creating Cosmos DB..."
-    az cosmosdb create \
-        --name "$COSMOS_DB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --default-consistency-level Session \
-        --locations regionName="$LOCATION" \
-        --capabilities EnableServerless EnableVectorSearch \
-        --backup-policy-type Continuous
-
-    # Create Cosmos DB database and containers
-    echo "Creating Cosmos DB database and containers..."
-    az cosmosdb sql database create \
-        --account-name "$COSMOS_DB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --name SpiritualGuidance
-
-    az cosmosdb sql container create \
-        --account-name "$COSMOS_DB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --database-name SpiritualGuidance \
-        --name Documents \
-        --partition-key-path "/source" \
-        --throughput 400
-
-    az cosmosdb sql container create \
-        --account-name "$COSMOS_DB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --database-name SpiritualGuidance \
-        --name Vectors \
-        --partition-key-path "/document_id" \
-        --throughput 400
-
-    # Create Function App
-    echo "Creating Function App..."
-    az functionapp create \
-        --name "$FUNCTION_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
-        --storage-account "$STORAGE_ACCOUNT_NAME" \
-        --consumption-plan-location "$LOCATION" \
-        --runtime python \
-        --runtime-version 3.12 \
-        --functions-version 4 \
-        --app-insights "$APP_INSIGHTS_NAME" \
-        --disable-app-insights false
-
-    echo -e "${GREEN}✅ Infrastructure created successfully${NC}"
+    # Deploy compute resources (Functions, Web App, Insights)
+    echo "Deploying compute resources to $COMPUTE_RESOURCE_GROUP..."
+    if [[ -f "$PROJECT_ROOT/infrastructure/compute.bicep" ]]; then
+        az deployment group create \
+            --resource-group "$COMPUTE_RESOURCE_GROUP" \
+            --template-file "$PROJECT_ROOT/infrastructure/compute.bicep" \
+            --parameters location="$LOCATION" \
+                        keyVaultUri="$KEY_VAULT_URI" \
+                        keyVaultName="$KEY_VAULT_NAME" \
+                        cosmosDbEndpoint="$COSMOS_ENDPOINT" \
+                        expertReviewEmail="vedprakash.m@me.com" \
+            --output table
+        echo -e "${GREEN}✅ Compute resources deployment completed${NC}"
+    else
+        echo -e "${RED}❌ Compute Bicep template not found${NC}"
+        exit 1
+    fi
 }
 
 # Function to configure application settings
 configure_app_settings() {
     echo -e "${BLUE}⚙️  Configuring application settings...${NC}"
 
-    # Get connection strings and keys
+    # Get connection strings and keys from respective resource groups
     COSMOS_CONNECTION_STRING=$(az cosmosdb keys list \
         --name "$COSMOS_DB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$DB_RESOURCE_GROUP" \
         --type connection-strings \
         --query 'connectionStrings[0].connectionString' \
         --output tsv)
 
     APPINSIGHTS_KEY=$(az monitor app-insights component show \
         --app "$APP_INSIGHTS_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --query 'instrumentationKey' \
         --output tsv)
 
     # Configure Function App settings
     az functionapp config appsettings set \
         --name "$FUNCTION_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --settings \
             "GEMINI_API_KEY=$GEMINI_API_KEY" \
             "COSMOS_CONNECTION_STRING=$COSMOS_CONNECTION_STRING" \
@@ -273,7 +244,7 @@ configure_app_settings() {
             "FUNCTIONS_WORKER_RUNTIME=python" \
             "ENVIRONMENT=$ENVIRONMENT" \
             "LOG_LEVEL=INFO" \
-            "EXPERT_REVIEW_EMAIL=experts@example.com" \
+            "EXPERT_REVIEW_EMAIL=vedprakash.m@me.com" \
             "MAX_QUERY_LENGTH=1000" \
             "RESPONSE_TIMEOUT_SECONDS=30"
 
@@ -310,16 +281,16 @@ deploy_frontend() {
     # Get Function App URL
     FUNCTION_APP_URL=$(az functionapp show \
         --name "$FUNCTION_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --query 'defaultHostName' \
         --output tsv)
 
     # Create Static Web App (if doesn't exist)
-    if ! az staticwebapp show --name "$STATIC_WEB_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+    if ! az staticwebapp show --name "$STATIC_WEB_APP_NAME" --resource-group "$COMPUTE_RESOURCE_GROUP" &> /dev/null; then
         echo "Creating Static Web App..."
         az staticwebapp create \
             --name "$STATIC_WEB_APP_NAME" \
-            --resource-group "$RESOURCE_GROUP" \
+            --resource-group "$COMPUTE_RESOURCE_GROUP" \
             --source https://github.com/vedprakash-m/vimarsh \
             --branch main \
             --app-location "/frontend" \
@@ -329,7 +300,7 @@ deploy_frontend() {
     # Configure Static Web App settings
     az staticwebapp appsettings set \
         --name "$STATIC_WEB_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --setting-names \
             REACT_APP_API_BASE_URL="https://$FUNCTION_APP_URL/api" \
             REACT_APP_ENVIRONMENT="$ENVIRONMENT"
@@ -349,7 +320,7 @@ load_data() {
     # Get Cosmos DB connection string
     COSMOS_CONNECTION_STRING=$(az cosmosdb keys list \
         --name "$COSMOS_DB_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$DB_RESOURCE_GROUP" \
         --type connection-strings \
         --query 'connectionStrings[0].connectionString' \
         --output tsv)
@@ -376,7 +347,7 @@ verify_deployment() {
     # Get Function App URL
     FUNCTION_APP_URL=$(az functionapp show \
         --name "$FUNCTION_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --query 'defaultHostName' \
         --output tsv)
 
@@ -393,7 +364,7 @@ verify_deployment() {
     echo "Testing spiritual guidance endpoint..."
     FUNCTION_KEY=$(az functionapp keys list \
         --name "$FUNCTION_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --query 'functionKeys.default' \
         --output tsv)
 
@@ -419,17 +390,18 @@ display_summary() {
     echo -e "${BLUE}📋 Deployment Summary${NC}"
     echo -e "${BLUE}===================${NC}"
     echo -e "Environment: ${YELLOW}$ENVIRONMENT${NC}"
-    echo -e "Resource Group: ${YELLOW}$RESOURCE_GROUP${NC}"
+    echo -e "DB Resource Group: ${YELLOW}$DB_RESOURCE_GROUP${NC}"
+    echo -e "Compute Resource Group: ${YELLOW}$COMPUTE_RESOURCE_GROUP${NC}"
     
     FUNCTION_APP_URL=$(az functionapp show \
         --name "$FUNCTION_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --query 'defaultHostName' \
         --output tsv 2>/dev/null || echo "Not deployed")
     
     STATIC_WEB_APP_URL=$(az staticwebapp show \
         --name "$STATIC_WEB_APP_NAME" \
-        --resource-group "$RESOURCE_GROUP" \
+        --resource-group "$COMPUTE_RESOURCE_GROUP" \
         --query 'defaultHostname' \
         --output tsv 2>/dev/null || echo "Not deployed")
 
@@ -437,9 +409,13 @@ display_summary() {
     echo -e "Frontend URL: ${GREEN}https://$STATIC_WEB_APP_URL${NC}"
     echo ""
     echo -e "${BLUE}🔗 Useful Commands:${NC}"
-    echo -e "Monitor logs: ${YELLOW}az functionapp log tail --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP${NC}"
-    echo -e "View metrics: ${YELLOW}az monitor app-insights component show --app $APP_INSIGHTS_NAME --resource-group $RESOURCE_GROUP${NC}"
+    echo -e "Monitor logs: ${YELLOW}az functionapp log tail --name $FUNCTION_APP_NAME --resource-group $COMPUTE_RESOURCE_GROUP${NC}"
+    echo -e "View metrics: ${YELLOW}az monitor app-insights component show --app $APP_INSIGHTS_NAME --resource-group $COMPUTE_RESOURCE_GROUP${NC}"
     echo -e "Test API: ${YELLOW}curl https://$FUNCTION_APP_URL/api/health${NC}"
+    echo ""
+    echo -e "${BLUE}💰 Cost Management:${NC}"
+    echo -e "Pause compute: ${YELLOW}az group delete --name $COMPUTE_RESOURCE_GROUP --yes --no-wait${NC}"
+    echo -e "Resume operation: ${YELLOW}./deploy.sh $ENVIRONMENT${NC}"
     echo ""
     echo -e "${GREEN}🕉️  Deployment completed with divine blessings!${NC}"
 }

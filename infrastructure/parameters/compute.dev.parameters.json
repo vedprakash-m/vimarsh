@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "keyVaultUri": {
+      "value": "https://vimarsh-kv.vault.azure.net/"
+    },
+    "keyVaultName": {
+      "value": "vimarsh-kv"
+    },
+    "cosmosDbEndpoint": {
+      "value": "https://vimarsh-db.documents.azure.com:443/"
+    },
+    "expertReviewEmail": {
+      "value": "vedprakash.m@me.com"
+    }
+  }
+}

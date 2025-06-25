@@ -4,13 +4,34 @@ Complete guide for deploying Vimarsh AI Spiritual Guidance System to production.
 
 ## Overview
 
-Vimarsh uses a modern cloud-native architecture with:
-- **Backend:** Azure Functions (Python)
-- **Frontend:** Azure Static Web Apps (React)
-- **Database:** Azure Cosmos DB with vector search
-- **AI:** Google Gemini Pro API
-- **Authentication:** Microsoft Entra External ID
-- **Monitoring:** Azure Application Insights
+Vimarsh uses a modern cloud-native architecture with a cost-optimized two-resource-group strategy:
+
+### Architecture Components
+- **Backend:** Azure Functions (Python) - Consumption plan for cost efficiency
+- **Frontend:** Azure Static Web Apps (React) - Free tier for beta testing
+- **Database:** Azure Cosmos DB with vector search - Serverless mode
+- **AI:** Google Gemini Pro API - Pay-per-use model
+- **Authentication:** Microsoft Entra External ID - Free tier
+- **Monitoring:** Azure Application Insights - Basic tier
+- **Security:** Azure Key Vault - Standard tier
+
+### Two-Resource-Group Strategy (Cost Optimization)
+
+**vimarsh-db-rg (Persistent Resources):**
+- Cosmos DB (`vimarsh-db`)
+- Key Vault (`vimarsh-kv`) 
+- Storage Account (`vimarshstorage`)
+
+**vimarsh-rg (Compute Resources):**
+- Function App (`vimarsh-functions`)
+- Static Web App (`vimarsh-web`)
+- Application Insights (`vimarsh-insights`)
+
+**Benefits:**
+- **Pause/Resume:** Delete `vimarsh-rg` to stop all costs, keep data intact in `vimarsh-db-rg`
+- **Cost Control:** Pay only for storage when not actively using the application
+- **Quick Recovery:** Redeploy compute resources in minutes to resume operation
+- **Idempotent:** Static resource names prevent duplicate resources during CI/CD
 
 ## Prerequisites
 
@@ -62,42 +83,102 @@ az account set --subscription "Your Subscription Name"
 # Set required environment variables
 export GEMINI_API_KEY="your-gemini-api-key"
 export AZURE_SUBSCRIPTION_ID="your-subscription-id"
-export RESOURCE_GROUP_NAME="vimarsh-prod"
-export LOCATION="eastus"
 
-# Run deployment with environment
-./scripts/deploy.sh prod
+# Run deployment with two-resource-group strategy
+./scripts/deploy.sh dev
+```
+
+### 3. Deployment Output
+
+The deployment will create two resource groups:
+
+```bash
+# Persistent resources (always running - minimal cost)
+vimarsh-db-rg:
+  └── vimarsh-db (Cosmos DB)
+  └── vimarsh-kv (Key Vault)
+  └── vimarshstorage (Storage Account)
+
+# Compute resources (can be paused to save cost)
+vimarsh-rg:
+  └── vimarsh-functions (Function App)
+  └── vimarsh-web (Static Web App)
+  └── vimarsh-insights (Application Insights)
+```
+
+### 4. Cost Management Commands
+
+```bash
+# Pause application (delete compute resources, keep data)
+az group delete --name vimarsh-rg --yes --no-wait
+
+# Resume application (redeploy compute resources)
+./scripts/deploy.sh dev
+
+# Check costs
+az consumption usage list --billing-period-name current
 ```
 
 ---
 
 ## Manual Deployment (Step by Step)
 
-### Phase 1: Infrastructure Setup
+### Phase 1: Persistent Resources Setup
 
-#### 1.1 Create Resource Group
+#### 1.1 Create Persistent Resource Group
 
 ```bash
-# Create resource group
+# Create persistent resource group (Database, Key Vault, Storage)
 az group create \
-  --name vimarsh-prod \
+  --name vimarsh-db-rg \
   --location eastus \
-  --tags project=vimarsh environment=production
+  --tags project=vimarsh type=persistent costStrategy=pause-resume
 ```
 
-#### 1.2 Deploy Cosmos DB
+#### 1.2 Deploy Persistent Resources
 
 ```bash
-# Create Cosmos DB account with vector search
-az cosmosdb create \
-  --name vimarsh-cosmos-prod \
-  --resource-group vimarsh-prod \
-  --default-consistency-level Session \
-  --locations regionName=eastus \
-  --capabilities EnableServerless EnableVectorSearch \
-  --backup-policy-type Continuous
+# Deploy using Bicep template
+az deployment group create \
+  --resource-group vimarsh-db-rg \
+  --template-file infrastructure/persistent.bicep \
+  --parameters location=eastus geminiApiKey="YOUR_API_KEY"
+```
 
-# Create database
+This creates:
+- **vimarsh-db:** Cosmos DB with vector search (serverless)
+- **vimarsh-kv:** Key Vault for secrets management
+- **vimarshstorage:** Storage account for Functions
+
+### Phase 2: Compute Resources Setup
+
+#### 2.1 Create Compute Resource Group
+
+```bash
+# Create compute resource group (Functions, Web App, Insights)
+az group create \
+  --name vimarsh-rg \
+  --location eastus \
+  --tags project=vimarsh type=compute costStrategy=pause-resume
+```
+
+#### 2.2 Deploy Compute Resources
+
+```bash
+# Get outputs from persistent deployment
+COSMOS_ENDPOINT=$(az cosmosdb show --name vimarsh-db --resource-group vimarsh-db-rg --query documentEndpoint -o tsv)
+KEY_VAULT_URI=$(az keyvault show --name vimarsh-kv --resource-group vimarsh-db-rg --query properties.vaultUri -o tsv)
+
+# Deploy compute resources
+az deployment group create \
+  --resource-group vimarsh-rg \
+  --template-file infrastructure/compute.bicep \
+  --parameters location=eastus \
+              keyVaultUri="$KEY_VAULT_URI" \
+              keyVaultName=vimarsh-kv \
+              cosmosDbEndpoint="$COSMOS_ENDPOINT" \
+              expertReviewEmail="your-email@domain.com"
+```
 az cosmosdb sql database create \
   --account-name vimarsh-cosmos-prod \
   --resource-group vimarsh-prod \
