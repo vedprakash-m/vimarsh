@@ -1,0 +1,42 @@
+# Azure Functions Core (Essential only to avoid conflicts)
+azure-functions==1.18.0
+
+# Azure Services  
+azure-cosmos==4.5.1
+azure-storage-blob==12.19.0
+azure-identity==1.15.0
+
+# Essential AI/ML Libraries
+google-generativeai
+sentence-transformers
+faiss-cpu
+numpy
+torch
+
+# FastAPI for local development
+fastapi
+uvicorn
+
+# Text Processing
+beautifulsoup4
+nltk
+python-docx
+
+# Essential Utilities
+python-dotenv
+requests
+pydantic
+typing-extensions
+
+# Testing
+pytest
+pytest-asyncio
+pytest-mock
+httpx
+
+# Development Tools
+black
+flake8
+
+# Logging
+structlog

@@ -1,0 +1,39 @@
+{
+  "success": true,
+  "data": {
+    "response": {
+      "id": "test-response-1",
+      "text": "Dear devotee, dharma is the eternal law that sustains all creation. As I taught Arjuna in the sacred Bhagavad Gita, dharma represents your righteous duty that aligns with your svadharma - your inherent nature and divine purpose. In the modern world, dharma manifests as living with integrity, serving others selflessly, and fulfilling your responsibilities while maintaining spiritual awareness.",
+      "sanskritText": "धर्म एव हतो हन्ति धर्मो रक्षति रक्षितः",
+      "transliteration": "dharma eva hato hanti dharmo rakṣati rakṣitaḥ",
+      "timestamp": "2024-06-24T10:30:00Z",
+      "citations": [
+        {
+          "source": "Bhagavad Gita",
+          "reference": "2.47",
+          "verse": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन",
+          "chapter": "2",
+          "book": "Bhagavad Gita",
+          "translation": "You have a right to perform your prescribed duty, but not to the fruits of action."
+        },
+        {
+          "source": "Mahabharata",
+          "reference": "Vana Parva 313.128",
+          "verse": "धर्म एव हतो हन्ति धर्मो रक्षति रक्षितः",
+          "chapter": "313",
+          "book": "Mahabharata",
+          "translation": "Dharma destroys those who destroy it; dharma protects those who protect it."
+        }
+      ],
+      "confidence": 0.95,
+      "persona": "krishna",
+      "language": "English",
+      "metadata": {
+        "authenticity_score": 0.96,
+        "spiritual_depth": 0.92,
+        "cultural_sensitivity": 0.94,
+        "response_time_ms": 2340
+      }
+    }
+  }
+}

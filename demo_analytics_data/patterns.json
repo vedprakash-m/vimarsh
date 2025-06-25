@@ -1,0 +1,300 @@
+{
+  "ValueError_query_validator": {
+    "pattern_id": "ValueError_query_validator",
+    "description": "Recurring ValueError in query_validator",
+    "frequency": 17,
+    "first_seen": "2025-06-22T15:43:38.516662",
+    "last_seen": "2025-06-22T21:18:41.407703",
+    "affected_components": [
+      "query_validator"
+    ],
+    "common_contexts": [
+      {
+        "key": "validation_step",
+        "value": "format_check",
+        "frequency": 17
+      },
+      {
+        "key": "session_id",
+        "value": "session_9",
+        "frequency": 2
+      },
+      {
+        "key": "user_visible",
+        "value": "True",
+        "frequency": 17
+      },
+      {
+        "key": "user_input",
+        "value": "not a proper question",
+        "frequency": 17
+      }
+    ],
+    "severity_distribution": {
+      "low": 17
+    },
+    "suggested_actions": [
+      "Implement proactive monitoring for this error pattern",
+      "Consider root cause analysis to prevent recurrence",
+      "Consider input validation improvements"
+    ],
+    "confidence_score": 0.7865344700023148
+  },
+  "ConnectionError_llm_client": {
+    "pattern_id": "ConnectionError_llm_client",
+    "description": "Recurring ConnectionError in llm_client",
+    "frequency": 8,
+    "first_seen": "2025-06-22T16:34:50.766532",
+    "last_seen": "2025-06-22T20:59:43.691109",
+    "affected_components": [
+      "llm_client"
+    ],
+    "common_contexts": [
+      {
+        "key": "session_interrupted",
+        "value": "True",
+        "frequency": 8
+      },
+      {
+        "key": "api_endpoint",
+        "value": "generativelanguage.googleapis.com",
+        "frequency": 8
+      },
+      {
+        "key": "recovery_method",
+        "value": "fallback_service",
+        "frequency": 2
+      },
+      {
+        "key": "timeout_duration",
+        "value": "30",
+        "frequency": 8
+      },
+      {
+        "key": "user_visible",
+        "value": "True",
+        "frequency": 8
+      },
+      {
+        "key": "retry_count",
+        "value": "3",
+        "frequency": 8
+      }
+    ],
+    "severity_distribution": {
+      "critical": 8
+    },
+    "suggested_actions": [
+      "Prioritize immediate investigation due to high severity",
+      "Consider implementing circuit breaker for affected component",
+      "Review LLM prompt engineering and fallback mechanisms"
+    ],
+    "confidence_score": 0.7567891772615741
+  },
+  "KeyError_citation_extractor": {
+    "pattern_id": "KeyError_citation_extractor",
+    "description": "Recurring KeyError in citation_extractor",
+    "frequency": 13,
+    "first_seen": "2025-06-22T15:31:44.141139",
+    "last_seen": "2025-06-22T21:18:39.908240",
+    "affected_components": [
+      "citation_extractor"
+    ],
+    "common_contexts": [
+      {
+        "key": "expected_citations",
+        "value": "2",
+        "frequency": 13
+      },
+      {
+        "key": "user_visible",
+        "value": "False",
+        "frequency": 13
+      },
+      {
+        "key": "user_id",
+        "value": "user_85",
+        "frequency": 2
+      },
+      {
+        "key": "response_length",
+        "value": "500",
+        "frequency": 13
+      },
+      {
+        "key": "found_citations",
+        "value": "0",
+        "frequency": 13
+      }
+    ],
+    "severity_distribution": {
+      "medium": 13
+    },
+    "suggested_actions": [
+      "Implement proactive monitoring for this error pattern",
+      "Consider root cause analysis to prevent recurrence"
+    ],
+    "confidence_score": 0.8481846460671296
+  },
+  "TimeoutError_vector_search": {
+    "pattern_id": "TimeoutError_vector_search",
+    "description": "Recurring TimeoutError in vector_search",
+    "frequency": 6,
+    "first_seen": "2025-06-22T15:24:53.823176",
+    "last_seen": "2025-06-22T21:18:40.491713",
+    "affected_components": [
+      "vector_search"
+    ],
+    "common_contexts": [
+      {
+        "key": "timeout_threshold",
+        "value": "10.0",
+        "frequency": 6
+      },
+      {
+        "key": "collection_size",
+        "value": "50000",
+        "frequency": 6
+      },
+      {
+        "key": "session_id",
+        "value": "session_49",
+        "frequency": 2
+      },
+      {
+        "key": "search_time",
+        "value": "15.3",
+        "frequency": 6
+      },
+      {
+        "key": "query_embedding_time",
+        "value": "2.1",
+        "frequency": 6
+      }
+    ],
+    "severity_distribution": {
+      "medium": 6
+    },
+    "suggested_actions": [
+      "Check database connection pooling and retry policies"
+    ],
+    "confidence_score": 0.6891358067986111
+  },
+  "RuntimeError_content_moderator": {
+    "pattern_id": "RuntimeError_content_moderator",
+    "description": "Recurring RuntimeError in content_moderator",
+    "frequency": 5,
+    "first_seen": "2025-06-22T15:33:25.965118",
+    "last_seen": "2025-06-22T21:18:38.512688",
+    "affected_components": [
+      "content_moderator"
+    ],
+    "common_contexts": [
+      {
+        "key": "fallback_successful",
+        "value": "False",
+        "frequency": 5
+      },
+      {
+        "key": "moderation_service",
+        "value": "internal",
+        "frequency": 5
+      },
+      {
+        "key": "fallback_attempted",
+        "value": "True",
+        "frequency": 5
+      },
+      {
+        "key": "user_visible",
+        "value": "True",
+        "frequency": 5
+      }
+    ],
+    "severity_distribution": {
+      "critical": 5
+    },
+    "suggested_actions": [
+      "Prioritize immediate investigation due to high severity",
+      "Consider implementing circuit breaker for affected component"
+    ],
+    "confidence_score": 0.5879457119675926
+  },
+  "ValueError_text_processor": {
+    "pattern_id": "ValueError_text_processor",
+    "description": "Recurring ValueError in text_processor",
+    "frequency": 22,
+    "first_seen": "2025-06-22T15:34:08.136309",
+    "last_seen": "2025-06-22T21:18:42.027662",
+    "affected_components": [
+      "text_processor"
+    ],
+    "common_contexts": [
+      {
+        "key": "character_encoding",
+        "value": "UTF-8",
+        "frequency": 22
+      },
+      {
+        "key": "input_language",
+        "value": "sanskrit",
+        "frequency": 22
+      },
+      {
+        "key": "transliteration_scheme",
+        "value": "IAST",
+        "frequency": 22
+      },
+      {
+        "key": "user_visible",
+        "value": "False",
+        "frequency": 22
+      }
+    ],
+    "severity_distribution": {
+      "low": 22
+    },
+    "suggested_actions": [
+      "Implement proactive monitoring for this error pattern",
+      "Consider root cause analysis to prevent recurrence"
+    ],
+    "confidence_score": 0.7878562299837962
+  },
+  "PermissionError_expert_review_system": {
+    "pattern_id": "PermissionError_expert_review_system",
+    "description": "Recurring PermissionError in expert_review_system",
+    "frequency": 6,
+    "first_seen": "2025-06-22T17:53:05.404489",
+    "last_seen": "2025-06-22T21:18:43.277426",
+    "affected_components": [
+      "expert_review_system"
+    ],
+    "common_contexts": [
+      {
+        "key": "reviewer_id",
+        "value": "expert_123",
+        "frequency": 6
+      },
+      {
+        "key": "review_level",
+        "value": "theological",
+        "frequency": 6
+      },
+      {
+        "key": "permission_required",
+        "value": "REVIEW_THEOLOGICAL",
+        "frequency": 6
+      },
+      {
+        "key": "user_visible",
+        "value": "False",
+        "frequency": 6
+      }
+    ],
+    "severity_distribution": {
+      "medium": 6
+    },
+    "suggested_actions": [],
+    "confidence_score": 0.6085598910578703
+  }
+}

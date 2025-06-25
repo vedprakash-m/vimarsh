@@ -1,0 +1,22 @@
+
+================================================================================
+🕉️  VIMARSH BACKEND TEST REPORT
+================================================================================
+Generated at: 2025-06-24 17:45:16
+
+Total test suites: 1
+Successful suites: 0
+Failed suites: 1
+Total execution time: 0.89 seconds
+
+❌ FAILED UNIT (0.89s)
+----------------------------------------
+Error output: ERROR: file or directory not found: tests/test_spiritual_guidance_api.py
+
+...
+
+🎯 Quality Standards:
+- All tests should pass with >95% coverage
+- Response times should meet performance targets
+- Spiritual authenticity must be maintained
+- Error handling should be comprehensive

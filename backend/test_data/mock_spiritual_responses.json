@@ -1,0 +1,39 @@
+{
+  "responses": [
+    {
+      "query": "What is dharma?",
+      "response": "O Arjuna, dharma is the eternal law that sustains all creation. It is the righteous path that leads to liberation and inner peace.",
+      "citations": [
+        {
+          "source": "Bhagavad Gita",
+          "chapter": 4,
+          "verse": 7,
+          "text": "Whenever dharma declines and adharma increases, I manifest Myself."
+        }
+      ],
+      "language": "English",
+      "authenticity_score": 0.95
+    },
+    {
+      "query": "\u0906\u0927\u0941\u0928\u093f\u0915 \u091c\u0940\u0935\u0928 \u092e\u0947\u0902 \u0927\u0930\u094d\u092e \u0915\u094d\u092f\u093e \u0939\u0948?",
+      "response": "\u0939\u0947 \u0905\u0930\u094d\u091c\u0941\u0928, \u0927\u0930\u094d\u092e \u0935\u0939 \u0936\u093e\u0936\u094d\u0935\u0924 \u0928\u093f\u092f\u092e \u0939\u0948 \u091c\u094b \u0938\u092d\u0940 \u0938\u0943\u0937\u094d\u091f\u093f \u0915\u094b \u0927\u093e\u0930\u0923 \u0915\u0930\u0924\u093e \u0939\u0948\u0964",
+      "citations": [
+        {
+          "source": "\u092d\u0917\u0935\u0926\u094d \u0917\u0940\u0924\u093e",
+          "chapter": 2,
+          "verse": 47,
+          "text": "\u0915\u0930\u094d\u092e\u0923\u094d\u092f\u0947\u0935\u093e\u0927\u093f\u0915\u093e\u0930\u0938\u094d\u0924\u0947 \u092e\u093e \u092b\u0932\u0947\u0937\u0941 \u0915\u0926\u093e\u091a\u0928\u0964"
+        }
+      ],
+      "language": "Hindi",
+      "authenticity_score": 0.94
+    }
+  ],
+  "voice_responses": [
+    {
+      "query": "How to find inner peace?",
+      "audio_duration": 15.5,
+      "language": "English"
+    }
+  ]
+}

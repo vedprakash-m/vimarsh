@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "data": {
+    "response": {
+      "id": "test-response-hindi-1",
+      "text": "प्रिय भक्त, धर्म वह शाश्वत नियम है जो समस्त सृष्टि का पालन करता है। जैसा कि मैंने अर्जुन को पवित्र भगवद्गीता में सिखाया था, धर्म आपका वह पुण्य कर्तव्य है जो आपके स्वधर्म के साथ संरेखित होता है।",
+      "sanskritText": "धर्म एव हतो हन्ति धर्मो रक्षति रक्षितः",
+      "transliteration": "dharma eva hato hanti dharmo rakṣati rakṣitaḥ",
+      "timestamp": "2024-06-24T10:30:00Z",
+      "citations": [
+        {
+          "source": "भगवद्गीता",
+          "reference": "2.47",
+          "verse": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन",
+          "chapter": "2",
+          "book": "Bhagavad Gita",
+          "translation": "आपको अपने निर्धारित कर्तव्य को पूरा करने का अधिकार है, लेकिन कर्म के फल पर नहीं।"
+        }
+      ],
+      "confidence": 0.93,
+      "persona": "krishna",
+      "language": "Hindi",
+      "metadata": {
+        "authenticity_score": 0.94,
+        "spiritual_depth": 0.91,
+        "cultural_sensitivity": 0.95,
+        "response_time_ms": 2850
+      }
+    }
+  }
+}
