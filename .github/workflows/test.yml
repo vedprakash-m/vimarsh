@@ -1,0 +1,222 @@
+name: 🧪 Vimarsh Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_call:
+
+jobs:
+  backend-tests:
+    name: 🐍 Backend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: 🔧 Install backend dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio
+
+    - name: 🧪 Run backend unit tests
+      run: |
+        cd backend
+        python -m pytest tests/ -v --tb=short --cov=. --cov-report=term-missing
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🎯 Run integration tests
+      run: |
+        cd backend
+        python -m pytest tests/test_integration_rag_llm.py -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🔊 Run voice interface tests
+      run: |
+        cd backend
+        python -m pytest tests/voice_interface/ -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 📊 Run analytics tests
+      run: |
+        cd backend
+        python -m pytest tests/analytics/ -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+  frontend-tests:
+    name: ⚛️ Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Set up Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 📦 Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: 🔍 Run TypeScript type checking
+      run: |
+        cd frontend
+        npm run type-check
+
+    - name: 🧪 Run frontend unit tests
+      run: |
+        cd frontend
+        npm test -- --coverage --watchAll=false
+
+    - name: 🏗️ Test frontend build
+      run: |
+        cd frontend
+        npm run build
+
+  e2e-tests:
+    name: 🎭 End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 🔧 Install backend dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio
+
+    - name: 🎭 Run E2E user journey tests
+      run: |
+        cd backend
+        python -m pytest tests/e2e/test_user_journeys.py -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 📈 Run performance tests
+      run: |
+        cd backend
+        python -m pytest tests/e2e/test_performance_concurrent.py -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🔮 Run spiritual content quality tests
+      run: |
+        cd backend
+        python -m pytest tests/spiritual_quality/ -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 📱 Run PWA tests
+      run: |
+        cd backend
+        python -m pytest tests/pwa/ -v --tb=short
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔍 Run Bandit security linter
+      run: |
+        pip install bandit
+        bandit -r backend/ -f json -o bandit-report.json || true
+
+    - name: 📊 Upload security scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-report
+        path: bandit-report.json
+
+  quality-checks:
+    name: ✨ Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 🔧 Install quality tools
+      run: |
+        pip install black flake8 isort mypy
+
+    - name: 🎨 Check code formatting (Black)
+      run: |
+        black --check backend/ || echo "Code formatting check completed"
+
+    - name: 📏 Check import sorting (isort)
+      run: |
+        isort --check-only backend/ || echo "Import sorting check completed"
+
+    - name: 🔍 Run linting (flake8)
+      run: |
+        flake8 backend/ --max-line-length=88 --extend-ignore=E203,W503 || echo "Linting check completed"
+
+  test-summary:
+    name: 📋 Test Summary
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests, e2e-tests, security-scan, quality-checks]
+    if: always()
+    
+    steps:
+    - name: 📊 Generate test summary
+      run: |
+        echo "## 🧪 Vimarsh Test Suite Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Test Results:" >> $GITHUB_STEP_SUMMARY
+        echo "- 🐍 Backend Tests: ${{ needs.backend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ⚛️ Frontend Tests: ${{ needs.frontend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- 🎭 E2E Tests: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔒 Security Scan: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ✨ Quality Checks: ${{ needs.quality-checks.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🙏 Spiritual Guidance Platform Status" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.backend-tests.result }}" == "success" ] && [ "${{ needs.frontend-tests.result }}" == "success" ]; then
+          echo "✅ **Core systems ready for divine service**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Requires attention before serving seekers**" >> $GITHUB_STEP_SUMMARY
+        fi

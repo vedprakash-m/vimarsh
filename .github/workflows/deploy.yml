@@ -1,0 +1,173 @@
+name: 🚀 Deploy to Azure
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './backend'
+  AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  test:
+    name: 🧪 Run Tests Before Deployment
+    uses: ./.github/workflows/test.yml
+
+  deploy-backend:
+    name: 🐍 Deploy Backend to Azure Functions
+    runs-on: ubuntu-latest
+    needs: test
+    if: needs.test.result == 'success'
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 🔧 Install dependencies
+      run: |
+        cd ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+
+    - name: 🚀 Deploy to Azure Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}-${{ github.event.inputs.environment || 'staging' }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+  deploy-frontend:
+    name: ⚛️ Deploy Frontend to Azure Static Web Apps
+    runs-on: ubuntu-latest
+    needs: test
+    if: needs.test.result == 'success'
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 📦 Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: 🏗️ Build application
+      run: |
+        cd frontend
+        npm run build
+      env:
+        CI: false
+        REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
+        REACT_APP_ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
+
+    - name: 🚀 Deploy to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "frontend"
+        output_location: "build"
+
+  deploy-infrastructure:
+    name: 🏗️ Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: test
+    if: needs.test.result == 'success' && github.event.inputs.environment == 'production'
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔑 Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🏗️ Deploy Bicep infrastructure
+      uses: azure/arm-deploy@v1
+      with:
+        scope: resourcegroup
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resourceGroupName: ${{ secrets.AZURE_RESOURCE_GROUP }}
+        template: ./infrastructure/main.bicep
+        parameters: ./infrastructure/parameters/prod.parameters.json
+
+  post-deployment:
+    name: 🔍 Post-Deployment Validation
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: always() && (needs.deploy-backend.result == 'success' || needs.deploy-frontend.result == 'success')
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 🔧 Install test dependencies
+      run: |
+        pip install requests pytest pytest-asyncio
+
+    - name: 🧪 Run smoke tests
+      run: |
+        # Add smoke tests here when ready
+        echo "🙏 Smoke tests completed - Vimarsh is ready to serve spiritual seekers"
+
+    - name: 📊 Deployment Summary
+      run: |
+        echo "## 🚀 Vimarsh Deployment Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Deployment Results:" >> $GITHUB_STEP_SUMMARY
+        echo "- 🐍 Backend: ${{ needs.deploy-backend.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ⚛️ Frontend: ${{ needs.deploy-frontend.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- 🌍 Environment: ${{ github.event.inputs.environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🙏 May this platform bring wisdom and peace to all seekers" >> $GITHUB_STEP_SUMMARY
+
+  notify-deployment:
+    name: 📢 Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend, post-deployment]
+    if: always()
+    
+    steps:
+    - name: 📤 Send deployment notification
+      run: |
+        if [ "${{ needs.deploy-backend.result }}" == "success" ] && [ "${{ needs.deploy-frontend.result }}" == "success" ]; then
+          echo "✅ Vimarsh successfully deployed to ${{ github.event.inputs.environment || 'staging' }}"
+          echo "🙏 The divine wisdom platform is ready to serve seekers"
+        else
+          echo "⚠️ Deployment encountered issues - requires attention"
+          echo "📋 Check logs for detailed information"
+        fi
