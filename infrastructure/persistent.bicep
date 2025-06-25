@@ -35,7 +35,7 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
         name: 'EnableServerless'
       }
     ]
-    enableFreeTier: true  // Cost-effective for beta testing
+    enableFreeTier: false  // Disable free tier to avoid conflicts
   }
   tags: {
     project: 'vimarsh'
@@ -114,7 +114,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableRbacAuthorization: true
     enableSoftDelete: true
     softDeleteRetentionInDays: 7  // Minimum for cost savings
-    enablePurgeProtection: false  // Allow purge for beta testing cost management
+    enablePurgeProtection: true  // Required by Azure policy
     accessPolicies: []
   }
   tags: {
