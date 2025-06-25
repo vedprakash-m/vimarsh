@@ -3,7 +3,12 @@ Main Azure Functions application entry point for Vimarsh spiritual guidance API.
 
 This module implements the core Azure Functions HTTP triggers for the spiritual
 guidance system, providing endpoints for user queries and spiritual guidance
-through Lord Krishna's persona.
+through Lord Krishna's persona with authentic Sanskrit terminology support.
+
+Features:
+- Sanskrit pronunciation optimization in voice responses
+- Sanskrit verse citations with proper transliteration
+- Multi-language support (English, Hindi) with Sanskrit terms
 """
 
 import azure.functions as func

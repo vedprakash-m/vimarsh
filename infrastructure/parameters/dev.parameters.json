@@ -11,13 +11,11 @@
     "appName": {
       "value": "vimarsh"
     },
+    "projectName": {
+      "value": "vimarsh"
+    },
     "geminiApiKey": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/vimarsh-shared/providers/Microsoft.KeyVault/vaults/vimarsh-shared-kv"
-        },
-        "secretName": "gemini-api-key"
-      }
+      "value": "YOUR_GEMINI_API_KEY_HERE"
     },
     "expertReviewEmail": {
       "value": "vedprakash.m@me.com"

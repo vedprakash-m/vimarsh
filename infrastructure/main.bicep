@@ -11,6 +11,9 @@ param location string = resourceGroup().location
 @description('Application name prefix')
 param appName string = 'vimarsh'
 
+@description('Project name for resource naming')
+param projectName string = 'vimarsh'
+
 @description('Gemini API key for LLM integration')
 @secure()
 param geminiApiKey string
@@ -19,7 +22,7 @@ param geminiApiKey string
 param expertReviewEmail string = 'experts@example.com'
 
 // Variables
-var resourceSuffix = '${appName}-${environment}'
+var resourceSuffix = '${projectName}-${environment}'
 var functionAppName = '${resourceSuffix}-functions'
 var cosmosDbName = '${resourceSuffix}-cosmos'
 var staticWebAppName = '${resourceSuffix}-web'
@@ -222,13 +225,13 @@ resource vectorsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/co
   }
 }
 
-// App Service Plan for Function App
+// App Service Plan for Function App (Consumption Plan for cost optimization)
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: '${resourceSuffix}-plan'
   location: location
   sku: {
-    name: environment == 'prod' ? 'P1V2' : 'Y1'
-    tier: environment == 'prod' ? 'PremiumV2' : 'Dynamic'
+    name: environment == 'prod' ? 'P1V2' : 'Y1'  // Y1 = Consumption plan
+    tier: environment == 'prod' ? 'PremiumV2' : 'Dynamic'  // Dynamic = Consumption tier
   }
   properties: {}
   tags: {

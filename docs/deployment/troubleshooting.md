@@ -1,6 +1,74 @@
 # 🔧 Vimarsh Deployment Troubleshooting Guide
 
-Common issues and solutions for deploying Vimarsh AI Spiritual Guidance System.
+Common issues and solutions for dep```
+
+### ⚙️ Configuration Issues
+
+#### **Issue:** Environment variable configuration errors
+```
+Error: GEMINI_API_KEY environment variable not set
+```
+
+**Solution:**
+```bash
+# Set environment variables for local development
+export GEMINI_API_KEY="your-gemini-api-key"
+export AZURE_SUBSCRIPTION_ID="your-subscription-id"
+
+# For Azure Functions, configure app settings
+az functionapp config appsettings set \
+  --name vimarsh-functions-prod \
+  --resource-group vimarsh-prod \
+  --settings GEMINI_API_KEY="@Microsoft.KeyVault(SecretUri=https://vimarsh-shared-kv.vault.azure.net/secrets/gemini-api-key/)"
+```
+
+#### **Issue:** Bicep parameter file validation errors
+```
+Error: Invalid parameter file format
+```
+
+**Solution:**
+```bash
+# Validate parameter file syntax
+az deployment group validate \
+  --resource-group vimarsh-prod \
+  --template-file infrastructure/main.bicep \
+  --parameters @infrastructure/parameters/prod.parameters.json
+
+# Fix parameter file structure
+cat > infrastructure/parameters/dev.parameters.json << EOF
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {"value": "dev"},
+    "geminiApiKey": {"value": "YOUR_KEY_HERE"}
+  }
+}
+EOF
+```
+
+#### **Issue:** CORS configuration problems
+```
+Error: Access to fetch at 'API_URL' from origin 'FRONTEND_URL' has been blocked by CORS policy
+```
+
+**Solution:**
+```bash
+# Update Function App CORS settings
+az functionapp cors add \
+  --name vimarsh-functions-prod \
+  --resource-group vimarsh-prod \
+  --allowed-origins "https://vimarsh-web-prod.azurestaticapps.net"
+
+# For local development, allow localhost
+az functionapp cors add \
+  --name vimarsh-functions-dev \
+  --resource-group vimarsh-dev \
+  --allowed-origins "http://localhost:3000"
+```
+
+### 🚫 Infrastructure Issuesing Vimarsh AI Spiritual Guidance System.
 
 ## Quick Diagnostics
 
@@ -34,7 +102,55 @@ az functionapp config appsettings list --name vimarsh-functions-prod --resource-
 
 ## Issue Categories
 
-### 🚫 Infrastructure Issues
+### � Permissions Issues
+
+#### **Issue:** Insufficient permissions to create resources
+```
+Error: The client 'user@domain.com' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourceGroups/write'
+```
+
+**Solution:**
+```bash
+# Check current role assignments
+az role assignment list --assignee $(az account show --query user.name -o tsv)
+
+# Request required roles from subscription admin:
+# - Contributor (for resource creation)
+# - User Access Administrator (for role assignments)
+```
+
+#### **Issue:** Function app deployment permission errors
+```
+Error: Insufficient privileges to complete the operation
+```
+
+**Solution:**
+```bash
+# Check Function App permissions
+az functionapp list --query "[].{name:name, resourceGroup:resourceGroup, state:state}"
+
+# Ensure you have Function App Contributor role
+az role assignment create \
+  --assignee $(az account show --query user.name -o tsv) \
+  --role "Website Contributor" \
+  --resource-group vimarsh-prod
+```
+
+#### **Issue:** Key Vault access denied
+```
+Error: Access denied to Key Vault 'vimarsh-shared-kv'
+```
+
+**Solution:**
+```bash
+# Grant Key Vault access
+az keyvault set-policy \
+  --name vimarsh-shared-kv \
+  --upn $(az account show --query user.name -o tsv) \
+  --secret-permissions get list set delete
+```
+
+### �🚫 Infrastructure Issues
 
 #### **Issue:** Resource creation fails
 ```

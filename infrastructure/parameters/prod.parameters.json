@@ -11,6 +11,9 @@
     "appName": {
       "value": "vimarsh"
     },
+    "projectName": {
+      "value": "vimarsh"
+    },
     "geminiApiKey": {
       "reference": {
         "keyVault": {

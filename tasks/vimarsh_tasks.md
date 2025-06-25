@@ -192,7 +192,13 @@ Generated from PRD_Vimarsh.md, Tech_Spec_Vimarsh.md, and User_Experience.md
     - **Production Ready:** YES - Application ready for immediate deployment
     - **Report:** full_application_flow_final_report.md & comprehensive test results
 
-- [ ] 6.0 Repository Setup & Version Control
+- [x] 6.0 Repository Setup & Version Control ✅ COMPLETED
+  - **Status:** All repository setup and version control tasks successfully completed
+  - **Repository:** Production-ready GitHub repository with comprehensive documentation
+  - **CI/CD:** Automated testing and deployment workflows implemented
+  - **Strategy:** Single-branch development strategy optimized for maximum velocity
+  - **Documentation:** Complete API documentation, deployment guides, and infrastructure templates
+  - **Ready:** Repository fully prepared for production deployment and team scaling
   - [x] 6.1 Initialize Git repository with proper .gitignore for Python/Node.js
     - **Status:** ✅ Complete - Repository initialized with comprehensive .gitignore
   - [x] 6.2 Create GitHub repository with appropriate branch protection rules
@@ -220,32 +226,61 @@ Generated from PRD_Vimarsh.md, Tech_Spec_Vimarsh.md, and User_Experience.md
     - **Deployment Guide:** Step-by-step Azure deployment with environment configuration
     - **Infrastructure:** Bicep templates for automated resource provisioning
     - **Scripts:** Automated deployment script with environment validation
-  - [ ] 6.7 Push all tested code to GitHub repository
+  - [x] 6.7 Push all tested code to GitHub repository
+    - **Status:** ✅ Complete - All tested code and documentation successfully pushed to GitHub
+    - **Repository:** https://github.com/vedprakash-m/vimarsh
+    - **Branch:** main (up to date with latest commits)
+    - **Content:** Complete codebase, tests, documentation, infrastructure templates, deployment scripts
+    - **Ready:** Repository ready for production deployment and team collaboration
 
-- [ ] 7.0 Infrastructure Setup & Cloud Migration
-  - [ ] 7.1 Set up Azure resource group and basic infrastructure including key vault using Bicep templates
-  - [ ] 7.2 Deploy Cosmos DB with vector search configuration and test connectivity
-  - [ ] 7.3 Set up Azure Functions consumption plan with proper scaling configuration
-  - [ ] 7.4 Configure Azure Static Web Apps for frontend hosting with custom domain
-  - [ ] 7.5 Set up Application Insights and monitoring dashboard
-  - [ ] 7.6 Implement real-time cost monitoring and budget alert system
-  - [ ] 7.7 Migrate local vector storage to Cosmos DB vector search
-  - [ ] 7.8 Load and chunk source texts into production Cosmos DB
-  - [ ] 7.9 Configure Microsoft Entra External ID authentication
+Cost Management Automation: 
+  ○ Objective: Implement automated actions to manage AI costs.
+  ○ Approach: 
+    § Integrate Azure Cost Management APIs to trigger alerts or automated throttling in AISvc when budgets are approached or exceeded.
+    § Implement automated scaling down of AI-related compute resources during off-peak hours where applicable.
 
-- [ ] 8.0 Production Deployment & Optimization
-  - [ ] 8.1 Create automated CI/CD pipeline with GitHub Actions
-  - [ ] 8.2 Set up production environment with proper security configuration
-  - [ ] 8.3 Implement environment-specific configuration management
-  - [ ] 8.4 Deploy and configure monitoring and alerting systems
-  - [ ] 8.5 Set up backup and disaster recovery procedures
-  - [ ] 8.6 Create production deployment validation and smoke tests
-  - [ ] 8.7 Implement security scanning and compliance verification
-  - [ ] 8.8 Configure cost optimization and budget monitoring for Azure resources
-  - [ ] 8.9 Set up user feedback collection and continuous improvement processes
 
-- [ ] 9.0 Legal & Compliance Foundation
-  - [ ] 9.1 Legal Verification of Source Texts
+### [ ] 7.0 Enhanced AI Cost Management & Dynamic Fallbacks 
+- [ ] 7.1 Implement real-time token usage tracking for all Azure OpenAI operations
+- [ ] 7.2 Create budget validation before expensive LLM operations
+- [ ] 7.3 Add intelligent caching layer using Python functools.lru_cache for RAG responses
+- [ ] 7.4 Implement dynamic fallback mechanisms for budget constraints
+- [ ] 7.5 Create cost-effective model switching (from gemini pro to flash)
+- [ ] 7.6 Add request batching and query deduplication for cost optimization
+- [ ] 7.7 Implement graceful degradation with user notification system
+- [ ] 7.8 Create AI cost forecasting and budget planning tools
+- [ ] 7.9 Add per-user AI usage limits with enforcement and override capabilities
+- [ ] 7.10 Implement AI cost analytics dashboard with detailed breakdown
+
+
+**Note:** We will first do beta testing, during which we need to control on cost. There are 2 key decisions I want you to make sure is reflected consistently and accurately through the project including all the docs and code base:
+1. In order to keep the cost, we will have single slot, single environment, single region, cost effective deployment.
+2. All the resources needed for the project are divided into 2 resource groups: (a) vimarsh-db-rg: this resource group will have all the persistent resources such as database, key vault and storage account. (b) vimarsh-rg: this resource group will have all the remaining resources, which should mostly be computing resources. The reason for this resource organization is to save on cost. If the app is not needed for extended period of time, I can delete vimarsh-rg to save on operating cost while not losing any context or data. Whenever the app is needed again, I can just have those resources created again under vimarsh-rg to resume operation. This is pause-resume operation solution is my innovation. Also make sure the resources are named minimal with static names so the infrastructure provisioning is idempotent. I don’t want duplicate resources to be created with ci cd executions. The naming convention should be vimarsh-<resource>, like db resource is named vigor-db, key vault is named as vigor-kv, so and so forth.
+
+- [ ] 8.0 Infrastructure Setup & Cloud Migration
+  - [ ] 8.1 Set up Azure resource group and basic infrastructure including key vault using Bicep templates
+  - [ ] 8.2 Deploy Cosmos DB with vector search configuration and test connectivity
+  - [ ] 8.3 Set up Azure Functions consumption plan with proper scaling configuration
+  - [ ] 8.4 Configure Azure Static Web Apps for frontend hosting with custom domain
+  - [ ] 8.5 Set up Application Insights and monitoring dashboard
+  - [ ] 8.6 Implement real-time cost monitoring and budget alert system
+  - [ ] 8.7 Migrate local vector storage to Cosmos DB vector search
+  - [ ] 8.8 Load and chunk source texts into production Cosmos DB
+  - [ ] 8.9 Configure Microsoft Entra External ID authentication
+
+- [ ] 9.0 Production Deployment & Optimization
+  - [ ] 9.1 Create automated CI/CD pipeline with GitHub Actions
+  - [ ] 9.2 Set up production environment with proper security configuration
+  - [ ] 9.3 Implement environment-specific configuration management
+  - [ ] 9.4 Deploy and configure monitoring and alerting systems
+  - [ ] 9.5 Set up backup and disaster recovery procedures
+  - [ ] 9.6 Create production deployment validation and smoke tests
+  - [ ] 9.7 Implement security scanning and compliance verification
+  - [ ] 9.8 Configure cost optimization and budget monitoring for Azure resources
+  - [ ] 9.9 Set up user feedback collection and continuous improvement processes
+
+- [ ] 10.0 Legal & Compliance Foundation
+  - [ ] 10.1 Legal Verification of Source Texts
     - **WHO:** Junior Engineer + Legal Advisor/Senior Developer
     - **WHAT:** Research and document public domain status of each source text
     - **DELIVERABLES:**
@@ -256,7 +291,7 @@ Generated from PRD_Vimarsh.md, Tech_Spec_Vimarsh.md, and User_Experience.md
       - Create `docs/legal/legal_compliance_checklist.md` with verification steps
     - **ACCEPTANCE CRITERIA:** All source texts confirmed public domain with documented proof
   
-  - [ ] 9.2 Copyright Attribution Framework
+  - [ ] 10.2 Copyright Attribution Framework
     - **WHO:** Junior Engineer
     - **WHAT:** Create standardized attribution and citation system
     - **DELIVERABLES:**
@@ -265,7 +300,7 @@ Generated from PRD_Vimarsh.md, Tech_Spec_Vimarsh.md, and User_Experience.md
       - Update `backend/citation_system/extractor.py` to include legal attribution in all responses
     - **ACCEPTANCE CRITERIA:** All responses include proper source attribution automatically
   
-  - [ ] 9.3 International Compliance Documentation
+  - [ ] 10.3 International Compliance Documentation
     - **WHO:** Junior Engineer + Legal Review
     - **WHAT:** Document compliance requirements for key markets
     - **DELIVERABLES:**
@@ -273,7 +308,7 @@ Generated from PRD_Vimarsh.md, Tech_Spec_Vimarsh.md, and User_Experience.md
       - Create `backend/legal/compliance_checker.py` for automated compliance validation
     - **ACCEPTANCE CRITERIA:** Compliance framework documented and validated
   
-  - [ ] 9.4 Expert Panel Recruitment
+  - [ ] 10.4 Expert Panel Recruitment
     - **WHO:** Project Manager/Senior Developer (NOT Junior Engineer - this requires domain expertise)
     - **WHAT:** Identify, contact, and onboard spiritual/Sanskrit experts
     - **DELIVERABLES:**
@@ -282,7 +317,7 @@ Generated from PRD_Vimarsh.md, Tech_Spec_Vimarsh.md, and User_Experience.md
       - Create expert review agreements and NDAs
     - **ACCEPTANCE CRITERIA:** Expert panel established with signed agreements
   
-  - [ ] 9.5 Expert Review System Setup
+  - [ ] 10.5 Expert Review System Setup
     - **WHO:** Junior Engineer
     - **WHAT:** Build technical infrastructure for expert review workflow
     - **DELIVERABLES:**

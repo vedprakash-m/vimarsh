@@ -127,6 +127,17 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
+# Check Bicep CLI (for infrastructure deployment)
+if ! command -v bicep &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Bicep CLI not found. Installing...${NC}"
+    az bicep install
+    if ! command -v bicep &> /dev/null; then
+        echo -e "${RED}❌ Failed to install Bicep CLI${NC}"
+        echo "Please install Bicep CLI manually: https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install"
+        exit 1
+    fi
+fi
+
 # Check required environment variables
 if [[ -z "$GEMINI_API_KEY" ]]; then
     echo -e "${YELLOW}⚠️  GEMINI_API_KEY not set. Please provide your Gemini API key:${NC}"
@@ -137,9 +148,9 @@ fi
 
 echo -e "${GREEN}✅ Prerequisites check passed${NC}"
 
-# Function to create Azure infrastructure
+# Function to create Azure infrastructure using Bicep
 create_infrastructure() {
-    echo -e "${BLUE}🏗️  Creating Azure infrastructure...${NC}"
+    echo -e "${BLUE}🏗️  Creating Azure infrastructure using Bicep templates...${NC}"
 
     # Create resource group
     echo "Creating resource group..."
@@ -147,6 +158,24 @@ create_infrastructure() {
         --name "$RESOURCE_GROUP" \
         --location "$LOCATION" \
         --tags project=vimarsh environment="$ENVIRONMENT"
+
+    # Deploy infrastructure using Bicep template
+    echo "Deploying infrastructure from Bicep template..."
+    if [[ -f "$PROJECT_ROOT/infrastructure/main.bicep" ]]; then
+        az deployment group create \
+            --resource-group "$RESOURCE_GROUP" \
+            --template-file "$PROJECT_ROOT/infrastructure/main.bicep" \
+            --parameters "$PROJECT_ROOT/infrastructure/parameters/$ENVIRONMENT.parameters.json" \
+            --output table
+        echo -e "${GREEN}✅ Bicep deployment completed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Bicep template not found, falling back to individual resource creation...${NC}"
+        create_infrastructure_individual_resources
+    fi
+}
+
+# Function to create individual Azure resources (fallback)
+create_infrastructure_individual_resources() {
 
     # Create storage account
     echo "Creating storage account..."

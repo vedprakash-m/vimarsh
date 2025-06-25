@@ -72,7 +72,54 @@ Vimarsh is an AI-powered spiritual guidance system that embodies the divine wisd
 - **CI/CD**: GitHub Actions
 - **Monitoring**: Application Insights + custom spiritual metrics
 
-## 🚀 Quick Start
+## � Installation
+
+### Local Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/vedprakash-m/vimarsh.git
+   cd vimarsh
+   ```
+
+2. **Backend Setup:**
+   ```bash
+   cd backend
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+3. **Frontend Setup:**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+4. **Environment Configuration:**
+   ```bash
+   # Copy and configure environment files
+   cp backend/local.settings.json.example backend/local.settings.json
+   cp frontend/.env.example frontend/.env.local
+   
+   # Set your API keys
+   export GEMINI_API_KEY="your-gemini-api-key"
+   ```
+
+5. **Start Development Servers:**
+   ```bash
+   # Terminal 1 - Backend
+   cd backend && func start
+   
+   # Terminal 2 - Frontend  
+   cd frontend && npm start
+   ```
+
+### Production Deployment
+
+See [Deployment Guide](docs/deployment/) for complete production setup instructions.
+
+## �🚀 Quick Start
 
 ### Prerequisites
 
@@ -150,6 +197,58 @@ npm start
 **Access Application:**
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:7071
+
+---
+
+## 💫 Usage
+
+### Web Interface
+
+1. **Open the application** in your browser (locally: `http://localhost:3000`)
+
+2. **Ask spiritual questions** in the text input:
+   - "What is the meaning of dharma?"
+   - "How can I find inner peace?"
+   - "What does Krishna teach about duty?"
+
+3. **Use voice input** by clicking the microphone icon:
+   - Speak naturally in English or Hindi
+   - Sanskrit terms are automatically recognized
+   - Voice responses include proper Sanskrit pronunciation
+
+4. **View citations** from sacred texts:
+   - Bhagavad Gita verses with Sanskrit originals
+   - Mahabharata references with context
+   - Srimad Bhagavatam wisdom with translations
+
+### API Usage
+
+#### Get Spiritual Guidance
+
+```bash
+curl -X POST http://localhost:7071/api/spiritual_guidance \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "How do I overcome fear?",
+    "language": "English",
+    "include_citations": true
+  }'
+```
+
+#### Health Check
+
+```bash
+curl -X GET http://localhost:7071/api/health
+```
+
+### Voice Features
+
+- **Sanskrit Pronunciation**: Accurate pronunciation of Sanskrit terms in voice responses
+- **Multilingual**: Switch between English and Hindi seamlessly  
+- **Voice Commands**: "Ask Krishna", "Show citations", "Read in Sanskrit"
+- **Accessibility**: Screen reader compatible with spiritual content
+
+---
 
 ## 🧪 Testing
 

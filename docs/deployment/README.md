@@ -35,7 +35,9 @@ Vimarsh uses a modern cloud-native architecture with:
 
 ---
 
-## Quick Deployment (Automated)
+## 🚀 Deployment Steps
+
+### Quick Deployment (Automated)
 
 ### 1. Clone and Setup
 
@@ -657,6 +659,82 @@ az consumption budget create \
   --amount 200 \
   --time-grain Monthly
 ```
+
+---
+
+## ✅ Validation
+
+### Post-Deployment Validation
+
+After deployment, verify all systems are working correctly:
+
+#### 1. Health Check Validation
+
+```bash
+# Test API health endpoint
+curl -X GET https://vimarsh-functions-prod.azurewebsites.net/api/health
+
+# Expected response:
+# {
+#   "status": "healthy",
+#   "service": "vimarsh-spiritual-guidance",
+#   "version": "1.0.0",
+#   "timestamp": "2025-06-24T10:30:00Z"
+# }
+```
+
+#### 2. Spiritual Guidance Validation
+
+```bash
+# Test spiritual guidance endpoint
+curl -X POST https://vimarsh-functions-prod.azurewebsites.net/api/spiritual-guidance \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_FUNCTION_KEY" \
+  -d '{
+    "query": "What is the purpose of life according to dharma?",
+    "language": "English",
+    "include_citations": true
+  }'
+```
+
+#### 3. Database Connectivity Validation
+
+```bash
+# Check Cosmos DB connection
+az cosmosdb collection show \
+  --collection-name spiritual-texts \
+  --db-name vimarsh \
+  --resource-group vimarsh-prod \
+  --name vimarsh-cosmos-prod
+```
+
+#### 4. Frontend Validation
+
+- **Static Web App**: Verify frontend loads at deployment URL
+- **Authentication**: Test login flow (if enabled)
+- **Voice Interface**: Test speech recognition and synthesis
+- **Responsive Design**: Check mobile, tablet, and desktop layouts
+
+#### 5. Monitoring Validation
+
+```bash
+# Check Application Insights
+az monitor app-insights component show \
+  --app vimarsh-insights-prod \
+  --resource-group vimarsh-prod
+
+# View recent logs
+az monitor app-insights query \
+  --app vimarsh-insights-prod \
+  --analytics-query "requests | limit 10"
+```
+
+#### 6. Performance Validation
+
+- **Response Times**: < 1 second for spiritual guidance queries
+- **Concurrent Users**: Support 100+ simultaneous users
+- **Error Rates**: < 1% error rate under normal load
+- **Availability**: 99.9% uptime target
 
 ---
 

@@ -1,4 +1,4 @@
-# 🕉️ Vimarsh API Documentation
+# Vimarsh API Documentation
 
 **Version:** 1.0.0  
 **Base URL:** `https://vimarsh-functions.azurewebsites.net/api`  
@@ -37,7 +37,7 @@ For local development, use the default function key or configure in `local.setti
 
 Check service availability and status.
 
-**Endpoint:** `GET /health`
+**Endpoint:** `GET /api/health`
 
 **Response:**
 ```json
@@ -60,7 +60,7 @@ Check service availability and status.
 
 Main endpoint for receiving Lord Krishna's spiritual guidance.
 
-**Endpoint:** `POST /spiritual_guidance`
+**Endpoint:** `POST /api/spiritual_guidance`
 
 **Request Body:**
 ```json
@@ -154,7 +154,7 @@ Main endpoint for receiving Lord Krishna's spiritual guidance.
 
 Get list of supported languages for spiritual guidance.
 
-**Endpoint:** `GET /languages`
+**Endpoint:** `GET /api/languages`
 
 **Response:**
 ```json
@@ -170,10 +170,14 @@ Get list of supported languages for spiritual guidance.
       "code": "Hindi", 
       "name": "Hindi",
       "native_name": "हिन्दी",
-      "supported_features": ["text", "voice", "citations"]
+      "supported_features": ["text", "voice", "citations", "sanskrit_terminology"]
     }
   ],
-  "default_language": "English"
+  "default_language": "English",
+  "special_features": {
+    "sanskrit_pronunciation": "Optimized Sanskrit pronunciation in voice responses",
+    "sanskrit_citations": "Original Sanskrit verses with transliteration"
+  }
 }
 ```
 
@@ -364,6 +368,50 @@ guidance = api.get_spiritual_guidance(
 print(guidance['response'])
 for citation in guidance['citations']:
     print(f"- {citation['source']} {citation['chapter']}.{citation['verse']}")
+```
+
+---
+
+## Examples
+
+### Simple Spiritual Query
+
+```bash
+curl -X POST https://vimarsh-functions.azurewebsites.net/api/spiritual_guidance \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_FUNCTION_KEY" \
+  -d '{
+    "query": "How can I find peace in troubled times?",
+    "language": "English",
+    "include_citations": true
+  }'
+```
+
+### Sanskrit Terminology Query
+
+```bash
+curl -X POST https://vimarsh-functions.azurewebsites.net/api/spiritual_guidance \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_FUNCTION_KEY" \
+  -d '{
+    "query": "What is the meaning of dharma?",
+    "language": "English",
+    "include_citations": true,
+    "voice_enabled": false
+  }'
+```
+
+### Hindi Language Query
+
+```bash
+curl -X POST https://vimarsh-functions.azurewebsites.net/api/spiritual_guidance \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_FUNCTION_KEY" \
+  -d '{
+    "query": "मुझे जीवन का उद्देश्य कैसे मिलेगा?",
+    "language": "Hindi",
+    "include_citations": true
+  }'
 ```
 
 ---
