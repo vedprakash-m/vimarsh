@@ -1,0 +1,265 @@
+# Vimarsh Smoke Test Configuration
+# Comprehensive test scenarios for production deployment validation
+
+test_scenarios:
+  # Basic health checks
+  health_checks:
+    - name: "Azure Functions Health"
+      endpoint: "/api/health"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["status", "timestamp"]
+      timeout: 10
+      
+    - name: "Static Web App Availability"
+      endpoint: "/"
+      method: "GET"
+      expected_status: 200
+      content_check: ["Vimarsh", "spiritual"]
+      timeout: 10
+
+  # Infrastructure connectivity
+  infrastructure:
+    - name: "Cosmos DB Connection"
+      endpoint: "/api/test/cosmos"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["status", "database", "collections"]
+      timeout: 15
+      
+    - name: "Key Vault Access"
+      endpoint: "/api/test/keyvault"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["status", "secrets_accessible"]
+      timeout: 10
+      
+    - name: "Application Insights"
+      endpoint: "/api/test/insights"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["status", "telemetry_enabled"]
+      timeout: 10
+
+  # Core functionality
+  spiritual_guidance:
+    - name: "Basic Spiritual Query"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: "What is dharma?"
+        language: "en"
+      expected_status: 200
+      required_fields: ["response", "source", "citations"]
+      content_validation:
+        - keyword: "dharma"
+          context: "spiritual"
+        - keyword: "duty"
+          context: "righteousness"
+      timeout: 30
+      
+    - name: "Sanskrit Term Query"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: "Explain Om"
+        language: "en"
+      expected_status: 200
+      required_fields: ["response", "source", "citations"]
+      content_validation:
+        - keyword: "Om"
+          context: "sacred"
+        - keyword: "sound"
+          context: "vibration"
+      timeout: 30
+      
+    - name: "Hindi Language Query"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: "कर्म क्या है?"
+        language: "hi"
+      expected_status: 200
+      required_fields: ["response", "source", "citations"]
+      timeout: 30
+
+  # Voice interface
+  voice_tests:
+    - name: "Voice Capability Check"
+      endpoint: "/api/voice/capabilities"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["speech_recognition", "text_to_speech"]
+      timeout: 10
+      
+    - name: "Sanskrit Pronunciation Test"
+      endpoint: "/api/voice/pronunciation-test"
+      method: "POST"
+      payload:
+        text: "Om Namah Shivaya"
+        language: "hi"
+      expected_status: 200
+      required_fields: ["audio_url", "pronunciation_score"]
+      timeout: 20
+
+  # Authentication
+  auth_tests:
+    - name: "Auth Configuration"
+      endpoint: "/api/auth/config"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["provider", "tenant_id", "client_id"]
+      timeout: 10
+      
+    - name: "Auth Token Validation"
+      endpoint: "/api/auth/validate"
+      method: "GET"
+      expected_status: 401  # Should fail without token
+      timeout: 10
+
+  # Performance benchmarks
+  performance:
+    - name: "Response Time Benchmark"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: "What is the meaning of life according to the Gita?"
+        language: "en"
+      expected_status: 200
+      max_response_time: 5000  # 5 seconds
+      timeout: 10
+      
+    - name: "Concurrent User Simulation"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: "What is meditation?"
+        language: "en"
+      expected_status: 200
+      concurrent_requests: 5
+      success_threshold: 80  # 80% success rate
+      timeout: 15
+
+  # Error handling
+  error_scenarios:
+    - name: "Invalid Query Format"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        invalid_field: "test"
+      expected_status: 400
+      required_fields: ["error", "message"]
+      timeout: 10
+      
+    - name: "Empty Query"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: ""
+        language: "en"
+      expected_status: 400
+      required_fields: ["error", "message"]
+      timeout: 10
+      
+    - name: "Unsupported Language"
+      endpoint: "/api/spiritual-guidance"
+      method: "POST"
+      payload:
+        query: "test"
+        language: "fr"
+      expected_status: 400
+      required_fields: ["error", "supported_languages"]
+      timeout: 10
+
+  # Security validation
+  security:
+    - name: "HTTPS Enforcement"
+      test_type: "https_redirect"
+      timeout: 10
+      
+    - name: "CORS Headers"
+      endpoint: "/api/health"
+      method: "OPTIONS"
+      expected_headers:
+        - "Access-Control-Allow-Origin"
+        - "Access-Control-Allow-Methods"
+      timeout: 10
+      
+    - name: "Security Headers"
+      endpoint: "/"
+      method: "GET"
+      expected_headers:
+        - "X-Content-Type-Options"
+        - "X-Frame-Options"
+        - "X-XSS-Protection"
+      timeout: 10
+
+  # Data integrity
+  data_validation:
+    - name: "Scripture Availability"
+      endpoint: "/api/scriptures/list"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["scriptures", "total_count"]
+      content_validation:
+        - keyword: "Bhagavad Gita"
+          context: "available"
+        - keyword: "Sri Isopanisad"
+          context: "available"
+      timeout: 15
+      
+    - name: "Citation Accuracy"
+      endpoint: "/api/test/citations"
+      method: "GET"
+      expected_status: 200
+      required_fields: ["sample_citations", "verification_status"]
+      timeout: 15
+
+# Environment-specific configurations
+environments:
+  staging:
+    base_urls:
+      functions: "https://vimarsh-staging-functions.azurewebsites.net"
+      web: "https://vimarsh-staging-web.azurestaticapps.net"
+    timeouts:
+      default: 30
+      performance: 60
+    thresholds:
+      success_rate: 85
+      response_time: 8000
+      
+  prod:
+    base_urls:
+      functions: "https://vimarsh-functions.azurewebsites.net"
+      web: "https://vimarsh-web.azurestaticapps.net"
+    timeouts:
+      default: 20
+      performance: 30
+    thresholds:
+      success_rate: 95
+      response_time: 5000
+
+# Test execution settings
+execution:
+  retry_count: 3
+  retry_delay: 2
+  parallel_execution: true
+  fail_fast: false
+  generate_report: true
+  
+# Reporting configuration
+reporting:
+  formats: ["json", "markdown", "html"]
+  include_response_samples: true
+  include_performance_metrics: true
+  include_error_details: true
+  
+# Notification settings
+notifications:
+  on_failure: true
+  on_success: false
+  channels:
+    - type: "log"
+      level: "info"
+    - type: "file"
+      path: "deployment-validation-results.json"

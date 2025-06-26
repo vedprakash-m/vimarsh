@@ -1,0 +1,41 @@
+{
+  "customEvents": [
+    {
+      "name": "SpiritualGuidanceRequested",
+      "description": "Spiritual seeker requests guidance",
+      "properties": {
+        "language": "string",
+        "queryType": "string",
+        "responseTime": "number",
+        "qualityScore": "number"
+      }
+    },
+    {
+      "name": "ExpertReviewTriggered", 
+      "description": "Content flagged for expert review",
+      "properties": {
+        "contentType": "string",
+        "flagReason": "string",
+        "severity": "string"
+      }
+    },
+    {
+      "name": "CostThresholdReached",
+      "description": "AI cost threshold reached",
+      "properties": {
+        "currentCost": "number",
+        "threshold": "number",
+        "action": "string"
+      }
+    },
+    {
+      "name": "VoiceInteractionCompleted",
+      "description": "Voice interaction with spiritual seeker",
+      "properties": {
+        "language": "string",
+        "duration": "number",
+        "transcriptionAccuracy": "number"
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+// Expert Review System Monitoring
+customEvents  
+| where name == "ExpertReviewTriggered"
+| where timestamp > ago(7d)
+| extend severity = tostring(customDimensions.severity)
+| extend flagReason = tostring(customDimensions.flagReason)
+| summarize 
+    ReviewCount = count(),
+    HighSeverityCount = countif(severity == "high"),
+    MediumSeverityCount = countif(severity == "medium")
+    by flagReason, bin(timestamp, 1d)
+| order by timestamp desc

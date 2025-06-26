@@ -1,0 +1,13 @@
+// AI Cost Monitoring and Optimization
+customEvents
+| where name == "CostThresholdReached" or name == "SpiritualGuidanceRequested"
+| where timestamp > ago(24h)
+| extend currentCost = toreal(customDimensions.currentCost)
+| extend responseTime = toreal(customDimensions.responseTime)
+| summarize 
+    TotalRequests = countif(name == "SpiritualGuidanceRequested"),
+    CostAlerts = countif(name == "CostThresholdReached"),
+    AvgResponseTime = avg(responseTime),
+    TotalCost = sum(currentCost)
+    by bin(timestamp, 1h)
+| order by timestamp desc

@@ -1,0 +1,41 @@
+{
+  "dashboards": {
+    "spiritual-guidance": {
+      "name": "🙏 Vimarsh Spiritual Guidance Dashboard",
+      "description": "Comprehensive monitoring for spiritual guidance system",
+      "widgets": [
+        {
+          "type": "kql",
+          "title": "Daily Seekers Served",
+          "query": "customEvents | where name == 'SpiritualGuidanceRequested' | summarize count() by bin(timestamp, 1d)"
+        },
+        {
+          "type": "metric",
+          "title": "Response Time",
+          "metric": "requests/duration"
+        },
+        {
+          "type": "kql", 
+          "title": "Quality Metrics",
+          "query": "customEvents | where name == 'SpiritualGuidanceRequested' | extend quality = toreal(customDimensions.qualityScore) | summarize avg(quality)"
+        }
+      ]
+    },
+    "cost-optimization": {
+      "name": "💰 AI Cost Management Dashboard", 
+      "description": "Cost monitoring and optimization for AI services",
+      "widgets": [
+        {
+          "type": "kql",
+          "title": "Cost Trends",
+          "query": "customEvents | where name == 'CostThresholdReached' | summarize sum(toreal(customDimensions.currentCost)) by bin(timestamp, 1d)"
+        },
+        {
+          "type": "kql",
+          "title": "Budget Utilization",
+          "query": "customEvents | where name == 'CostThresholdReached' | extend threshold = toreal(customDimensions.threshold) | summarize max(threshold)"
+        }
+      ]
+    }
+  }
+}

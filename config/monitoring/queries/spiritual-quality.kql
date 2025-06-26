@@ -1,0 +1,13 @@
+// Spiritual Guidance Quality Monitoring
+customEvents
+| where name == "SpiritualGuidanceRequested"
+| where timestamp > ago(24h)
+| extend qualityScore = toreal(customDimensions.qualityScore)
+| extend language = tostring(customDimensions.language)
+| summarize 
+    RequestCount = count(),
+    AvgQuality = avg(qualityScore),
+    MinQuality = min(qualityScore),
+    LowQualityCount = countif(qualityScore < 0.7)
+    by language, bin(timestamp, 1h)
+| order by timestamp desc

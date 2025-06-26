@@ -1,0 +1,369 @@
+# Vimarsh Cost Management Configuration
+# Comprehensive cost policies, budget limits, and optimization settings
+
+# Environment-specific budget configurations
+environments:
+  dev:
+    monthly_budget: 50
+    daily_budget_limit: 2.5
+    alert_thresholds: [50, 70, 85, 100]
+    auto_optimization: true
+    auto_shutdown_enabled: true
+    shutdown_schedule: "18:00-08:00"  # 6 PM to 8 AM
+    weekend_shutdown: true
+    
+  staging:
+    monthly_budget: 100
+    daily_budget_limit: 5.0
+    alert_thresholds: [60, 80, 95, 100]
+    auto_optimization: true
+    auto_shutdown_enabled: true
+    shutdown_schedule: "20:00-07:00"  # 8 PM to 7 AM
+    weekend_shutdown: false
+    
+  prod:
+    monthly_budget: 200
+    daily_budget_limit: 10.0
+    alert_thresholds: [70, 85, 95, 100]
+    auto_optimization: false  # Manual approval required
+    auto_shutdown_enabled: false
+    shutdown_schedule: null
+    weekend_shutdown: false
+
+# Cost optimization policies
+cost_optimization:
+  
+  # Azure Functions optimization
+  azure_functions:
+    preferred_plan: "Consumption"
+    max_instances: 10
+    timeout_minutes: 5
+    memory_size_mb: 512
+    optimization_rules:
+      - rule: "cold_start_optimization"
+        description: "Keep functions warm during business hours"
+        enabled: true
+        cost_impact: "low"
+        
+      - rule: "batch_processing"
+        description: "Use batching for multiple requests"
+        enabled: true
+        cost_impact: "medium"
+        
+      - rule: "connection_pooling"
+        description: "Implement database connection pooling"
+        enabled: true
+        cost_impact: "medium"
+
+  # Cosmos DB optimization  
+  cosmos_db:
+    preferred_mode: "serverless"  # for dev/staging
+    production_mode: "provisioned"
+    auto_scaling: true
+    min_throughput: 400
+    max_throughput: 4000
+    optimization_rules:
+      - rule: "right_sizing"
+        description: "Monitor and adjust throughput based on usage"
+        enabled: true
+        cost_impact: "high"
+        
+      - rule: "data_lifecycle"
+        description: "Implement TTL for temporary data"
+        enabled: true
+        cost_impact: "medium"
+        
+      - rule: "query_optimization"
+        description: "Optimize queries to reduce RU consumption"
+        enabled: true
+        cost_impact: "high"
+
+  # Static Web Apps optimization
+  static_web_apps:
+    tier: "Free"  # for dev/staging
+    production_tier: "Standard"
+    optimization_rules:
+      - rule: "asset_optimization"
+        description: "Compress and optimize static assets"
+        enabled: true
+        cost_impact: "low"
+        
+      - rule: "cdn_optimization"
+        description: "Optimize CDN cache settings"
+        enabled: true
+        cost_impact: "medium"
+
+  # Application Insights optimization
+  application_insights:
+    sampling_percentage: 50  # for cost control
+    retention_days: 30
+    daily_cap_gb: 1
+    optimization_rules:
+      - rule: "smart_sampling"
+        description: "Use adaptive sampling for telemetry"
+        enabled: true
+        cost_impact: "medium"
+        
+      - rule: "log_filtering"
+        description: "Filter out verbose logs in production"
+        enabled: true
+        cost_impact: "medium"
+
+# Budget alert configurations
+budget_alerts:
+  
+  # Email notification settings
+  email_notifications:
+    enabled: true
+    recipients:
+      - "admin@vimarsh.ai"
+      - "devops@vimarsh.ai"
+    frequency: "immediate"  # immediate, daily, weekly
+    
+  # Webhook notifications for automation
+  webhook_notifications:
+    enabled: true
+    endpoints:
+      - url: "https://vimarsh-functions.azurewebsites.net/api/cost-alert"
+        secret_header: "X-Vimarsh-Secret"
+        retry_attempts: 3
+        
+  # Slack integration (optional)
+  slack_notifications:
+    enabled: false
+    webhook_url: ""
+    channel: "#vimarsh-alerts"
+
+# Automated cost control actions
+automated_actions:
+  
+  # Actions for different alert levels
+  alert_50_percent:
+    actions:
+      - type: "notification"
+        target: "email"
+        message: "Budget at 50% - monitoring increased"
+        
+      - type: "log_analysis"
+        target: "application_insights"
+        action: "increase_sampling"
+        
+  alert_80_percent:
+    actions:
+      - type: "notification"
+        target: "email"
+        message: "Budget at 80% - optimization recommended"
+        
+      - type: "resource_optimization"
+        target: "cosmos_db"
+        action: "reduce_throughput"
+        percentage: 20
+        
+      - type: "function_optimization"
+        target: "azure_functions"
+        action: "reduce_timeout"
+        new_timeout: 180  # 3 minutes
+        
+  alert_90_percent:
+    actions:
+      - type: "notification"
+        target: "all"
+        message: "CRITICAL: Budget at 90% - immediate action required"
+        
+      - type: "resource_scaling"
+        target: "non_critical_resources"
+        action: "scale_down"
+        
+      - type: "feature_toggle"
+        target: "non_essential_features"
+        action: "disable"
+        
+  alert_100_percent:
+    actions:
+      - type: "emergency_notification"
+        target: "all"
+        message: "EMERGENCY: Budget exceeded - emergency controls activated"
+        
+      - type: "resource_pause"
+        target: "development_resources"
+        action: "shutdown"
+        exceptions: ["production_critical"]
+        
+      - type: "throttling"
+        target: "api_requests"
+        action: "enable_throttling"
+        rate_limit: "100_per_hour"
+
+# Resource tagging for cost tracking
+cost_tracking_tags:
+  required_tags:
+    - "Environment"
+    - "Project" 
+    - "CostCenter"
+    - "Owner"
+    - "Purpose"
+    
+  cost_allocation_tags:
+    - "Feature"
+    - "Component"
+    - "Team"
+    - "Application"
+    
+  tag_values:
+    Project: "Vimarsh"
+    CostCenter: "Engineering"
+    Application: "SpiritualGuidanceAI"
+    
+# Cost reporting configuration
+cost_reporting:
+  
+  # Report generation schedule
+  daily_reports:
+    enabled: true
+    time: "08:00"  # UTC
+    recipients: ["admin@vimarsh.ai"]
+    include_recommendations: true
+    
+  weekly_reports:
+    enabled: true
+    day: "Monday"
+    time: "09:00"  # UTC
+    recipients: ["admin@vimarsh.ai", "stakeholders@vimarsh.ai"]
+    include_trends: true
+    include_forecasts: true
+    
+  monthly_reports:
+    enabled: true
+    day: 1  # First day of month
+    time: "10:00"  # UTC
+    recipients: ["admin@vimarsh.ai", "finance@vimarsh.ai"]
+    include_optimization_plan: true
+    include_executive_summary: true
+
+# Optimization thresholds and targets
+optimization_targets:
+  
+  # Cost efficiency targets
+  cost_per_user: 0.50  # Target cost per active user per month
+  cost_per_query: 0.01  # Target cost per spiritual guidance query
+  infrastructure_efficiency: 85  # Target infrastructure utilization percentage
+  
+  # Performance vs cost balance
+  response_time_target: 1000  # milliseconds
+  availability_target: 99.9  # percentage
+  cost_performance_ratio: 0.8  # cost efficiency score
+  
+  # Optimization success metrics
+  monthly_savings_target: 15  # percentage improvement
+  waste_reduction_target: 90  # percentage of identified waste eliminated
+  automation_coverage: 80  # percentage of cost optimizations automated
+
+# Spiritual guidance for cost management
+spiritual_guidance:
+  principles:
+    - "Dharmic Stewardship: Use resources mindfully and for the highest good"
+    - "Balanced Action: Neither wasteful nor stingy, but wisely proportioned"
+    - "Continuous Improvement: Regular reflection and optimization"
+    - "Service Orientation: Cost efficiency serves better spiritual guidance"
+    
+  mantras:
+    daily: "Om Gam Ganapataye Namaha - Remove obstacles to efficient resource use"
+    weekly: "Om Namah Shivaya - Transform waste into wisdom"
+    monthly: "Om Shanti Shanti Shanti - Peace in resource harmony"
+    
+  decision_framework:
+    - question: "Does this expense serve our spiritual mission?"
+      priority: "highest"
+      
+    - question: "Can we achieve the same result more efficiently?"
+      priority: "high"
+      
+    - question: "What would Lord Krishna advise about this resource use?"
+      priority: "medium"
+      
+    - question: "How does this align with dharmic principles?"
+      priority: "medium"
+
+# Emergency cost controls
+emergency_controls:
+  
+  # Automatic emergency actions
+  emergency_thresholds:
+    daily_spend_multiplier: 3.0  # 3x normal daily spend
+    hourly_spike_threshold: 50  # dollars per hour
+    resource_cost_anomaly: 200  # percentage increase
+    
+  emergency_actions:
+    - action: "immediate_notification"
+      targets: ["admin", "oncall"]
+      channels: ["email", "sms", "slack"]
+      
+    - action: "resource_circuit_breaker"
+      target: "high_cost_resources"
+      duration: "1_hour"
+      
+    - action: "api_throttling"
+      target: "all_apis"
+      rate_limit: "essential_only"
+      
+    - action: "feature_disabling"
+      target: "non_critical_features"
+      duration: "until_resolved"
+      
+  # Manual override capabilities
+  override_controls:
+    enabled: true
+    authorized_users: ["admin@vimarsh.ai"]
+    approval_required: true
+    audit_logging: true
+    max_override_duration: "24_hours"
+
+# Integration settings
+integrations:
+  
+  # Azure Cost Management API
+  azure_cost_api:
+    enabled: true
+    polling_interval: "hourly"
+    data_retention: "90_days"
+    
+  # Application Insights
+  application_insights:
+    enabled: true
+    custom_metrics: true
+    cost_tracking_events: true
+    
+  # External monitoring tools
+  external_tools:
+    - name: "Azure Monitor"
+      enabled: true
+      cost_alerts: true
+      
+    - name: "Third-party cost tools"
+      enabled: false
+      
+# Compliance and governance
+compliance:
+  
+  # Financial governance
+  approval_workflows:
+    budget_increases:
+      threshold: 20  # percentage
+      approvers: ["finance@vimarsh.ai"]
+      
+    new_resources:
+      estimated_monthly_cost: 10  # dollars
+      approvers: ["admin@vimarsh.ai"]
+      
+  # Audit requirements
+  audit_logging:
+    enabled: true
+    retention_days: 365
+    include_cost_decisions: true
+    include_optimization_actions: true
+    
+  # Regulatory compliance
+  data_retention:
+    cost_data: "7_years"
+    audit_logs: "7_years"
+    optimization_reports: "3_years"

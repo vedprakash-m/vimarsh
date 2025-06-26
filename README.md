@@ -398,6 +398,10 @@ vimarsh/
 ├── infrastructure/           # Azure Bicep templates
 ├── data/                    # Sacred texts and processing
 ├── docs/                    # Documentation
+│   ├── metadata.md          # Comprehensive project metadata and status
+│   ├── api/                 # API documentation
+│   ├── deployment/          # Deployment guides
+│   └── security/            # Security documentation
 ├── scripts/                 # Deployment and setup scripts
 └── .github/workflows/       # CI/CD GitHub Actions
 ```
