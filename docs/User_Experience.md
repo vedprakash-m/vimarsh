@@ -8,11 +8,45 @@ This document serves as the **authoritative source of truth** for all UX/UI desi
 
 **Design Philosophy:** "Simplicity with Reverence" - Creating an interface that honors the divine wisdom while remaining accessible to modern users across all technical proficiency levels.
 
+**Deployment Philosophy:** Single production environment with cost-optimized pause-resume architecture for maximum operational efficiency.
+
 ---
 
-## 2. Design Philosophy & Principles
+## 2. Deployment & Operational Considerations
 
-### 2.1. Core Design Philosophy
+### 2.1. Single Environment Strategy
+
+**Production-First Approach:**
+- **Environment**: Single production deployment for cost efficiency and operational simplicity
+- **Region**: East US for optimal performance and cost management
+- **Availability**: 24/7 operation with planned maintenance windows for cost optimization
+
+### 2.2. Pause-Resume User Impact
+
+**Service Availability:**
+- **Active State**: Full functionality available (spiritual guidance, voice interface, conversation history)
+- **Pause State**: Service temporarily unavailable with informative maintenance page
+- **Resume Time**: Service restoration within 10 minutes of resume operation
+
+**User Communication Strategy:**
+- **Advance Notice**: 48-hour notification for planned pause periods
+- **Status Page**: Real-time service status and estimated restoration time
+- **Email Updates**: Automatic notifications for service availability changes
+- **Graceful Messaging**: Spiritual context for maintenance ("meditation period" rather than "downtime")
+
+### 2.3. Data Continuity
+
+**User Data Preservation:**
+- **Conversation History**: Fully preserved during pause periods
+- **User Preferences**: Maintained across pause-resume cycles  
+- **Progress Tracking**: Spiritual journey continuity ensured
+- **No Data Loss**: Zero impact on user experience from infrastructure operations
+
+---
+
+## 3. Design Philosophy & Principles
+
+### 3.1. Core Design Philosophy
 
 **"Divine Simplicity"** - The interface should reflect the profound yet accessible nature of spiritual wisdom, combining:
 - **Reverence**: Visual elements that honor the sacred nature of the content
@@ -20,7 +54,7 @@ This document serves as the **authoritative source of truth** for all UX/UI desi
 - **Accessibility**: Inclusive design for users of all backgrounds and abilities
 - **Cultural Authenticity**: Respectful incorporation of Indian spiritual aesthetics
 
-### 2.2. Design Principles
+### 3.2. Design Principles
 
 **1. Spiritual Authenticity**
 - Visual elements inspired by traditional Indian art and spiritual symbols
@@ -42,7 +76,7 @@ This document serves as the **authoritative source of truth** for all UX/UI desi
 - Offline capabilities for uninterrupted contemplation
 - Graceful degradation across different devices and network conditions
 
-### 2.3. Visual Design Language
+### 3.3. Visual Design Language
 
 **Color Palette: "Sacred Harmony"**
 ```
@@ -84,7 +118,7 @@ Sacred Font: Crimson Text (For quoted wisdom)
 
 ---
 
-## 3. User Roles & Personas
+## 4. User Roles & Personas
 
 ### 3.1. End User (Spiritual Seeker)
 

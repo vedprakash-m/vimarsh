@@ -34,14 +34,45 @@ Vimarsh is an AI-powered spiritual guidance system that embodies the divine wisd
 - **Progressive Web App**: Install on any device with native-like experience
 - **Real-time Guidance**: Sub-second response times with quality monitoring
 
-## 🏗️ Architecture
+## 🏗️ Architecture & Deployment Strategy
+
+### 🔄 Innovative Cost-Optimized Infrastructure
+
+Vimarsh implements a groundbreaking **two-resource-group architecture** designed for maximum cost efficiency:
+
+#### 📚 vimarsh-db-rg (Persistent Resources)
+- **Purpose**: Data retention through all deployment cycles
+- **Resources**: Cosmos DB (`vimarsh-db`), Key Vault (`vimarsh-kv`), Storage (`vimarshstorage`)
+- **Cost**: ~$5-10/month (storage only)
+- **Lifecycle**: Always active, never deleted
+
+#### 💻 vimarsh-rg (Compute Resources)  
+- **Purpose**: Application execution and user interaction
+- **Resources**: Functions (`vimarsh-functions`), Web App (`vimarsh-web`), Monitoring (`vimarsh-insights`)
+- **Cost**: ~$45-90/month (compute and hosting)
+- **Lifecycle**: Delete to pause, redeploy to resume
+
+### 🎯 Pause-Resume Strategy
+- **Active Production**: Full service at $50-100/month
+- **Paused State**: Data-only preservation at $5-10/month
+- **Resume Time**: <10 minutes to full operation
+- **Cost Savings**: Up to 90% during inactive periods
+- **Data Safety**: Zero data loss through pause-resume cycles
+
+### 🏛️ Single Environment Production
+- **Strategy**: Production-only deployment for cost efficiency
+- **Region**: Single region (East US) for optimal performance
+- **Naming**: Static, idempotent resource names prevent duplicates
+- **Scaling**: Serverless consumption-based pricing
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   React Frontend │────│  Azure Functions  │────│   Cosmos DB     │
-│   (Static Web)   │    │   (Python API)    │    │ (Vector Search) │
+│   (vimarsh-web)  │    │ (vimarsh-functions)│    │  (vimarsh-db)   │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                        │                        │
+    vimarsh-rg              vimarsh-rg              vimarsh-db-rg
+    (deletable)             (deletable)              (persistent)
          │                        │                        │
     ┌────▼────┐            ┌──────▼──────┐         ┌──────▼──────┐
     │ Voice   │            │  Gemini Pro │         │   Sacred    │
@@ -117,7 +148,26 @@ Vimarsh is an AI-powered spiritual guidance system that embodies the divine wisd
 
 ### Production Deployment
 
-See [Deployment Guide](docs/deployment/) for complete production setup instructions.
+Vimarsh uses an innovative **two-resource-group architecture** for cost-optimized production deployment:
+
+```bash
+# Deploy persistent + compute resources
+az deployment sub create \
+  --location "East US" \
+  --template-file infrastructure/main.bicep \
+  --parameters geminiApiKey="<api-key>" expertReviewEmail="<email>"
+
+# Pause service (90% cost reduction)
+az group delete --name vimarsh-rg --yes
+
+# Resume service (<10 minutes)
+az deployment sub create \
+  --location "East US" \
+  --template-file infrastructure/main.bicep \
+  --parameters geminiApiKey="<api-key>" expertReviewEmail="<email>"
+```
+
+See [Deployment Guide](docs/deployment-guide.md) for complete production setup and operational procedures.
 
 ## �🚀 Quick Start
 
@@ -420,19 +470,31 @@ vimarsh/
 - **Citation Verification**: All responses include proper source attribution
 - **Expert Panel Review**: Spiritual scholars validate content quality
 
-## 📊 Monitoring & Analytics
+## 📊 Monitoring & Cost Management
 
-### Application Health
-- **Real-time Monitoring**: Azure Application Insights
+### Operational Monitoring
+- **Service Health**: Real-time monitoring with Azure Application Insights
 - **Performance Metrics**: Response times, success rates, error patterns
-- **Cost Monitoring**: Azure consumption tracking with budget alerts
-- **Spiritual Quality Metrics**: Divine persona consistency, citation accuracy
+- **Pause-Resume Status**: Automated monitoring of resource group states
+- **Data Integrity**: Continuous validation of persistent resource connectivity
+
+### Cost Optimization Tracking
+- **Active State Costs**: $50-100/month monitoring and alerts
+- **Pause State Costs**: $5-10/month storage-only verification
+- **Budget Thresholds**: Multi-tier alerts (50%, 80%, 95%, 100%)
+- **ROI Analysis**: Cost savings tracking through pause-resume cycles
+
+### Two-Resource-Group Monitoring
+- **vimarsh-db-rg**: Persistent data health and backup status
+- **vimarsh-rg**: Compute resource performance and availability
+- **Cross-Group Connectivity**: Automated testing of service integration
+- **Recovery Time**: Tracking resume operation duration and success rates
 
 ### User Analytics (Privacy-Respecting)
-- **Anonymous Journey Tracking**: User flow optimization
+- **Anonymous Journey Tracking**: User flow optimization without personal data
 - **Content Effectiveness**: Most helpful spiritual guidance patterns
 - **Voice Interaction Quality**: Sanskrit pronunciation and recognition metrics
-- **A/B Testing Framework**: Interface optimization experiments
+- **Service Availability Impact**: User behavior during pause-resume cycles
 
 ## 🤝 Contributing
 

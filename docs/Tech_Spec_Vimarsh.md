@@ -8,9 +8,60 @@ This document provides detailed technical specifications for implementing the Vi
 
 ---
 
-## 2. System Architecture
+## 2. Deployment Architecture & Cost Strategy
 
-### 2.1. High-Level Architecture
+### 2.1. Single Environment Production Strategy
+
+**Deployment Philosophy:**
+* **Single Environment**: Production-only deployment for cost efficiency and operational simplicity
+* **Single Region**: East US deployment to minimize latency and cross-region costs  
+* **Single Slot**: No staging slots to avoid environment duplication overhead
+* **Static Naming**: Idempotent resource names prevent duplicate creation during CI/CD
+
+### 2.2. Two-Resource-Group Architecture
+
+**vimarsh-db-rg (Persistent Resources):**
+* **Purpose**: Data retention and persistence through deployment cycles
+* **Resources**: 
+  - Cosmos DB (`vimarsh-db`) - Spiritual texts and user data
+  - Key Vault (`vimarsh-kv`) - API keys and secrets
+  - Storage Account (`vimarshstorage`) - Content and media files
+* **Cost Behavior**: Always active, minimal storage costs (~$5-10/month)
+* **Lifecycle**: Never deleted, preserves all application state
+
+**vimarsh-rg (Compute Resources):**
+* **Purpose**: Application execution and user interaction
+* **Resources**:
+  - Function App (`vimarsh-functions`) - Backend API
+  - Static Web App (`vimarsh-web`) - Frontend hosting
+  - App Insights (`vimarsh-insights`) - Monitoring and telemetry
+* **Cost Behavior**: Can be completely deleted for cost savings
+* **Lifecycle**: Delete for pause, redeploy for resume
+
+### 2.3. Pause-Resume Cost Strategy
+
+**Pause Operation (Cost Savings):**
+1. Delete entire `vimarsh-rg` resource group
+2. Eliminates compute costs (~$40-90/month)
+3. Retains all data in `vimarsh-db-rg`
+4. Reduces costs to storage fees only
+
+**Resume Operation (Service Restoration):**
+1. Redeploy `vimarsh-rg` infrastructure via Bicep
+2. Automatic reconnection to existing data
+3. Full service restoration in <10 minutes
+4. Zero data loss or configuration required
+
+**Cost Comparison:**
+* **Active Production**: $50-100/month
+* **Paused State**: $5-10/month  
+* **Savings**: Up to 90% during inactive periods
+
+---
+
+## 3. System Architecture
+
+### 3.1. High-Level Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -35,7 +86,7 @@ This document provides detailed technical specifications for implementing the Vi
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2. Detailed Component Architecture
+### 3.2. Detailed Component Architecture
 
 **Frontend (User Interface):**
 * **Technology Stack:** React.js or Vue.js for responsive web application
@@ -58,14 +109,11 @@ This document provides detailed technical specifications for implementing the Vi
   - Security and rate limiting
 
 **RAG Pipeline Components:**
-* **Document Store:** Azure Blob Storage for raw text files
-* **Vector Database Options:** 
-  - **Recommended**: Azure Cosmos DB with Vector Search (Preview)
-  - **Alternative**: Self-hosted Qdrant on Azure Container Instance
-  - **Enterprise**: Azure AI Search (for advanced features)
+* **Document Store:** Azure Blob Storage in vimarsh-db-rg for persistent content
+* **Vector Database:** Azure Cosmos DB (`vimarsh-db`) with serverless pricing
 * **Embedding Model:** Hugging Face `sentence-transformers` library
   - Primary: `all-MiniLM-L6-v2` or `paraphrase-MiniLM-L6-v2`
-  - Hosted locally or via dedicated service
+  - Hosted in Function App for cost efficiency
 
 **External Services:**
 * **Large Language Model:** Gemini Pro API (Google AI Studio)
@@ -85,9 +133,9 @@ This document provides detailed technical specifications for implementing the Vi
 
 ---
 
-## 3. Data Sources & Processing
+## 4. Data Sources & Processing
 
-### 3.1. Source Text Corpus
+### 4.1. Source Text Corpus
 
 **Primary Texts (Public Domain English Translations):**
 * **Bhagavad Gita:** Kisari Mohan Ganguli or Annie Besant translations

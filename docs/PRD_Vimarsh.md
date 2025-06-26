@@ -118,40 +118,42 @@ The digital spiritual guidance market is fragmented. Vimarsh's competitive advan
 
 **Phase 1: Foundation & MVP Development (Months 1-6)**
 * **Month 1-2: Setup & Data Preparation**
-  - Team onboarding and environment setup
+  - Team onboarding and production environment setup
   - Source text acquisition and legal verification (public domain status)
   - Initial data ingestion and chunking pipeline development
   - Expert panel recruitment and onboarding
 * **Month 3-4: Core RAG Development**
-  - Vector database implementation and embedding model integration
+  - Two-resource-group infrastructure deployment (vimarsh-db-rg + vimarsh-rg)
+  - Vector database implementation in Cosmos DB with static naming
   - RAG retrieval system development and testing
   - Lord Krishna persona profile creation and validation
   - Initial prompt engineering and LLM integration
-* **Month 5-6: UI/UX Development & Integration**
+* **Month 5-6: Production Integration & Testing**
   - Web interface development (text input/output)
   - Voice input/output integration (STT/TTS)
   - Hindi translation integration
-  - End-to-end testing and expert review cycles
+  - Pause-resume strategy testing and validation
+  - End-to-end production testing and expert review cycles
 
-**Phase 2: Alpha Testing & Refinement (Months 7-8)**
+**Phase 2: Production Validation & Refinement (Months 7-8)**
 * **Month 7:**
-  - Closed alpha testing with curated group (20-30 users)
-  - Expert panel review of AI responses
-  - Performance optimization and bug fixes
+  - Production deployment with closed user group (20-30 users)
+  - Expert panel review of AI responses in live environment
+  - Cost monitoring and pause-resume strategy validation
 * **Month 8:**
-  - Beta testing with expanded group (100-150 users)
+  - Expanded production testing (100-150 users)
   - User feedback collection and analysis
-  - Final refinements and quality assurance
+  - Final optimizations and quality assurance
 
-**Phase 3: Public Launch & Market Validation (Months 9-12)**
+**Phase 3: Public Launch & Operational Excellence (Months 9-12)**
 * **Month 9:**
-  - Public MVP launch
+  - Public production launch
   - Marketing campaign initiation
   - Community engagement and partnerships
 * **Month 10-12:**
   - User acquisition and retention optimization
-  - Continuous monitoring and improvement
-  - Preparation for next iteration features
+  - Cost optimization through pause-resume cycles
+  - Operational excellence and monitoring enhancement
 
 ### 7.2. Critical Dependencies:
 
@@ -175,28 +177,32 @@ The digital spiritual guidance market is fragmented. Vimarsh's competitive advan
 * **Month 6:** Implement comprehensive content filtering systems
 * **Month 8:** Finalize community guidelines and moderation processes
 
-### 7.4. Cost Management & Business Model
+### 7.4. Cost Management & Deployment Strategy
 
-**MVP Operating Cost Structure (50 Users):**
-* **Monthly Operating Costs:** $89-97 (optimized Azure Functions + Cosmos DB architecture)
-* **Cost per User:** $1.77-1.93 per month
-* **Break-even Point:** 9-10 paying users at $10/month pricing
-* **Target Gross Margin:** 82% at competitive pricing
+**Single Environment Production Deployment:**
+* **Architecture Strategy**: Two-resource-group separation for cost optimization
+* **Monthly Active Cost**: $50-100 for full production operation
+* **Monthly Pause Cost**: $5-10 for storage-only during inactive periods
+* **Cost Reduction**: Up to 90% savings during extended inactivity
 
-**Scalable Pricing Strategy:**
+**Innovative Pause-Resume Strategy:**
 ```
-Pricing Tier          | Price/User | Target Market           | Value Proposition
----------------------|------------|-------------------------|-------------------
-Freemium             | $0         | Trial users, students   | Limited daily queries
-Basic Seeker         | $8-10      | Individual practitioners| Full access, voice
-Premium Guidance     | $15-20     | Serious seekers        | Advanced features
-Community/Institutional| $25-50    | Organizations          | Multiple users, analytics
+Operational Mode     | Monthly Cost | Resource Status        | Data Retention
+---------------------|--------------|------------------------|---------------
+Active Production    | $50-100      | Full service running   | Complete
+Paused State         | $5-10        | Compute deleted        | Complete
+Resume Operation     | $50-100      | Redeployed in <10min   | Complete
 ```
+
+**Resource Group Architecture:**
+* **vimarsh-db-rg**: Persistent resources (Cosmos DB, Key Vault, Storage) - Always active
+* **vimarsh-rg**: Compute resources (Functions, Web App, Monitoring) - Pause-resume capable
 
 **Cost Optimization Benefits:**
-* **Low barriers to entry:** Affordable pricing enables broad accessibility
-* **Sustainable unit economics:** Strong margins support reinvestment in quality and features
-* **Pricing flexibility:** Profitable across $8-20 range enables market adaptation
+* **Operational flexibility**: Pause during low-usage periods without data loss
+* **Development efficiency**: Single production environment reduces complexity
+* **Resource efficiency**: Consumption-based pricing with serverless architecture
+* **Deployment consistency**: Static naming prevents duplicate resource creation
 
 > **Note:** Detailed cost analysis, infrastructure optimization strategies, and scaling projections are comprehensively documented in `Tech_Spec_Vimarsh.md` Section 17.
 

@@ -2,17 +2,20 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "environment": {
+      "value": "prod"
+    },
     "location": {
       "value": "East US"
     },
-    "keyVaultUri": {
-      "value": "https://vimarsh-kv.vault.azure.net/"
+    "appName": {
+      "value": "vimarsh"
     },
-    "keyVaultName": {
-      "value": "vimarsh-kv"
+    "projectName": {
+      "value": "vimarsh"
     },
-    "cosmosDbEndpoint": {
-      "value": "https://vimarsh-db.documents.azure.com:443/"
+    "geminiApiKey": {
+      "value": "placeholder-will-set-later"
     },
     "expertReviewEmail": {
       "value": "vedprakash.m@me.com"

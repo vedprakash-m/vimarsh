@@ -1,20 +1,22 @@
 // Vimarsh Persistent Resources Template
-// This template deploys all persistent resources to vimarsh-db-rg
-// Resources: Cosmos DB, Key Vault, Storage Account
+// RESOURCE GROUP: vimarsh-db-rg (persistent resources for data retention)
+// PURPOSE: Contains all data and secrets that must persist through deployment cycles
+// COST STRATEGY: These resources provide foundational data storage and remain active
+// NAMING: Static, minimal names for idempotent deployments (vimarsh-db, vimarsh-kv, etc.)
 
-@description('Location for all resources')
+@description('Location for all persistent resources - single region deployment')
 param location string = resourceGroup().location
 
 @description('Gemini API key for LLM integration')
 @secure()
 param geminiApiKey string
 
-// Static resource names for idempotency
+// Static resource names for idempotent deployments - no duplicates
 var cosmosDbName = 'vimarsh-db'
 var keyVaultName = 'vimarsh-kv'
 var storageAccountName = 'vimarshstorage'
 
-// Cosmos DB with Vector Search
+// Cosmos DB with Vector Search - Single Region for Cost Efficiency
 resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: cosmosDbName
   location: location
@@ -32,15 +34,18 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     ]
     capabilities: [
       {
-        name: 'EnableServerless'
+        name: 'EnableServerless'  // Cost optimization - pay per request
       }
     ]
-    enableFreeTier: false  // Disable free tier to avoid conflicts
+    enableFreeTier: false  // Disabled to avoid conflicts in production
+    publicNetworkAccess: 'Enabled'
+    networkAclBypass: 'AzureServices'
   }
   tags: {
     project: 'vimarsh'
     type: 'persistent'
-    costCenter: 'beta-testing'
+    purpose: 'data-retention'
+    costStrategy: 'serverless-pricing'
   }
 }
 
@@ -120,7 +125,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   tags: {
     project: 'vimarsh'
     type: 'persistent'
-    costCenter: 'beta-testing'
+    purpose: 'secrets-management'
+    costStrategy: 'minimal-retention'
   }
 }
 
@@ -162,7 +168,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   tags: {
     project: 'vimarsh'
     type: 'persistent'
-    costCenter: 'beta-testing'
+    purpose: 'data-storage'
+    costStrategy: 'cool-storage-tier'
   }
 }
 

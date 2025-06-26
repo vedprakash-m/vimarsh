@@ -1,8 +1,10 @@
 // Vimarsh Compute Resources Template  
-// This template deploys all compute resources to vimarsh-rg
-// Resources: Function App, Static Web App, Application Insights
+// RESOURCE GROUP: vimarsh-rg (compute/ephemeral resources for pause-resume strategy)
+// PURPOSE: Contains all compute resources that can be deleted/recreated for cost savings
+// COST STRATEGY: Delete this entire resource group to pause costs, redeploy to resume
+// NAMING: Static, minimal names for idempotent deployments (vimarsh-functions, vimarsh-web, etc.)
 
-@description('Location for all resources')
+@description('Location for all compute resources - single region deployment')
 param location string = resourceGroup().location
 
 @description('URI of the Key Vault containing secrets')
@@ -17,7 +19,7 @@ param cosmosDbEndpoint string
 @description('Expert review email for spiritual content validation')
 param expertReviewEmail string = 'vedprakash.m@me.com'
 
-// Static resource names for idempotency
+// Static resource names for idempotent deployments - no duplicates
 var functionAppName = 'vimarsh-functions'
 var staticWebAppName = 'vimarsh-web'
 var appInsightsName = 'vimarsh-insights'
@@ -37,7 +39,8 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   tags: {
     project: 'vimarsh'
     type: 'compute'
-    costCenter: 'beta-testing'
+    purpose: 'monitoring'
+    costStrategy: 'pause-resume'
   }
 }
 
@@ -56,7 +59,8 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   tags: {
     project: 'vimarsh'
     type: 'compute'
-    costCenter: 'beta-testing'
+    purpose: 'hosting-plan'
+    costStrategy: 'consumption-based'
   }
 }
 
@@ -141,7 +145,8 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   tags: {
     project: 'vimarsh'
     type: 'compute'
-    costCenter: 'beta-testing'
+    purpose: 'backend-api'
+    costStrategy: 'serverless-functions'
   }
 }
 
@@ -177,7 +182,8 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-01-01' = {
   tags: {
     project: 'vimarsh'
     type: 'compute'
-    costCenter: 'beta-testing'
+    purpose: 'frontend-hosting'
+    costStrategy: 'free-tier'
   }
 }
 
@@ -192,16 +198,16 @@ resource staticWebAppSettings 'Microsoft.Web/staticSites/config@2023-01-01' = {
   }
 }
 
-// Budget Alert for Cost Management
+// Budget Alert for Cost Management - Single Environment Production
 resource budget 'Microsoft.Consumption/budgets@2023-05-01' = {
-  name: 'vimarsh-beta-budget'
+  name: 'vimarsh-production-budget'
   properties: {
     timePeriod: {
       startDate: '2024-01-01'
       endDate: '2025-12-31'
     }
     timeGrain: 'Monthly'
-    amount: 50  // $50 monthly budget for beta testing
+    amount: 100  // $100 monthly budget for production deployment
     category: 'Cost'
     notifications: {
       actual_GreaterThan_80_Percent: {
