@@ -1,0 +1,57 @@
+{
+  "task": "8.9 Configure Microsoft Entra External ID authentication",
+  "timestamp": "2025-06-26T01:30:20.594548",
+  "status": "configuration_complete",
+  "tenant_info": {
+    "tenant_name": "VED",
+    "tenant_domain": "VedID.onmicrosoft.com",
+    "resource_group": "ved-id-rg",
+    "tenant_type": "External ID"
+  },
+  "app_config": {
+    "app_name": "Vimarsh AI Agent",
+    "app_description": "Spiritual guidance AI agent with Lord Krishna persona",
+    "redirect_uris": [
+      "https://localhost:3000/auth/callback",
+      "https://vimarsh-app.azurestaticapps.net/auth/callback"
+    ],
+    "logout_uris": [
+      "https://localhost:3000/auth/logout",
+      "https://vimarsh-app.azurestaticapps.net/auth/logout"
+    ],
+    "scopes": [
+      "openid",
+      "profile",
+      "email",
+      "User.Read"
+    ],
+    "user_flows": {
+      "sign_up_sign_in": "B2C_1_vimarsh_signup_signin",
+      "profile_edit": "B2C_1_vimarsh_profile_edit",
+      "password_reset": "B2C_1_vimarsh_password_reset"
+    }
+  },
+  "configuration_files": [
+    "config/auth/app_registration.json",
+    "config/auth/frontend_auth_config.json",
+    "config/auth/backend_auth_config.json",
+    "config/auth/auth_environment_variables.json",
+    "config/auth/entra_external_id_auth.bicep",
+    "backend/auth/entra_external_id_middleware.py",
+    "config/auth/setup_instructions.md"
+  ],
+  "next_steps": [
+    "Register Vimarsh application in VED tenant (ved-id-rg)",
+    "Configure API permissions and generate client secret",
+    "Deploy authentication Bicep templates",
+    "Update environment variables with actual credentials",
+    "Test authentication flow in development environment"
+  ],
+  "benefits": [
+    "Reuses existing VED tenant and domain (cost savings)",
+    "Leverages Entra External ID for external user management",
+    "Provides secure JWT-based authentication",
+    "Integrates with both Static Web App and Azure Functions",
+    "Supports spiritual user community management"
+  ]
+}

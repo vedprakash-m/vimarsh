@@ -1,0 +1,142 @@
+{
+  "thresholds": [
+    {
+      "metric_type": "daily_budget",
+      "threshold_value": 10.0,
+      "alert_level": "warning",
+      "actions": [
+        "log_only",
+        "notify_admin"
+      ],
+      "notification_channels": [
+        "email",
+        "application_insights"
+      ],
+      "spiritual_message": "\ud83d\ude4f Divine guidance reminds us of mindful resource usage",
+      "cooldown_minutes": 30,
+      "enabled": true
+    },
+    {
+      "metric_type": "daily_budget",
+      "threshold_value": 15.0,
+      "alert_level": "critical",
+      "actions": [
+        "notify_admin",
+        "enable_caching",
+        "reduce_quality"
+      ],
+      "notification_channels": [
+        "email",
+        "application_insights"
+      ],
+      "spiritual_message": "\u26a0\ufe0f The path of wisdom includes conscious spending",
+      "cooldown_minutes": 15,
+      "enabled": true
+    },
+    {
+      "metric_type": "daily_budget",
+      "threshold_value": 20.0,
+      "alert_level": "emergency",
+      "actions": [
+        "throttle_requests",
+        "switch_model",
+        "block_expensive_operations"
+      ],
+      "notification_channels": [
+        "email",
+        "application_insights",
+        "slack"
+      ],
+      "spiritual_message": "\ud83d\uded1 Emergency protocols activated - seeking balance",
+      "cooldown_minutes": 5,
+      "enabled": true
+    },
+    {
+      "metric_type": "hourly_rate",
+      "threshold_value": 2.0,
+      "alert_level": "warning",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [
+        "application_insights"
+      ],
+      "spiritual_message": "\ud83d\udcca Observing the flow of resources",
+      "cooldown_minutes": 60,
+      "enabled": true
+    },
+    {
+      "metric_type": "hourly_rate",
+      "threshold_value": 5.0,
+      "alert_level": "critical",
+      "actions": [
+        "notify_admin",
+        "enable_caching"
+      ],
+      "notification_channels": [
+        "email",
+        "application_insights"
+      ],
+      "spiritual_message": "\u26a1 High energy usage detected - seeking efficiency",
+      "cooldown_minutes": 30,
+      "enabled": true
+    },
+    {
+      "metric_type": "user_cost",
+      "threshold_value": 5.0,
+      "alert_level": "warning",
+      "actions": [
+        "log_only",
+        "notify_admin"
+      ],
+      "notification_channels": [
+        "application_insights"
+      ],
+      "spiritual_message": "\ud83d\udc64 Individual usage pattern noted",
+      "cooldown_minutes": 120,
+      "enabled": true
+    },
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 0.01,
+      "alert_level": "warning",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [
+        "test"
+      ],
+      "spiritual_message": "Test validation message",
+      "cooldown_minutes": 5,
+      "enabled": true
+    },
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 0.01,
+      "alert_level": "warning",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [
+        "test"
+      ],
+      "spiritual_message": "Test validation message",
+      "cooldown_minutes": 5,
+      "enabled": true
+    },
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 0.01,
+      "alert_level": "warning",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [
+        "test"
+      ],
+      "spiritual_message": "Test validation message",
+      "cooldown_minutes": 5,
+      "enabled": true
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="section-title">
+            <i class="fas fa-books me-2"></i>
+            Books Registry
+        </h1>
+        <p class="text-muted">Manage your spiritual books collection</p>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="/add-book" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>
+            Add New Book
+        </a>
+        <button class="btn btn-outline-secondary" onclick="refreshData()">
+            <i class="fas fa-sync-alt me-2"></i>
+            Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Processed Books -->
+{% if books %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Processed Books ({{ books|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Content</th>
+                                <th>Embeddings</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in books %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong>{{ book.title }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ book.author }}</small>
+                                        <br>
+                                        <span class="badge bg-secondary">{{ book.book_code }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ book.type|title }}</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ book.status }}">
+                                        {{ book.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if book.status == 'success' %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 100%">
+                                                Complete
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 30%">
+                                                Processing
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>
+                                        <strong>Chapters:</strong> {{ book.chapters_processed or 0 }}<br>
+                                        <strong>Verses:</strong> {{ book.verses_processed or 0 }}<br>
+                                        <strong>Chunks:</strong> {{ book.chunks_created or 0 }}
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if book.embeddings_uploaded %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i>
+                                            {{ book.vectors_count or 0 }} vectors
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock"></i>
+                                            Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/books/{{ book.book_id }}" class="btn btn-outline-primary" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button class="btn btn-outline-secondary" onclick="enrichMetadata('{{ book.book_id }}')" title="Enrich Metadata">
+                                            <i class="fas fa-magic"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Planned Books -->
+{% if planned_books %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Planned Books ({{ planned_books|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Type</th>
+                                <th>Priority</th>
+                                <th>Added Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in planned_books %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong>{{ book.title }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ book.author or 'Unknown Author' }}</small>
+                                        <br>
+                                        <span class="badge bg-secondary">{{ book.book_id }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ book.type|title }}</span>
+                                </td>
+                                <td>
+                                    {% set priority_class = 'danger' if book.priority == 'high' else ('warning' if book.priority == 'medium' else 'success') %}
+                                    <span class="badge bg-{{ priority_class }}">
+                                        {{ book.priority|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if book.added_date %}
+                                        {{ book.added_date[:10] }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/books/{{ book.book_id }}" class="btn btn-outline-primary" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button class="btn btn-outline-success" onclick="promoteToProcessing('{{ book.book_id }}')" title="Start Processing">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Empty State -->
+{% if not books and not planned_books %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                <h4>No Books Yet</h4>
+                <p class="text-muted">Start by adding your first spiritual book to the registry</p>
+                <a href="/add-book" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Add Your First Book
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Metadata Enrichment Modal -->
+<div class="modal fade" id="enrichModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enrich Metadata</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="enrichForm">
+                    <div class="mb-3">
+                        <label for="webSources" class="form-label">Web Sources (URLs)</label>
+                        <textarea class="form-control" id="webSources" rows="4" 
+                                placeholder="Enter URLs, one per line"></textarea>
+                        <small class="form-text text-muted">
+                            Add URLs to scrape for additional metadata (descriptions, reviews, etc.)
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEnrichment()">
+                    <i class="fas fa-magic me-2"></i>
+                    Enrich Metadata
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentBookId = null;
+
+function refreshData() {
+    location.reload();
+}
+
+function enrichMetadata(bookId) {
+    currentBookId = bookId;
+    const modal = new bootstrap.Modal(document.getElementById('enrichModal'));
+    modal.show();
+}
+
+async function submitEnrichment() {
+    if (!currentBookId) return;
+    
+    const webSources = document.getElementById('webSources').value
+        .split('\n')
+        .map(url => url.trim())
+        .filter(url => url.length > 0);
+    
+    if (webSources.length === 0) {
+        alert('Please provide at least one web source URL');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/books/${currentBookId}/enrich`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({web_sources: webSources})
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Metadata enrichment completed successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('enrichModal')).hide();
+            refreshData();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Request failed: ' + error.message);
+    }
+}
+
+function promoteToProcessing(bookId) {
+    alert('Processing promotion feature coming soon! This will move the book from planned to processing queue.');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{
+  "AZURE_AD_TENANT_ID": "${TENANT_ID}",
+  "AZURE_AD_CLIENT_ID": "${CLIENT_ID}",
+  "AZURE_AD_CLIENT_SECRET": "${CLIENT_SECRET}",
+  "AZURE_AD_AUTHORITY": "https://login.microsoftonline.com/VedID.onmicrosoft.com",
+  "REACT_APP_AZURE_AD_CLIENT_ID": "${CLIENT_ID}",
+  "REACT_APP_AZURE_AD_AUTHORITY": "https://VedID.onmicrosoft.com/",
+  "REACT_APP_AZURE_AD_REDIRECT_URI": "https://localhost:3000/auth/callback",
+  "JWT_AUDIENCE": "${CLIENT_ID}",
+  "JWT_ISSUER": "https://login.microsoftonline.com/VedID.onmicrosoft.com/v2.0",
+  "JWT_JWKS_URI": "https://login.microsoftonline.com/VedID.onmicrosoft.com/discovery/v2.0/keys"
+}

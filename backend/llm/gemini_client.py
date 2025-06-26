@@ -13,6 +13,9 @@ import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import time
 
+# Import cost management system
+from ..cost_management.token_tracker import get_token_tracker, track_llm_usage
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -227,7 +230,9 @@ Your responses should:
     
     def generate_response(self, prompt: str, 
                          context: SpiritualContext = SpiritualContext.GENERAL,
-                         include_context: bool = True) -> GeminiResponse:
+                         include_context: bool = True,
+                         user_id: Optional[str] = None,
+                         session_id: Optional[str] = None) -> GeminiResponse:
         """
         Generate a spiritually appropriate response using Gemini Pro.
         
@@ -235,6 +240,8 @@ Your responses should:
             prompt: User's question or input
             context: Spiritual context for the response
             include_context: Whether to include spiritual system prompt
+            user_id: User ID for cost tracking
+            session_id: Session ID for cost tracking
             
         Returns:
             GeminiResponse with content and metadata
@@ -260,6 +267,42 @@ Your responses should:
             safety_ratings = {}
             finish_reason = "STOP"
             usage_metadata = {}
+            
+            # Extract usage metadata for token tracking
+            if hasattr(response, 'usage_metadata') and response.usage_metadata:
+                usage_metadata = {
+                    'input_tokens': getattr(response.usage_metadata, 'prompt_token_count', 0),
+                    'output_tokens': getattr(response.usage_metadata, 'candidates_token_count', 0),
+                    'total_tokens': getattr(response.usage_metadata, 'total_token_count', 0),
+                    'model_name': 'gemini-pro'
+                }
+            else:
+                # Fallback token estimation if usage not available
+                input_tokens = len(full_prompt.split()) * 1.3  # Rough estimation
+                output_tokens = len(content.split()) * 1.3 if content else 0
+                usage_metadata = {
+                    'input_tokens': int(input_tokens),
+                    'output_tokens': int(output_tokens),
+                    'total_tokens': int(input_tokens + output_tokens),
+                    'model_name': 'gemini-pro',
+                    'estimated': True
+                }
+            
+            # Track token usage for cost management
+            if usage_metadata.get('input_tokens', 0) > 0 or usage_metadata.get('output_tokens', 0) > 0:
+                try:
+                    tracker = get_token_tracker()
+                    tracker.track_usage(
+                        operation_type='spiritual_guidance',
+                        model_name=usage_metadata.get('model_name', 'gemini-pro'),
+                        input_tokens=usage_metadata.get('input_tokens', 0),
+                        output_tokens=usage_metadata.get('output_tokens', 0),
+                        user_id=user_id,
+                        session_id=session_id,
+                        spiritual_context=context.value
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to track token usage: {e}")
             
             # Extract safety ratings if available
             if hasattr(response, 'prompt_feedback') and response.prompt_feedback:

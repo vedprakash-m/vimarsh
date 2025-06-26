@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-06-26T01:25:17.603478",
+  "scriptures": {
+    "bhagavad_gita": {
+      "scripture_id": "bhagavad_gita",
+      "title": "Bhagavad Gita As It Is",
+      "author": "A.C. Bhaktivedanta Swami Prabhupada",
+      "type": "dialogue",
+      "language": "Sanskrit/English",
+      "scripture_code": "bg",
+      "source_format": "raw_json",
+      "embedding_model": "text-embedding-ada-002",
+      "status": "success",
+      "metadata_enriched": false,
+      "web_sources": [],
+      "chapters_processed": 18,
+      "verses_processed": 657,
+      "chunks_created": 1971,
+      "output_file": "/Users/vedprakashmishra/vimarsh/data/sources/bhagavad_gita_clean.jsonl",
+      "processed_date": "2025-06-26T01:19:37.727358",
+      "embeddings_uploaded": false,
+      "embedding_upload_date": "2025-06-26T01:25:17.593347",
+      "embedding_status": "dry_run"
+    },
+    "sri_isopanisad": {
+      "scripture_id": "sri_isopanisad",
+      "title": "Sri Isopanisad",
+      "author": "A.C. Bhaktivedanta Swami Prabhupada",
+      "type": "upanisad",
+      "language": "Sanskrit/English",
+      "scripture_code": "iso",
+      "source_format": "raw_json",
+      "embedding_model": "text-embedding-ada-002",
+      "status": "success",
+      "metadata_enriched": false,
+      "web_sources": [],
+      "chapters_processed": 1,
+      "verses_processed": 19,
+      "chunks_created": 57,
+      "output_file": "/Users/vedprakashmishra/vimarsh/data/sources/sri_isopanisad_clean.jsonl",
+      "processed_date": "2025-06-26T01:19:38.099938",
+      "embeddings_uploaded": false,
+      "embedding_upload_date": "2025-06-26T01:25:17.603441",
+      "embedding_status": "dry_run"
+    }
+  }
+}

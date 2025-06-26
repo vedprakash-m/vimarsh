@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-06-26T00:52:46.983125",
+  "books": {
+    "bhagavad_gita": {
+      "book_id": "bhagavad_gita",
+      "title": "Bhagavad Gita As It Is",
+      "author": "A.C. Bhaktivedanta Swami Prabhupada",
+      "type": "dialogue",
+      "language": "Sanskrit/English",
+      "book_code": "bg",
+      "source_format": "raw_json",
+      "embedding_model": "text-embedding-ada-002",
+      "status": "success",
+      "metadata_enriched": false,
+      "web_sources": [],
+      "chapters_processed": 18,
+      "verses_processed": 657,
+      "chunks_created": 1971,
+      "output_file": "/Users/vedprakashmishra/vimarsh/data/sources/bhagavad_gita_clean.jsonl",
+      "processed_date": "2025-06-26T00:52:46.023734"
+    },
+    "srimad_bhagavatam": {
+      "book_id": "srimad_bhagavatam",
+      "title": "Srimad Bhagavatam",
+      "author": "A.C. Bhaktivedanta Swami Prabhupada",
+      "type": "scripture",
+      "language": "Sanskrit/English",
+      "book_code": "sb",
+      "source_format": "raw_json",
+      "embedding_model": "text-embedding-ada-002",
+      "status": "success",
+      "metadata_enriched": false,
+      "web_sources": [],
+      "chapters_processed": 1,
+      "verses_processed": 0,
+      "chunks_created": 0,
+      "output_file": "/Users/vedprakashmishra/vimarsh/data/sources/srimad_bhagavatam_clean.jsonl",
+      "processed_date": "2025-06-26T00:52:46.968500"
+    },
+    "sri_isopanisad": {
+      "book_id": "sri_isopanisad",
+      "title": "Sri Isopanisad",
+      "author": "A.C. Bhaktivedanta Swami Prabhupada",
+      "type": "upanisad",
+      "language": "Sanskrit/English",
+      "book_code": "iso",
+      "source_format": "raw_json",
+      "embedding_model": "text-embedding-ada-002",
+      "status": "success",
+      "metadata_enriched": false,
+      "web_sources": [],
+      "chapters_processed": 1,
+      "verses_processed": 0,
+      "chunks_created": 0,
+      "output_file": "/Users/vedprakashmishra/vimarsh/data/sources/sri_isopanisad_clean.jsonl",
+      "processed_date": "2025-06-26T00:52:46.983031"
+    }
+  }
+}

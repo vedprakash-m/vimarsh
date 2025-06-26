@@ -1,0 +1,18 @@
+{
+  "auth": {
+    "clientId": "${CLIENT_ID}",
+    "authority": "https://VedID.onmicrosoft.com/",
+    "redirectUri": "https://localhost:3000/auth/callback",
+    "postLogoutRedirectUri": "https://localhost:3000/"
+  },
+  "cache": {
+    "cacheLocation": "sessionStorage",
+    "storeAuthStateInCookie": false
+  },
+  "system": {
+    "loggerOptions": {
+      "loggerCallback": "(level, message, containsPii) => { if (!containsPii) { console.log(message); } }",
+      "piiLoggingEnabled": false
+    }
+  }
+}

@@ -1,6 +1,5 @@
 # Azure Functions Core
 azure-functions==1.18.0
-azure-functions-worker==1.0.0
 
 # Azure Services
 azure-cosmos==4.5.1

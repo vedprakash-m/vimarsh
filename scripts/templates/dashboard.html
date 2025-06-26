@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="section-title">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Registry Dashboard
+        </h1>
+        <p class="text-muted">Manage and monitor your spiritual books collection</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="stat-number">{{ summary.statistics.total_books }}</div>
+                <div class="stat-label">Total Books</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="stat-number">{{ summary.statistics.processed_books }}</div>
+                <div class="stat-label">Processed</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="stat-number">{{ summary.statistics.vectorized_books }}</div>
+                <div class="stat-label">Vectorized</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="stat-number">{{ summary.statistics.planned_books }}</div>
+                <div class="stat-label">Planned</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-book-open fa-2x sacred-icon mb-2"></i>
+                <h5>{{ "{:,}".format(summary.statistics.total_chapters) }}</h5>
+                <small class="text-muted">Chapters</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-scroll fa-2x sacred-icon mb-2"></i>
+                <h5>{{ "{:,}".format(summary.statistics.total_verses) }}</h5>
+                <small class="text-muted">Verses</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-cubes fa-2x sacred-icon mb-2"></i>
+                <h5>{{ "{:,}".format(summary.statistics.total_chunks) }}</h5>
+                <small class="text-muted">RAG Chunks</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Distributions -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Status Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Content Types
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="typeChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Books -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Recent Books
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if summary.books %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Verses</th>
+                                    <th>Chunks</th>
+                                    <th>Vectors</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in summary.books[:5] %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ book.title }}</strong><br>
+                                        <small class="text-muted">{{ book.author }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-{{ book.status }}">
+                                            {{ book.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ book.verses_processed or 0 }}</td>
+                                    <td>{{ book.chunks_created or 0 }}</td>
+                                    <td>{{ book.vectors_count or 0 }}</td>
+                                    <td>
+                                        {% if book.processed_date %}
+                                            {{ book.processed_date[:10] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="/books/{{ book.book_id }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-book fa-3x mb-3"></i>
+                        <p>No books in registry yet</p>
+                        <a href="/add-book" class="btn btn-primary">Add Your First Book</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Registry Information -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Registry Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Version:</strong> {{ summary.registry_info.version }}<br>
+                        <strong>Last Updated:</strong> {{ summary.registry_info.last_updated[:19] }}<br>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Registry Path:</strong><br>
+                        <code>{{ summary.registry_info.registry_path }}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Status Distribution Chart
+const statusData = {{ summary.distributions.status | tojsonfilter }};
+const statusLabels = Object.keys(statusData);
+const statusValues = Object.values(statusData);
+
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: statusLabels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+        datasets: [{
+            data: statusValues,
+            backgroundColor: [
+                '#059669', // success - peaceful green
+                '#F59E0B', // planned - meditation gold
+                '#dc3545', // error - red
+                '#6b7280'  // other - gray
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Content Types Chart
+const typeData = {{ summary.distributions.content_types | tojsonfilter }};
+const typeLabels = Object.keys(typeData);
+const typeValues = Object.values(typeData);
+
+const typeCtx = document.getElementById('typeChart').getContext('2d');
+new Chart(typeCtx, {
+    type: 'bar',
+    data: {
+        labels: typeLabels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+        datasets: [{
+            data: typeValues,
+            backgroundColor: '#FF9933', // sacred saffron
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

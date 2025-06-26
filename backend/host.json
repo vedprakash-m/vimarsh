@@ -30,5 +30,13 @@
     "maxRetryCount": 3,
     "minimumInterval": "00:00:01",
     "maximumInterval": "00:00:10"
+  },
+  "extensions": {
+    "http": {
+      "routePrefix": "api",
+      "maxConcurrentRequests": 100,
+      "maxOutstandingRequests": 200,
+      "dynamicThrottlesEnabled": true
+    }
   }
 }

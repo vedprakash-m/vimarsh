@@ -1,0 +1,11 @@
+{
+  "tenant_id": "${TENANT_ID}",
+  "client_id": "${CLIENT_ID}",
+  "client_secret": "${CLIENT_SECRET}",
+  "authority": "https://login.microsoftonline.com/VedID.onmicrosoft.com",
+  "scope": [
+    "https://graph.microsoft.com/.default"
+  ],
+  "redirect_uri": "https://vimarsh-functions.azurewebsites.net/.auth/login/aad/callback",
+  "logout_uri": "https://vimarsh-functions.azurewebsites.net/.auth/logout"
+}

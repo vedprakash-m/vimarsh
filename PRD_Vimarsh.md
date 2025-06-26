@@ -202,9 +202,97 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 
 ---
 
-## 8. Team & Resource Requirements
+## 8. Content Management & Book Registry System
 
-### 8.1. Core Team Structure:
+### 8.1. Spiritual Books Registry
+
+A comprehensive book registry system is essential for managing the spiritual texts corpus, tracking processing status, and planning future expansions.
+
+**Registry Core Functions:**
+* **Book Inventory Management:** Maintain authoritative records of all spiritual texts in the system
+* **Processing Status Tracking:** Monitor the complete lifecycle from raw text to vector embeddings
+* **Metadata Enrichment:** Collect and manage additional information about each book (descriptions, difficulty levels, recommended audiences, etc.)
+* **Quality Assurance:** Track validation status, expert reviews, and content quality metrics
+* **Planned Books Queue:** Manage upcoming texts for processing, prioritization, and resource planning
+
+### 8.2. Admin Dashboard Interface
+
+**Target Users:**
+* **Content Managers:** Responsible for adding new books, monitoring processing status, and managing metadata
+* **Technical Administrators:** Monitor system health, vector database status, and processing pipeline performance
+* **Spiritual Content Experts:** Review and validate book metadata, recommend priority texts, and ensure cultural authenticity
+
+**Dashboard Core Features:**
+* **Registry Overview:** Real-time statistics on processed books, pending items, and system health
+* **Book Management Interface:** Add new books, edit metadata, track processing status, and manage planned texts
+* **Processing Pipeline Control:** Monitor and control the text processing, cleaning, chunking, and vectorization workflows
+* **Metadata Enrichment Tools:** Semi-automated systems for enhancing book information from web sources
+* **Quality Metrics Dashboard:** Track processing quality, chunk statistics, and vector database health
+
+### 8.3. Book Lifecycle Management
+
+**Planned → Processing → Processed → Vectorized → Published**
+
+1. **Planned Books Queue:**
+   - Title, author, type, priority level
+   - Estimated processing timeline
+   - Source material acquisition status
+   - Expert review assignments
+
+2. **Processing Status Tracking:**
+   - Text cleaning and spam removal progress
+   - Chapter and verse segmentation status
+   - RAG chunk creation metrics
+   - Quality validation checkpoints
+
+3. **Vector Database Integration:**
+   - Embedding generation status
+   - Upload to Azure Cosmos DB (MongoDB vCore)
+   - Vector search index health
+   - Performance optimization tracking
+
+4. **Metadata Enrichment:**
+   - Web scraping for additional context
+   - Expert annotations and recommendations
+   - Difficulty level assessments
+   - Cultural sensitivity validations
+
+### 8.4. Future Extensibility Considerations
+
+**Planned Enhancements:**
+* **Community Contributions:** Interface for expert submissions and community-driven metadata improvements
+* **Multi-language Support:** Registry extension for different language versions of texts
+* **Advanced Analytics:** Usage patterns, search effectiveness, and user engagement metrics per book
+* **API Integration:** Programmatic access for external tools and advanced management workflows
+* **Automated Quality Assurance:** ML-based content validation and quality scoring systems
+
+**Integration Points:**
+* **RAG Pipeline:** Seamless integration with existing text processing and vectorization workflows
+* **User Interface:** Registry data feeds into user-facing book recommendations and content discovery
+* **Analytics Platform:** Registry metrics contribute to overall system performance and usage analytics
+* **Cost Management:** Track processing costs and optimize resource allocation based on book priority and usage
+
+### 8.5. Data Architecture & Storage
+
+**Registry Data Structure:**
+* **Books Collection:** Core book metadata, processing status, and configuration
+* **Processing Logs:** Detailed tracking of each processing step with timestamps and results
+* **Metadata Sources:** Web sources, expert annotations, and enrichment history
+* **Quality Metrics:** Processing statistics, chunk quality scores, and validation results
+
+**Backup & Recovery:**
+* **Registry Backup:** Automated daily backups of the complete registry
+* **Processing Checkpoint Recovery:** Ability to resume processing from any stage
+* **Metadata Versioning:** Track changes to book metadata over time
+* **Disaster Recovery:** Complete system restoration capabilities
+
+> **Note:** Technical implementation details for the book registry system and admin dashboard are documented in `Tech_Spec_Vimarsh.md` Section 12. User interface specifications and admin user experience design are detailed in `User_Experience.md` Section 8.
+
+---
+
+## 9. Team & Resource Requirements
+
+### 9.1. Core Team Structure:
 
 **Technical Team (4-5 members):**
 * **Lead AI/ML Engineer (1):** RAG architecture, LLM integration, prompt engineering
@@ -223,7 +311,7 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 * **1-2 Spiritual Teachers:** Persona authenticity and tone guidance
 * **1 Legal Advisor:** Copyright, compliance, and regulatory guidance
 
-### 8.2. Skill Requirements:
+### 9.2. Skill Requirements:
 
 **Technical Skills:**
 * **AI/ML:** Experience with RAG systems, vector databases, modern AI frameworks
@@ -237,7 +325,7 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 * **Linguistic:** Native Hindi proficiency, translation quality assessment
 * **UX Design:** Experience with spiritual/wellness applications
 
-### 8.3. Organizational Structure:
+### 9.3. Organizational Structure:
 
 **Reporting Structure:**
 * **Project Lead/Technical Director:** Overall project coordination
@@ -253,17 +341,17 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 
 ---
 
-## 9. User Experience Requirements
+## 10. User Experience Requirements
 
 **Vimarsh is committed to providing an accessible, culturally sensitive, and high-quality user experience that honors the sacred nature of the content while remaining accessible to modern users.**
 
-### 9.1. Core UX Commitments:
+### 10.1. Core UX Commitments:
 
 * **Universal Accessibility:** Full WCAG 2.1 AA compliance for inclusive access across all abilities and devices
 * **Cultural Authenticity:** Respectful representation of Indian spiritual traditions with appropriate visual and interaction design
 * **Quality Assurance:** Comprehensive user feedback mechanisms and expert validation workflows to ensure response accuracy and spiritual authenticity
 
-### 9.2. Implementation Standards:
+### 10.2. Implementation Standards:
 
 * **Multi-Modal Support:** Seamless voice and text interaction options optimized for diverse user preferences and environments  
 * **Responsive Design:** Consistent experience across desktop, tablet, and mobile platforms
@@ -271,7 +359,7 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 
 > **Note:** Complete interface specifications, detailed user journeys, wireframes, interaction design patterns, accessibility implementation, and cultural sensitivity guidelines are comprehensively documented in `User_Experience.md`.
 
-### 9.3. User Feedback & Quality Assurance:
+### 10.3. User Feedback & Quality Assurance:
 
 * **Response Quality Validation:** Implement rating mechanisms to assess accuracy, relevance, and tone appropriateness
 * **Content Moderation:** Provide reporting mechanisms for inappropriate content or responses that violate spiritual guidelines
@@ -279,7 +367,7 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 
 > **Note:** Detailed interface specifications, user journeys, wireframes, and interaction design patterns are documented in `User_Experience.md`.
 
-### 9.4. UX Requirements Validation
+### 10.4. UX Requirements Validation
 
 **Integration with Business Requirements:**
 * **Accessibility Standards:** UX design implements WCAG 2.1 AA compliance to meet stated accessibility commitments
@@ -301,11 +389,11 @@ Community/Institutional| $25-50    | Organizations          | Multiple users, an
 
 ---
 
-## 10. Privacy & Security Enhancements
+## 11. Privacy & Security Enhancements
 
 User trust, especially with sensitive spiritual content and voice data, is paramount.
 
-### 10.1. Data Protection:
+### 11.1. Data Protection:
 
 * **Encryption Standards for Voice and Text Data:** All data in transit (user input to server, server to LLM, LLM to server) and at rest (if any temporary storage) must be encrypted using industry-standard protocols (e.g., TLS 1.2+, AES-256).
 * **Data Retention and Deletion Policies:** Implement a strict "no persistence" policy for user queries and responses. Voice inputs are immediately transcribed and deleted. Text queries and generated responses are processed in memory and *not stored* to maintain user privacy. If any temporary logging is needed for debugging/improvement, it must be anonymized and purged regularly.
@@ -314,11 +402,11 @@ User trust, especially with sensitive spiritual content and voice data, is param
 
 ---
 
-## 11. Risk Management & Mitigation
+## 12. Risk Management & Mitigation
 
 Proactive identification and mitigation of risks are critical for Vimarsh's success and reputation.
 
-### 11.1. Technical Risks:
+### 12.1. Technical Risks:
 
 * **LLM Hallucination Despite RAG Grounding:**
     * *Mitigation:* Strict prompt engineering (negative constraints, "answer only from context"), robust RAG retrieval (high *k*, diverse chunks), explicit "cannot answer" if not in text, and comprehensive expert review.
@@ -329,7 +417,7 @@ Proactive identification and mitigation of risks are critical for Vimarsh's succ
 * **System Downtime and Reliability:**
     * *Mitigation:* Use reliable cloud infrastructure for deployment. Implement monitoring and alerting. Design for basic redundancy where feasible for MVP.
 
-### 11.2. Content & Cultural Risks:
+### 12.2. Content & Cultural Risks:
 
 * **Misinterpretation of Sacred Texts:**
     * *Mitigation:* **Foremost risk.** Strict adherence to RAG grounding, relying on established public domain translations. Rigorous expert review panel to vet interpretation. Explicit disclaimer that AI provides interpretations, not definitive spiritual authority.
@@ -340,7 +428,7 @@ Proactive identification and mitigation of risks are critical for Vimarsh's succ
 * **Religious Community Acceptance:**
     * *Mitigation:* Early engagement with community leaders during alpha/beta. Demonstrate respect and fidelity. Highlight benefits of accessibility and preservation.
 
-### 11.3. Legal & Compliance Risks:
+### 12.3. Legal & Compliance Risks:
 
 * **Copyright Issues with Text Translations:**
     * *Mitigation:* **Strictly use public domain translations** (e.g., Kisari Mohan Ganguli for Mahabharata/Bhagavad Gita, well-established Upanishad translations). Meticulously document the public domain status of all ingested texts.
@@ -351,11 +439,11 @@ Proactive identification and mitigation of risks are critical for Vimarsh's succ
 
 ---
 
-## 12. Internationalization Strategy
+## 13. Internationalization Strategy
 
 Vimarsh has global appeal, necessitating a thoughtful approach to internationalization.
 
-### 12.1. Cultural Adaptation:
+### 13.1. Cultural Adaptation:
 
 * **Regional Variations in Spiritual Understanding:** Acknowledge that while texts are universal, their interpretation and emphasis might vary regionally. Focus on core philosophical principles rather than specific sectarian interpretations. Future iterations with localized RAG sources or persona variations could address this.
 * **Local Partnership Strategies:** As the project grows, explore partnerships with local spiritual organizations or educational institutions in different countries/regions to ensure cultural relevance and acceptance.
@@ -366,7 +454,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 
 ---
 
-## 13. Success Metrics & KPIs (MVP):
+## 14. Success Metrics & KPIs (MVP):
 
 * **Business Success Metrics:**
     * **User Acquisition:** Monthly Active Users (MAU), user growth rate, and retention metrics
@@ -387,9 +475,9 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 
 ---
 
-## 14. Legal & Compliance Framework
+## 15. Legal & Compliance Framework
 
-### 14.1. Intellectual Property & Copyright:
+### 15.1. Intellectual Property & Copyright:
 
 **Source Text Compliance:**
 * **Public Domain Verification:** Maintain comprehensive documentation of public domain status for all source texts
@@ -400,7 +488,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 * **Content Licensing:** Clear licensing terms for Vimarsh-generated content and responses
 * **Trademark Considerations:** Protection of "Vimarsh" brand and related intellectual property
 
-### 14.2. Data Privacy & Protection:
+### 15.2. Data Privacy & Protection:
 
 **Regulatory Compliance:**
 * **GDPR (European Users):**
@@ -421,7 +509,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 * **User Analytics:** Aggregated, anonymized usage statistics only
 * **Third-Party APIs:** Data processing agreements with all external services
 
-### 14.3. Content & Religious Compliance:
+### 15.3. Content & Religious Compliance:
 
 **Cultural Sensitivity Framework:**
 * **Religious Content Guidelines:** Non-dogmatic presentation of spiritual concepts
@@ -435,7 +523,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 * **User Reporting:** Accessible mechanisms for reporting concerns
 * **Correction Protocols:** Swift response to identified issues
 
-### 14.4. Terms of Service & User Agreements:
+### 15.4. Terms of Service & User Agreements:
 
 **Core Terms:**
 * **Service Description:** Clear explanation of AI-generated spiritual guidance
@@ -451,7 +539,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 * **Community Guidelines:** Standards for any future community features
 * **Content Policy:** Rules regarding user-generated content or feedback
 
-### 14.5. International Compliance:
+### 15.5. International Compliance:
 
 **Regional Considerations:**
 * **India:** Compliance with local cultural and religious sensitivities
@@ -467,9 +555,9 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 
 ---
 
-## 15. Enhanced Success Metrics Framework
+## 16. Enhanced Success Metrics Framework
 
-### 15.1. Product Performance Metrics:
+### 16.1. Product Performance Metrics:
 
 **Core Functionality:**
 * **Response Quality Metrics:**
@@ -495,7 +583,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - User retention rate (30-day): Target >60%
   - Net Promoter Score (NPS): Target >50
 
-### 15.2. Business & Growth Metrics:
+### 16.2. Business & Growth Metrics:
 
 **User Acquisition & Retention:**
 * **Growth Metrics:**
@@ -509,7 +597,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Session frequency: Track average sessions per user per week
   - Content exploration: Track variety of topics explored
 
-### 15.3. Content Quality & Cultural Metrics:
+### 16.3. Content Quality & Cultural Metrics:
 
 **Textual Fidelity:**
 * **RAG Performance:**
@@ -530,7 +618,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Cultural appropriateness in Hindi: Expert evaluation
   - User preference for Hindi vs. English: Track usage patterns
 
-### 15.4. Risk & Compliance Metrics:
+### 16.4. Risk & Compliance Metrics:
 
 **Content Safety:**
 * **Error Rates:**
@@ -544,7 +632,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Legal disclaimer prominence: User acknowledgment rates
   - Expert review coverage: Percentage of responses reviewed
 
-### 15.5. Technical Infrastructure Metrics:
+### 16.5. Technical Infrastructure Metrics:
 
 **System Performance:**
 * **Reliability:**
@@ -558,7 +646,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Infrastructure cost per user: Track efficiency improvements
   - API rate limit utilization: Monitor service usage patterns
 
-### 15.6. Measurement & Reporting:
+### 16.6. Measurement & Reporting:
 
 **Data Collection Methods:**
 * **Automated Metrics:** System logging, user analytics, performance monitoring
@@ -574,9 +662,9 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
 
 ---
 
-## 16. Future Iterations & Expansion Roadmap
+## 17. Future Iterations & Expansion Roadmap
 
-### 16.1. Iteration 2: Expanding Divine Personalities (Months 13-18)
+### 17.1. Iteration 2: Expanding Divine Personalities (Months 13-18)
 
 **Lord Rama Integration:**
 * **Technical Development:**
@@ -597,7 +685,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Persona-specific UI themes and visual elements
   - Voice modulation for different divine personalities (future consideration)
 
-### 16.2. Iteration 3: Broader Textual Integration (Months 19-24)
+### 17.2. Iteration 3: Broader Textual Integration (Months 19-24)
 
 **Extended Corpus:**
 * **Upanishads Integration:**
@@ -623,7 +711,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Multilingual testing framework
   - Cultural sensitivity validation protocols
 
-### 16.3. Iteration 4: Advanced Features & Community (Months 25-30)
+### 17.3. Iteration 4: Advanced Features & Community (Months 25-30)
 
 **Guided Learning Experiences:**
 * **Wisdom Journeys:**
@@ -649,7 +737,7 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Academic research collaboration tools
   - Scholarly citation and reference systems
 
-### 16.4. Long-term Vision (Months 31+)
+### 17.4. Long-term Vision (Months 31+)
 
 **Immersive Experiences:**
 * **Virtual Environments:**
@@ -686,5 +774,3 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Academic research tools and datasets
   - Cross-cultural philosophical dialogue facilitation
   - Global spiritual heritage documentation and accessibility
-
----

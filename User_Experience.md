@@ -416,8 +416,8 @@ Voice Recording:
 Voice Playback:
 ┌─────────────────────────┐
 │ 🔊 Playing Response     │
-│ ▶️ ━━━━━●━━━━━━━ 2:34   │
-│                         │
+│ ▶️ ━━━━━●━━━━━━━━━━━━━━━━━ 3:42        │
+│                                         │
 │ Speed: [1x] [1.5x] [2x] │
 │ [⏸️] [⏪] [⏩] [🔄]     │
 └─────────────────────────┘
@@ -648,9 +648,269 @@ Content Respect:
 
 ---
 
-## 8. Performance & Technical UX
+## 8. Admin Interface & Content Management
 
-### 8.1. Loading & Response States
+### 8.1. Admin Dashboard Overview
+
+**Purpose:** Comprehensive management interface for content administrators, spiritual experts, and technical staff to manage the book registry, monitor system performance, and maintain content quality.
+
+**Access Control:**
+- **Super Admin:** Full system access, user management, configuration changes
+- **Content Manager:** Book registry management, metadata editing, processing control
+- **Spiritual Expert:** Content validation, quality review, metadata enrichment
+- **Technical Admin:** System monitoring, performance metrics, troubleshooting
+
+### 8.2. Book Registry Management Interface
+
+#### 8.2.1. Dashboard Overview Screen
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ [Logo] Vimarsh Admin              [Profile] [Settings] [Logout] │
+├─────────────────────────────────────────────────────────────┤
+│                     Registry Statistics                      │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │ Total Books │ │ Processed   │ │ Vectorized  │ │ Planned     │ │
+│ │     15      │ │     12      │ │     10      │ │      8      │ │
+│ └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│                      Content Metrics                        │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │
+│ │  Chapters   │ │   Verses    │ │ RAG Chunks  │ │   Vectors   │ │
+│ │    247      │ │   12,450    │ │   37,350    │ │   35,120    │ │
+│ └─────────────┴─────────────┴─────────────┴─────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│                    Recent Activity                          │
+│ • Bhagavad Gita processing completed (2 hours ago)          │
+│ • Srimad Bhagavatam vectorization in progress (4 hours ago) │
+│ • New planned book added: Yoga Sutras (1 day ago)          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key Features:**
+- **Real-time Statistics:** Live updates of processing status and content metrics
+- **Visual Progress Indicators:** Progress bars for ongoing processing tasks
+- **Status Distribution Charts:** Pie charts showing book status and content type distribution
+- **Activity Feed:** Chronological log of recent system activities and changes
+
+#### 8.2.2. Books Management Screen
+
+**Primary Interface Elements:**
+- **Filter Controls:** Status (All, Processed, Planned, Processing), Type (Scripture, Dialogue, Upanisad), Priority
+- **Search Functionality:** Full-text search across book titles, authors, and metadata
+- **Bulk Actions:** Multi-select operations for batch processing and updates
+- **Add Book Button:** Prominent CTA for adding new planned books
+
+**Book List Table:**
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Book Title              │ Status    │ Progress │ Content      │ Actions       │
+│                        │           │          │              │               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 📖 Bhagavad Gita As It Is │ ✅ Success │ [████████] │ 18 Ch, 700 V │ 👁️ 🔧 🔍     │
+│ 📚 A.C. Bhaktivedanta...   │           │ 100%     │ 2,100 Chunks │               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 📿 Srimad Bhagavatam      │ 🔄 Processing │ [████░░░░] │ 12 Cantos   │ 👁️ ⏸️ 📊     │
+│ 📚 A.C. Bhaktivedanta...   │              │ 60%      │ Processing   │               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 🕉️ Sri Isopanisad         │ 📅 Planned   │ [░░░░░░░░] │ High Priority │ 👁️ ▶️ 📝     │
+│ 📚 A.C. Bhaktivedanta...   │              │ 0%       │ Awaiting     │               │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Action Icons:**
+- 👁️ **View Details:** Open detailed book information page
+- 🔧 **Edit Metadata:** Quick metadata editing interface
+- 🔍 **Search Test:** Test vector search functionality for the book
+- ⏸️ **Pause Processing:** Pause ongoing processing tasks
+- ▶️ **Start Processing:** Begin processing for planned books
+- 📊 **View Analytics:** Book-specific analytics and metrics
+- 📝 **Add Notes:** Add administrative notes and comments
+
+#### 8.2.3. Add New Book Interface
+
+**Multi-step Form Design:**
+
+**Step 1: Basic Information**
+```
+┌─────────────────────────────────────────────────────┐
+│                  Add New Book                       │
+├─────────────────────────────────────────────────────┤
+│ Book Title: [________________________]              │
+│ Author:     [________________________]              │
+│ Book ID:    [________________________] (auto-gen)   │
+│ Type:       [Dropdown: Scripture ▼]                 │
+│ Language:   [Sanskrit/English______]                │
+│ Priority:   [○ High ● Medium ○ Low]                  │
+├─────────────────────────────────────────────────────┤
+│                [Cancel] [Next Step →]               │
+└─────────────────────────────────────────────────────┘
+```
+
+**Step 2: Metadata & Classification**
+```
+┌─────────────────────────────────────────────────────┐
+│              Book Metadata                          │
+├─────────────────────────────────────────────────────┤
+│ Description: [_________________________________]    │
+│             [_________________________________]    │
+│                                                     │
+│ Tags:        [devotion, philosophy, ethics_____]    │
+│                                                     │
+│ Recommended For: [beginners, practitioners_____]    │
+│                                                     │
+│ Difficulty: [Dropdown: Intermediate ▼]             │
+│                                                     │
+│ Web Sources: [________________________________]     │
+│             [________________________________]     │
+│             [+ Add Another URL]                     │
+├─────────────────────────────────────────────────────┤
+│             [← Back] [Add to Registry]              │
+└─────────────────────────────────────────────────────┘
+```
+
+#### 8.2.4. Book Detail Page
+
+**Comprehensive Book Management Interface:**
+
+**Header Section:**
+- Book title, author, and status badge
+- Last updated timestamp and processing progress
+- Quick action buttons (Edit, Process, Delete, Duplicate)
+
+**Information Tabs:**
+1. **Overview:** Basic information, description, tags, and classification
+2. **Processing:** Detailed processing status, logs, and metrics
+3. **Content:** Chapter/verse breakdown, chunk statistics, quality metrics
+4. **Embeddings:** Vector status, model information, search testing
+5. **Metadata:** Web sources, enrichment history, expert annotations
+6. **Analytics:** Usage statistics, search performance, user engagement
+
+**Processing Status Panel:**
+```
+┌─────────────────────────────────────────────────────┐
+│              Processing Pipeline                    │
+├─────────────────────────────────────────────────────┤
+│ 1. Text Cleaning     [✅] Completed (2 hours ago)   │
+│ 2. Chapter Parsing   [✅] Completed (2 hours ago)   │
+│ 3. Verse Extraction  [✅] Completed (1 hour ago)    │
+│ 4. RAG Chunking      [✅] Completed (1 hour ago)    │
+│ 5. Embedding Gen     [🔄] In Progress (45 min)     │
+│ 6. Vector Upload     [⏳] Pending                   │
+│ 7. Index Creation    [⏳] Pending                   │
+├─────────────────────────────────────────────────────┤
+│ Current Status: Generating embeddings (60% complete) │
+│ Estimated Time: 25 minutes remaining               │
+│ [Pause] [View Logs] [Restart from Step]            │
+└─────────────────────────────────────────────────────┘
+```
+
+### 8.3. Content Quality & Validation Interface
+
+#### 8.3.1. Expert Review Dashboard
+
+**For Spiritual Content Experts:**
+
+**Review Queue Interface:**
+- **Pending Reviews:** Books awaiting expert validation
+- **Priority Flagging:** Content requiring urgent review
+- **Quality Scoring:** Tools for rating content accuracy and appropriateness
+- **Annotation System:** Add expert notes and recommendations
+
+**Content Validation Tools:**
+- **Side-by-side Comparison:** Original text vs. processed content
+- **Citation Verification:** Check accuracy of source references
+- **Cultural Sensitivity Review:** Ensure appropriate representation
+- **Translation Quality Assessment:** For multilingual content
+
+#### 8.3.2. Metadata Enrichment Interface
+
+**Web Source Integration:**
+- **URL Input Panel:** Add web sources for automated scraping
+- **Content Preview:** Review scraped content before integration
+- **Metadata Mapping:** Map scraped content to registry fields
+- **Quality Validation:** Expert approval of enriched metadata
+
+**Semi-automated Enhancement:**
+- **Difficulty Level Suggestions:** AI-powered difficulty assessment
+- **Tag Recommendations:** Automated tag suggestions based on content
+- **Related Books Discovery:** Identify connections between texts
+- **Audience Targeting:** Suggest appropriate user segments
+
+### 8.4. System Monitoring & Analytics
+
+#### 8.4.1. Real-time System Dashboard
+
+**Performance Metrics:**
+- **Processing Queue Status:** Current processing tasks and estimated completion
+- **Vector Database Health:** Storage utilization, index performance, query response times
+- **API Usage Monitoring:** OpenAI API calls, costs, and rate limiting
+- **System Resource Utilization:** CPU, memory, and storage usage
+
+**Cost Monitoring:**
+- **Real-time Cost Tracking:** Current spending on AI APIs and cloud services
+- **Budget Alerts:** Configurable thresholds for cost management
+- **Usage Projections:** Forecasted costs based on current usage patterns
+- **Cost Optimization Recommendations:** Suggestions for reducing operational expenses
+
+#### 8.4.2. Content Analytics Dashboard
+
+**Usage Statistics:**
+- **Book Popularity:** Most queried books and content types
+- **Search Performance:** Vector search accuracy and relevance scores
+- **User Engagement:** Content that generates the most follow-up questions
+- **Quality Metrics:** Processing success rates and error analysis
+
+**Content Performance:**
+- **Response Quality Scores:** User satisfaction ratings for different books
+- **Citation Accuracy:** Frequency and accuracy of source references
+- **Processing Efficiency:** Time and resource consumption per book
+- **User Feedback Integration:** Incorporation of user suggestions and corrections
+
+### 8.5. Admin Interface Design Principles
+
+#### 8.5.1. Sacred Aesthetics in Admin Tools
+
+**Visual Design Language:**
+- **Color Palette:** Consistent with user-facing interface (Sacred Saffron, Krishna Blue)
+- **Typography:** Clear, professional fonts with sacred text highlighting
+- **Iconography:** Respectful use of spiritual symbols in navigation and actions
+- **Sacred Geometry:** Subtle incorporation of traditional patterns in layouts
+
+#### 8.5.2. Efficiency & Workflow Optimization
+
+**Streamlined Operations:**
+- **Keyboard Shortcuts:** Quick access to common admin functions
+- **Bulk Operations:** Efficient management of multiple books simultaneously
+- **Contextual Menus:** Right-click actions for quick access to relevant functions
+- **Progressive Disclosure:** Show advanced options only when needed
+
+**Intelligent Defaults:**
+- **Smart Form Filling:** Auto-completion based on previous entries
+- **Template System:** Pre-defined configurations for common book types
+- **Workflow Automation:** Automated progression through processing stages
+- **Error Prevention:** Validation and confirmation for critical operations
+
+#### 8.5.3. Accessibility & Inclusivity
+
+**Universal Design:**
+- **WCAG 2.1 AA Compliance:** Full accessibility for users with disabilities
+- **Multilingual Support:** Admin interface available in multiple languages
+- **Responsive Design:** Optimal experience across desktop, tablet, and mobile
+- **High Contrast Mode:** Alternative color schemes for visual accessibility
+
+**Expert-friendly Features:**
+- **Sanskrit Text Support:** Proper rendering of Devanagari script
+- **Citation Tools:** Easy reference formatting and verification
+- **Collaboration Features:** Multi-user editing and review workflows
+- **Version Control:** Track changes and maintain content history
+
+---
+
+## 9. Performance & Technical UX
+
+### 9.1. Loading & Response States
 
 #### Progressive Loading Strategy
 ```
@@ -678,7 +938,7 @@ Offline Features:
 - Graceful degradation messaging
 ```
 
-### 8.2. Error Handling & Recovery
+### 9.2. Error Handling & Recovery
 
 #### Error State Design
 ```
@@ -706,9 +966,9 @@ Service Error:
 
 ---
 
-## 9. Content Strategy & Information Design
+## 10. Content Strategy & Information Design
 
-### 9.1. Content Hierarchy & Typography
+### 10.1. Content Hierarchy & Typography
 
 #### Sacred Text Presentation
 ```
@@ -744,7 +1004,7 @@ Source Credibility:
 - Community validation metrics
 ```
 
-### 9.2. Personalization & Customization
+### 10.2. Personalization & Customization
 
 #### User Preference Settings
 ```
@@ -766,56 +1026,6 @@ Interface Customization:
 │ ☑️ Enable voice shortcuts               │
 │ ☐ High contrast mode                    │
 └─────────────────────────────────────────┘
-```
-
----
-
-## 10. Platform-Specific Considerations
-
-### 10.1. Progressive Web App (PWA) Features
-
-#### Installation & App-like Experience
-```
-PWA Capabilities:
-- Install prompt for desktop/mobile
-- Offline conversation caching
-- Push notifications for daily wisdom (optional)
-- Native sharing integration
-- Full-screen mode support
-
-Installation Flow:
-1. Usage threshold trigger (3+ sessions)
-2. Native install banner
-3. Custom install prompt in app
-4. Installation completion confirmation
-5. Onboarding for PWA features
-```
-
-#### Native Device Integration
-```
-Device Features:
-- Camera access for text recognition (future)
-- Microphone permission management
-- Speaker/headphone audio optimization
-- Notification permission handling
-- Home screen icon customization
-```
-
-### 10.2. Cross-Platform Consistency
-
-#### Design System Adaptation
-```
-Responsive Breakpoints:
-- Mobile: 320px - 768px
-- Tablet: 768px - 1024px
-- Desktop: 1024px - 1440px
-- Large Desktop: 1440px+
-
-Component Scaling:
-- Proportional spacing system (8px grid)
-- Flexible typography scales
-- Adaptive icon sizes
-- Context-aware navigation patterns
 ```
 
 ---
