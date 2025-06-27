@@ -1,0 +1,286 @@
+name: 🧪 Vimarsh Optimized Test Suite
+
+"on":
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_call:
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '18'
+
+jobs:
+  # Fast validation job - runs first to catch obvious issues quickly
+  fast-validation:
+    name: ⚡ Fast Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 📦 Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: 🔧 Install minimal dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-timeout
+        pip install -r requirements.txt
+
+    - name: ⚡ Run fast smoke tests
+      run: |
+        cd backend
+        python -m pytest tests/test_basic_integration.py -v --timeout=30
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+  # Parallel test execution for maximum speed
+  backend-parallel-tests:
+    name: 🐍 Backend Tests (${{ matrix.test-group }})
+    runs-on: ubuntu-latest
+    needs: fast-validation
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        test-group: [
+          "unit-core",
+          "unit-llm", 
+          "unit-monitoring",
+          "unit-voice",
+          "integration",
+          "e2e"
+        ]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 📦 Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: 🔧 Install backend dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio pytest-timeout pytest-xdist
+
+    - name: 🧪 Run test group - unit-core
+      if: matrix.test-group == 'unit-core'
+      run: |
+        cd backend
+        python -m pytest tests/test_basic_integration.py tests/test_spiritual_guidance_api.py tests/test_rag_pipeline.py tests/test_cost_management.py -v --tb=short --cov=spiritual_guidance --cov=rag_pipeline --cov=cost_management --cov-report=xml:coverage-unit-core.xml --timeout=120
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🧪 Run test group - unit-llm
+      if: matrix.test-group == 'unit-llm'
+      run: |
+        cd backend
+        python -m pytest tests/test_llm_integration_comprehensive.py -v --tb=short --cov=llm --cov-report=xml:coverage-unit-llm.xml --timeout=120
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🧪 Run test group - unit-monitoring
+      if: matrix.test-group == 'unit-monitoring'
+      run: |
+        cd backend
+        python -m pytest tests/test_monitoring_comprehensive.py -v --tb=short --cov=monitoring --cov-report=xml:coverage-unit-monitoring.xml --timeout=120
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🧪 Run test group - unit-voice
+      if: matrix.test-group == 'unit-voice'
+      run: |
+        cd backend
+        python -m pytest tests/test_voice_interface_comprehensive.py -v --tb=short --cov=voice --cov-report=xml:coverage-unit-voice.xml --timeout=120
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🧪 Run test group - integration
+      if: matrix.test-group == 'integration'
+      run: |
+        cd backend
+        python -m pytest tests/test_integration_rag_llm.py tests/test_llm_workflow_integration.py tests/test_end_to_end_workflow.py -v --tb=short --cov=. --cov-report=xml:coverage-integration.xml --timeout=180
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 🧪 Run test group - e2e
+      if: matrix.test-group == 'e2e'
+      run: |
+        cd backend
+        python -m pytest tests/e2e/ -v --tb=short --timeout=300
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+    - name: 📊 Upload coverage
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        file: backend/coverage-${{ matrix.test-group }}.xml
+        flags: backend-${{ matrix.test-group }}
+        name: backend-${{ matrix.test-group }}
+
+  frontend-parallel-tests:
+    name: ⚛️ Frontend Tests
+    runs-on: ubuntu-latest
+    needs: fast-validation
+    timeout-minutes: 10
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 📦 Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci --prefer-offline
+
+    - name: 🧪 Run frontend tests
+      run: |
+        cd frontend
+        npm run test:coverage
+      env:
+        CI: true
+
+    - name: 📊 Upload frontend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  # Security and quality checks run in parallel
+  security-quality-checks:
+    name: 🔒 Security & Quality
+    runs-on: ubuntu-latest
+    needs: fast-validation
+    timeout-minutes: 8
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔒 Run Semgrep security scan
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: auto
+
+    - name: 🐍 Python security scan
+      uses: pypa/gh-action-pip-audit@v1.0.8
+      with:
+        inputs: backend/requirements.txt
+
+  quality-gates:
+    name: 🎯 Quality Gates
+    runs-on: ubuntu-latest
+    needs: [backend-parallel-tests, frontend-parallel-tests, security-quality-checks]
+    timeout-minutes: 5
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🎯 Check overall status
+      run: |
+        echo "Checking quality gates..."
+        if [[ "${{ needs.backend-parallel-tests.result }}" == "success" && "${{ needs.frontend-parallel-tests.result }}" == "success" && "${{ needs.security-quality-checks.result }}" == "success" ]]; then
+          echo "🎉 All quality gates passed!"
+          echo "✅ Test pass rate: 100%"
+          echo "✅ Security scan: Clean"
+          echo "🚀 Ready for deployment!"
+        else
+          echo "⛔ Quality gates failed!"
+          echo "❌ Backend tests: ${{ needs.backend-parallel-tests.result }}"
+          echo "❌ Frontend tests: ${{ needs.frontend-parallel-tests.result }}"
+          echo "❌ Security checks: ${{ needs.security-quality-checks.result }}"
+          echo "🚫 Not ready for deployment"
+          exit 1
+        fi
+
+  # Performance regression tests (optional, only on main branch)
+  performance-tests:
+    name: 🚀 Performance Tests
+    runs-on: ubuntu-latest
+    needs: fast-validation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 12
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 🔧 Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install pytest-benchmark
+
+    - name: 🚀 Run performance tests
+      run: |
+        cd backend
+        python -m pytest tests/performance/ -v --benchmark-only
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+
+  # Summary job for easy status checking
+  test-summary:
+    name: 📋 Test Summary
+    runs-on: ubuntu-latest
+    needs: [quality-gates, performance-tests]
+    if: always()
+    
+    steps:
+    - name: 📋 Print test summary
+      run: |
+        echo "# Vimarsh Test Suite Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Results:" >> $GITHUB_STEP_SUMMARY
+        echo "- Quality Gates: ${{ needs.quality-gates.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Performance Tests: ${{ needs.performance-tests.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ needs.quality-gates.result }}" == "success" ]]; then
+          echo "✅ **All tests passed! Ready for deployment.**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Tests failed. Please review and fix issues.**" >> $GITHUB_STEP_SUMMARY
+        fi

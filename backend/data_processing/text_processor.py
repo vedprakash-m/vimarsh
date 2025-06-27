@@ -1,0 +1,407 @@
+"""
+Spiritual Text Processor for Vimarsh AI Agent
+
+Comprehensive text processing capabilities for spiritual content including
+Sanskrit text handling, verse-aware chunking, and cultural preservation.
+"""
+
+import re
+import logging
+from typing import List, Dict, Any, Optional, Tuple
+from pathlib import Path
+import unicodedata
+
+logger = logging.getLogger(__name__)
+
+
+class SpiritualTextProcessor:
+    """
+    Advanced text processor specifically designed for spiritual and religious content.
+    
+    Handles Sanskrit Unicode, verse boundaries, cultural terminology preservation,
+    and maintains spiritual context during preprocessing.
+    """
+    
+    def __init__(self):
+        """Initialize the spiritual text processor with cultural patterns."""
+        # Sanskrit/Devanagari Unicode ranges
+        self.sanskrit_patterns = {
+            'devanagari': r'[\u0900-\u097F]+',
+            'vedic_extensions': r'[\u1CD0-\u1CFF]+',
+            'combining_marks': r'[\u0300-\u036F]+',
+        }
+        
+        # Spiritual terminology to preserve
+        self.sacred_terms = {
+            'english': [
+                'dharma', 'karma', 'moksha', 'samsara', 'atman', 'brahman',
+                'yoga', 'yogi', 'guru', 'ashram', 'mantra', 'meditation',
+                'krishna', 'arjuna', 'vishnu', 'shiva', 'devi', 'gita',
+                'upanishad', 'vedas', 'purana', 'bhagavatam', 'mahabharata'
+            ],
+            'sanskrit': [
+                'श्री', 'भगवान्', 'अर्जुन', 'कृष्ण', 'धर्म', 'कर्म', 'योग',
+                'आत्मा', 'ब्रह्म', 'मोक्ष', 'संसार', 'गुरु', 'मन्त्र'
+            ]
+        }
+        
+        # Verse and chapter patterns
+        self.structural_patterns = {
+            'chapter': r'(?:Chapter|अध्याय)\s*(\d+)',
+            'verse': r'(?:Verse|श्लोक)\s*(\d+)',
+            'section': r'(?:Section|खण्ड)\s*(\d+)',
+            'canto': r'(?:Canto|स्कन्द)\s*(\d+)'
+        }
+    
+    def normalize_unicode(self, text: str) -> str:
+        """
+        Normalize Unicode text while preserving Sanskrit/Devanagari.
+        
+        Args:
+            text: Input text with potential Unicode issues
+            
+        Returns:
+            Normalized text with proper Sanskrit preservation
+        """
+        # Normalize to NFC form (canonical decomposition + canonical composition)
+        normalized = unicodedata.normalize('NFC', text)
+        
+        # Remove excessive whitespace but preserve spiritual formatting
+        normalized = re.sub(r'\s+', ' ', normalized)
+        normalized = re.sub(r'\n\s*\n\s*\n+', '\n\n', normalized)
+        
+        return normalized.strip()
+    
+    def preserve_sacred_terms(self, text: str) -> str:
+        """
+        Ensure sacred terms are properly preserved and not corrupted.
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Text with protected sacred terminology
+        """
+        # Create a mapping for case-insensitive preservation
+        preserved_text = text
+        
+        for lang, terms in self.sacred_terms.items():
+            for term in terms:
+                # Case-insensitive replacement while preserving original case
+                pattern = re.compile(re.escape(term), re.IGNORECASE)
+                preserved_text = pattern.sub(term, preserved_text)
+        
+        return preserved_text
+    
+    def extract_structural_info(self, text: str) -> Dict[str, Any]:
+        """
+        Extract structural information like chapter, verse numbers.
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Dictionary with structural metadata
+        """
+        structure = {
+            'chapters': [],
+            'verses': [],
+            'sections': [],
+            'cantos': []
+        }
+        
+        for struct_type, pattern in self.structural_patterns.items():
+            matches = re.finditer(pattern, text, re.IGNORECASE)
+            for match in matches:
+                if struct_type == 'chapter':
+                    structure['chapters'].append(int(match.group(1)))
+                elif struct_type == 'verse':
+                    structure['verses'].append(int(match.group(1)))
+                elif struct_type == 'section':
+                    structure['sections'].append(int(match.group(1)))
+                elif struct_type == 'canto':
+                    structure['cantos'].append(int(match.group(1)))
+        
+        return structure
+    
+    def clean_text(self, text: str) -> str:
+        """
+        Clean and normalize text while preserving spiritual context.
+        
+        Args:
+            text: Raw input text
+            
+        Returns:
+            Cleaned text
+        """
+        # Normalize Unicode
+        cleaned = self.normalize_unicode(text)
+        
+        # Preserve sacred terms
+        cleaned = self.preserve_sacred_terms(cleaned)
+        
+        # Remove unnecessary punctuation but preserve important marks
+        # Keep colons for verse references, preserve Sanskrit punctuation
+        cleaned = re.sub(r'[^\w\s\u0900-\u097F\u1CD0-\u1CFF:.;,!?()-]', '', cleaned)
+        
+        # Normalize spacing around punctuation
+        cleaned = re.sub(r'\s*([:.;,!?])\s*', r'\1 ', cleaned)
+        cleaned = re.sub(r'\s+', ' ', cleaned)
+        
+        return cleaned.strip()
+    
+    def segment_by_verses(self, text: str) -> List[Dict[str, Any]]:
+        """
+        Segment text by verse boundaries for spiritual texts.
+        
+        Args:
+            text: Input spiritual text
+            
+        Returns:
+            List of verse segments with metadata
+        """
+        verses = []
+        
+        # Split by common verse patterns
+        verse_pattern = r'(?:(?:Chapter|अध्याय)\s*\d+[.,:]?\s*)?(?:Verse|श्लोक)\s*(\d+)[.,:]?\s*([^(?:Verse|श्लोक)]*?)(?=(?:Verse|श्लोक)|\Z)'
+        
+        matches = re.finditer(verse_pattern, text, re.IGNORECASE | re.DOTALL)
+        
+        for match in matches:
+            verse_num = match.group(1)
+            verse_text = match.group(2).strip()
+            
+            if verse_text:
+                verses.append({
+                    'verse_number': int(verse_num),
+                    'text': verse_text,
+                    'type': 'verse',
+                    'metadata': self.extract_structural_info(match.group(0))
+                })
+        
+        # If no verses found, return as single segment
+        if not verses:
+            verses.append({
+                'verse_number': 1,
+                'text': text,
+                'type': 'text_block',
+                'metadata': self.extract_structural_info(text)
+            })
+        
+        return verses
+    
+    def chunk_text(self, text: str, chunk_size: int = 512, overlap: int = 50) -> List[Dict[str, Any]]:
+        """
+        Intelligent chunking that respects verse boundaries and spiritual structure.
+        
+        Args:
+            text: Input text to chunk
+            chunk_size: Target chunk size in characters
+            overlap: Overlap between chunks
+            
+        Returns:
+            List of text chunks with metadata
+        """
+        # First try to segment by verses
+        verses = self.segment_by_verses(text)
+        chunks = []
+        
+        current_chunk = ""
+        current_metadata = {}
+        chunk_id = 0
+        
+        for verse in verses:
+            verse_text = verse['text']
+            
+            # If verse fits in current chunk
+            if len(current_chunk) + len(verse_text) <= chunk_size:
+                current_chunk += verse_text + " "
+                current_metadata.update(verse['metadata'])
+            else:
+                # Save current chunk if it has content
+                if current_chunk.strip():
+                    chunks.append({
+                        'id': chunk_id,
+                        'text': current_chunk.strip(),
+                        'metadata': current_metadata,
+                        'type': 'verse_chunk'
+                    })
+                    chunk_id += 1
+                
+                # Start new chunk
+                current_chunk = verse_text + " "
+                current_metadata = verse['metadata'].copy()
+        
+        # Add final chunk
+        if current_chunk.strip():
+            chunks.append({
+                'id': chunk_id,
+                'text': current_chunk.strip(),
+                'metadata': current_metadata,
+                'type': 'verse_chunk'
+            })
+        
+        return chunks
+    
+    def process_text(self, text: str, preserve_structure: bool = True) -> str:
+        """
+        Main text processing pipeline.
+        
+        Args:
+            text: Raw input text
+            preserve_structure: Whether to preserve verse/chapter structure
+            
+        Returns:
+            Processed text
+        """
+        # Clean the text
+        processed = self.clean_text(text)
+        
+        # Extract and preserve structural information if requested
+        if preserve_structure:
+            structure = self.extract_structural_info(processed)
+            logger.debug(f"Extracted structure: {structure}")
+        
+        logger.info(f"Processed text: {len(text)} -> {len(processed)} characters")
+        return processed
+    
+    def validate_spiritual_content(self, text: str) -> Dict[str, Any]:
+        """
+        Validate that content appears to be legitimate spiritual text.
+        
+        Args:
+            text: Text to validate
+            
+        Returns:
+            Validation results with quality metrics
+        """
+        validation = {
+            'is_spiritual': False,
+            'confidence': 0.0,
+            'detected_traditions': [],
+            'sacred_term_count': 0,
+            'structural_elements': 0
+        }
+        
+        # Count sacred terms
+        sacred_count = 0
+        for terms in self.sacred_terms.values():
+            for term in terms:
+                sacred_count += len(re.findall(re.escape(term), text, re.IGNORECASE))
+        
+        validation['sacred_term_count'] = sacred_count
+        
+        # Check for structural elements
+        structure = self.extract_structural_info(text)
+        structural_count = sum(len(v) for v in structure.values())
+        validation['structural_elements'] = structural_count
+        
+        # Calculate confidence
+        text_length = len(text.split())
+        if text_length > 0:
+            sacred_density = sacred_count / text_length
+            structure_density = structural_count / max(text_length / 100, 1)  # Per 100 words
+            
+            # Combine metrics for confidence score
+            validation['confidence'] = min(1.0, (sacred_density * 10 + structure_density * 5))
+            validation['is_spiritual'] = validation['confidence'] > 0.1
+        
+        # Detect traditions based on terminology
+        if re.search(r'\b(?:krishna|gita|mahabharata|dharma|karma)\b', text, re.IGNORECASE):
+            validation['detected_traditions'].append('hinduism')
+        if re.search(r'\b(?:buddha|sangha|nirvana|dharma)\b', text, re.IGNORECASE):
+            validation['detected_traditions'].append('buddhism')
+        
+        return validation
+    
+    def process_sanskrit_text(self, text: str) -> 'SanskritProcessingResult':
+        """
+        Process Sanskrit text with comprehensive analysis.
+        
+        Args:
+            text: Sanskrit text to process
+            
+        Returns:
+            SanskritProcessingResult with detailed analysis
+        """
+        from dataclasses import dataclass
+        
+        @dataclass
+        class SanskritProcessingResult:
+            original_text: str
+            normalized_text: str
+            contains_sanskrit: bool
+            sanskrit_terms: List[str]
+            devanagari_count: int
+            transliteration: Optional[str] = None
+        
+        # Normalize the text
+        normalized = self.normalize_unicode(text)
+        
+        # Check for Sanskrit/Devanagari content
+        contains_sanskrit = bool(re.search(self.sanskrit_patterns['devanagari'], text))
+        
+        # Extract Sanskrit terms
+        sanskrit_terms = re.findall(self.sanskrit_patterns['devanagari'], text)
+        
+        # Count Devanagari characters
+        devanagari_count = len(re.findall(r'[\u0900-\u097F]', text))
+        
+        return SanskritProcessingResult(
+            original_text=text,
+            normalized_text=normalized,
+            contains_sanskrit=contains_sanskrit,
+            sanskrit_terms=sanskrit_terms,
+            devanagari_count=devanagari_count
+        )
+    
+    def detect_verse_boundaries(self, text: str) -> List[Dict[str, Any]]:
+        """
+        Detect verse boundaries in spiritual texts.
+        
+        Args:
+            text: Spiritual text with verses
+            
+        Returns:
+            List of verse segments with metadata
+        """
+        verses = []
+        
+        # Pattern for verse numbers like ॥२.४७॥ or (2.47)
+        verse_pattern = r'(?:॥(\d+)\.(\d+)॥|\((\d+)\.(\d+)\)|Verse\s+(\d+)\.(\d+))'
+        
+        # Split text by verse boundaries
+        segments = re.split(verse_pattern, text)
+        
+        current_chapter = 1
+        current_verse = 1
+        
+        for i, segment in enumerate(segments):
+            if segment and segment.strip():
+                # Check if this segment contains verse numbers
+                verse_match = re.search(verse_pattern, segment)
+                if verse_match:
+                    groups = verse_match.groups()
+                    if groups[0] and groups[1]:  # ॥च.व॥ format
+                        current_chapter = int(groups[0])
+                        current_verse = int(groups[1])
+                    elif groups[2] and groups[3]:  # (च.व) format
+                        current_chapter = int(groups[2])
+                        current_verse = int(groups[3])
+                    elif groups[4] and groups[5]:  # Verse च.व format
+                        current_chapter = int(groups[4])
+                        current_verse = int(groups[5])
+                
+                # Clean text content
+                content = re.sub(verse_pattern, '', segment).strip()
+                if content:
+                    verses.append({
+                        'chapter': current_chapter,
+                        'verse': current_verse,
+                        'text': content,
+                        'contains_sanskrit': bool(re.search(self.sanskrit_patterns['devanagari'], content)),
+                        'word_count': len(content.split())
+                    })
+                    current_verse += 1
+        
+        return verses

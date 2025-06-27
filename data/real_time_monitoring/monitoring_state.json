@@ -1,47 +1,202 @@
 {
-  "timestamp": "2025-06-25T20:13:13.032779",
+  "timestamp": "2025-06-26T18:11:14.227459",
   "current_costs": {
-    "total": 0.05,
+    "total": 0.1500293045043945,
     "hourly": 0.0,
     "daily": 0.0,
     "monthly": 0.0,
     "by_user": {
-      "test_user": 0.05
+      "test_user": 0.15001108503341673,
+      "test_user2": 1.2639045715332031e-05,
+      "error_user": 5.580425262451172e-06
     },
     "by_model": {
-      "gemini-pro": 0.05
+      "test_model": 0.15001108503341673,
+      "test_model2": 1.2639045715332031e-05,
+      "error_model": 5.580425262451172e-06
     },
     "by_operation": {
-      "test_op": 0.05
+      "test_op": 0.15001108503341673,
+      "test_op2": 1.2639045715332031e-05,
+      "error_op_error": 5.580425262451172e-06
     }
   },
   "active_alerts": [
     {
-      "alert_id": "66d34200",
-      "timestamp": "2025-06-25 20:13:12.530194",
+      "alert_id": "5054a9db",
+      "timestamp": "2025-06-26 18:11:14.120986",
       "metric_type": "CostMetricType.TOTAL_COST",
-      "current_value": 0.05,
-      "threshold_value": 0.01,
+      "current_value": 0.1500293045043945,
+      "threshold_value": 0.1,
       "alert_level": "AlertLevel.WARNING",
-      "message": "total_cost exceeded: $0.05 > $0.01",
-      "spiritual_message": "Test validation message",
+      "message": "total_cost exceeded: $0.15 > $0.10",
+      "spiritual_message": "Test budget alert",
       "actions_taken": [
         "log_only"
       ],
       "context": {
-        "total_cost": 0.05,
+        "total_cost": 0.1500293045043945,
         "hourly_rate": 0.0,
         "top_users": {
-          "test_user": 0.05
+          "test_user": 0.15001108503341673,
+          "test_user2": 1.2639045715332031e-05,
+          "error_user": 5.580425262451172e-06
         },
         "top_models": {
-          "gemini-pro": 0.05
+          "test_model": 0.15001108503341673,
+          "test_model2": 1.2639045715332031e-05,
+          "error_model": 5.580425262451172e-06
         },
         "metrics_count": 1,
         "active_alerts": 0
       }
+    },
+    {
+      "alert_id": "627176f2",
+      "timestamp": "2025-06-26 18:11:14.121312",
+      "metric_type": "CostMetricType.TOTAL_COST",
+      "current_value": 0.1500293045043945,
+      "threshold_value": 0.1,
+      "alert_level": "AlertLevel.WARNING",
+      "message": "total_cost exceeded: $0.15 > $0.10",
+      "spiritual_message": "Test budget alert",
+      "actions_taken": [
+        "log_only"
+      ],
+      "context": {
+        "total_cost": 0.1500293045043945,
+        "hourly_rate": 0.0,
+        "top_users": {
+          "test_user": 0.15001108503341673,
+          "test_user2": 1.2639045715332031e-05,
+          "error_user": 5.580425262451172e-06
+        },
+        "top_models": {
+          "test_model": 0.15001108503341673,
+          "test_model2": 1.2639045715332031e-05,
+          "error_model": 5.580425262451172e-06
+        },
+        "metrics_count": 1,
+        "active_alerts": 1
+      }
+    },
+    {
+      "alert_id": "2b8c19e5",
+      "timestamp": "2025-06-26 18:11:14.121522",
+      "metric_type": "CostMetricType.TOTAL_COST",
+      "current_value": 0.1500293045043945,
+      "threshold_value": 0.1,
+      "alert_level": "AlertLevel.WARNING",
+      "message": "total_cost exceeded: $0.15 > $0.10",
+      "spiritual_message": "Test budget alert",
+      "actions_taken": [
+        "log_only"
+      ],
+      "context": {
+        "total_cost": 0.1500293045043945,
+        "hourly_rate": 0.0,
+        "top_users": {
+          "test_user": 0.15001108503341673,
+          "test_user2": 1.2639045715332031e-05,
+          "error_user": 5.580425262451172e-06
+        },
+        "top_models": {
+          "test_model": 0.15001108503341673,
+          "test_model2": 1.2639045715332031e-05,
+          "error_model": 5.580425262451172e-06
+        },
+        "metrics_count": 1,
+        "active_alerts": 2
+      }
+    },
+    {
+      "alert_id": "d43fd575",
+      "timestamp": "2025-06-26 18:11:14.227203",
+      "metric_type": "CostMetricType.TOTAL_COST",
+      "current_value": 0.1500293045043945,
+      "threshold_value": 0.1,
+      "alert_level": "AlertLevel.WARNING",
+      "message": "total_cost exceeded: $0.15 > $0.10",
+      "spiritual_message": "Test budget alert",
+      "actions_taken": [
+        "log_only"
+      ],
+      "context": {
+        "total_cost": 0.1500293045043945,
+        "hourly_rate": 0.0,
+        "top_users": {
+          "test_user": 0.15001108503341673,
+          "test_user2": 1.2639045715332031e-05,
+          "error_user": 5.580425262451172e-06
+        },
+        "top_models": {
+          "test_model": 0.15001108503341673,
+          "test_model2": 1.2639045715332031e-05,
+          "error_model": 5.580425262451172e-06
+        },
+        "metrics_count": 2,
+        "active_alerts": 3
+      }
+    },
+    {
+      "alert_id": "0ebdaf02",
+      "timestamp": "2025-06-26 18:11:14.227349",
+      "metric_type": "CostMetricType.TOTAL_COST",
+      "current_value": 0.1500293045043945,
+      "threshold_value": 0.1,
+      "alert_level": "AlertLevel.WARNING",
+      "message": "total_cost exceeded: $0.15 > $0.10",
+      "spiritual_message": "Test budget alert",
+      "actions_taken": [
+        "log_only"
+      ],
+      "context": {
+        "total_cost": 0.1500293045043945,
+        "hourly_rate": 0.0,
+        "top_users": {
+          "test_user": 0.15001108503341673,
+          "test_user2": 1.2639045715332031e-05,
+          "error_user": 5.580425262451172e-06
+        },
+        "top_models": {
+          "test_model": 0.15001108503341673,
+          "test_model2": 1.2639045715332031e-05,
+          "error_model": 5.580425262451172e-06
+        },
+        "metrics_count": 2,
+        "active_alerts": 4
+      }
+    },
+    {
+      "alert_id": "e6c330b5",
+      "timestamp": "2025-06-26 18:11:14.227408",
+      "metric_type": "CostMetricType.TOTAL_COST",
+      "current_value": 0.1500293045043945,
+      "threshold_value": 0.1,
+      "alert_level": "AlertLevel.WARNING",
+      "message": "total_cost exceeded: $0.15 > $0.10",
+      "spiritual_message": "Test budget alert",
+      "actions_taken": [
+        "log_only"
+      ],
+      "context": {
+        "total_cost": 0.1500293045043945,
+        "hourly_rate": 0.0,
+        "top_users": {
+          "test_user": 0.15001108503341673,
+          "test_user2": 1.2639045715332031e-05,
+          "error_user": 5.580425262451172e-06
+        },
+        "top_models": {
+          "test_model": 0.15001108503341673,
+          "test_model2": 1.2639045715332031e-05,
+          "error_model": 5.580425262451172e-06
+        },
+        "metrics_count": 2,
+        "active_alerts": 5
+      }
     }
   ],
   "metrics_count": 2,
-  "alert_count": 1
+  "alert_count": 6
 }

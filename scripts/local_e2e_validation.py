@@ -1,0 +1,763 @@
+#!/usr/bin/env python3
+"""
+Vimarsh Local E2E Validation Runner
+
+This script provides comprehensive local testing and validation to catch all issues
+before pushing to GitHub. It's designed for speed, effectiveness, and complete
+validation of the Vimarsh system.
+
+Usage:
+    python scripts/local_e2e_validation.py [--quick] [--coverage] [--parallel]
+
+Features:
+    - Fast execution with intelligent test selection
+    - Comprehensive coverage analysis (>85% target)
+    - Parallel test execution where possible
+    - Real-time progress and results
+    - Detailed failure analysis and recommendations
+    - CI/CD readiness validation
+"""
+
+import os
+import sys
+import subprocess
+import time
+import json
+import argparse
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Any
+from dataclasses import dataclass, field
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+import logging
+from datetime import datetime
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class TestResult:
+    """Test execution result"""
+    test_file: str
+    test_count: int
+    passed: int
+    failed: int
+    skipped: int
+    errors: int
+    duration: float
+    exit_code: int
+    output: str = ""
+    coverage: Optional[float] = None
+
+
+@dataclass
+class ValidationReport:
+    """Comprehensive validation report"""
+    total_tests: int = 0
+    passed_tests: int = 0
+    failed_tests: int = 0
+    skipped_tests: int = 0
+    error_tests: int = 0
+    total_duration: float = 0.0
+    overall_coverage: Optional[float] = None
+    module_coverage: Dict[str, float] = field(default_factory=dict)
+    test_results: List[TestResult] = field(default_factory=list)
+    critical_failures: List[str] = field(default_factory=list)
+    performance_issues: List[str] = field(default_factory=list)
+    coverage_gaps: List[str] = field(default_factory=list)
+    recommendations: List[str] = field(default_factory=list)
+    ci_cd_ready: bool = False
+
+
+class LocalE2EValidator:
+    """
+    Comprehensive local validation system for Vimarsh
+    """
+    
+    def __init__(self, 
+                 project_root: Optional[Path] = None,
+                 quick_mode: bool = False,
+                 enable_coverage: bool = True,
+                 parallel: bool = True,
+                 max_workers: int = 4):
+        """
+        Initialize the validator
+        
+        Args:
+            project_root: Root directory of the project
+            quick_mode: Run only critical tests for faster feedback
+            enable_coverage: Collect test coverage data
+            parallel: Run tests in parallel where possible
+            max_workers: Maximum number of parallel workers
+        """
+        self.project_root = project_root or Path.cwd()
+        self.quick_mode = quick_mode
+        self.enable_coverage = enable_coverage
+        self.parallel = parallel
+        self.max_workers = max_workers
+        
+        # Test categories for intelligent selection
+        self.test_categories = {
+            'critical': [
+                'backend/tests/test_end_to_end_workflow.py',
+                'backend/tests/test_spiritual_guidance_api.py',
+                'backend/tests/test_basic_integration.py',
+                'backend/function_app_test.py'
+            ],
+            'core_functionality': [
+                'backend/tests/test_rag_pipeline.py',
+                'backend/tests/test_llm_integration_comprehensive.py',
+                'backend/llm/test_gemini_client.py',
+                'backend/spiritual_guidance/test_*.py'
+            ],
+            'data_processing': [
+                'backend/rag_pipeline/test_*.py',
+                'backend/data_processing/test_*.py',
+                'backend/rag/test_*.py'
+            ],
+            'cost_management': [
+                'backend/cost_management/test_*.py'
+            ],
+            'voice_interface': [
+                'backend/voice/test_*.py',
+                'backend/tests/test_voice_*.py'
+            ],
+            'monitoring': [
+                'backend/tests/test_monitoring_*.py',
+                'backend/error_handling/test_*.py'
+            ],
+            'e2e_integration': [
+                'backend/tests/e2e/test_*.py',
+                'tests/*/test_*.py'
+            ]
+        }
+        
+        # Coverage targets by module
+        self.coverage_targets = {
+            'spiritual_guidance': 85.0,
+            'rag_pipeline': 85.0,
+            'llm': 80.0,
+            'cost_management': 90.0,  # Well-tested module
+            'voice': 75.0,
+            'monitoring': 80.0,
+            'data_processing': 85.0,
+            'overall': 85.0
+        }
+        
+        # Performance thresholds
+        self.performance_thresholds = {
+            'test_duration_per_file': 30.0,  # seconds
+            'total_test_duration': 300.0,    # 5 minutes max
+            'memory_usage_mb': 1000.0,       # 1GB max
+        }
+        
+        self.validation_start_time = time.time()
+        logger.info(f"Local E2E Validator initialized - Quick: {quick_mode}, Coverage: {enable_coverage}, Parallel: {parallel}")
+    
+    def run_validation(self) -> ValidationReport:
+        """
+        Run comprehensive validation
+        
+        Returns:
+            ValidationReport with all results and recommendations
+        """
+        logger.info("🚀 Starting Vimarsh Local E2E Validation")
+        
+        report = ValidationReport()
+        
+        try:
+            # 1. Environment validation
+            self._validate_environment()
+            
+            # 2. Test discovery and categorization
+            test_files = self._discover_tests()
+            logger.info(f"📊 Discovered {len(test_files)} test files")
+            
+            # 3. Run tests with intelligent selection
+            if self.quick_mode:
+                test_files = self._select_critical_tests(test_files)
+                logger.info(f"⚡ Quick mode: Running {len(test_files)} critical tests")
+            
+            # 4. Execute tests
+            test_results = self._execute_tests(test_files, report)
+            
+            # 5. Collect coverage data
+            if self.enable_coverage:
+                self._collect_coverage_data(report)
+            
+            # 6. Performance analysis
+            self._analyze_performance(report)
+            
+            # 7. Generate recommendations
+            self._generate_recommendations(report)
+            
+            # 8. CI/CD readiness check
+            report.ci_cd_ready = self._check_ci_cd_readiness(report)
+            
+            # 9. Generate final report
+            self._print_final_report(report)
+            
+            return report
+            
+        except Exception as e:
+            logger.error(f"❌ Validation failed with error: {e}")
+            report.critical_failures.append(f"Validation system error: {e}")
+            return report
+    
+    def _validate_environment(self):
+        """Validate the development environment"""
+        logger.info("🔍 Validating environment...")
+        
+        # Check Python version
+        python_version = sys.version_info
+        if python_version.major != 3 or python_version.minor < 12:
+            raise RuntimeError(f"Python 3.12+ required, found {python_version.major}.{python_version.minor}")
+        
+        # Check required dependencies
+        required_packages = [
+            'pytest', 'pytest_cov', 'pytest_asyncio', 'faiss', 
+            'azure.keyvault.secrets', 'sentence_transformers'
+        ]
+        
+        for package in required_packages:
+            try:
+                __import__(package)
+            except ImportError:
+                raise RuntimeError(f"Required package '{package}' not installed")
+        
+        # Check project structure
+        required_dirs = ['backend', 'frontend', 'infrastructure', 'tests']
+        for dir_name in required_dirs:
+            if not (self.project_root / dir_name).exists():
+                logger.warning(f"⚠️  Expected directory '{dir_name}' not found")
+        
+        logger.info("✅ Environment validation passed")
+    
+    def _discover_tests(self) -> List[Path]:
+        """Discover all test files in the project"""
+        test_files = []
+        
+        # Search patterns for test files
+        patterns = [
+            '**/test_*.py',
+            '**/*_test.py',
+            '**/tests.py'
+        ]
+        
+        for pattern in patterns:
+            test_files.extend(self.project_root.glob(pattern))
+        
+        # Filter out non-test files and duplicates
+        valid_tests = []
+        seen = set()
+        
+        for test_file in test_files:
+            # Skip __pycache__ and other non-source directories
+            if '__pycache__' in str(test_file) or '.pytest_cache' in str(test_file):
+                continue
+                
+            # Skip if already seen
+            if test_file in seen:
+                continue
+                
+            # Check if it's actually a test file (contains test classes/functions)
+            if self._is_valid_test_file(test_file):
+                valid_tests.append(test_file)
+                seen.add(test_file)
+        
+        return sorted(valid_tests)
+    
+    def _is_valid_test_file(self, file_path: Path) -> bool:
+        """Check if a file contains actual tests"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # Look for test indicators
+            test_indicators = [
+                'def test_',
+                'class Test',
+                '@pytest.',
+                'import pytest',
+                'from pytest'
+            ]
+            
+            return any(indicator in content for indicator in test_indicators)
+            
+        except Exception:
+            return False
+    
+    def _select_critical_tests(self, all_tests: List[Path]) -> List[Path]:
+        """Select critical tests for quick validation"""
+        critical_tests = []
+        
+        for test_file in all_tests:
+            file_str = str(test_file)
+            
+            # Check if it's in critical category
+            for critical_pattern in self.test_categories['critical']:
+                if critical_pattern.replace('*', '') in file_str:
+                    critical_tests.append(test_file)
+                    break
+                    
+            # Also include end-to-end tests
+            if 'e2e' in file_str or 'end_to_end' in file_str:
+                critical_tests.append(test_file)
+        
+        return critical_tests
+    
+    def _execute_tests(self, test_files: List[Path], report: ValidationReport) -> List[TestResult]:
+        """Execute tests with parallel execution support"""
+        logger.info(f"🧪 Executing {len(test_files)} test files...")
+        
+        test_results = []
+        
+        if self.parallel and len(test_files) > 1:
+            # Parallel execution for independent test files
+            test_results = self._execute_tests_parallel(test_files)
+        else:
+            # Sequential execution
+            test_results = self._execute_tests_sequential(test_files)
+        
+        # Update report
+        for result in test_results:
+            report.test_results.append(result)
+            report.total_tests += result.test_count
+            report.passed_tests += result.passed
+            report.failed_tests += result.failed
+            report.skipped_tests += result.skipped
+            report.error_tests += result.errors
+            report.total_duration += result.duration
+            
+            if result.failed > 0 or result.errors > 0:
+                report.critical_failures.append(f"{result.test_file}: {result.failed} failed, {result.errors} errors")
+        
+        return test_results
+    
+    def _execute_tests_parallel(self, test_files: List[Path]) -> List[TestResult]:
+        """Execute tests in parallel"""
+        results = []
+        
+        # Group tests by estimated execution time
+        fast_tests = []
+        slow_tests = []
+        
+        for test_file in test_files:
+            # Simple heuristic: voice and e2e tests are usually slower
+            if 'voice' in str(test_file) or 'e2e' in str(test_file) or 'integration' in str(test_file):
+                slow_tests.append(test_file)
+            else:
+                fast_tests.append(test_file)
+        
+        # Execute fast tests in parallel
+        logger.info(f"⚡ Running {len(fast_tests)} fast tests in parallel...")
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_test = {
+                executor.submit(self._run_single_test, test_file): test_file 
+                for test_file in fast_tests
+            }
+            
+            for future in as_completed(future_to_test):
+                test_file = future_to_test[future]
+                try:
+                    result = future.result()
+                    results.append(result)
+                    logger.info(f"✅ {result.test_file}: {result.passed}/{result.test_count} passed")
+                except Exception as e:
+                    logger.error(f"❌ {test_file} failed: {e}")
+                    results.append(TestResult(
+                        test_file=str(test_file),
+                        test_count=0, passed=0, failed=0, skipped=0, errors=1,
+                        duration=0.0, exit_code=1, output=str(e)
+                    ))
+        
+        # Execute slow tests sequentially to avoid resource conflicts
+        if slow_tests:
+            logger.info(f"🐌 Running {len(slow_tests)} slow tests sequentially...")
+            for test_file in slow_tests:
+                try:
+                    result = self._run_single_test(test_file)
+                    results.append(result)
+                    logger.info(f"✅ {result.test_file}: {result.passed}/{result.test_count} passed")
+                except Exception as e:
+                    logger.error(f"❌ {test_file} failed: {e}")
+                    results.append(TestResult(
+                        test_file=str(test_file),
+                        test_count=0, passed=0, failed=0, skipped=0, errors=1,
+                        duration=0.0, exit_code=1, output=str(e)
+                    ))
+        
+        return results
+    
+    def _execute_tests_sequential(self, test_files: List[Path]) -> List[TestResult]:
+        """Execute tests sequentially"""
+        results = []
+        
+        for i, test_file in enumerate(test_files, 1):
+            logger.info(f"🧪 Running test {i}/{len(test_files)}: {test_file.name}")
+            
+            try:
+                result = self._run_single_test(test_file)
+                results.append(result)
+                
+                status = "✅" if result.failed == 0 and result.errors == 0 else "❌"
+                logger.info(f"{status} {result.test_file}: {result.passed}/{result.test_count} passed ({result.duration:.2f}s)")
+                
+            except Exception as e:
+                logger.error(f"❌ {test_file} failed: {e}")
+                results.append(TestResult(
+                    test_file=str(test_file),
+                    test_count=0, passed=0, failed=0, skipped=0, errors=1,
+                    duration=0.0, exit_code=1, output=str(e)
+                ))
+        
+        return results
+    
+    def _run_single_test(self, test_file: Path) -> TestResult:
+        """Run a single test file and parse results"""
+        start_time = time.time()
+        
+        # Construct pytest command
+        cmd = [
+            sys.executable, '-m', 'pytest',
+            str(test_file),
+            '-v',
+            '--tb=short',
+            '--no-header',
+            '--disable-warnings'
+        ]
+        
+        if self.enable_coverage:
+            cmd.extend(['--cov=backend', '--cov-report=term-missing'])
+        
+        try:
+            # Run the test
+            result = subprocess.run(
+                cmd,
+                cwd=self.project_root,
+                capture_output=True,
+                text=True,
+                timeout=60  # 1 minute timeout per test file
+            )
+            
+            duration = time.time() - start_time
+            
+            # Parse pytest output
+            test_count, passed, failed, skipped, errors = self._parse_pytest_output(result.stdout)
+            
+            return TestResult(
+                test_file=str(test_file.relative_to(self.project_root)),
+                test_count=test_count,
+                passed=passed,
+                failed=failed,
+                skipped=skipped,
+                errors=errors,
+                duration=duration,
+                exit_code=result.returncode,
+                output=result.stdout + result.stderr
+            )
+            
+        except subprocess.TimeoutExpired:
+            duration = time.time() - start_time
+            return TestResult(
+                test_file=str(test_file.relative_to(self.project_root)),
+                test_count=0, passed=0, failed=0, skipped=0, errors=1,
+                duration=duration, exit_code=1,
+                output="Test execution timed out after 60 seconds"
+            )
+    
+    def _parse_pytest_output(self, output: str) -> Tuple[int, int, int, int, int]:
+        """Parse pytest output to extract test counts"""
+        # Default values
+        test_count = passed = failed = skipped = errors = 0
+        
+        lines = output.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            
+            # Look for summary line like "3 failed, 5 passed, 1 skipped in 2.34s"
+            if ' passed' in line or ' failed' in line:
+                parts = line.split()
+                for i, part in enumerate(parts):
+                    if part == 'passed' and i > 0:
+                        passed = int(parts[i-1])
+                    elif part == 'failed' and i > 0:
+                        failed = int(parts[i-1])
+                    elif part == 'skipped' and i > 0:
+                        skipped = int(parts[i-1])
+                    elif part == 'error' and i > 0:
+                        errors = int(parts[i-1])
+        
+        test_count = passed + failed + skipped + errors
+        
+        return test_count, passed, failed, skipped, errors
+    
+    def _collect_coverage_data(self, report: ValidationReport):
+        """Collect and analyze test coverage data"""
+        if not self.enable_coverage:
+            return
+            
+        logger.info("📊 Collecting coverage data...")
+        
+        try:
+            # Run coverage report
+            cmd = [
+                sys.executable, '-m', 'pytest',
+                '--cov=backend',
+                '--cov-report=json:coverage.json',
+                '--cov-report=term-missing',
+                '--disable-warnings',
+                '-q'
+            ]
+            
+            subprocess.run(cmd, cwd=self.project_root, capture_output=True)
+            
+            # Read coverage data
+            coverage_file = self.project_root / 'coverage.json'
+            if coverage_file.exists():
+                with open(coverage_file, 'r') as f:
+                    coverage_data = json.load(f)
+                
+                # Extract overall coverage
+                totals = coverage_data.get('totals', {})
+                if totals:
+                    covered = totals.get('covered_lines', 0)
+                    total = totals.get('num_statements', 1)
+                    report.overall_coverage = (covered / total) * 100
+                
+                # Extract module-level coverage
+                files = coverage_data.get('files', {})
+                modules = {}
+                
+                for file_path, file_data in files.items():
+                    if 'backend/' in file_path:
+                        # Extract module name
+                        path_parts = file_path.replace('backend/', '').split('/')
+                        if path_parts:
+                            module = path_parts[0]
+                            
+                            covered = file_data.get('summary', {}).get('covered_lines', 0)
+                            total = file_data.get('summary', {}).get('num_statements', 1)
+                            coverage_pct = (covered / total) * 100
+                            
+                            if module not in modules:
+                                modules[module] = {'covered': 0, 'total': 0}
+                            
+                            modules[module]['covered'] += covered
+                            modules[module]['total'] += total
+                
+                # Calculate module coverages
+                for module, data in modules.items():
+                    if data['total'] > 0:
+                        coverage_pct = (data['covered'] / data['total']) * 100
+                        report.module_coverage[module] = coverage_pct
+                        
+                        # Check against targets
+                        target = self.coverage_targets.get(module, 80.0)
+                        if coverage_pct < target:
+                            report.coverage_gaps.append(
+                                f"{module}: {coverage_pct:.1f}% (target: {target}%)"
+                            )
+                
+                # Clean up
+                coverage_file.unlink(missing_ok=True)
+                
+        except Exception as e:
+            logger.warning(f"⚠️  Coverage collection failed: {e}")
+    
+    def _analyze_performance(self, report: ValidationReport):
+        """Analyze test performance and identify issues"""
+        logger.info("⚡ Analyzing test performance...")
+        
+        # Check total duration
+        if report.total_duration > self.performance_thresholds['total_test_duration']:
+            report.performance_issues.append(
+                f"Total test duration ({report.total_duration:.1f}s) exceeds threshold "
+                f"({self.performance_thresholds['total_test_duration']}s)"
+            )
+        
+        # Check individual test file durations
+        for result in report.test_results:
+            if result.duration > self.performance_thresholds['test_duration_per_file']:
+                report.performance_issues.append(
+                    f"{result.test_file} took {result.duration:.1f}s "
+                    f"(threshold: {self.performance_thresholds['test_duration_per_file']}s)"
+                )
+    
+    def _generate_recommendations(self, report: ValidationReport):
+        """Generate actionable recommendations"""
+        logger.info("💡 Generating recommendations...")
+        
+        # Test failure recommendations
+        if report.failed_tests > 0:
+            report.recommendations.append(
+                f"🔧 Fix {report.failed_tests} failing tests before pushing to CI/CD"
+            )
+        
+        # Coverage recommendations
+        if report.overall_coverage and report.overall_coverage < self.coverage_targets['overall']:
+            report.recommendations.append(
+                f"📈 Increase overall test coverage from {report.overall_coverage:.1f}% to {self.coverage_targets['overall']}%"
+            )
+        
+        # Performance recommendations
+        if report.performance_issues:
+            report.recommendations.append(
+                "⚡ Optimize slow tests or split them into smaller, focused tests"
+            )
+        
+        # Critical tests recommendations
+        critical_failures = [f for f in report.critical_failures if 'end_to_end' in f or 'integration' in f]
+        if critical_failures:
+            report.recommendations.append(
+                "🚨 Critical E2E/integration tests failing - these must pass for production readiness"
+            )
+        
+        # Module-specific recommendations
+        for module, coverage in report.module_coverage.items():
+            target = self.coverage_targets.get(module, 80.0)
+            if coverage < target:
+                report.recommendations.append(
+                    f"📊 Add tests for {module} module (current: {coverage:.1f}%, target: {target}%)"
+                )
+    
+    def _check_ci_cd_readiness(self, report: ValidationReport) -> bool:
+        """Check if the codebase is ready for CI/CD"""
+        logger.info("🔍 Checking CI/CD readiness...")
+        
+        criteria = []
+        
+        # Must have no failing tests
+        criteria.append(("No failing tests", report.failed_tests == 0))
+        
+        # Must have acceptable coverage
+        coverage_ok = True
+        if report.overall_coverage:
+            coverage_ok = report.overall_coverage >= self.coverage_targets['overall']
+        criteria.append(("Coverage target met", coverage_ok))
+        
+        # Critical tests must pass
+        critical_tests_ok = not any('end_to_end' in f or 'integration' in f for f in report.critical_failures)
+        criteria.append(("Critical tests passing", critical_tests_ok))
+        
+        # Performance within limits
+        performance_ok = len(report.performance_issues) == 0
+        criteria.append(("Performance acceptable", performance_ok))
+        
+        # Check results
+        all_criteria_met = all(result for _, result in criteria)
+        
+        logger.info("📋 CI/CD Readiness Checklist:")
+        for criterion, met in criteria:
+            status = "✅" if met else "❌"
+            logger.info(f"  {status} {criterion}")
+        
+        return all_criteria_met
+    
+    def _print_final_report(self, report: ValidationReport):
+        """Print comprehensive final report"""
+        duration = time.time() - self.validation_start_time
+        
+        print("\n" + "="*80)
+        print("🎯 VIMARSH LOCAL E2E VALIDATION REPORT")
+        print("="*80)
+        
+        # Summary
+        print(f"\n📊 TEST SUMMARY:")
+        print(f"   Total Tests: {report.total_tests}")
+        print(f"   ✅ Passed: {report.passed_tests}")
+        print(f"   ❌ Failed: {report.failed_tests}")
+        print(f"   ⏭️  Skipped: {report.skipped_tests}")
+        print(f"   💥 Errors: {report.error_tests}")
+        print(f"   ⏱️  Duration: {report.total_duration:.2f}s")
+        
+        # Coverage
+        if report.overall_coverage:
+            print(f"\n📈 COVERAGE ANALYSIS:")
+            print(f"   Overall Coverage: {report.overall_coverage:.1f}%")
+            print(f"   Target: {self.coverage_targets['overall']}%")
+            
+            if report.module_coverage:
+                print(f"   Module Coverage:")
+                for module, coverage in sorted(report.module_coverage.items()):
+                    target = self.coverage_targets.get(module, 80.0)
+                    status = "✅" if coverage >= target else "❌"
+                    print(f"     {status} {module}: {coverage:.1f}% (target: {target}%)")
+        
+        # Performance
+        if report.performance_issues:
+            print(f"\n⚡ PERFORMANCE ISSUES:")
+            for issue in report.performance_issues:
+                print(f"   ⚠️  {issue}")
+        
+        # Critical failures
+        if report.critical_failures:
+            print(f"\n🚨 CRITICAL FAILURES:")
+            for failure in report.critical_failures:
+                print(f"   ❌ {failure}")
+        
+        # Coverage gaps
+        if report.coverage_gaps:
+            print(f"\n📊 COVERAGE GAPS:")
+            for gap in report.coverage_gaps:
+                print(f"   📉 {gap}")
+        
+        # Recommendations
+        if report.recommendations:
+            print(f"\n💡 RECOMMENDATIONS:")
+            for rec in report.recommendations:
+                print(f"   {rec}")
+        
+        # CI/CD Readiness
+        print(f"\n🚀 CI/CD READINESS:")
+        status = "✅ READY" if report.ci_cd_ready else "❌ NOT READY"
+        print(f"   {status}")
+        
+        # Final status
+        print(f"\n⏱️  Total Validation Time: {duration:.2f}s")
+        
+        if report.ci_cd_ready:
+            print("\n🎉 SUCCESS: Your code is ready for CI/CD!")
+        else:
+            print("\n⚠️  WARNING: Address the issues above before pushing to CI/CD")
+        
+        print("="*80)
+
+
+def main():
+    """Main entry point"""
+    parser = argparse.ArgumentParser(description="Vimarsh Local E2E Validation")
+    parser.add_argument('--quick', action='store_true', help='Run only critical tests')
+    parser.add_argument('--no-coverage', action='store_true', help='Disable coverage collection')
+    parser.add_argument('--no-parallel', action='store_true', help='Disable parallel execution')
+    parser.add_argument('--max-workers', type=int, default=4, help='Maximum parallel workers')
+    parser.add_argument('--project-root', type=Path, help='Project root directory')
+    
+    args = parser.parse_args()
+    
+    # Initialize validator
+    validator = LocalE2EValidator(
+        project_root=args.project_root,
+        quick_mode=args.quick,
+        enable_coverage=not args.no_coverage,
+        parallel=not args.no_parallel,
+        max_workers=args.max_workers
+    )
+    
+    # Run validation
+    report = validator.run_validation()
+    
+    # Exit with appropriate code
+    if report.ci_cd_ready:
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

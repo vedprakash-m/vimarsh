@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 # Import the testing system
-from test_spiritual_content_quality import (
+from backend.tests.spiritual_quality.test_spiritual_quality_validator import (
     SpiritualContentValidator, SpiritualTestCase, ValidationDimension,
     SpiritualContentQuality
 )

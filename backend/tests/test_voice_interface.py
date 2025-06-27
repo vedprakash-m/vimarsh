@@ -16,10 +16,13 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from voice.speech_processor import SpeechProcessor
-from voice.sanskrit_optimizer import SanskritOptimizer
-from voice.tts_optimizer import TTSOptimizer
-from voice.multilingual import MultilingualVoiceHandler
-from voice.voice_recovery import VoiceErrorRecovery
+from voice.sanskrit_optimizer import SanskritRecognitionOptimizer
+from voice.tts_optimizer import SpiritualTTSOptimizer
+from voice.multilingual import MultilingualVoiceManager
+from voice.voice_recovery import SpiritualVoiceRecovery
+from voice.tts_optimizer import SpiritualTTSOptimizer
+from voice.multilingual import MultilingualVoiceManager
+from voice.voice_recovery import SpiritualVoiceRecovery
 from voice.quality_monitor import VoiceQualityMonitor
 from tests.fixtures import (
     VOICE_TEST_DATA, PERFORMANCE_BENCHMARKS, ERROR_TEST_SCENARIOS,
@@ -384,13 +387,13 @@ class TestTTSOptimizer:
             assert "error" in result or "fallback" in result
 
 
-class TestMultilingualVoiceHandler:
-    """Test suite for MultilingualVoiceHandler class."""
+class TestMultilingualVoiceManager:
+    """Test suite for MultilingualVoiceManager class."""
     
     @pytest.fixture
     def multilingual_handler(self):
-        """Create MultilingualVoiceHandler instance for testing."""
-        return MultilingualVoiceHandler()
+        """Create MultilingualVoiceManager instance for testing."""
+        return MultilingualVoiceManager()
     
     def test_multilingual_handler_initialization(self, multilingual_handler):
         """Test multilingual handler initialization."""
@@ -494,7 +497,7 @@ class TestVoiceErrorRecovery:
     @pytest.fixture
     def voice_recovery(self):
         """Create VoiceErrorRecovery instance for testing."""
-        return VoiceErrorRecovery()
+        return SpiritualVoiceRecovery()
     
     def test_voice_recovery_initialization(self, voice_recovery):
         """Test voice recovery system initialization."""
@@ -781,7 +784,7 @@ class TestVoiceIntegrationFlow:
     async def test_voice_error_recovery_integration(self):
         """Test integrated error recovery across voice components."""
         speech_processor = SpeechProcessor()
-        voice_recovery = VoiceErrorRecovery()
+        voice_recovery = SpiritualVoiceRecovery()
         
         # Simulate cascading errors and recovery
         poor_audio = b"very_poor_quality_audio"

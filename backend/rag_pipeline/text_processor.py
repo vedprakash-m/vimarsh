@@ -348,3 +348,16 @@ class SpiritualTextProcessor:
         chapter_info['total_verses'] = len(verse_boundaries)
         
         return chapter_info
+    
+    def chunk_text(self, text: str, max_chunk_size: int = 1000) -> List[TextChunk]:
+        """
+        Chunk text into meaningful segments for RAG processing.
+        
+        Args:
+            text: Text to chunk
+            max_chunk_size: Maximum characters per chunk
+            
+        Returns:
+            List of TextChunk objects
+        """
+        return self.process_text(text, max_chunk_size=max_chunk_size)

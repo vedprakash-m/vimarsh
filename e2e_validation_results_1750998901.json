@@ -1,0 +1,73 @@
+{
+  "suite_level": "core",
+  "quick_mode": false,
+  "start_time": 1750998895.5943801,
+  "results": [
+    {
+      "name": "syntax_validation",
+      "passed": true,
+      "duration": 0.37361669540405273,
+      "message": "All Python files have valid syntax",
+      "details": null
+    },
+    {
+      "name": "import_validation",
+      "passed": true,
+      "duration": 3.912788152694702,
+      "message": "All key modules import successfully",
+      "details": null
+    },
+    {
+      "name": "basic_functionality",
+      "passed": true,
+      "duration": 1.2552402019500732,
+      "message": "Basic functionality test passed",
+      "details": null
+    },
+    {
+      "name": "security_baseline",
+      "passed": true,
+      "duration": 0.0007719993591308594,
+      "message": "Basic security checks passed",
+      "details": null
+    },
+    {
+      "name": "spiritual_guidance_api",
+      "passed": true,
+      "duration": 2.8133392333984375e-05,
+      "message": "API check passed",
+      "details": null
+    },
+    {
+      "name": "rag_pipeline_basic",
+      "passed": true,
+      "duration": 1.0967254638671875e-05,
+      "message": "RAG pipeline check passed",
+      "details": null
+    },
+    {
+      "name": "llm_integration",
+      "passed": true,
+      "duration": 6.9141387939453125e-06,
+      "message": "LLM integration check passed",
+      "details": null
+    },
+    {
+      "name": "error_handling",
+      "passed": true,
+      "duration": 5.9604644775390625e-06,
+      "message": "Error handling check passed",
+      "details": null
+    }
+  ],
+  "summary": {
+    "total_checks": 8,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "pass_rate": 100.0,
+    "total_duration": 5.542469024658203,
+    "duration": 5.544217824935913
+  },
+  "recommendation": "\u2705 All checks passed! Safe to push to repository."
+}

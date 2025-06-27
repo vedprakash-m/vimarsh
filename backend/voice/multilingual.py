@@ -463,6 +463,7 @@ class MultilingualVoiceManager:
         self.voice_selector = VoiceSelector()
         self.current_language = Language.ENGLISH
         self.current_voice_profile = None
+        self.supported_languages = ['en', 'hi', 'sa']  # English, Hindi, Sanskrit
         
     def initialize_voice(self, language: Language, preferences: Optional[Dict] = None) -> VoiceProfile:
         """

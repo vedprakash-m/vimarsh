@@ -20,7 +20,8 @@ except ImportError:
 class TestPWAFeatures:
     """Test PWA features including offline functionality, caching, and installation"""
     
-    def __init__(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         """Setup test environment"""
         self.frontend_path = Path(__file__).parent.parent.parent.parent / "frontend"
         self.base_url = "http://localhost:3000"  # Assuming dev server

@@ -19,9 +19,9 @@ from dataclasses import dataclass, asdict
 # Import our modules
 from spiritual_text_manager import SpiritualTextDataManager, SpiritualTextSource
 from text_ingestion import DataIngestionPipeline, ProcessedDocument
-from ..rag.storage_factory import get_vector_storage, VectorStorageInterface
-from ..rag.text_processor import AdvancedSpiritualTextProcessor, EnhancedTextChunk
-from ..rag.cosmos_vector_search import SpiritualTextChunk
+from backend.rag.storage_factory import get_vector_storage, VectorStorageInterface
+from backend.rag.text_processor import AdvancedSpiritualTextProcessor, EnhancedTextChunk
+from backend.rag.cosmos_vector_search import SpiritualTextChunk
 from sentence_transformers import SentenceTransformer
 
 # Configure logging

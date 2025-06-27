@@ -70,6 +70,12 @@ SAMPLE_USER_QUERIES = {
         "language": "English",
         "expected_themes": ["emotional control", "peace", "wisdom"],
         "expected_sources": ["Bhagavad Gita"]
+    },
+    "dharma_modern": {
+        "query": "What is dharma in today's world?",
+        "language": "English",
+        "expected_themes": ["dharma", "modern context", "righteousness", "duty"],
+        "expected_sources": ["Bhagavad Gita", "Mahabharata"]
     }
 }
 
@@ -86,6 +92,66 @@ SAMPLE_KRISHNA_RESPONSES = {
         "citations": ["Bhagavad Gita 2.47", "Bhagavad Gita 3.9"],
         "tone_markers": ["loving_guidance", "practical_wisdom", "divine_assurance"],
         "language": "English"
+    },
+    "dharma_modern": {
+        "response": "O Arjuna, in today's world, dharma remains the eternal principle of righteous living. Your dharma encompasses both your personal duties and your responsibility to serve the greater good. Whether you are a student, professional, parent, or leader, perform your role with integrity, compassion, and dedication.",
+        "citations": ["Bhagavad Gita 2.47", "Bhagavad Gita 4.7"],
+        "tone_markers": ["timeless_wisdom", "practical_guidance", "divine_authority"],
+        "language": "English"
+    },
+    "hindi_response": {
+        "response": "हे अर्जुन, तुम्हारा धर्म तुम्हारे स्वभाव और परिस्थितियों से निर्धारित होता है। अपने कर्तव्य का पालन करो लेकिन फल की चिंता मत करो।",
+        "citations": ["Bhagavad Gita 2.47"],
+        "tone_markers": ["divine_wisdom", "compassionate_guidance"],
+        "language": "Hindi"
+    }
+}
+
+# Sample spiritual responses for testing
+SAMPLE_SPIRITUAL_RESPONSES = {
+    "purpose_response": {
+        "response": "Dear devotee, your purpose in life is to realize your true divine nature and serve the Supreme with love and devotion. As I taught Arjuna, fulfill your dharmic duties while offering all actions to the Divine.",
+        "citations": [
+            {
+                "source": "Bhagavad Gita 2.47",
+                "text": "You have a right to perform your prescribed duty, but not to the fruits of action.",
+                "relevance_score": 0.95
+            }
+        ],
+        "metadata": {
+            "language": "English",
+            "processing_time_ms": 450,
+            "model_version": "gemini-pro-v1.0",
+            "confidence_score": 0.92,
+            "spiritual_authenticity": "validated",
+            "features_used": {
+                "voice_synthesis": False,
+                "personalization": True,
+                "context_aware": True
+            }
+        }
+    },
+    "peace_response": {
+        "response": "Beloved soul, inner peace comes through detachment from the fruits of action and surrender to the Divine will. Practice meditation, chant the holy names, and see the divine presence in all beings.",
+        "citations": [
+            {
+                "source": "Bhagavad Gita 2.48",
+                "text": "Perform your duty equipoised, O Arjuna, abandoning all attachment to success or failure.",
+                "relevance_score": 0.88
+            }
+        ],
+        "metadata": {
+            "language": "English",
+            "processing_time_ms": 380,
+            "model_version": "gemini-pro-v1.0",
+            "confidence_score": 0.89,
+            "spiritual_authenticity": "validated",
+            "features_used": {
+                "voice_synthesis": False,
+                "personalization": True,
+                "context_aware": True
+            }
+        }
     }
 }
 
@@ -190,5 +256,30 @@ From the Katha Upanishad: उत्तिष्ठत जाग्रत प्�
 
 Arise! Awake! Approach the great teachers and learn! 
 The wise say that the path is sharp like the edge of a razor, 
-difficult to traverse."""
+difficult to traverse.""",
 }
+
+def create_test_spiritual_content(query: str, response_type: str = "guidance") -> dict:
+    """Create test spiritual content for various test scenarios."""
+    return {
+        "query": query,
+        "response": SAMPLE_KRISHNA_RESPONSES.get("dharma_modern", {}).get("response", ""),
+        "sources": ["Bhagavad Gita 2.47"],
+        "type": response_type,
+        "authenticity_score": 0.95
+    }
+
+def create_mock_rag_response(query: str) -> dict:
+    """Create mock RAG response for testing."""
+    return {
+        "query": query,
+        "retrieved_chunks": [
+            {
+                "text": SAMPLE_BHAGAVAD_GITA_VERSES["2.47"]["translation"],
+                "source": "Bhagavad Gita 2.47",
+                "similarity": 0.85
+            }
+        ],
+        "response": SAMPLE_KRISHNA_RESPONSES["dharma_modern"]["response"],
+        "sources": ["Bhagavad Gita 2.47"]
+    }

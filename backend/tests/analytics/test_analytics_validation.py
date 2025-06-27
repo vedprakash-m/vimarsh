@@ -15,7 +15,8 @@ from unittest.mock import Mock, patch, MagicMock
 class TestAnalyticsImplementation:
     """Test analytics implementation and data collection"""
     
-    def __init__(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         """Setup test environment"""
         self.test_results = []
         self.mock_events = []

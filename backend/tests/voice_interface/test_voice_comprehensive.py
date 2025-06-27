@@ -20,10 +20,10 @@ from voice.speech_processor import (
     SpeechProcessor, VoiceConfig, VoiceLanguage, 
     SpeechQuality, RecognitionStatus
 )
-from voice.sanskrit_optimizer import SanskritOptimizer
-from voice.tts_optimizer import TTSOptimizer
+from voice.sanskrit_optimizer import SanskritRecognitionOptimizer
+from voice.tts_optimizer import SpiritualTTSOptimizer
 from voice.multilingual import MultilingualVoiceManager
-from voice.voice_recovery import VoiceErrorRecovery
+from voice.voice_recovery import SpiritualVoiceRecovery
 from voice.quality_monitor import VoiceQualityMonitor
 from voice.advanced_features import AdvancedVoiceFeatures
 
@@ -408,7 +408,7 @@ class TestVoiceErrorRecovery:
     @pytest.fixture
     def error_recovery(self):
         """Voice error recovery fixture"""
-        return VoiceErrorRecovery()
+        return SpiritualVoiceRecovery()
     
     @pytest.mark.asyncio
     async def test_network_error_recovery(self, error_recovery):

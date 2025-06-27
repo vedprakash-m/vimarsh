@@ -22,6 +22,7 @@ class DocumentMetadata:
     file_size: int
     encoding: str
     mime_type: str
+    source: Optional[str] = None  # Source file path or identifier
     language: Optional[str] = None
     source_tradition: Optional[str] = None  # e.g., "Hinduism", "Buddhism"
     text_type: Optional[str] = None  # e.g., "scripture", "commentary"
@@ -235,6 +236,7 @@ class SpiritualDocumentLoader:
                 file_size=file_stat.st_size,
                 encoding=encoding,
                 mime_type=mime_type or 'text/plain',
+                source=str(file_path),
                 language=detected_language,
                 source_tradition=text_info['source_tradition'],
                 text_type=text_info['text_type']
@@ -279,7 +281,7 @@ class SpiritualDocumentLoader:
             
             raise ValueError(f"Could not decode {file_path} with any supported encoding")
     
-    def load_directory(self, directory_path: Union[str, Path]) -> List[tuple[str, DocumentMetadata]]:
+    def load_directory(self, directory_path: Union[str, Path]) -> List[Dict[str, Any]]:
         """
         Load all supported text files from a directory
         
@@ -287,7 +289,7 @@ class SpiritualDocumentLoader:
             directory_path: Path to directory containing text files
             
         Returns:
-            List of (content, metadata) tuples
+            List of document dictionaries with content and metadata
         """
         directory_path = Path(directory_path)
         
@@ -304,7 +306,13 @@ class SpiritualDocumentLoader:
             if file_path.is_file() and file_path.suffix.lower() in self.supported_extensions:
                 try:
                     content, metadata = self.load_text_file(file_path)
-                    documents.append((content, metadata))
+                    document_dict = {
+                        "content": content,
+                        "metadata": metadata,
+                        "source": str(file_path),
+                        "file_type": file_path.suffix.lower()
+                    }
+                    documents.append(document_dict)
                 except Exception as e:
                     logger.error(f"Failed to load {file_path}: {e}")
                     continue
@@ -357,3 +365,32 @@ class SpiritualDocumentLoader:
             validation['is_valid'] = False
         
         return validation
+    
+    def load_file(self, file_path: Union[str, Path]) -> str:
+        """
+        Load a file and return just the content (without metadata).
+        
+        Args:
+            file_path: Path to the file to load
+            
+        Returns:
+            File content as string
+        """
+        content, _ = self.load_text_file(file_path)
+        return content
+    
+    def load_file_with_metadata(self, file_path: Union[str, Path]) -> Dict[str, Any]:
+        """
+        Load a file and return content with metadata as a dictionary.
+        
+        Args:
+            file_path: Path to the file to load
+            
+        Returns:
+            Dictionary with 'content' and 'metadata' keys
+        """
+        content, metadata = self.load_text_file(file_path)
+        return {
+            'content': content,
+            'metadata': metadata.__dict__
+        }

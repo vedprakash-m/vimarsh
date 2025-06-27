@@ -1,0 +1,45 @@
+{
+  "suite_level": "critical",
+  "quick_mode": false,
+  "start_time": 1750995532.4653819,
+  "results": [
+    {
+      "name": "syntax_validation",
+      "passed": true,
+      "duration": 0.055203914642333984,
+      "message": "All Python files have valid syntax",
+      "details": null
+    },
+    {
+      "name": "import_validation",
+      "passed": true,
+      "duration": 1.248243808746338,
+      "message": "All key modules import successfully",
+      "details": null
+    },
+    {
+      "name": "basic_functionality",
+      "passed": true,
+      "duration": 0.5908842086791992,
+      "message": "Basic functionality test passed",
+      "details": null
+    },
+    {
+      "name": "security_baseline",
+      "passed": true,
+      "duration": 0.0004401206970214844,
+      "message": "Basic security checks passed",
+      "details": null
+    }
+  ],
+  "summary": {
+    "total_checks": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "pass_rate": 100.0,
+    "total_duration": 1.8947720527648926,
+    "duration": 1.895169973373413
+  },
+  "recommendation": "\u2705 All checks passed! Safe to push to repository."
+}

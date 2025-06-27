@@ -16,6 +16,7 @@ from spiritual_guidance.api import SpiritualGuidanceAPI
 from tests.fixtures import (
     SAMPLE_USER_QUERIES, 
     SAMPLE_SPIRITUAL_TEXTS,
+    SAMPLE_KRISHNA_RESPONSES,
     SAMPLE_SPIRITUAL_RESPONSES,
     create_test_spiritual_content
 )

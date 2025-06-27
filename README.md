@@ -1,6 +1,6 @@
 # 🕉️ Vimarsh - AI Spiritual Guidance System
 
-*Seeking spiritual wisdom through the divine guidance of Lord Krishna*
+*Seeking spiritual wisdom through the divine guidance of Vedic Scriptures*
 
 [![CI/CD Pipeline](https://github.com/vedprakash-m/vimarsh/actions/workflows/test.yml/badge.svg)](https://github.com/vedprakash-m/vimarsh/actions)
 [![Azure Deployment](https://github.com/vedprakash-m/vimarsh/actions/workflows/deploy.yml/badge.svg)](https://github.com/vedprakash-m/vimarsh/actions)
@@ -8,7 +8,7 @@
 
 ## 🎯 Vision
 
-Vimarsh is an AI-powered spiritual guidance system that embodies the divine wisdom of Lord Krishna, offering authentic, reverent, and personalized spiritual guidance through advanced AI technology. Built with respect for Dharmic traditions and optimized for both English and Hindi speakers.
+Vimarsh is an AI-powered spiritual guidance system that embodies the divine wisdom of Vedic Scriptures, offering authentic, reverent, and personalized spiritual guidance through advanced AI technology. Built with respect for Dharmic traditions and optimized for both English and Hindi speakers.
 
 ## ✨ Features
 

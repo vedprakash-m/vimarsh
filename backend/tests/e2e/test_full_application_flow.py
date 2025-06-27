@@ -17,7 +17,8 @@ from typing import Dict, List, Any
 class TestFullApplicationFlow:
     """Test complete application flow with mock data"""
     
-    def __init__(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         """Setup comprehensive test environment"""
         self.test_results = []
         self.mock_sessions = []

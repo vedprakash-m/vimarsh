@@ -7,6 +7,7 @@ including the VoiceInterface component and useVoiceRecognition hook.
 
 import json
 import time
+import pytest
 from typing import Dict, List, Any
 from dataclasses import dataclass
 
@@ -62,7 +63,8 @@ class MockWebSpeechAPI:
 class TestVoiceInterfaceComponent:
     """Test VoiceInterface React component functionality"""
     
-    def __init__(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.mock_web_speech = MockWebSpeechAPI()
         self.test_results = []
     
@@ -290,7 +292,8 @@ class TestVoiceInterfaceComponent:
 class TestUseVoiceRecognitionHook:
     """Test useVoiceRecognition React hook functionality"""
     
-    def __init__(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.mock_web_speech = MockWebSpeechAPI()
         self.test_results = []
     
@@ -470,7 +473,8 @@ class TestUseVoiceRecognitionHook:
 class TestVoiceIntegrationFlow:
     """Test end-to-end voice interface integration"""
     
-    def __init__(self):
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
         self.test_results = []
     
     def test_voice_to_spiritual_guidance_flow(self):
