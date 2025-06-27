@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-06-27 13:09:05",
+  "total_duration": 0.0,
+  "test_summary": {
+    "test_directories": 7,
+    "test_files": 28,
+    "strategic_tests": 1,
+    "comprehensive_tests": 5
+  },
+  "coverage_summary": {
+    "total_test_files": 25,
+    "total_source_files": 50,
+    "test_coverage_ratio": 0.5,
+    "estimated_coverage": 85
+  },
+  "component_analysis": {
+    "spiritual_guidance": {
+      "name": "spiritual_guidance",
+      "exists": true,
+      "source_files": 5,
+      "test_files": 1,
+      "status": "partial_coverage",
+      "priority": "medium"
+    },
+    "rag_pipeline": {
+      "name": "rag_pipeline",
+      "exists": true,
+      "source_files": 4,
+      "test_files": 2,
+      "status": "partial_coverage",
+      "priority": "medium"
+    },
+    "llm_integration": {
+      "name": "llm_integration",
+      "exists": true,
+      "source_files": 0,
+      "test_files": 1,
+      "status": "no_source",
+      "priority": "low"
+    },
+    "voice_interface": {
+      "name": "voice_interface",
+      "exists": true,
+      "source_files": 0,
+      "test_files": 4,
+      "status": "no_source",
+      "priority": "low"
+    },
+    "cost_management": {
+      "name": "cost_management",
+      "exists": true,
+      "source_files": 13,
+      "test_files": 7,
+      "status": "partial_coverage",
+      "priority": "medium"
+    },
+    "monitoring": {
+      "name": "monitoring",
+      "exists": true,
+      "source_files": 9,
+      "test_files": 1,
+      "status": "partial_coverage",
+      "priority": "medium"
+    },
+    "error_handling": {
+      "name": "error_handling",
+      "exists": true,
+      "source_files": 9,
+      "test_files": 7,
+      "status": "partial_coverage",
+      "priority": "medium"
+    },
+    "data_processing": {
+      "name": "data_processing",
+      "exists": true,
+      "source_files": 9,
+      "test_files": 2,
+      "status": "partial_coverage",
+      "priority": "medium"
+    },
+    "auth": {
+      "name": "auth",
+      "exists": true,
+      "source_files": 1,
+      "test_files": 0,
+      "status": "no_tests",
+      "priority": "high"
+    }
+  },
+  "recommendations": [
+    "\ud83d\udcdd Add tests for: auth"
+  ]
+}

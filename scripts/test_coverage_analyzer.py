@@ -701,8 +701,54 @@ class AdvancedVimarshaAnalyzer:
                   f"(gap: {component['gap']:.1f}%, priority: {component['priority']})")
         
         return strategy
-
-
+    
+    def analyze_component(self, component_name: str) -> Dict[str, Any]:
+        """Analyze a specific component for test coverage and quality."""
+        component_path = self.backend_dir / component_name
+        
+        analysis = {
+            "name": component_name,
+            "exists": component_path.exists(),
+            "source_files": 0,
+            "test_files": 0,
+            "coverage_percentage": 0.0,
+            "complexity_score": 0,
+            "test_quality": "unknown",
+            "recommendations": []
+        }
+        
+        if not component_path.exists():
+            analysis["recommendations"].append(f"Component directory {component_name} not found")
+            return analysis
+        
+        # Count source files
+        py_files = list(component_path.glob("*.py"))
+        analysis["source_files"] = len([f for f in py_files if not f.name.startswith("test_")])
+        
+        # Count test files  
+        test_files = list(component_path.glob("test_*.py"))
+        tests_dir = self.backend_dir / "tests" / component_name
+        if tests_dir.exists():
+            test_files.extend(tests_dir.glob("test_*.py"))
+        analysis["test_files"] = len(test_files)
+        
+        # Calculate test-to-source ratio
+        if analysis["source_files"] > 0:
+            test_ratio = analysis["test_files"] / analysis["source_files"]
+            if test_ratio < 0.5:
+                analysis["test_quality"] = "low"
+                analysis["recommendations"].append("Consider adding more test files")
+            elif test_ratio < 1.0:
+                analysis["test_quality"] = "medium"
+            else:
+                analysis["test_quality"] = "high"
+        
+        # Estimate coverage (simplified)
+        if analysis["test_files"] > 0 and analysis["source_files"] > 0:
+            analysis["coverage_percentage"] = min(90.0, test_ratio * 60 + 30)
+        
+        return analysis
+    
 def main():
     """Main execution function."""
     if len(sys.argv) > 1:
