@@ -1,0 +1,114 @@
+name: 🧪 Vimarsh Optimized Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '18'
+
+jobs:
+  # Backend Tests
+  backend-tests:
+    name: 🐍 Backend Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        test-group:
+          - name: 'unit-llm'
+            pattern: 'tests/test_llm_integration_comprehensive.py'
+            timeout: 8
+          - name: 'integration'
+            pattern: 'tests/test_integration_rag_llm.py tests/test_llm_workflow_integration.py tests/test_end_to_end_workflow.py'
+            timeout: 12
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+        
+    - name: 🔧 Install backend dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio pytest-timeout pytest-xdist
+        
+    - name: 🧪 Run test group - ${{ matrix.test-group.name }}
+      timeout-minutes: ${{ matrix.test-group.timeout }}
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+      run: |
+        cd backend
+        python -m pytest ${{ matrix.test-group.pattern }} -v --tb=short --cov=. --cov-report=xml:coverage-${{ matrix.test-group.name }}.xml --timeout=120
+        
+    - name: 📊 Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: backend/coverage-${{ matrix.test-group.name }}.xml
+        flags: backend-${{ matrix.test-group.name }}
+        name: backend-${{ matrix.test-group.name }}
+
+  # Quality Gates
+  quality-gates:
+    name: 🎯 Quality Gates
+    needs: [backend-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🎯 Check overall status
+      run: |
+        echo "Checking quality gates..."
+        if [[ "${{ needs.backend-tests.result }}" == "success" ]]; then
+          echo "🎉 All quality gates passed!"
+          echo "✅ Test pass rate: 100%"
+          echo "🚀 Ready for deployment!"
+        else
+          echo "⛔ Quality gates failed!"
+          echo "❌ Backend tests: ${{ needs.backend-tests.result }}"
+          echo "🚫 Not ready for deployment"
+          exit 1
+        fi
+
+  # Test Summary
+  test-summary:
+    name: 📋 Test Summary
+    needs: [quality-gates]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📋 Print test summary
+      run: |
+        echo "# Vimarsh Test Suite Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Results:" >> $GITHUB_STEP_SUMMARY
+        echo "- Quality Gates: ${{ needs.quality-gates.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ needs.quality-gates.result }}" == "success" ]]; then
+          echo "✅ **All tests passed! Ready for deployment.**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Tests failed. Please review and fix issues.**" >> $GITHUB_STEP_SUMMARY
+        fi

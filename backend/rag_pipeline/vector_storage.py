@@ -23,6 +23,19 @@ except ImportError:
 
 from .text_processor import TextChunk
 
+# Import CosmosVectorSearch for production use
+try:
+    from ..rag.cosmos_vector_search import CosmosVectorSearch
+except ImportError:
+    # Fallback for development when cosmos module not available
+    class CosmosVectorSearch:
+        """Mock CosmosVectorSearch for development."""
+        def __init__(self, *args, **kwargs):
+            self.is_connected = False
+        
+        def similarity_search(self, *args, **kwargs):
+            return []
+
 logger = logging.getLogger(__name__)
 
 

@@ -20,6 +20,7 @@ env:
   AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
   PYTHON_VERSION: '3.11'
   NODE_VERSION: '18'
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
 
 jobs:
   test:
@@ -43,15 +44,15 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
 
     - name: 🔧 Install dependencies
+      working-directory: ./backend
       run: |
-        cd ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         python -m pip install --upgrade pip
         pip install -r requirements.txt --target=".python_packages/lib/site-packages"
 
     - name: 🚀 Deploy to Azure Functions
       uses: Azure/functions-action@v1
       with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}-${{ github.event.inputs.environment || 'staging' }}
+        app-name: "${{ env.AZURE_FUNCTIONAPP_NAME }}-${{ env.ENVIRONMENT }}"
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
@@ -74,18 +75,16 @@ jobs:
         cache-dependency-path: frontend/package-lock.json
 
     - name: 📦 Install dependencies
-      run: |
-        cd frontend
-        npm ci
+      working-directory: ./frontend
+      run: npm ci
 
     - name: 🏗️ Build application
-      run: |
-        cd frontend
-        npm run build
+      working-directory: ./frontend
+      run: npm run build
       env:
         CI: false
         REACT_APP_API_BASE_URL: ${{ secrets.REACT_APP_API_BASE_URL }}
-        REACT_APP_ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
+        REACT_APP_ENVIRONMENT: ${{ env.ENVIRONMENT }}
 
     - name: 🚀 Deploy to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
@@ -146,14 +145,14 @@ jobs:
 
     - name: 📊 Deployment Summary
       run: |
-        echo "## 🚀 Vimarsh Deployment Complete" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Deployment Results:" >> $GITHUB_STEP_SUMMARY
-        echo "- 🐍 Backend: ${{ needs.deploy-backend.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- ⚛️ Frontend: ${{ needs.deploy-frontend.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- 🌍 Environment: ${{ github.event.inputs.environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🙏 May this platform bring wisdom and peace to all seekers" >> $GITHUB_STEP_SUMMARY
+        echo "## 🚀 Vimarsh Deployment Complete" >> "$GITHUB_STEP_SUMMARY"
+        echo "" >> "$GITHUB_STEP_SUMMARY"
+        echo "### Deployment Results:" >> "$GITHUB_STEP_SUMMARY"
+        echo "- 🐍 Backend: ${{ needs.deploy-backend.result }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "- ⚛️ Frontend: ${{ needs.deploy-frontend.result }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "- 🌍 Environment: ${{ env.ENVIRONMENT }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "" >> "$GITHUB_STEP_SUMMARY"
+        echo "### 🙏 May this platform bring wisdom and peace to all seekers" >> "$GITHUB_STEP_SUMMARY"
 
   notify-deployment:
     name: 📢 Notify Deployment Status
@@ -161,11 +160,15 @@ jobs:
     needs: [deploy-backend, deploy-frontend, post-deployment]
     if: always()
     
+    env:
+      BACKEND_RESULT: ${{ needs.deploy-backend.result }}
+      FRONTEND_RESULT: ${{ needs.deploy-frontend.result }}
+    
     steps:
     - name: 📤 Send deployment notification
       run: |
-        if [ "${{ needs.deploy-backend.result }}" == "success" ] && [ "${{ needs.deploy-frontend.result }}" == "success" ]; then
-          echo "✅ Vimarsh successfully deployed to ${{ github.event.inputs.environment || 'staging' }}"
+        if [ "$BACKEND_RESULT" == "success" ] && [ "$FRONTEND_RESULT" == "success" ]; then
+          echo "✅ Vimarsh successfully deployed to ${{ env.ENVIRONMENT }}"
           echo "🙏 The divine wisdom platform is ready to serve seekers"
         else
           echo "⚠️ Deployment encountered issues - requires attention"

@@ -192,13 +192,16 @@ class LocalE2EValidator:
             # 6. Performance analysis
             self._analyze_performance(report)
             
-            # 7. Generate recommendations
+            # 7. Validate missing files and modules (CI/CD gap analysis)
+            self._validate_missing_files_and_modules()
+            
+            # 8. Generate recommendations
             self._generate_recommendations(report)
             
-            # 8. CI/CD readiness check
+            # 9. CI/CD readiness check
             report.ci_cd_ready = self._check_ci_cd_readiness(report)
             
-            # 9. Generate final report
+            # 10. Generate final report
             self._print_final_report(report)
             
             return report
@@ -727,6 +730,84 @@ class LocalE2EValidator:
             print("\n⚠️  WARNING: Address the issues above before pushing to CI/CD")
         
         print("="*80)
+    
+    def _validate_missing_files_and_modules(self):
+        """Validate files and modules that CI/CD expects but might be missing."""
+        logger.info("🔍 Validating files and modules expected by CI/CD...")
+        
+        # Check for missing test files that caused CI/CD failure
+        missing_test_files = [
+            "backend/tests/test_cost_management.py",
+            "backend/tests/performance/__init__.py"
+        ]
+        
+        for test_file in missing_test_files:
+            file_path = self.project_root / test_file
+            if not file_path.exists():
+                logger.error(f"❌ Missing test file expected by CI/CD: {test_file}")
+                self.test_results["validation"]["failed"] += 1
+            else:
+                logger.info(f"✅ Test file exists: {test_file}")
+                self.test_results["validation"]["passed"] += 1
+        
+        # Check for missing Python modules that caused import errors
+        missing_modules = [
+            "backend/monitoring/alerts.py",
+            "backend/monitoring/real_time.py"
+        ]
+        
+        for module_file in missing_modules:
+            file_path = self.project_root / module_file
+            if not file_path.exists():
+                logger.error(f"❌ Missing module expected by tests: {module_file}")
+                self.test_results["validation"]["failed"] += 1
+            else:
+                logger.info(f"✅ Module exists: {module_file}")
+                self.test_results["validation"]["passed"] += 1
+        
+        # Check frontend package.json for required scripts
+        package_json = self.project_root / "frontend" / "package.json"
+        if package_json.exists():
+            try:
+                import json
+                with open(package_json, 'r') as f:
+                    package_data = json.load(f)
+                
+                required_scripts = ["test:coverage", "test:ci"]
+                scripts = package_data.get("scripts", {})
+                
+                for script in required_scripts:
+                    if script not in scripts:
+                        logger.error(f"❌ Missing npm script in package.json: {script}")
+                        self.test_results["validation"]["failed"] += 1
+                    else:
+                        logger.info(f"✅ NPM script exists: {script}")
+                        self.test_results["validation"]["passed"] += 1
+                        
+            except Exception as e:
+                logger.error(f"❌ Error validating package.json: {e}")
+                self.test_results["validation"]["failed"] += 1
+        
+        # Check for CosmosVectorSearch availability in vector_storage module
+        try:
+            vector_storage_file = self.project_root / "backend" / "rag_pipeline" / "vector_storage.py"
+            if vector_storage_file.exists():
+                with open(vector_storage_file, 'r') as f:
+                    content = f.read()
+                    
+                if "CosmosVectorSearch" in content:
+                    logger.info("✅ CosmosVectorSearch found in vector_storage module")
+                    self.test_results["validation"]["passed"] += 1
+                else:
+                    logger.error("❌ CosmosVectorSearch not found in vector_storage module")
+                    self.test_results["validation"]["failed"] += 1
+            else:
+                logger.error("❌ vector_storage.py not found")
+                self.test_results["validation"]["failed"] += 1
+                
+        except Exception as e:
+            logger.error(f"❌ Error checking vector_storage module: {e}")
+            self.test_results["validation"]["failed"] += 1
 
 
 def main():

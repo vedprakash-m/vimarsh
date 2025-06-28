@@ -502,7 +502,9 @@ Translation: Everything in this universe is controlled and owned by the Lord. On
         processor = SpiritualTextProcessor()
         all_chunks = []
         
-        for content, metadata in all_documents:
+        for document in all_documents:
+            content = document["content"]
+            metadata = document["metadata"]
             chunks = processor.process_text(content, source_file=metadata.filename)
             all_chunks.extend(chunks)
         
