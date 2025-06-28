@@ -92,15 +92,22 @@ jobs:
         SHOULD_BUILD="false"
         SHOULD_DEPLOY="false"
         
-        # Test if backend or frontend changed
-        if [[ "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.frontend }}" == "true" || "${{ github.event.inputs.force_full_pipeline }}" == "true" ]]; then
+        # Force full pipeline for main branch pushes and manual triggers
+        if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event.inputs.force_full_pipeline }}" == "true" ]]; then
           SHOULD_TEST="true"
           SHOULD_BUILD="true"
-        fi
-        
-        # Deploy on main branch or manual trigger
-        if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           SHOULD_DEPLOY="true"
+        else
+          # For other branches, run based on changes
+          if [[ "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.frontend }}" == "true" || "${{ steps.changes.outputs.infrastructure }}" == "true" ]]; then
+            SHOULD_TEST="true"
+            SHOULD_BUILD="true"
+          fi
+          
+          # Deploy develop branch to staging
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            SHOULD_DEPLOY="true"
+          fi
         fi
         
         echo "should_test=$SHOULD_TEST" >> $GITHUB_OUTPUT
@@ -149,7 +156,7 @@ jobs:
     name: 🧪 Backend Tests
     runs-on: ubuntu-latest
     needs: [setup, security-scan]
-    if: needs.setup.outputs.backend_changed == 'true' && needs.setup.outputs.should_test == 'true'
+    if: needs.setup.outputs.should_test == 'true'
     timeout-minutes: 15
 
     steps:
@@ -188,7 +195,7 @@ jobs:
     name: 🧪 Frontend Tests
     runs-on: ubuntu-latest
     needs: [setup, security-scan]
-    if: needs.setup.outputs.frontend_changed == 'true' && needs.setup.outputs.should_test == 'true'
+    if: needs.setup.outputs.should_test == 'true'
     timeout-minutes: 10
 
     steps:
