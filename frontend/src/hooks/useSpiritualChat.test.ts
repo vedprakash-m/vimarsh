@@ -1,7 +1,11 @@
 /**
  * Test suite for useSpiritualChat hook
  * 
- * Tests the main chat functionality for spiritual guidance,
+ * Tests the main chat     }),
+    getSessions: jest.fn(() => []),
+    setCurrentSession: jest.fn(),
+    updateSessionMessages: jest.fn(),
+    saveSession: jest.fn(),ty for spiritual guidance,
  * including message handling, spiritual content validation,
  * and conversation management.
  */
@@ -13,6 +17,37 @@ import { useSpiritualChat } from './useSpiritualChat';
 jest.mock('../utils/conversationHistory', () => ({
   conversationHistory: {
     saveSession: jest.fn(),
+    getSession: jest.fn((sessionId) => {
+      if (sessionId === 'existing-session') {
+        return {
+          id: 'test-session',
+          messages: [
+            {
+              id: '1',
+              text: 'What is dharma?',
+              sender: 'user',
+              timestamp: new Date('2024-01-15T10:30:00Z')
+            },
+            {
+              id: '2',
+              text: 'Dear devotee, dharma refers to righteous living according to cosmic law.',
+              sender: 'ai',
+              timestamp: new Date('2024-01-15T10:30:30Z'),
+              citations: [
+                {
+                  source: 'Bhagavad Gita',
+                  reference: '2.47',
+                  verse: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन'
+                }
+              ]
+            }
+          ],
+          title: 'Understanding Dharma',
+          timestamp: new Date('2024-01-15T10:30:00Z')
+        };
+      }
+      return null;
+    }),
     loadSession: jest.fn(() => ({
       id: 'test-session',
       messages: [
@@ -39,6 +74,9 @@ jest.mock('../utils/conversationHistory', () => ({
       title: 'Understanding Dharma',
       timestamp: new Date('2024-01-15T10:30:00Z')
     })),
+    getSessions: jest.fn(() => []),
+    setCurrentSession: jest.fn(),
+    updateSessionMessages: jest.fn(),
     createSession: jest.fn(() => ({
       id: 'new-session-id',
       title: 'New Session',
@@ -52,8 +90,7 @@ jest.mock('../utils/conversationHistory', () => ({
         topics: [],
         duration: 0
       }
-    })),
-    getSessions: jest.fn(() => [])
+    }))
   }
 }));
 

@@ -1,0 +1,45 @@
+{
+  "suite_level": "core",
+  "quick_mode": false,
+  "start_time": 1751130386.751269,
+  "results": [
+    {
+      "name": "syntax_validation",
+      "passed": true,
+      "duration": 0.327470064163208,
+      "message": "All Python files have valid syntax",
+      "details": null
+    },
+    {
+      "name": "import_validation",
+      "passed": false,
+      "duration": 7.4055399894714355,
+      "message": "Import failures: llm.gemini_client: Command '['/Users/vedprakashmishra/vimarsh/.venv/bin/python3', '-c', 'import llm.gemini_client']' timed out after 5 seconds",
+      "details": null
+    },
+    {
+      "name": "basic_functionality",
+      "passed": true,
+      "duration": 3.265342950820923,
+      "message": "Basic functionality test passed",
+      "details": null
+    },
+    {
+      "name": "security_baseline",
+      "passed": true,
+      "duration": 0.02630782127380371,
+      "message": "Basic security checks passed",
+      "details": null
+    }
+  ],
+  "summary": {
+    "total_checks": 4,
+    "passed": 3,
+    "failed": 1,
+    "skipped": 0,
+    "pass_rate": 75.0,
+    "total_duration": 11.02466082572937,
+    "duration": 11.063620805740356
+  },
+  "recommendation": "\ud83d\udd25 Significant issues found. Fix before pushing."
+}
