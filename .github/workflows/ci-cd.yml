@@ -162,7 +162,7 @@ jobs:
         python fast_local_e2e.py --level core --quick --verbose
         
     - name: Upload E2E results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-results
@@ -242,7 +242,7 @@ jobs:
         isort --check-only --diff .
         
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports
@@ -484,7 +484,7 @@ jobs:
         name: ${{ matrix.test-category }}-coverage
         
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.test-category }}
@@ -521,7 +521,7 @@ jobs:
         python -m pytest backend/tests/e2e/ tests/ -v --cov=backend --cov-report=json --json-report --json-report-file=e2e-results.json
         
     - name: Upload E2E results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-test-results
@@ -596,7 +596,7 @@ jobs:
         mypy backend/ --ignore-missing-imports --json-report mypy-report || true
         
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-quality-reports
@@ -646,7 +646,7 @@ jobs:
         python scripts/check_coverage_thresholds.py --min-coverage 85
         
     - name: Upload combined coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: combined-coverage
         path: |
@@ -694,7 +694,7 @@ jobs:
         python scripts/generate_deployment_report.py
         
     - name: Upload deployment artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: deployment-readiness
         path: |

@@ -1,0 +1,45 @@
+{
+  "suite_level": "core",
+  "quick_mode": false,
+  "start_time": 1751093370.888863,
+  "results": [
+    {
+      "name": "syntax_validation",
+      "passed": true,
+      "duration": 0.035095930099487305,
+      "message": "All Python files have valid syntax",
+      "details": null
+    },
+    {
+      "name": "import_validation",
+      "passed": false,
+      "duration": 0.9211719036102295,
+      "message": "Import failures: llm.gemini_client: WARNING:root:Azure SDK not available - using mock data for cost monitoring\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/Users/vedprakashmishra/vimarsh/backend/llm/__init__.py\", line 6, in <module>\n    from .gemini_client import (\n  File \"/Users/vedprakashmishra/vimarsh/backend/llm/gemini_client.py\", line 17, in <module>\n    from cost_management.token_tracker import get_token_tracker\n  File \"/Users/vedprakashmishra/vimarsh/backend/cost_management/__init__.py\", line 8, in <module>\n    from .intelligent_cache import QueryDeduplication\nImportError: cannot import name 'QueryDeduplication' from 'cost_management.intelligent_cache' (/Users/vedprakashmishra/vimarsh/backend/cost_management/intelligent_cache.py)",
+      "details": null
+    },
+    {
+      "name": "basic_functionality",
+      "passed": true,
+      "duration": 0.8140208721160889,
+      "message": "Basic functionality test passed",
+      "details": null
+    },
+    {
+      "name": "security_baseline",
+      "passed": true,
+      "duration": 0.0009739398956298828,
+      "message": "Basic security checks passed",
+      "details": null
+    }
+  ],
+  "summary": {
+    "total_checks": 4,
+    "passed": 3,
+    "failed": 1,
+    "skipped": 0,
+    "pass_rate": 75.0,
+    "total_duration": 1.7712626457214355,
+    "duration": 1.7719950675964355
+  },
+  "recommendation": "\ud83d\udd25 Significant issues found. Fix before pushing."
+}

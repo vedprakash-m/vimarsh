@@ -113,7 +113,7 @@ jobs:
         
     - name: Upload validation artifacts
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: validation-results-${{ matrix.validation-group.name }}
         path: |
@@ -209,7 +209,7 @@ jobs:
         fi
         
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.test-group.name }}
@@ -286,7 +286,7 @@ jobs:
         fi
         
     - name: Upload combined coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: combined-coverage-report
         path: |
@@ -335,7 +335,7 @@ jobs:
         npm run build
         
     - name: Upload frontend artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frontend-build
         path: |
@@ -375,7 +375,7 @@ jobs:
         bandit -r . -f json -o bandit-report.json || true
         
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -412,7 +412,7 @@ jobs:
         python -m pytest tests/test_performance_benchmarks.py --benchmark-json=benchmark-results.json || true
         
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: performance-benchmarks
         path: backend/benchmark-results.json

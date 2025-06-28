@@ -19,6 +19,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+# Import workflow validator
+try:
+    from workflow_validator import WorkflowValidator
+    WORKFLOW_VALIDATION_AVAILABLE = True
+except ImportError:
+    WORKFLOW_VALIDATION_AVAILABLE = False
+    print("⚠️  Workflow validation not available - install PyYAML and requests")
+
 
 @dataclass
 class ValidationResult:
