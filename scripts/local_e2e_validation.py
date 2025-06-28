@@ -100,6 +100,23 @@ class LocalE2EValidator:
         self.parallel = parallel
         self.max_workers = max_workers
         
+        # Test results initialization
+        self.test_results = {
+            "validation": {
+                "total": 0,
+                "passed": 0,
+                "failed": 0
+            },
+            "coverage": {
+                "total": 0.0,
+                "achieved": 0.0
+            },
+            "performance": {
+                "total": 0.0,
+                "issues": 0
+            }
+        }
+        
         # Test categories for intelligent selection
         self.test_categories = {
             'critical': [
@@ -319,12 +336,30 @@ class LocalE2EValidator:
         
         test_results = []
         
-        if self.parallel and len(test_files) > 1:
-            # Parallel execution for independent test files
-            test_results = self._execute_tests_parallel(test_files)
-        else:
-            # Sequential execution
-            test_results = self._execute_tests_sequential(test_files)
+        # First run real pytest on backend
+        if self.project_root.joinpath("backend").exists():
+            logger.info("🐍 Running backend pytest suite...")
+            backend_result = self._run_backend_pytest()
+            if backend_result:
+                test_results.append(backend_result)
+        
+        # Then run frontend tests  
+        if self.project_root.joinpath("frontend").exists():
+            logger.info("⚛️ Running frontend test suite...")
+            frontend_result = self._run_frontend_tests()
+            if frontend_result:
+                test_results.append(frontend_result)
+        
+        # Run original test discovery for any remaining tests (but reduced priority in quick mode)
+        if not self.quick_mode:
+            if self.parallel and len(test_files) > 1:
+                # Parallel execution for independent test files
+                additional_results = self._execute_tests_parallel(test_files)
+                test_results.extend(additional_results)
+            else:
+                # Sequential execution
+                additional_results = self._execute_tests_sequential(test_files)
+                test_results.extend(additional_results)
         
         # Update report
         for result in test_results:
@@ -808,6 +843,131 @@ class LocalE2EValidator:
         except Exception as e:
             logger.error(f"❌ Error checking vector_storage module: {e}")
             self.test_results["validation"]["failed"] += 1
+    
+    def _run_backend_pytest(self) -> Optional[TestResult]:
+        """Run actual pytest on backend to catch real failures"""
+        try:
+            backend_dir = self.project_root / "backend"
+            logger.info(f"Running pytest in {backend_dir}")
+            
+            result = subprocess.run(
+                ["python", "-m", "pytest", "--tb=short", "-q"],
+                cwd=backend_dir,
+                capture_output=True,
+                text=True,
+                timeout=300  # 5 minute timeout
+            )
+            
+            output = result.stdout + result.stderr
+            
+            # Parse pytest output for counts
+            test_count = 0
+            passed = 0
+            failed = 0
+            errors = 0
+            skipped = 0
+            
+            # Look for summary line like "120 failed, 192 passed, 52 errors"
+            import re
+            summary_pattern = r'(\d+) failed, (\d+) passed, (\d+) errors'
+            match = re.search(summary_pattern, output)
+            if match:
+                failed = int(match.group(1))
+                passed = int(match.group(2))
+                errors = int(match.group(3))
+                test_count = failed + passed + errors
+            else:
+                # Try other patterns
+                if "failed" in output:
+                    failed_match = re.search(r'(\d+) failed', output)
+                    if failed_match:
+                        failed = int(failed_match.group(1))
+                if "passed" in output:
+                    passed_match = re.search(r'(\d+) passed', output)
+                    if passed_match:
+                        passed = int(passed_match.group(1))
+                test_count = failed + passed + errors
+            
+            return TestResult(
+                test_file="backend/pytest",
+                test_count=test_count,
+                passed=passed,
+                failed=failed,
+                skipped=skipped,
+                errors=errors,
+                duration=0.0,  # We don't track this granularly
+                exit_code=result.returncode,
+                output=output[:1000]  # Truncate for brevity
+            )
+            
+        except Exception as e:
+            logger.error(f"Backend pytest failed: {e}")
+            return TestResult(
+                test_file="backend/pytest",
+                test_count=0,
+                passed=0,
+                failed=1,
+                skipped=0,
+                errors=1,
+                duration=0.0,
+                exit_code=1,
+                output=str(e)
+            )
+    
+    def _run_frontend_tests(self) -> Optional[TestResult]:
+        """Run frontend tests to catch real failures"""
+        try:
+            frontend_dir = self.project_root / "frontend"
+            logger.info(f"Running npm test in {frontend_dir}")
+            
+            result = subprocess.run(
+                ["npm", "test", "--", "--watchAll=false", "--verbose=false"],
+                cwd=frontend_dir,
+                capture_output=True,
+                text=True,
+                timeout=120  # 2 minute timeout
+            )
+            
+            output = result.stdout + result.stderr
+            
+            # Parse npm test output
+            test_count = 0
+            passed = 0
+            failed = 0
+            
+            import re
+            # Look for "Tests: 150 failed, 117 passed, 267 total"
+            test_summary = re.search(r'Tests:\s+(\d+)\s+failed,\s+(\d+)\s+passed,\s+(\d+)\s+total', output)
+            if test_summary:
+                failed = int(test_summary.group(1))
+                passed = int(test_summary.group(2))
+                test_count = int(test_summary.group(3))
+            
+            return TestResult(
+                test_file="frontend/npm-test",
+                test_count=test_count,
+                passed=passed,
+                failed=failed,
+                skipped=0,
+                errors=0,
+                duration=0.0,
+                exit_code=result.returncode,
+                output=output[:1000]  # Truncate for brevity
+            )
+            
+        except Exception as e:
+            logger.error(f"Frontend tests failed: {e}")
+            return TestResult(
+                test_file="frontend/npm-test",
+                test_count=0,
+                passed=0,
+                failed=1,
+                skipped=0,
+                errors=1,
+                duration=0.0,
+                exit_code=1,
+                output=str(e)
+            )
 
 
 def main():

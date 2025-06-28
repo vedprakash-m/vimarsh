@@ -121,10 +121,12 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
     // Create session in history if auto-save enabled
     if (finalConfig.autoSave) {
       const session = conversationHistory.createSession(finalConfig.language);
-      setState(prev => ({
-        ...prev,
-        currentSessionId: session.id
-      }));
+      if (session && session.id) {
+        setState(prev => ({
+          ...prev,
+          currentSessionId: session.id
+        }));
+      }
     }
   }, [finalConfig.language, finalConfig.autoSave, config.sessionId]);
 

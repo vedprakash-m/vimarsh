@@ -39,7 +39,20 @@ jest.mock('../utils/conversationHistory', () => ({
       title: 'Understanding Dharma',
       timestamp: new Date('2024-01-15T10:30:00Z')
     })),
-    createSession: jest.fn(() => 'new-session-id'),
+    createSession: jest.fn(() => ({
+      id: 'new-session-id',
+      title: 'New Session',
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      language: 'en',
+      metadata: {
+        messageCount: 0,
+        lastActivity: new Date(),
+        topics: [],
+        duration: 0
+      }
+    })),
     getSessions: jest.fn(() => [])
   }
 }));
@@ -54,10 +67,12 @@ describe('useSpiritualChat', () => {
   });
 
   describe('Initialization', () => {
-    test('initializes with empty state', () => {
+    test('initializes with welcome message', () => {
       const { result } = renderHook(() => useSpiritualChat());
 
-      expect(result.current.messages).toEqual([]);
+      expect(result.current.messages).toHaveLength(1);
+      expect(result.current.messages[0].sender).toBe('ai');
+      expect(result.current.messages[0].text).toMatch(/Namaste/);
       expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBeNull();
       expect(result.current.sessionId).toBeTruthy();

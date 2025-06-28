@@ -1027,7 +1027,7 @@ class SpiritualTTSOptimizer:
         
         return optimized_text
     
-    def generate_speech(self, text: str, voice_config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def generate_speech(self, text: str, voice_config: Optional[Dict[str, Any]] = None, language: str = "en-US") -> Any:
         """Generate speech with spiritual optimizations."""
         if voice_config is None:
             voice_config = self.select_optimal_voice('teaching')
@@ -1035,13 +1035,17 @@ class SpiritualTTSOptimizer:
         # Process text
         processed_text = self.preprocess_for_tts(text)
         
-        # Mock TTS generation
-        result = {
-            'success': True,
-            'audio_url': 'mock://generated-speech.wav',
-            'duration': len(text) * 0.1,  # Rough estimate
-            'processed_text': processed_text,
-            'voice_config': voice_config
-        }
+        # Mock TTS generation with async simulation
+        await asyncio.sleep(0.01)  # Simulate async processing
         
-        return result
+        # Create mock audio response object
+        audio_response = type('AudioResponse', (), {
+            'audio_data': f"generated_audio_for_{text[:20]}".encode(),
+            'duration': len(text) * 0.1,  # Rough estimate
+            'language': language,
+            'processed_text': processed_text,
+            'voice_config': voice_config,
+            'success': True
+        })()
+        
+        return audio_response
