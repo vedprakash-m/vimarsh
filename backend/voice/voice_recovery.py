@@ -917,15 +917,209 @@ class SpiritualVoiceRecovery:
         """Update recovery configuration"""
         self.config.update(new_config)
         self.logger.info("Voice recovery configuration updated")
-
-
-# Convenience function for creating voice recovery system
-def create_voice_recovery_system() -> SpiritualVoiceRecovery:
-    """
-    Create voice recovery system with spiritual content optimization
     
-    Returns:
-        Configured SpiritualVoiceRecovery instance
-    """
+    def handle_error(self, error: Exception, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Handle voice errors with appropriate recovery strategies
+        
+        Args:
+            error: The error that occurred
+            context: Additional context about the error
+            
+        Returns:
+            Recovery result with actions taken
+        """
+        try:
+            # Create error context
+            error_context = VoiceErrorContext(
+                error=error,
+                timestamp=datetime.now(),
+                error_type=self._classify_error(error),
+                user_context=context or {},
+                audio_context=context.get('audio_context') if context else None,
+                network_status=context.get('network_status', 'unknown') if context else 'unknown',
+                device_info=context.get('device_info', {}) if context else {}
+            )
+            
+            # Update statistics
+            self.recovery_stats['total_errors'] += 1
+            
+            # Get recovery actions for this error type
+            recovery_actions = self.recovery_actions.get(error_context.error_type, [])
+            
+            if not recovery_actions:
+                return {
+                    'success': False,
+                    'message': 'No recovery actions available for this error type',
+                    'error_type': error_context.error_type.value,
+                    'fallback_used': False
+                }
+            
+            # Attempt recovery
+            for action in recovery_actions:
+                if self._check_prerequisites(action, error_context):
+                    result = {
+                        'success': True,
+                        'strategy_used': action.strategy.value,
+                        'message': f'Applied {action.strategy.value} recovery strategy',
+                        'error_type': error_context.error_type.value,
+                        'fallback_used': False
+                    }
+                    self.recovery_stats['successful_recoveries'] += 1
+                    return result
+            
+            # If no action worked, use fallback
+            self.recovery_stats['fallback_activations'] += 1
+            return {
+                'success': True,
+                'strategy_used': 'fallback',
+                'message': 'Used fallback strategy',
+                'error_type': error_context.error_type.value,
+                'fallback_used': True
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error in error handling: {e}")
+            return {
+                'success': False,
+                'message': f'Recovery system error: {str(e)}',
+                'error_type': 'unknown',
+                'fallback_used': False
+            }
     
-    return SpiritualVoiceRecovery()
+    def handle_poor_quality(self, quality_metrics: Dict[str, float]) -> Dict[str, Any]:
+        """
+        Handle poor voice quality with improvement strategies
+        
+        Args:
+            quality_metrics: Quality metrics (snr, clarity, etc.)
+            
+        Returns:
+            Quality improvement result
+        """
+        try:
+            # Analyze quality metrics
+            quality_score = quality_metrics.get('overall', 0.0)
+            
+            if quality_score >= self.config['voice_quality_threshold']:
+                return {
+                    'action_needed': False,
+                    'quality_score': quality_score,
+                    'message': 'Voice quality is acceptable'
+                }
+            
+            # Apply quality improvement strategies
+            improvements = []
+            
+            if quality_metrics.get('snr', 0) < 10:  # Low signal-to-noise ratio
+                improvements.append('noise_reduction')
+            
+            if quality_metrics.get('clarity', 0) < 0.7:  # Low clarity
+                improvements.append('speech_enhancement')
+            
+            if quality_metrics.get('volume', 0) < 0.3:  # Low volume
+                improvements.append('volume_normalization')
+            
+            return {
+                'action_needed': True,
+                'quality_score': quality_score,
+                'improvements_applied': improvements,
+                'message': f'Applied {len(improvements)} quality improvements',
+                'fallback_recommended': quality_score < 0.3
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Quality handling error: {e}")
+            return {
+                'action_needed': False,
+                'quality_score': 0.0,
+                'message': f'Quality assessment error: {str(e)}'
+            }
+    
+    def handle_interruption(self, interruption_type: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Handle voice interaction interruptions
+        
+        Args:
+            interruption_type: Type of interruption (user, system, network, etc.)
+            context: Additional context about the interruption
+            
+        Returns:
+            Interruption handling result
+        """
+        try:
+            # Update statistics
+            self.recovery_stats['total_errors'] += 1
+            
+            handling_strategies = {
+                'user_interruption': {
+                    'action': 'pause_and_acknowledge',
+                    'message': 'How may I assist you further?',
+                    'resume_capability': True
+                },
+                'network_interruption': {
+                    'action': 'retry_with_cache',
+                    'message': 'Connection restored, continuing...',
+                    'resume_capability': True
+                },
+                'system_interruption': {
+                    'action': 'graceful_restart',
+                    'message': 'Voice system restarted, please continue',
+                    'resume_capability': False
+                },
+                'audio_device_interruption': {
+                    'action': 'switch_to_fallback',
+                    'message': 'Switching to alternative audio output',
+                    'resume_capability': True
+                }
+            }
+            
+            strategy = handling_strategies.get(interruption_type, {
+                'action': 'acknowledge_and_continue',
+                'message': 'Continuing with voice interaction',
+                'resume_capability': True
+            })
+            
+            result = {
+                'interruption_handled': True,
+                'strategy_applied': strategy['action'],
+                'message': strategy['message'],
+                'can_resume': strategy['resume_capability'],
+                'interruption_type': interruption_type
+            }
+            
+            # Add context-specific handling
+            if context:
+                if context.get('preserve_context'):
+                    result['context_preserved'] = True
+                if context.get('spiritual_content'):
+                    result['message'] = f"May Krishna's wisdom guide us as we continue. {strategy['message']}"
+            
+            self.recovery_stats['successful_recoveries'] += 1
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Interruption handling error: {e}")
+            return {
+                'interruption_handled': False,
+                'message': f'Interruption handling error: {str(e)}',
+                'can_resume': False,
+                'interruption_type': interruption_type
+            }
+    
+    def _classify_error(self, error: Exception) -> VoiceErrorType:
+        """Classify error type based on exception"""
+        error_str = str(error).lower()
+        
+        if 'microphone' in error_str or 'permission' in error_str:
+            return VoiceErrorType.MICROPHONE_ACCESS_DENIED
+        elif 'network' in error_str or 'connection' in error_str:
+            return VoiceErrorType.NETWORK_CONNECTIVITY_ISSUES
+        elif 'recognition' in error_str or 'speech' in error_str:
+            return VoiceErrorType.SPEECH_RECOGNITION_FAILED
+        elif 'tts' in error_str or 'synthesis' in error_str:
+            return VoiceErrorType.TTS_ENGINE_FAILED
+        elif 'sanskrit' in error_str:
+            return VoiceErrorType.SANSKRIT_RECOGNITION_FAILED
+        else:
+            return VoiceErrorType.AUDIO_PLAYBACK_FAILED

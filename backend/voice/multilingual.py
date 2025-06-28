@@ -620,6 +620,125 @@ class MultilingualVoiceManager:
             if term in text.lower():
                 terms.append(term)
         return terms
+    
+    def detect_language(self, text: str) -> Language:
+        """
+        Detect the primary language of the input text
+        
+        Args:
+            text: Text to analyze
+            
+        Returns:
+            Detected language
+        """
+        return self.detect_language_preference(text)
+    
+    def process_mixed_language(self, text: str) -> Dict[str, Any]:
+        """
+        Process text that contains multiple languages (code-switching)
+        
+        Args:
+            text: Mixed language text
+            
+        Returns:
+            Processing result with language segments
+        """
+        try:
+            # Analyze text for language segments
+            segments = []
+            words = text.split()
+            current_segment = []
+            current_language = self.detect_language(text)
+            
+            for word in words:
+                # Simple heuristic for language detection
+                if self._is_sanskrit_term(word):
+                    if current_language != Language.SANSKRIT:
+                        if current_segment:
+                            segments.append({
+                                'text': ' '.join(current_segment),
+                                'language': current_language,
+                                'start_pos': len(' '.join(segments)) if segments else 0
+                            })
+                            current_segment = []
+                        current_language = Language.SANSKRIT
+                    current_segment.append(word)
+                else:
+                    # Continue with current language or detect
+                    current_segment.append(word)
+            
+            # Add final segment
+            if current_segment:
+                segments.append({
+                    'text': ' '.join(current_segment),
+                    'language': current_language,
+                    'start_pos': len(' '.join(segments)) if segments else 0
+                })
+            
+            return {
+                'segments': segments,
+                'primary_language': self.detect_language(text),
+                'has_code_switching': len(set(s['language'] for s in segments)) > 1
+            }
+            
+        except Exception as e:
+            logger.error(f"Mixed language processing error: {e}")
+            return {
+                'segments': [{'text': text, 'language': self.current_language, 'start_pos': 0}],
+                'primary_language': self.current_language,
+                'has_code_switching': False
+            }
+    
+    def synthesize_multilingual(self, text: str, preserve_accents: bool = True) -> Dict[str, Any]:
+        """
+        Synthesize speech for multilingual text
+        
+        Args:
+            text: Text to synthesize (may contain multiple languages)
+            preserve_accents: Whether to preserve language-specific accents
+            
+        Returns:
+            Synthesis result with audio data and metadata
+        """
+        try:
+            # Process mixed language content
+            processing_result = self.process_mixed_language(text)
+            
+            # Prepare synthesis for each segment
+            synthesis_segments = []
+            for segment in processing_result['segments']:
+                voice_profile = self.voice_selector.select_voice(
+                    segment['language'], 
+                    {'preserve_accent': preserve_accents}
+                )
+                
+                synthesis_segments.append({
+                    'text': segment['text'],
+                    'language': segment['language'],
+                    'voice_profile': voice_profile,
+                    'start_pos': segment['start_pos']
+                })
+            
+            return {
+                'segments': synthesis_segments,
+                'total_segments': len(synthesis_segments),
+                'primary_language': processing_result['primary_language'],
+                'multilingual': processing_result['has_code_switching']
+            }
+            
+        except Exception as e:
+            logger.error(f"Multilingual synthesis error: {e}")
+            return {
+                'segments': [{'text': text, 'language': self.current_language, 'voice_profile': self.current_voice_profile}],
+                'total_segments': 1,
+                'primary_language': self.current_language,
+                'multilingual': False
+            }
+    
+    def _is_sanskrit_term(self, word: str) -> bool:
+        """Check if a word is a Sanskrit term"""
+        clean_word = re.sub(r'[^\w]', '', word.lower())
+        return clean_word in self.text_processor.sanskrit_guide.sanskrit_terms
 
 
 # Convenience functions for integration

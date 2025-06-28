@@ -14,6 +14,7 @@ import tempfile
 import subprocess
 import argparse
 import os
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
@@ -919,6 +920,190 @@ except Exception as e:
                 message="No performance tests found, skipping"
             )
     
+    async def _run_comprehensive_test_validation(self) -> ValidationResult:
+        """
+        Run comprehensive test validation that matches CI coverage
+        """
+        start_time = time.time()
+        
+        try:
+            # First check if all dependencies are available
+            dependency_check = await self._validate_test_dependencies()
+            if not dependency_check.passed:
+                return dependency_check
+            
+            # Run the same pytest command as CI
+            cmd = [
+                sys.executable, "-m", "pytest",
+                "--tb=short", "--no-header", "-v"
+            ]
+            
+            result = subprocess.run(
+                cmd, cwd=self.backend_dir,
+                capture_output=True, text=True, timeout=600  # 10 minutes
+            )
+            
+            duration = time.time() - start_time
+            
+            # Parse comprehensive results
+            output_lines = result.stdout.split('\n')
+            
+            # Count test results
+            passed_count = 0
+            failed_count = 0
+            error_count = 0
+            
+            for line in output_lines:
+                if " PASSED" in line:
+                    passed_count += 1
+                elif " FAILED" in line:
+                    failed_count += 1
+                elif " ERROR" in line:
+                    error_count += 1
+            
+            # Analyze failures for root causes
+            failure_patterns = self._analyze_test_failures(result.stdout)
+            
+            if result.returncode == 0:
+                return ValidationResult(
+                    name="Comprehensive Test Suite",
+                    passed=True,
+                    duration=duration,
+                    message=f"All tests passed ({passed_count} passed, 0 failed)",
+                    details={
+                        "passed": passed_count,
+                        "failed": failed_count,
+                        "errors": error_count,
+                        "total": passed_count + failed_count + error_count
+                    }
+                )
+            else:
+                return ValidationResult(
+                    name="Comprehensive Test Suite",
+                    passed=False,
+                    duration=duration,
+                    message=f"Tests failed: {failed_count} failed, {error_count} errors, {passed_count} passed",
+                    details={
+                        "passed": passed_count,
+                        "failed": failed_count,
+                        "errors": error_count,
+                        "total": passed_count + failed_count + error_count,
+                        "failure_patterns": failure_patterns,
+                        "stdout": result.stdout[-2000:],  # Last 2000 chars
+                        "stderr": result.stderr[-1000:]   # Last 1000 chars
+                    }
+                )
+                
+        except subprocess.TimeoutExpired:
+            return ValidationResult(
+                name="Comprehensive Test Suite",
+                passed=False,
+                duration=time.time() - start_time,
+                message="Test suite timed out after 10 minutes"
+            )
+        except Exception as e:
+            return ValidationResult(
+                name="Comprehensive Test Suite",
+                passed=False,
+                duration=time.time() - start_time,
+                message=f"Test validation error: {str(e)}"
+            )
+    
+    async def _validate_test_dependencies(self) -> ValidationResult:
+        """
+        Validate that all test dependencies are available
+        """
+        start_time = time.time()
+        
+        try:
+            # Check for missing dependencies by scanning test files
+            missing_deps = []
+            test_files = []
+            
+            # Find all test files
+            for root, dirs, files in os.walk(os.path.join(self.backend_dir, "tests")):
+                for file in files:
+                    if file.startswith("test_") and file.endswith(".py"):
+                        test_files.append(os.path.join(root, file))
+            
+            # Check imports in test files
+            import_patterns = [
+                r"import\s+(\w+)",
+                r"from\s+(\w+)\s+import",
+                r"from\s+([^.]\w+\.\w+)\s+import"
+            ]
+            
+            required_modules = set()
+            for test_file in test_files:
+                try:
+                    with open(test_file, 'r') as f:
+                        content = f.read()
+                        for pattern in import_patterns:
+                            matches = re.findall(pattern, content)
+                            required_modules.update(matches)
+                except Exception:
+                    continue
+            
+            # Check if modules are available
+            for module in required_modules:
+                if module in ['psutil', 'pydub']:  # Known external dependencies
+                    try:
+                        __import__(module)
+                    except ImportError:
+                        missing_deps.append(module)
+            
+            if missing_deps:
+                return ValidationResult(
+                    name="Test Dependencies",
+                    passed=False,
+                    duration=time.time() - start_time,
+                    message=f"Missing test dependencies: {', '.join(missing_deps)}",
+                    details={"missing_dependencies": missing_deps}
+                )
+            
+            return ValidationResult(
+                name="Test Dependencies",
+                passed=True,
+                duration=time.time() - start_time,
+                message="All test dependencies available"
+            )
+            
+        except Exception as e:
+            return ValidationResult(
+                name="Test Dependencies",
+                passed=False,
+                duration=time.time() - start_time,
+                message=f"Dependency validation error: {str(e)}"
+            )
+    
+    def _analyze_test_failures(self, test_output: str) -> Dict[str, Any]:
+        """
+        Analyze test failures to identify patterns and root causes
+        """
+        patterns = {
+            "missing_methods": [],
+            "import_errors": [],
+            "mock_issues": [],
+            "dependency_issues": [],
+            "interface_mismatches": []
+        }
+        
+        lines = test_output.split('\n')
+        
+        for line in lines:
+            if "AttributeError" in line and "has no attribute" in line:
+                patterns["missing_methods"].append(line.strip())
+            elif "ModuleNotFoundError" in line:
+                patterns["import_errors"].append(line.strip())
+            elif "ImportError" in line:
+                patterns["dependency_issues"].append(line.strip())
+            elif "Mock" in line and ("can't be used" in line or "await" in line):
+                patterns["mock_issues"].append(line.strip())
+            elif "TypeError" in line and ("object" in line or "method" in line):
+                patterns["interface_mismatches"].append(line.strip())
+        
+        return patterns
+
     # ===============================
     # UTILITY METHODS
     # ===============================
