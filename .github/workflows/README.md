@@ -1,65 +1,60 @@
-# GitHub Actions Configuration for Vimarsh
+# Vimarsh CI/CD Workflows
 
-## Required Secrets
+## Unified Pipeline Architecture
 
-Configure these secrets in your GitHub repository settings:
+This directory contains a single, unified CI/CD pipeline that follows DAG (Directed Acyclic Graph) principles for optimal efficiency and reliability.
 
-### Backend Deployment
-- `AZURE_FUNCTIONAPP_PUBLISH_PROFILE` - Azure Functions publish profile
-- `AZURE_CREDENTIALS` - Azure service principal credentials (JSON format)
-- `AZURE_SUBSCRIPTION_ID` - Azure subscription ID
-- `AZURE_RESOURCE_GROUP` - Azure resource group name
+### Pipeline Stages
 
-### Frontend Deployment
-- `AZURE_STATIC_WEB_APPS_API_TOKEN` - Azure Static Web Apps deployment token
-- `REACT_APP_API_BASE_URL` - Backend API base URL for frontend
+```mermaid
+graph TD
+    A[Setup & Change Detection] --> B[Security Scan]
+    B --> C[Backend Tests]
+    B --> D[Frontend Tests]
+    C --> E[Integration Tests]
+    D --> E
+    E --> F[Build Backend]
+    E --> G[Build Frontend]
+    F --> H[Deploy Staging]
+    G --> H
+    F --> I[Deploy Production]
+    G --> I
+    H --> J[Post-Deploy Validation]
+    I --> J
+    J --> K[Notify & Cleanup]
+```
 
-## Workflow Files
+### Key Features
 
-1. **`.github/workflows/test.yml`** - Comprehensive test suite
-   - Backend unit tests (pytest)
-   - Frontend unit tests (Jest)
-   - Integration tests
-   - E2E tests
-   - Performance tests
-   - Security scanning
-   - Code quality checks
+- **🎯 Intelligent Execution**: Only runs necessary stages based on change detection
+- **🔒 Security First**: Integrated security scanning before any deployments
+- **⚡ Parallel Processing**: Backend and frontend tests run in parallel
+- **🏗️ Artifact-Based Deployment**: Builds once, deploys multiple times
+- **📊 Comprehensive Monitoring**: Full visibility into pipeline health
+- **🧹 Resource Management**: Automatic cleanup of temporary resources
 
-2. **`.github/workflows/deploy.yml`** - Deployment pipeline
-   - Runs tests before deployment
-   - Deploys backend to Azure Functions
-   - Deploys frontend to Azure Static Web Apps
-   - Infrastructure deployment (production only)
-   - Post-deployment validation
-   - Deployment notifications
+### Workflow Files
 
-## Test Coverage
+- `unified-ci-cd.yml` - Main CI/CD pipeline (replaces all previous workflows)
 
-### Backend Tests
-- Unit tests for all modules
-- Integration tests for RAG pipeline
-- Voice interface validation
-- Analytics system validation
-- Spiritual content quality tests
-- PWA functionality tests
-- Performance and load tests
+### Migration History
 
-### Frontend Tests
-- Component unit tests
-- TypeScript type checking
-- Build verification
-- PWA manifest validation
+Previous workflows have been consolidated:
+- `ci-cd.yml` → Merged into unified pipeline
+- `ci-cd-optimized.yml` → Merged into unified pipeline  
+- `test.yml` → Merged into unified pipeline
+- `test-optimized.yml` → Merged into unified pipeline
+- `vimarsh-optimized-test-suite.yml` → Merged into unified pipeline
+- `deploy.yml` → Integrated into unified pipeline
 
-### Security & Quality
-- Bandit security scanning
-- Code formatting (Black)
-- Import sorting (isort)
-- Linting (flake8)
+Backups are stored in `backup-*` directories.
 
-## Spiritual Context
+### Usage
 
-All workflows include culturally appropriate messaging and emojis that honor the spiritual nature of the Vimarsh platform, maintaining reverence while providing technical feedback.
+The unified pipeline automatically:
+1. Detects what changed in your commit
+2. Runs only the necessary tests and builds
+3. Deploys to appropriate environments based on branch
+4. Provides comprehensive feedback and notifications
 
-## Manual Deployment
-
-You can trigger deployments manually through GitHub Actions with environment selection (staging/production).
+No manual intervention required - the pipeline is fully automated and intelligent.

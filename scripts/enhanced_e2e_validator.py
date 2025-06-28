@@ -427,7 +427,7 @@ class EnhancedE2EValidator:
             missing_items.append("RAGPipeline class check failed")
         
         # Check cost_management attributes
-        cost_attrs = ["cost_monitor", "request_batching", "query_deduplication", "cost_optimizer"]
+        cost_attrs = ["cost_monitor", "request_batching", "spiritual_cache", "model_switcher"]
         for attr in cost_attrs:
             cmd = [
                 sys.executable, "-c", 

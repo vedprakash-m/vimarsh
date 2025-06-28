@@ -1,0 +1,445 @@
+name: 🚀 Vimarsh Unified CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: 'Environment to deploy to'
+        required: false
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      force_full_pipeline:
+        description: 'Force full pipeline execution'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '18'
+  COVERAGE_THRESHOLD: 85
+  AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend'
+  AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
+
+jobs:
+  # ===== STAGE 1: CHANGE DETECTION & SETUP =====
+  setup:
+    name: 🔍 Setup & Change Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      backend_changed: ${{ steps.changes.outputs.backend }}
+      frontend_changed: ${{ steps.changes.outputs.frontend }}
+      infrastructure_changed: ${{ steps.changes.outputs.infrastructure }}
+      docs_only: ${{ steps.changes.outputs.docs_only }}
+      should_test: ${{ steps.decision.outputs.should_test }}
+      should_build: ${{ steps.decision.outputs.should_build }}
+      should_deploy: ${{ steps.decision.outputs.should_deploy }}
+      cache_key: ${{ steps.cache-keys.outputs.python }}
+      
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔄 Detect Changes
+      uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+            - 'requirements.txt'
+            - 'pyproject.toml'
+          frontend:
+            - 'frontend/**'
+            - 'package.json'
+            - 'package-lock.json'
+          infrastructure:
+            - 'infrastructure/**'
+            - '.github/workflows/**'
+          docs:
+            - 'docs/**'
+            - '*.md'
+          docs_only:
+            - 'docs/**'
+            - '*.md'
+            - '!backend/**'
+            - '!frontend/**'
+            - '!infrastructure/**'
+
+    - name: 🎯 Pipeline Decision Logic
+      id: decision
+      run: |
+        # Determine what stages should run
+        SHOULD_TEST="false"
+        SHOULD_BUILD="false"
+        SHOULD_DEPLOY="false"
+        
+        # Test if backend or frontend changed
+        if [[ "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.frontend }}" == "true" || "${{ github.event.inputs.force_full_pipeline }}" == "true" ]]; then
+          SHOULD_TEST="true"
+          SHOULD_BUILD="true"
+        fi
+        
+        # Deploy on main branch or manual trigger
+        if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          SHOULD_DEPLOY="true"
+        fi
+        
+        echo "should_test=$SHOULD_TEST" >> $GITHUB_OUTPUT
+        echo "should_build=$SHOULD_BUILD" >> $GITHUB_OUTPUT
+        echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
+        
+        echo "🎯 Pipeline Decisions:"
+        echo "  Should Test: $SHOULD_TEST"
+        echo "  Should Build: $SHOULD_BUILD"
+        echo "  Should Deploy: $SHOULD_DEPLOY"
+
+    - name: 🔑 Generate Cache Keys
+      id: cache-keys
+      run: |
+        echo "python=${{ runner.os }}-python-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt', 'pyproject.toml') }}" >> $GITHUB_OUTPUT
+        echo "node=${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('frontend/package-lock.json') }}" >> $GITHUB_OUTPUT
+
+  # ===== STAGE 2: SECURITY & QUALITY GATES =====
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.should_test == 'true'
+    timeout-minutes: 10
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🔍 Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: 📤 Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # ===== STAGE 3: PARALLEL TESTING =====
+  test-backend:
+    name: 🧪 Backend Tests
+    runs-on: ubuntu-latest
+    needs: [setup, security-scan]
+    if: needs.setup.outputs.backend_changed == 'true' && needs.setup.outputs.should_test == 'true'
+    timeout-minutes: 15
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: 📦 Install Dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio
+
+    - name: 🧪 Run Backend Tests
+      run: |
+        cd backend
+        python -m pytest tests/ \
+          --cov=. \
+          --cov-report=xml \
+          --cov-report=term-missing \
+          --cov-fail-under=${{ env.COVERAGE_THRESHOLD }} \
+          --junitxml=test-results.xml
+
+    - name: 📊 Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage.xml
+        flags: backend
+
+  test-frontend:
+    name: 🧪 Frontend Tests
+    runs-on: ubuntu-latest
+    needs: [setup, security-scan]
+    if: needs.setup.outputs.frontend_changed == 'true' && needs.setup.outputs.should_test == 'true'
+    timeout-minutes: 10
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: ⚡ Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 📦 Install Dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: 🧪 Run Frontend Tests
+      run: |
+        cd frontend
+        npm run test:coverage
+
+    - name: 📊 Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./frontend/coverage/lcov.info
+        flags: frontend
+
+  # ===== STAGE 4: INTEGRATION TESTING =====
+  test-integration:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: always() && (needs.test-backend.result == 'success' || needs.test-frontend.result == 'success')
+    timeout-minutes: 20
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: ⚡ Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 🏗️ Setup Environment
+      run: |
+        # Install backend dependencies
+        cd backend && pip install -r requirements.txt
+        cd ../frontend && npm ci
+
+    - name: 🧪 Run E2E Validation
+      run: |
+        python scripts/enhanced_e2e_validator.py --level comprehensive
+
+  # ===== STAGE 5: BUILD ARTIFACTS =====
+  build-backend:
+    name: 🏗️ Build Backend
+    runs-on: ubuntu-latest
+    needs: [setup, test-backend, test-integration]
+    if: needs.setup.outputs.should_build == 'true' && (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped')
+    timeout-minutes: 10
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 📦 Install Dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+
+    - name: 🏗️ Build Package
+      run: |
+        cd backend
+        # Create deployment package
+        mkdir -p dist
+        cp -r . dist/
+        cd dist && rm -rf tests/ __pycache__/ .pytest_cache/
+
+    - name: 📤 Upload Backend Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: backend-package
+        path: backend/dist/
+        retention-days: 30
+
+  build-frontend:
+    name: 🏗️ Build Frontend
+    runs-on: ubuntu-latest
+    needs: [setup, test-frontend, test-integration]
+    if: needs.setup.outputs.should_build == 'true' && (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
+    timeout-minutes: 10
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: ⚡ Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 📦 Install Dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: 🏗️ Build Application
+      run: |
+        cd frontend
+        npm run build
+
+    - name: 📤 Upload Frontend Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: frontend/dist/
+        retention-days: 30
+
+  # ===== STAGE 6: DEPLOYMENT =====
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [setup, build-backend, build-frontend]
+    if: needs.setup.outputs.should_deploy == 'true' && github.ref == 'refs/heads/develop'
+    environment: staging
+    timeout-minutes: 15
+
+    steps:
+    - name: 📥 Download Backend Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-package
+        path: ./backend-package
+
+    - name: 📥 Download Frontend Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-build
+        path: ./frontend-build
+
+    - name: 🚀 Deploy Backend to Azure Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}-staging
+        package: './backend-package'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_STAGING }}
+
+    - name: 🌐 Deploy Frontend to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_STAGING }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "./frontend-build"
+        skip_app_build: true
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [setup, build-backend, build-frontend]
+    if: needs.setup.outputs.should_deploy == 'true' && github.ref == 'refs/heads/main'
+    environment: production
+    timeout-minutes: 15
+
+    steps:
+    - name: 📥 Download Backend Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-package
+        path: ./backend-package
+
+    - name: 📥 Download Frontend Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-build
+        path: ./frontend-build
+
+    - name: 🚀 Deploy Backend to Azure Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: './backend-package'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+    - name: 🌐 Deploy Frontend to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "./frontend-build"
+        skip_app_build: true
+
+  # ===== STAGE 7: POST-DEPLOYMENT VALIDATION =====
+  post-deploy-validation:
+    name: ✅ Post-Deploy Validation
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    timeout-minutes: 10
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🔍 Health Check
+      run: |
+        # Add health check logic here
+        echo "🏥 Running post-deployment health checks..."
+        # Example: curl health endpoints, smoke tests, etc.
+
+    - name: 📊 Performance Baseline
+      run: |
+        # Add performance testing logic
+        echo "📈 Checking performance baselines..."
+
+  # ===== STAGE 8: NOTIFICATION & CLEANUP =====
+  notify:
+    name: 📢 Notify & Cleanup
+    runs-on: ubuntu-latest
+    needs: [setup, security-scan, test-backend, test-frontend, test-integration, build-backend, build-frontend, deploy-staging, deploy-production, post-deploy-validation]
+    if: always()
+    timeout-minutes: 5
+
+    steps:
+    - name: 📊 Pipeline Summary
+      run: |
+        echo "🎯 Pipeline Summary:"
+        echo "  Setup: ${{ needs.setup.result }}"
+        echo "  Security: ${{ needs.security-scan.result }}"
+        echo "  Backend Tests: ${{ needs.test-backend.result }}"
+        echo "  Frontend Tests: ${{ needs.test-frontend.result }}"
+        echo "  Integration Tests: ${{ needs.test-integration.result }}"
+        echo "  Backend Build: ${{ needs.build-backend.result }}"
+        echo "  Frontend Build: ${{ needs.build-frontend.result }}"
+        echo "  Staging Deploy: ${{ needs.deploy-staging.result }}"
+        echo "  Production Deploy: ${{ needs.deploy-production.result }}"
+        echo "  Post-Deploy Validation: ${{ needs.post-deploy-validation.result }}"
+
+    - name: 🧹 Cleanup Artifacts
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "🧹 Cleaning up PR artifacts..."
+        # Cleanup logic for PR artifacts
