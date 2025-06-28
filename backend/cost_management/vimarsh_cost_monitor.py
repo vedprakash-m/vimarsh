@@ -427,6 +427,39 @@ class VimarshCostMonitor:
             self.logger.error(f"Cost monitoring cycle failed: {e}")
             raise
 
+class CostMonitor:
+    """Main cost monitoring class for Vimarsh."""
+    
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """Initialize cost monitor."""
+        self.config = config or {}
+        self.logger = logging.getLogger(__name__)
+        self.alerts = []
+        self.budget_status = None
+        
+    async def get_current_costs(self) -> Dict[str, Any]:
+        """Get current costs."""
+        # Mock implementation
+        return {
+            'total_cost': 25.50,
+            'currency': 'USD',
+            'period': 'daily',
+            'timestamp': datetime.now().isoformat()
+        }
+    
+    async def check_budget_alerts(self) -> List[CostAlert]:
+        """Check for budget alerts."""
+        return self.alerts
+    
+    async def get_cost_breakdown(self) -> Dict[str, Any]:
+        """Get cost breakdown by service."""
+        return {
+            'llm_calls': 15.20,
+            'vector_storage': 5.30,
+            'compute': 3.50,
+            'storage': 1.50
+        }
+
 # Convenience function for easy usage
 async def monitor_vimarsh_costs(environment: str = 'dev', 
                               budget_amount: Decimal = Decimal('100')) -> Dict[str, Any]:

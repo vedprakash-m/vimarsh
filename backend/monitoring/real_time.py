@@ -248,6 +248,96 @@ class RealTimeMonitor:
             'status': 'healthy' if not any(anomalies.values()) else 'warning'
         }
     
+    async def emit_metric(self, metric_name: str, value: float, 
+                            tags: Optional[Dict[str, str]] = None) -> None:
+        """Emit a metric point to the real-time system."""
+        if tags is None:
+            tags = {}
+        
+        metric_point = MetricPoint(
+            timestamp=datetime.now(),
+            metric_name=metric_name,
+            value=value,
+            tags=tags
+        )
+        
+        await self.buffer.add_metric(metric_point)
+        
+        # Notify subscribers
+        for subscriber in self.subscribers:
+            try:
+                await subscriber(metric_point)
+            except Exception as e:
+                self.logger.error(f"Error notifying subscriber: {e}")
+    
+    async def detect_anomaly(self, metric_name: str, value: float) -> Optional[Dict[str, Any]]:
+        """Detect if a single metric value is anomalous."""
+        anomalies = await self.detect_anomalies(metric_name)
+        
+        # Check if current value would be anomalous
+        since = datetime.now() - timedelta(minutes=15)
+        metrics = await self.buffer.get_metrics(since)
+        
+        metric_values = [
+            metric.value for metric in metrics
+            if metric.metric_name == metric_name
+        ]
+        
+        if len(metric_values) < 5:
+            return None
+        
+        # Simple threshold-based detection
+        mean_val = statistics.mean(metric_values)
+        std_val = statistics.stdev(metric_values) if len(metric_values) > 1 else 0
+        
+        if abs(value - mean_val) > 2 * std_val:
+            return {
+                'metric_name': metric_name,
+                'anomalous_value': value,
+                'expected_range': [mean_val - 2*std_val, mean_val + 2*std_val],
+                'timestamp': datetime.now().isoformat()
+            }
+        
+        return None
+    
+    async def aggregate_for_dashboard(self, window: str = '5m') -> Dict[str, Any]:
+        """Aggregate metrics for dashboard display."""
+        if window not in self.aggregation_windows:
+            window = '5m'
+        
+        since = datetime.now() - self.aggregation_windows[window]
+        aggregated = await self.aggregate_metrics(window, since)
+        
+        # Add additional dashboard-specific data
+        dashboard_data = {
+            'timestamp': datetime.now().isoformat(),
+            'window': window,
+            'metrics': aggregated.get('metrics', {}),
+            'health_status': self._calculate_health_status(aggregated.get('metrics', {})),
+            'alerts_count': len([
+                metric for metric in aggregated.get('metrics', {}).values()
+                if isinstance(metric, dict) and metric.get('max', 0) > 1000  # Example threshold
+            ])
+        }
+        
+        return dashboard_data
+    
+    def _calculate_health_status(self, metrics: Dict[str, Any]) -> str:
+        """Calculate overall system health status."""
+        if not metrics:
+            return 'unknown'
+        
+        # Simple health calculation based on response times and error rates
+        response_time_metrics = metrics.get('response_time', {})
+        error_rate_metrics = metrics.get('error_rate', {})
+        
+        if response_time_metrics.get('avg', 0) > 5000:  # 5 seconds
+            return 'critical'
+        elif error_rate_metrics.get('avg', 0) > 0.1:  # 10% error rate
+            return 'warning'
+        else:
+            return 'healthy'
+
     async def _notify_subscribers(self, metric: MetricPoint) -> None:
         """Notify all subscribers of new metric."""
         for callback in self.subscribers:

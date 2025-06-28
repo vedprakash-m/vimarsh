@@ -64,6 +64,20 @@ class AudioChunk:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
+# Mock AudioSegment for testing
+try:
+    from pydub import AudioSegment
+except ImportError:
+    class AudioSegment:
+        """Mock AudioSegment for testing."""
+        @classmethod
+        def from_file(cls, *args, **kwargs):
+            return cls()
+        
+        def export(self, *args, **kwargs):
+            return b'mock_audio_data'
+
+
 class AudioProcessor:
     """Core audio processing functionality"""
     

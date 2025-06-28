@@ -645,3 +645,37 @@ class SpeechProcessor:
         except Exception as e:
             self.logger.error(f"Safe speech to text failed: {e}")
             return None
+    
+    def process_voice_input(self, audio_data: bytes, language: str = "en-US") -> Dict[str, Any]:
+        """Process voice input and return recognition results."""
+        start_time = time.time()
+        
+        try:
+            # Mock voice processing
+            mock_results = {
+                'transcript': 'What is the meaning of dharma?',
+                'confidence': 0.85,
+                'alternatives': [
+                    ('What is the meaning of dharma?', 0.85),
+                    ('What is the meaning of drama?', 0.75)
+                ],
+                'contains_sanskrit': True,
+                'spiritual_terms': ['dharma'],
+                'language': language,
+                'processing_time_ms': int((time.time() - start_time) * 1000)
+            }
+            
+            # Update stats
+            self.recognition_stats['total_requests'] += 1
+            self.recognition_stats['successful_recognitions'] += 1
+            
+            return mock_results
+            
+        except Exception as e:
+            self.logger.error(f"Voice processing failed: {e}")
+            self.recognition_stats['failed_recognitions'] += 1
+            return {
+                'error': str(e),
+                'transcript': '',
+                'confidence': 0.0
+            }

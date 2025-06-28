@@ -146,6 +146,16 @@ class AlertManager:
         """Update alert thresholds."""
         self.thresholds.update(new_thresholds)
         self.logger.info(f"Alert thresholds updated: {new_thresholds}")
+    
+    def check_error_rate_threshold(self, metrics: Dict[str, Any]) -> bool:
+        """Check if error rate exceeds threshold."""
+        error_rate = metrics.get('error_rate', 0)
+        return error_rate > self.thresholds['error_rate']
+    
+    def check_quality_degradation(self, metrics: Dict[str, Any]) -> bool:
+        """Check if spiritual quality degrades below threshold."""
+        quality_score = metrics.get('spiritual_quality_score', 1.0)
+        return quality_score < self.thresholds['spiritual_quality']
 
 
 class NotificationService:

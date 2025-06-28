@@ -600,6 +600,38 @@ TONE GUIDANCE:
         
         return template, suggested_level, key_themes
 
+class PromptEngineer:
+    """Prompt engineering class for handling language adaptation and prompt management."""
+    
+    def __init__(self):
+        """Initialize prompt engineer."""
+        self.supported_languages = ['English', 'Hindi', 'Sanskrit']
+        
+    def adapt_for_language(self, language: str) -> Dict[str, Any]:
+        """Adapt prompts and responses for specific language."""
+        adaptations = {
+            'English': {
+                'greeting_style': 'formal_friendly',
+                'scripture_references': 'translated',
+                'cultural_context': 'universal',
+                'terminology': 'english_with_sanskrit_terms'
+            },
+            'Hindi': {
+                'greeting_style': 'respectful_traditional',
+                'scripture_references': 'transliterated',
+                'cultural_context': 'indian_traditional',
+                'terminology': 'hindi_with_sanskrit'
+            },
+            'Sanskrit': {
+                'greeting_style': 'classical_respectful',
+                'scripture_references': 'original_sanskrit',
+                'cultural_context': 'classical_vedic',
+                'terminology': 'pure_sanskrit'
+            }
+        }
+        
+        return adaptations.get(language, adaptations['English'])
+
 # Example usage and testing functions
 def demo_prompt_engineering():
     """Demonstrate prompt engineering capabilities"""

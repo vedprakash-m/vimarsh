@@ -366,6 +366,70 @@ class SpiritualQueryCache:
             logger.info("Cache cleared")
 
 
+class IntelligentRAGCache:
+    """
+    Intelligent caching system for RAG responses to reduce LLM costs
+    """
+    
+    def __init__(self, 
+                 cache_dir: str = "cache_directory",
+                 max_cache_size: int = 1000,
+                 similarity_threshold: float = 0.85,
+                 max_age_days: int = 30):
+        """
+        Initialize intelligent cache system
+        
+        Args:
+            cache_dir: Directory to store cache files
+            max_cache_size: Maximum number of cached responses
+            similarity_threshold: Threshold for query similarity matching
+            max_age_days: Maximum age of cached responses in days
+        """
+        self.cache_dir = Path(cache_dir)
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        
+        self.max_cache_size = max_cache_size
+        self.similarity_threshold = similarity_threshold
+        self.max_age_days = max_age_days
+        
+        # In-memory cache for fast access
+        self.memory_cache: Dict[str, CachedResponse] = {}
+        
+        # Cache statistics
+        self.stats = CacheStats()
+        
+        # Thread lock for cache operations
+        self._lock = threading.Lock()
+        
+        # Load existing cache
+        self._load_cache()
+        
+        logger.info(f"Initialized intelligent cache with {len(self.memory_cache)} entries")
+    
+    def _normalize_query(self, query: str) -> str:
+        """Normalize query for consistent matching"""
+        # Convert to lowercase and strip whitespace
+        normalized = ' '.join(query.lower().strip().split())
+        
+        # Remove common variations that don't affect meaning
+        replacements = {
+            'lord krishna': 'krishna',
+            'bhagavan': 'krishna',
+            'shri krishna': 'krishna',
+            'please tell me': '',
+            'can you explain': '',
+            'what is': '',
+            'what does': '',
+            'help me understand': ''
+        }
+        
+        for old, new in replacements.items():
+            normalized = normalized.replace(old, new)
+        
+        # Remove extra spaces again
+        return ' '.join(normalized.split())
+
+
 # Global cache instance
 _cache_instance = None
 

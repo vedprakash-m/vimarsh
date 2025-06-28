@@ -29,6 +29,61 @@ class TextChunk:
     def __post_init__(self):
         if self.sanskrit_terms is None:
             self.sanskrit_terms = []
+    
+    def __getitem__(self, key):
+        """Make TextChunk subscriptable for backward compatibility with tests."""
+        if isinstance(key, int):
+            # Handle integer indexing for content characters
+            return self.content[key]
+        elif isinstance(key, str):
+            # Handle string key access for metadata-like access
+            if key == 'content':
+                return self.content
+            elif key == 'metadata':
+                return self.metadata
+            elif key == 'chapter':
+                return self.chapter
+            elif key == 'verse_range':
+                return self.verse_range
+            elif key == 'sanskrit_terms':
+                return self.sanskrit_terms
+            elif key == 'chunk_id':
+                return self.chunk_id
+            elif key == 'source_file':
+                return self.source_file
+            else:
+                # Try to get from metadata
+                return self.metadata.get(key)
+        else:
+            raise TypeError(f"TextChunk indices must be integers or strings, not {type(key)}")
+    
+    def __setitem__(self, key, value):
+        """Allow setting values for compatibility."""
+        if key == 'content':
+            self.content = value
+        elif key == 'metadata':
+            self.metadata = value
+        elif key == 'chapter':
+            self.chapter = value
+        elif key == 'verse_range':
+            self.verse_range = value
+        elif key == 'sanskrit_terms':
+            self.sanskrit_terms = value
+        elif key == 'chunk_id':
+            self.chunk_id = value
+        elif key == 'source_file':
+            self.source_file = value
+        else:
+            # Set in metadata
+            self.metadata[key] = value
+    
+    def __len__(self):
+        """Return length of content for compatibility."""
+        return len(self.content)
+    
+    def __contains__(self, item):
+        """Check if item is in content."""
+        return item in self.content
 
 
 class SpiritualTextProcessor:

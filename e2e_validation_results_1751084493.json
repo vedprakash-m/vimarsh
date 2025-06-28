@@ -1,0 +1,52 @@
+{
+  "level": "backend",
+  "suites": [
+    {
+      "name": "Critical Pre-Flight Checks",
+      "duration": 537.0757057666779,
+      "results": [
+        "ValidationResult(name='syntax_validation', passed=True, duration=535.0485031604767, message='All 12870 Python files have valid syntax', details=None)",
+        "ValidationResult(name='import_validation', passed=False, duration=1.5157692432403564, message='Import failures: llm.gemini_client: WARNING:root:Azure SDK not available - using mock data for cost monitoring\\nTraceback (most recent call last):\\n  File \"<string>\", line 1, in <module>\\n  File \"/Users/vedprakashmishra/vimarsh/backend/llm/__init__.py\", line 6, in <module>\\n    from .gemini_client import (\\n  File \"/Users/vedprakashmishra/vimarsh/backend/llm/gemini_client.py\", line 17, in <module>\\n    from cost_management.token_tracker import get_token_tracker\\n  File \"/Users/vedprakashmishra/vimarsh/backend/cost_management/__init__.py\", line 6, in <module>\\n    from .vimarsh_cost_monitor import CostMonitor\\nImportError: cannot import name \\'CostMonitor\\' from \\'cost_management.vimarsh_cost_monitor\\' (/Users/vedprakashmishra/vimarsh/backend/cost_management/vimarsh_cost_monitor.py); cost_management: WARNING:root:Azure SDK not available - using mock data for cost monitoring\\nTraceback (most recent call last):\\n  File \"<string>\", line 1, in <module>\\n  File \"/Users/vedprakashmishra/vimarsh/backend/cost_management/__init__.py\", line 6, in <module>\\n    from .vimarsh_cost_monitor import CostMonitor\\nImportError: cannot import name \\'CostMonitor\\' from \\'cost_management.vimarsh_cost_monitor\\' (/Users/vedprakashmishra/vimarsh/backend/cost_management/vimarsh_cost_monitor.py)', details=None)",
+        "ValidationResult(name='missing_class_detection', passed=False, duration=0.3852512836456299, message='Missing items: cost_management.cost_monitor not found; cost_management.request_batching not found; cost_management.query_deduplication not found; cost_management.cost_optimizer not found', details=None)",
+        "ValidationResult(name='api_interface_validation', passed=True, duration=0.12452363967895508, message='All API interfaces match expectations', details=None)"
+      ],
+      "passed": false,
+      "critical": true
+    },
+    {
+      "name": "Backend Test Suite",
+      "duration": 4.961284160614014,
+      "results": [
+        "ValidationResult(name='basic_integration_tests', passed=True, duration=0.523993968963623, message='All tests passed (10 tests)', details=None)",
+        "ValidationResult(name='rag_pipeline_tests', passed=False, duration=0.6742000579833984, message='Tests failed: 14 failed, 5 errors', details=None)",
+        "ValidationResult(name='cost_management_tests', passed=False, duration=0.8165528774261475, message='Tests failed: 2 failed, 27 errors', details=None)",
+        "ValidationResult(name='monitoring_tests', passed=False, duration=1.3783612251281738, message='Tests failed: 9 failed, 0 errors', details=None)",
+        "ValidationResult(name='voice_interface_tests', passed=False, duration=0.743354082107544, message='Tests failed: 26 failed, 0 errors', details=None)",
+        "ValidationResult(name='llm_workflow_tests', passed=False, duration=0.8245072364807129, message='Tests failed: 2 failed, 0 errors', details=None)"
+      ],
+      "passed": false,
+      "critical": true
+    }
+  ],
+  "results": [
+    "ValidationResult(name='syntax_validation', passed=True, duration=535.0485031604767, message='All 12870 Python files have valid syntax', details=None)",
+    "ValidationResult(name='import_validation', passed=False, duration=1.5157692432403564, message='Import failures: llm.gemini_client: WARNING:root:Azure SDK not available - using mock data for cost monitoring\\nTraceback (most recent call last):\\n  File \"<string>\", line 1, in <module>\\n  File \"/Users/vedprakashmishra/vimarsh/backend/llm/__init__.py\", line 6, in <module>\\n    from .gemini_client import (\\n  File \"/Users/vedprakashmishra/vimarsh/backend/llm/gemini_client.py\", line 17, in <module>\\n    from cost_management.token_tracker import get_token_tracker\\n  File \"/Users/vedprakashmishra/vimarsh/backend/cost_management/__init__.py\", line 6, in <module>\\n    from .vimarsh_cost_monitor import CostMonitor\\nImportError: cannot import name \\'CostMonitor\\' from \\'cost_management.vimarsh_cost_monitor\\' (/Users/vedprakashmishra/vimarsh/backend/cost_management/vimarsh_cost_monitor.py); cost_management: WARNING:root:Azure SDK not available - using mock data for cost monitoring\\nTraceback (most recent call last):\\n  File \"<string>\", line 1, in <module>\\n  File \"/Users/vedprakashmishra/vimarsh/backend/cost_management/__init__.py\", line 6, in <module>\\n    from .vimarsh_cost_monitor import CostMonitor\\nImportError: cannot import name \\'CostMonitor\\' from \\'cost_management.vimarsh_cost_monitor\\' (/Users/vedprakashmishra/vimarsh/backend/cost_management/vimarsh_cost_monitor.py)', details=None)",
+    "ValidationResult(name='missing_class_detection', passed=False, duration=0.3852512836456299, message='Missing items: cost_management.cost_monitor not found; cost_management.request_batching not found; cost_management.query_deduplication not found; cost_management.cost_optimizer not found', details=None)",
+    "ValidationResult(name='api_interface_validation', passed=True, duration=0.12452363967895508, message='All API interfaces match expectations', details=None)",
+    "ValidationResult(name='basic_integration_tests', passed=True, duration=0.523993968963623, message='All tests passed (10 tests)', details=None)",
+    "ValidationResult(name='rag_pipeline_tests', passed=False, duration=0.6742000579833984, message='Tests failed: 14 failed, 5 errors', details=None)",
+    "ValidationResult(name='cost_management_tests', passed=False, duration=0.8165528774261475, message='Tests failed: 2 failed, 27 errors', details=None)",
+    "ValidationResult(name='monitoring_tests', passed=False, duration=1.3783612251281738, message='Tests failed: 9 failed, 0 errors', details=None)",
+    "ValidationResult(name='voice_interface_tests', passed=False, duration=0.743354082107544, message='Tests failed: 26 failed, 0 errors', details=None)",
+    "ValidationResult(name='llm_workflow_tests', passed=False, duration=0.8245072364807129, message='Tests failed: 2 failed, 0 errors', details=None)"
+  ],
+  "summary": {
+    "total_checks": 10,
+    "passed": 3,
+    "failed": 7,
+    "pass_rate": 30.0,
+    "duration": 542.0378818511963
+  },
+  "timestamp": 1751083951.681872,
+  "recommendation": "\u274c Significant issues found. Do not push until resolved."
+}

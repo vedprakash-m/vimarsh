@@ -10,6 +10,18 @@ import time
 from typing import Dict, List, Any, Optional
 from unittest.mock import Mock
 
+# Mock CosmosClient for test compatibility
+try:
+    from azure.cosmos import CosmosClient
+except ImportError:
+    # Mock CosmosClient when Azure SDK not available
+    class CosmosClient:
+        def __init__(self, *args, **kwargs):
+            self.database_name = "mock_db"
+        
+        def get_database_client(self, database_name):
+            return Mock()
+
 
 class HealthChecker:
     """System health checking and monitoring."""
