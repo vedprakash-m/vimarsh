@@ -1,0 +1,34 @@
+{
+  "level": "critical",
+  "suites": [
+    {
+      "name": "Critical Pre-Flight Checks",
+      "duration": 591.6529049873352,
+      "results": [
+        "ValidationResult(name='syntax_validation', passed=True, duration=586.2779831886292, message='All 12870 Python files have valid syntax', details=None)",
+        "ValidationResult(name='import_validation', passed=True, duration=2.4586048126220703, message='All key modules import successfully', details=None)",
+        "ValidationResult(name='missing_class_detection', passed=True, duration=0.721444845199585, message='All expected classes and attributes found', details=None)",
+        "ValidationResult(name='api_interface_validation', passed=True, duration=0.15190482139587402, message='All API interfaces match expectations', details=None)",
+        "ValidationResult(name='workflow_validation', passed=False, duration=2.039820909500122, message='Critical workflow issues: Workflow validation failed', details={'errors': [\"unified-ci-cd.yml: Missing required field 'on'\"], 'warnings': ['Latest version of actions/checkout: v4.2.2', 'Latest version of actions/setup-python: v5.6.0', 'Latest version of actions/setup-node: v4.4.0', 'Latest version of aquasecurity/trivy-action: 0.31.0'], 'critical_errors': []})"
+      ],
+      "passed": false,
+      "critical": true
+    }
+  ],
+  "results": [
+    "ValidationResult(name='syntax_validation', passed=True, duration=586.2779831886292, message='All 12870 Python files have valid syntax', details=None)",
+    "ValidationResult(name='import_validation', passed=True, duration=2.4586048126220703, message='All key modules import successfully', details=None)",
+    "ValidationResult(name='missing_class_detection', passed=True, duration=0.721444845199585, message='All expected classes and attributes found', details=None)",
+    "ValidationResult(name='api_interface_validation', passed=True, duration=0.15190482139587402, message='All API interfaces match expectations', details=None)",
+    "ValidationResult(name='workflow_validation', passed=False, duration=2.039820909500122, message='Critical workflow issues: Workflow validation failed', details={'errors': [\"unified-ci-cd.yml: Missing required field 'on'\"], 'warnings': ['Latest version of actions/checkout: v4.2.2', 'Latest version of actions/setup-python: v5.6.0', 'Latest version of actions/setup-node: v4.4.0', 'Latest version of aquasecurity/trivy-action: 0.31.0'], 'critical_errors': []})"
+  ],
+  "summary": {
+    "total_checks": 5,
+    "passed": 4,
+    "failed": 1,
+    "pass_rate": 80.0,
+    "duration": 591.6531970500946
+  },
+  "timestamp": 1751097730.437858,
+  "recommendation": "\u26a0\ufe0f Mostly passing but some issues found. Review and fix before pushing."
+}

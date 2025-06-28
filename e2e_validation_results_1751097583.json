@@ -1,0 +1,34 @@
+{
+  "level": "critical",
+  "suites": [
+    {
+      "name": "Critical Pre-Flight Checks",
+      "duration": 473.5641632080078,
+      "results": [
+        "ValidationResult(name='syntax_validation', passed=True, duration=469.21165895462036, message='All 12870 Python files have valid syntax', details=None)",
+        "ValidationResult(name='import_validation', passed=True, duration=1.7325968742370605, message='All key modules import successfully', details=None)",
+        "ValidationResult(name='missing_class_detection', passed=True, duration=0.47687602043151855, message='All expected classes and attributes found', details=None)",
+        "ValidationResult(name='api_interface_validation', passed=True, duration=0.12920618057250977, message='All API interfaces match expectations', details=None)",
+        "ValidationResult(name='workflow_validation', passed=False, duration=2.0126700401306152, message=\"Critical workflow issues: unified-ci-cd.yml: Uses deprecated action 'actions/upload-artifact@v3' - replace with 'actions/upload-artifact@v4'; unified-ci-cd.yml: Uses deprecated action 'actions/download-artifact@v3' - replace with 'actions/download-artifact@v4'; unified-ci-cd.yml: Deployment workflows require 'deployments: write' permission\", details={'errors': [\"unified-ci-cd.yml: Uses deprecated action 'actions/upload-artifact@v3' - replace with 'actions/upload-artifact@v4'\", \"unified-ci-cd.yml: Uses deprecated action 'actions/download-artifact@v3' - replace with 'actions/download-artifact@v4'\", \"unified-ci-cd.yml: Missing required field 'on'\", \"unified-ci-cd.yml: Deployment workflows require 'deployments: write' permission\"], 'warnings': ['Latest version of actions/checkout: v4.2.2', 'Latest version of actions/setup-python: v5.6.0', 'Latest version of actions/setup-node: v4.4.0', 'Latest version of aquasecurity/trivy-action: 0.31.0'], 'critical_errors': [\"unified-ci-cd.yml: Uses deprecated action 'actions/upload-artifact@v3' - replace with 'actions/upload-artifact@v4'\", \"unified-ci-cd.yml: Uses deprecated action 'actions/download-artifact@v3' - replace with 'actions/download-artifact@v4'\", \"unified-ci-cd.yml: Deployment workflows require 'deployments: write' permission\"]})"
+      ],
+      "passed": false,
+      "critical": true
+    }
+  ],
+  "results": [
+    "ValidationResult(name='syntax_validation', passed=True, duration=469.21165895462036, message='All 12870 Python files have valid syntax', details=None)",
+    "ValidationResult(name='import_validation', passed=True, duration=1.7325968742370605, message='All key modules import successfully', details=None)",
+    "ValidationResult(name='missing_class_detection', passed=True, duration=0.47687602043151855, message='All expected classes and attributes found', details=None)",
+    "ValidationResult(name='api_interface_validation', passed=True, duration=0.12920618057250977, message='All API interfaces match expectations', details=None)",
+    "ValidationResult(name='workflow_validation', passed=False, duration=2.0126700401306152, message=\"Critical workflow issues: unified-ci-cd.yml: Uses deprecated action 'actions/upload-artifact@v3' - replace with 'actions/upload-artifact@v4'; unified-ci-cd.yml: Uses deprecated action 'actions/download-artifact@v3' - replace with 'actions/download-artifact@v4'; unified-ci-cd.yml: Deployment workflows require 'deployments: write' permission\", details={'errors': [\"unified-ci-cd.yml: Uses deprecated action 'actions/upload-artifact@v3' - replace with 'actions/upload-artifact@v4'\", \"unified-ci-cd.yml: Uses deprecated action 'actions/download-artifact@v3' - replace with 'actions/download-artifact@v4'\", \"unified-ci-cd.yml: Missing required field 'on'\", \"unified-ci-cd.yml: Deployment workflows require 'deployments: write' permission\"], 'warnings': ['Latest version of actions/checkout: v4.2.2', 'Latest version of actions/setup-python: v5.6.0', 'Latest version of actions/setup-node: v4.4.0', 'Latest version of aquasecurity/trivy-action: 0.31.0'], 'critical_errors': [\"unified-ci-cd.yml: Uses deprecated action 'actions/upload-artifact@v3' - replace with 'actions/upload-artifact@v4'\", \"unified-ci-cd.yml: Uses deprecated action 'actions/download-artifact@v3' - replace with 'actions/download-artifact@v4'\", \"unified-ci-cd.yml: Deployment workflows require 'deployments: write' permission\"]})"
+  ],
+  "summary": {
+    "total_checks": 5,
+    "passed": 4,
+    "failed": 1,
+    "pass_rate": 80.0,
+    "duration": 473.5645818710327
+  },
+  "timestamp": 1751097110.291776,
+  "recommendation": "\u26a0\ufe0f Mostly passing but some issues found. Review and fix before pushing."
+}

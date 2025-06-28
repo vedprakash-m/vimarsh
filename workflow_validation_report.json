@@ -1,0 +1,11 @@
+{
+  "workflow_validation": {
+    "errors": [
+      "actionlint errors: could not read \"/Users/vedprakashmishra/vimarsh/.github/workflows\": read /Users/vedprakashmishra/vimarsh/.github/workflows: is a directory\n"
+    ],
+    "warnings": [],
+    "error_count": 1,
+    "warning_count": 0,
+    "status": "FAIL"
+  }
+}

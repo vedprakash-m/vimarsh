@@ -66,7 +66,8 @@ class EnhancedE2EValidator:
                     "syntax_validation",
                     "import_validation",
                     "missing_class_detection",
-                    "api_interface_validation"
+                    "api_interface_validation",
+                    "workflow_validation"
                 ],
                 timeout=60,
                 parallel=True,
@@ -264,6 +265,7 @@ class EnhancedE2EValidator:
                 "import_validation": self._check_import_validation,
                 "missing_class_detection": self._check_missing_class_detection,
                 "api_interface_validation": self._check_api_interface_validation,
+                "workflow_validation": self._check_workflow_validation,
                 
                 # Backend test suites
                 "basic_integration_tests": self._check_basic_integration_tests,
@@ -503,6 +505,71 @@ except Exception as e:
                 passed=False,
                 duration=0.0,
                 message=f"Interface issues: {'; '.join(interface_issues)}"
+            )
+    
+    async def _check_workflow_validation(self) -> ValidationResult:
+        """Validate GitHub Actions workflows for deprecated actions and permissions."""
+        
+        if not WORKFLOW_VALIDATION_AVAILABLE:
+            return ValidationResult(
+                name="workflow_validation",
+                passed=False,
+                duration=0.0,
+                message="Workflow validation not available - install PyYAML and requests"
+            )
+        
+        try:
+            validator = WorkflowValidator(str(self.project_root))
+            
+            # Run comprehensive workflow validation
+            workflow_success = validator.validate_all_workflows()
+            action_success = validator.validate_action_versions()
+            
+            # Check external dependencies
+            external_issues = validator.validate_external_dependencies()
+            
+            # Collect all issues
+            all_errors = validator.errors[:]
+            all_warnings = validator.warnings[:]
+            
+            if external_issues:
+                all_warnings.extend(external_issues)
+            
+            # Determine overall success
+            critical_errors = [e for e in all_errors if any(term in e.lower() for term in 
+                             ['deprecated', 'permission', 'security-events', 'codeql'])]
+            
+            if not workflow_success or not action_success or critical_errors:
+                error_summary = "; ".join(critical_errors[:3]) if critical_errors else "Workflow validation failed"
+                return ValidationResult(
+                    name="workflow_validation",
+                    passed=False,
+                    duration=0.1,
+                    message=f"Critical workflow issues: {error_summary}",
+                    details={
+                        "errors": all_errors,
+                        "warnings": all_warnings,
+                        "critical_errors": critical_errors
+                    }
+                )
+            else:
+                warning_summary = f"{len(all_warnings)} warnings" if all_warnings else "No issues"
+                return ValidationResult(
+                    name="workflow_validation", 
+                    passed=True,
+                    duration=0.1,
+                    message=f"Workflows validated successfully. {warning_summary}",
+                    details={
+                        "warnings": all_warnings
+                    }
+                )
+                
+        except Exception as e:
+            return ValidationResult(
+                name="workflow_validation",
+                passed=False,
+                duration=0.0,
+                message=f"Workflow validation error: {str(e)}"
             )
     
     # ===============================

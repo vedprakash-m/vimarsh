@@ -28,6 +28,15 @@ class WorkflowValidator:
             "actions/setup-node@v3": "actions/setup-node@v4",
             "actions/cache@v3": "actions/cache@v4",
             "actions/checkout@v3": "actions/checkout@v4",
+            # CodeQL Action deprecations - CRITICAL
+            "github/codeql-action/upload-sarif@v1": "github/codeql-action/upload-sarif@v3",
+            "github/codeql-action/upload-sarif@v2": "github/codeql-action/upload-sarif@v3",
+            "github/codeql-action/init@v1": "github/codeql-action/init@v3",
+            "github/codeql-action/init@v2": "github/codeql-action/init@v3",
+            "github/codeql-action/analyze@v1": "github/codeql-action/analyze@v3",
+            "github/codeql-action/analyze@v2": "github/codeql-action/analyze@v3",
+            # Security scanning actions
+            "aquasecurity/trivy-action@master": "aquasecurity/trivy-action@master",  # Should use specific version
         }
         
         # GitHub API for checking latest action versions
@@ -80,6 +89,18 @@ class WorkflowValidator:
             # Check for common issues
             if not self.check_common_issues(workflow_file.name, content, workflow_data):
                 success = False
+                
+            # Validate permissions and security
+            permission_issues = self.validate_permissions(workflow_data)
+            if permission_issues:
+                for issue in permission_issues:
+                    self.errors.append(f"{workflow_file.name}: {issue}")
+                success = False
+                
+            security_issues = self.validate_security_best_practices(workflow_data)
+            if security_issues:
+                for issue in security_issues:
+                    self.warnings.append(f"{workflow_file.name}: {issue}")
                 
             return success
             
@@ -248,6 +269,97 @@ class WorkflowValidator:
             
         return True
         
+    def validate_permissions(self, workflow_content: Dict[str, Any]) -> List[str]:
+        """Validate workflow permissions and security requirements."""
+        issues = []
+        
+        # Check for SARIF upload permissions
+        if self._uses_sarif_upload(workflow_content):
+            permissions = workflow_content.get('permissions', {})
+            if not permissions.get('security-events') == 'write':
+                issues.append("SARIF upload requires 'security-events: write' permission")
+            if not permissions.get('actions') == 'read':
+                issues.append("Security scanning requires 'actions: read' permission")
+        
+        # Check for deployment permissions
+        if self._uses_deployment(workflow_content):
+            permissions = workflow_content.get('permissions', {})
+            if not permissions.get('deployments') == 'write':
+                issues.append("Deployment workflows require 'deployments: write' permission")
+        
+        return issues
+    
+    def _uses_sarif_upload(self, workflow_content: Dict[str, Any]) -> bool:
+        """Check if workflow uploads SARIF files."""
+        workflow_str = str(workflow_content)
+        return 'upload-sarif' in workflow_str or 'trivy' in workflow_str.lower()
+    
+    def _uses_deployment(self, workflow_content: Dict[str, Any]) -> bool:
+        """Check if workflow performs deployments."""
+        workflow_str = str(workflow_content).lower()
+        return any(term in workflow_str for term in ['deploy', 'azure-functions', 'static-web-apps'])
+    
+    def validate_security_best_practices(self, workflow_content: Dict[str, Any]) -> List[str]:
+        """Validate security best practices in workflows."""
+        issues = []
+        
+        # Check for pinned action versions (not @master or @main)
+        jobs = workflow_content.get('jobs', {})
+        for job_name, job_config in jobs.items():
+            steps = job_config.get('steps', [])
+            for step in steps:
+                if 'uses' in step:
+                    action = step['uses']
+                    if '@master' in action or '@main' in action:
+                        issues.append(f"Job '{job_name}' uses unpinned action: {action}")
+        
+        # Check for hardcoded secrets in workflow
+        workflow_str = str(workflow_content)
+        if '${{ secrets.' not in workflow_str and 'secret' in workflow_str.lower():
+            issues.append("Potential hardcoded secrets detected")
+        
+        return issues
+    
+    def validate_external_dependencies(self) -> List[str]:
+        """Validate external dependencies and check for updates."""
+        issues = []
+        
+        try:
+            # Check if GitHub CLI is available for API calls
+            result = subprocess.run(['gh', '--version'], capture_output=True, text=True)
+            if result.returncode != 0:
+                issues.append("GitHub CLI not available for dependency validation")
+                return issues
+        except FileNotFoundError:
+            issues.append("GitHub CLI not installed - cannot validate external dependencies")
+            return issues
+        
+        # Check latest versions of common actions
+        common_actions = [
+            'actions/checkout',
+            'actions/setup-python', 
+            'actions/setup-node',
+            'github/codeql-action/upload-sarif',
+            'aquasecurity/trivy-action'
+        ]
+        
+        for action in common_actions:
+            try:
+                # Get latest release
+                result = subprocess.run([
+                    'gh', 'api', f'/repos/{action}/releases/latest'
+                ], capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    release_data = json.loads(result.stdout)
+                    latest_version = release_data.get('tag_name', 'unknown')
+                    # This is informational for now
+                    self.warnings.append(f"Latest version of {action}: {latest_version}")
+            except Exception as e:
+                issues.append(f"Could not check latest version for {action}: {str(e)}")
+        
+        return issues
+    
     def generate_report(self) -> Dict[str, Any]:
         """Generate validation report"""
         return {
