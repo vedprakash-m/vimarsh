@@ -1011,21 +1011,57 @@ class SpiritualTTSOptimizer:
         processed_text = f'{tone_markup}{text}</prosody></amazon:domain>'
         return processed_text
     
-    def optimize_pauses_and_emphasis(self, text: str) -> str:
+    def optimize_pauses_and_emphasis(self, text: str) -> Any:
         """Optimize pauses and emphasis for spiritual content."""
         optimized_text = text
+        
+        # Track markers for analysis
+        markers = []
         
         # Add pauses after sentences
         optimized_text = re.sub(r'\.(\s+)', r'.<break time="0.5s"/>\1', optimized_text)
         
+        # Track citation pauses
+        if 'Chapter' in text or 'Verse' in text or '"' in text:
+            markers.append(type('Marker', (), {
+                'type': 'pause',
+                'duration': 1.2,
+                'position': text.find('Chapter') if 'Chapter' in text else text.find('"'),
+                'reason': 'citation'
+            })())
+        
         # Add emphasis to important spiritual terms
         spiritual_keywords = ['dharma', 'karma', 'moksha', 'atman', 'brahman', 'yoga']
         for keyword in spiritual_keywords:
-            pattern = r'\b' + re.escape(keyword) + r'\b'
-            replacement = f'<emphasis level="moderate">{keyword}</emphasis>'
-            optimized_text = re.sub(pattern, replacement, optimized_text, flags=re.IGNORECASE)
+            if keyword.lower() in text.lower():
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                replacement = f'<emphasis level="moderate">{keyword}</emphasis>'
+                optimized_text = re.sub(pattern, replacement, optimized_text, flags=re.IGNORECASE)
+                
+                markers.append(type('Marker', (), {
+                    'type': 'emphasis',
+                    'duration': 0.3,
+                    'position': text.lower().find(keyword.lower()),
+                    'term': keyword
+                })())
         
-        return optimized_text
+        # Add emphasis for quoted text
+        if '"' in text:
+            markers.append(type('Marker', (), {
+                'type': 'emphasis',
+                'duration': 0.5,
+                'position': text.find('"'),
+                'reason': 'quote'
+            })())
+        
+        # Create result object with markers
+        result = type('OptimizedResult', (), {
+            'text': optimized_text,
+            'markers': markers,
+            'marker_count': len(markers)
+        })()
+        
+        return result
     
     async def generate_speech(self, text: str, voice_config: Optional[Dict[str, Any]] = None, language: str = "en-US") -> Any:
         """Generate speech with spiritual optimizations."""

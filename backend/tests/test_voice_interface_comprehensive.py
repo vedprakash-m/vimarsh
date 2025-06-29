@@ -137,10 +137,13 @@ class TestSanskritRecognitionOptimizer:
         
         detected_terms = self.optimizer.detect_sanskrit_terms(text_with_sanskrit)
         
-        assert 'dharma' in detected_terms
-        assert 'karma' in detected_terms
-        assert 'yoga' in detected_terms
-        assert 'concept' not in detected_terms  # English word
+        # Extract term names from the result dictionaries
+        term_names = [term['term'] for term in detected_terms]
+        
+        assert 'dharma' in term_names
+        assert 'karma' in term_names
+        assert 'yoga' in term_names
+        assert 'concept' not in term_names  # English word
         
     def test_pronunciation_correction(self):
         """Test pronunciation-based correction of Sanskrit terms."""

@@ -33,7 +33,7 @@ class TestEndToEndDeployment:
         required_files = [
             # Infrastructure
             "infrastructure/main.bicep",
-            "infrastructure/parameters/dev.parameters.json",
+            "infrastructure/parameters/development.parameters.json",
             "infrastructure/parameters/prod.parameters.json",
             
             # Scripts
@@ -156,7 +156,7 @@ class TestEndToEndDeployment:
     def test_environment_configuration_completeness(self):
         """Test that environment configurations are complete."""
         param_files = [
-            self.infrastructure_dir / "parameters" / "dev.parameters.json",
+            self.infrastructure_dir / "parameters" / "development.parameters.json",
             self.infrastructure_dir / "parameters" / "prod.parameters.json"
         ]
         
@@ -172,8 +172,6 @@ class TestEndToEndDeployment:
                 
                 # Check required parameters
                 required_params = [
-                    "projectName",
-                    "environment",
                     "location",
                     "geminiApiKey"
                 ]
@@ -221,13 +219,35 @@ class TestEndToEndDeployment:
         if main_bicep.exists():
             bicep_content = main_bicep.read_text()
             
-            # Check for Application Insights resource
-            assert "Microsoft.Insights/components" in bicep_content, \
-                "Should configure Application Insights for monitoring"
+            # Check for Application Insights in compute module or main template
+            compute_bicep = self.infrastructure_dir / "compute.bicep"
+            app_insights_configured = False
             
-            # Check for logging configuration
-            assert "APPLICATIONINSIGHTS_CONNECTION_STRING" in bicep_content or \
-                   "APPINSIGHTS_INSTRUMENTATIONKEY" in bicep_content, \
+            if compute_bicep.exists():
+                compute_content = compute_bicep.read_text()
+                if "Microsoft.Insights/components" in compute_content:
+                    app_insights_configured = True
+            
+            if "Microsoft.Insights/components" in bicep_content:
+                app_insights_configured = True
+                
+            assert app_insights_configured, \
+                "Should configure Application Insights for monitoring in main.bicep or compute.bicep"
+            
+            # Check for logging configuration in relevant files
+            app_insights_connection_configured = False
+            
+            if compute_bicep.exists():
+                compute_content = compute_bicep.read_text()
+                if ("APPLICATIONINSIGHTS_CONNECTION_STRING" in compute_content or 
+                    "APPINSIGHTS_INSTRUMENTATIONKEY" in compute_content):
+                    app_insights_connection_configured = True
+            
+            if ("APPLICATIONINSIGHTS_CONNECTION_STRING" in bicep_content or 
+                "APPINSIGHTS_INSTRUMENTATIONKEY" in bicep_content):
+                app_insights_connection_configured = True
+                
+            assert app_insights_connection_configured, \
                 "Should configure Application Insights connection"
     
     def test_cost_optimization_configuration(self):

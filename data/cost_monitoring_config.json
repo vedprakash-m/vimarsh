@@ -131,6 +131,18 @@
       "spiritual_message": "Test budget alert",
       "cooldown_minutes": 0,
       "enabled": true
+    },
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 0.1,
+      "alert_level": "warning",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [],
+      "spiritual_message": "Test budget alert",
+      "cooldown_minutes": 0,
+      "enabled": true
     }
   ]
 }

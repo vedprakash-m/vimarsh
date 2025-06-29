@@ -14,7 +14,15 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import time
 
 # Import cost management system
-from cost_management.token_tracker import get_token_tracker
+try:
+    from backend.cost_management.token_tracker import get_token_tracker
+except ImportError:
+    # Fallback for testing or missing cost management
+    def get_token_tracker():
+        class MockTracker:
+            def track_usage(self, **kwargs):
+                pass
+        return MockTracker()
 
 # Mock function for easier testing - delegates to real function
 def track_llm_usage(**kwargs):

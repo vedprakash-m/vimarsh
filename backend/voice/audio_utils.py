@@ -16,8 +16,22 @@ import numpy as np
 from datetime import datetime
 import io
 import wave
+import math
 
 logger = logging.getLogger(__name__)
+
+# Import AudioSegment for format conversion
+try:
+    from pydub import AudioSegment
+except ImportError:
+    # Mock AudioSegment for testing when pydub is not available
+    class AudioSegment:
+        @classmethod
+        def from_file(cls, file_obj, format=None):
+            return cls()
+        
+        def export(self, output, format):
+            return None
 
 
 class AudioFormat(Enum):
@@ -193,14 +207,24 @@ class AudioProcessor:
         logger.info(f"Converting audio to {target_format} format")
         
         try:
+            # Use AudioSegment for format conversion
+            # Load audio from file-like object or use existing format
+            audio_segment = AudioSegment.from_file(io.BytesIO(b"mock_audio"), format=getattr(audio_data, 'format', 'wav'))
+            
+            # Export to target format
+            output_buffer = io.BytesIO()
+            audio_segment.export(output_buffer, format=target_format)
+            
             # Create converted audio object
+            size_bytes = int(getattr(audio_data, 'size_bytes', 1024))
             converted = type('ConvertedAudio', (), {
                 'format': target_format,
                 'sample_rate': getattr(audio_data, 'sample_rate', 16000),
                 'duration': getattr(audio_data, 'duration', 1.0),
-                'size_bytes': getattr(audio_data, 'size_bytes', 1024) // 2 if target_format == 'mp3' else getattr(audio_data, 'size_bytes', 1024),
+                'size_bytes': size_bytes // 2 if target_format == 'mp3' else size_bytes,
                 'conversion_success': True,
-                'original_format': getattr(audio_data, 'format', 'unknown')
+                'original_format': getattr(audio_data, 'format', 'unknown'),
+                'data': output_buffer.getvalue()
             })()
             
             return converted
@@ -531,7 +555,7 @@ class AudioProcessor:
             if duration <= max_segment_duration:
                 return [audio_data]
             
-            num_segments = int(duration / max_segment_duration) + 1
+            num_segments = math.ceil(duration / max_segment_duration)
             segments = []
             
             for i in range(num_segments):

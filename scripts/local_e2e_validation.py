@@ -1270,6 +1270,133 @@ class LocalE2EValidator:
             
         return issues
     
+    def validate_interface_contracts(self) -> bool:
+        """Validate that implementations satisfy test interface contracts"""
+        logger.info("🔍 Validating interface contracts between tests and implementations...")
+        issues = []
+        
+        # Check backend voice interface contracts
+        voice_issues = self._validate_voice_interface_contracts()
+        issues.extend(voice_issues)
+        
+        # Check frontend component contracts
+        frontend_issues = self._validate_frontend_component_contracts()
+        issues.extend(frontend_issues)
+        
+        # Check async method contracts
+        async_issues = self._validate_async_method_contracts()
+        issues.extend(async_issues)
+        
+        if issues:
+            logger.error(f"❌ Interface contract violations found: {len(issues)}")
+            for issue in issues:
+                logger.error(f"   - {issue}")
+            return False
+        else:
+            logger.info("✅ All interface contracts validated")
+            return True
+    
+    def _validate_voice_interface_contracts(self) -> List[str]:
+        """Validate voice interface implementation contracts"""
+        issues = []
+        
+        try:
+            # Check SpeechProcessor implementation
+            speech_processor_file = self.backend_path / "voice/speech_processor.py"
+            if speech_processor_file.exists():
+                content = speech_processor_file.read_text()
+                
+                # Check for expected methods from tests
+                expected_methods = [
+                    'process_audio', '_reduce_noise', '_recognize_speech',
+                    'preprocess_audio', 'speech_to_text', 'detect_voice_activity'
+                ]
+                
+                missing_methods = []
+                for method in expected_methods:
+                    if f"def {method}" not in content and f"async def {method}" not in content:
+                        # Check if it's a property
+                        if f"def {method}(" not in content and f"property" not in content or f"{method}" not in content:
+                            missing_methods.append(method)
+                
+                if missing_methods:
+                    issues.append(f"SpeechProcessor missing methods: {missing_methods}")
+                
+                # Check for property implementations
+                if "_recognize_speech" in content and "property" in content:
+                    # Verify property has setter/deleter if tests mock it
+                    if "setter" not in content:
+                        issues.append("SpeechProcessor._recognize_speech property needs setter for test mocking")
+                
+            # Check audio utils implementation
+            audio_utils_file = self.backend_path / "voice/audio_utils.py"
+            if audio_utils_file.exists():
+                content = audio_utils_file.read_text()
+                
+                # Check for AudioSegment class and export method
+                if "class AudioSegment" in content:
+                    if "def export" not in content:
+                        issues.append("AudioSegment class missing export method")
+                        
+        except Exception as e:
+            issues.append(f"Failed to validate voice interface contracts: {e}")
+            
+        return issues
+    
+    def _validate_frontend_component_contracts(self) -> List[str]:
+        """Validate frontend component implementation contracts"""
+        issues = []
+        
+        try:
+            # Check ABTestComponents implementation
+            ab_test_file = self.frontend_path / "src/components/ABTestComponents.tsx"
+            if ab_test_file.exists():
+                content = ab_test_file.read_text()
+                
+                # Check for voice tutorial implementation
+                if "voice-tutorial-overlay" in content:
+                    if "Voice Feature" not in content:
+                        issues.append("ABTestVoiceInterface missing 'Voice Feature' text in tutorial")
+                        
+                # Check for proper variant handling
+                if "useABTest" in content:
+                    # Verify all expected variants are handled
+                    expected_variants = ['prominent-voice', 'subtle-voice']
+                    for variant in expected_variants:
+                        if variant not in content:
+                            issues.append(f"ABTestVoiceInterface missing handling for variant: {variant}")
+                            
+        except Exception as e:
+            issues.append(f"Failed to validate frontend component contracts: {e}")
+            
+        return issues
+    
+    def _validate_async_method_contracts(self) -> List[str]:
+        """Validate async method signatures match test expectations"""
+        issues = []
+        
+        try:
+            # Check voice comprehensive tests
+            voice_test_file = self.backend_path / "tests/voice_interface/test_voice_comprehensive.py"
+            if voice_test_file.exists():
+                content = voice_test_file.read_text()
+                
+                # Find all await expressions in tests
+                import re
+                await_patterns = re.findall(r'await\s+([^(]+)', content)
+                
+                for pattern in await_patterns:
+                    # Check if the awaited object should actually be awaitable
+                    if 'Language' in pattern:
+                        issues.append(f"Test tries to await non-awaitable Language object: {pattern}")
+                    elif 'dict' in pattern or '{' in pattern:
+                        issues.append(f"Test tries to await dict object: {pattern}")
+                        
+        except Exception as e:
+            issues.append(f"Failed to validate async method contracts: {e}")
+            
+        return issues
+    
 
 
 def main():

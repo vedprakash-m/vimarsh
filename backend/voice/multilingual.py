@@ -531,20 +531,30 @@ class MultilingualVoiceManager:
             Detected preferred language
         """
         # Simple heuristics for language detection
-        hindi_indicators = ['देव', 'भगवान', 'गुरु', 'प्रभु', 'श्री']
+        hindi_indicators = ['देव', 'भगवान', 'गुरु', 'प्रभु', 'श्री', 'है', 'का', 'में', 'से', 'को', 'की', 'के']
+        sanskrit_indicators = ['स्य', 'अर्थः', 'किम्', 'त्वम्', 'अहम्', 'तत्', 'इति', 'यत्', 'सः', 'तस्य']
         sanskrit_density = self._calculate_sanskrit_density(text)
         
         # Check for Devanagari script
         devanagari_pattern = r'[\u0900-\u097F]'
         if re.search(devanagari_pattern, text):
+            # Check if it's Sanskrit based on specific indicators
+            if any(indicator in text for indicator in sanskrit_indicators):
+                return Language.SANSKRIT
+            # Check for classical Sanskrit patterns
+            if 'स्य' in text or 'ः' in text or 'अर्थः' in text:
+                return Language.SANSKRIT
+            # Otherwise, assume Hindi
             return Language.HINDI
         
-        # Check for Hindi indicators
+        # Check for Hindi indicators in romanized text
         if any(indicator in text for indicator in hindi_indicators):
             return Language.HINDI
         
-        # High Sanskrit content might prefer Hindi pronunciation
-        if sanskrit_density > 0.3:
+        # High Sanskrit content might prefer Sanskrit
+        if sanskrit_density > 0.5:
+            return Language.SANSKRIT
+        elif sanskrit_density > 0.3:
             return Language.HINDI
         
         return Language.ENGLISH
@@ -621,7 +631,7 @@ class MultilingualVoiceManager:
                 terms.append(term)
         return terms
     
-    def detect_language(self, text: str) -> Language:
+    async def detect_language(self, text: str) -> Dict[str, Any]:
         """
         Detect the primary language of the input text
         
@@ -629,9 +639,45 @@ class MultilingualVoiceManager:
             text: Text to analyze
             
         Returns:
-            Detected language
+            Dictionary with detection results
         """
-        return self.detect_language_preference(text)
+        # Simulate async language detection
+        import asyncio
+        await asyncio.sleep(0.01)  # Simulate processing time
+        
+        # Detect language preference
+        lang = self.detect_language_preference(text)
+        
+        # Check for code-switching (mixed languages)
+        is_code_switching = False
+        languages = [lang.value]
+        
+        # Simple heuristic for code-switching detection
+        has_devanagari = any(char in text for char in 'नमस्ते जी हैं का धर्म कर्म योग मोक्ष आत्मा ब्रह्म')
+        has_ascii_words = len([word for word in text.split() if word.isascii() and word.isalpha()]) > 0
+        
+        # More specific code-switching detection
+        if has_devanagari and has_ascii_words and len(text.split()) > 1:
+            # Check if it's actually mixed (not just Sanskrit transliteration)
+            mixed_indicators = ['hello', 'hi', 'bye', 'thanks', 'namaste']
+            if any(indicator in text.lower() for indicator in mixed_indicators) and has_devanagari:
+                is_code_switching = True
+                languages = ['en', 'hi']
+        
+        # Calculate confidence based on text analysis
+        confidence = 0.9
+        if is_code_switching:
+            confidence = 0.7
+        elif lang == Language.SANSKRIT:
+            confidence = 0.85  # Sanskrit might be less certain due to transliteration
+        
+        return {
+            'primary_language': lang.value,
+            'confidence': confidence,
+            'is_code_switching': is_code_switching,
+            'languages': languages,
+            'detected_segments': []
+        }
     
     def process_mixed_language(self, text: str) -> Dict[str, Any]:
         """

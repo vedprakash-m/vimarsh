@@ -1,0 +1,89 @@
+[tool.pytest.ini_options]
+# Pytest configuration for Vimarsh project
+minversion = "6.0"
+addopts = [
+    "-ra",
+    "--strict-markers", 
+    "--strict-config",
+    "--cov=backend",
+    "--cov-report=term-missing",
+    "--cov-report=html:backend/htmlcov",
+    "--cov-fail-under=80"
+]
+
+# Test discovery - ONLY project files
+testpaths = [
+    "backend/tests",
+    "tests"
+]
+
+# Ignore patterns - EXCLUDE all dependencies
+norecursedirs = [
+    ".*",
+    "build", 
+    "dist",
+    "CVS",
+    "_darcs",
+    "{arch}",
+    "*.egg",
+    "venv",
+    ".venv",
+    "env",
+    ".env",
+    "node_modules",
+    ".git",
+    "__pycache__",
+    "site-packages"
+]
+
+# Performance and timeout settings
+timeout = 300
+timeout_method = "thread"
+
+# Test markers for categorization
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "e2e: End-to-end tests",
+    "slow: Slow tests (>10s)",
+    "voice: Voice interface tests",
+    "llm: LLM integration tests",
+    "rag: RAG pipeline tests",
+    "auth: Authentication tests",
+    "api: API endpoint tests"
+]
+
+# Filters
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning"
+]
+
+# Python path
+pythonpath = [
+    "backend",
+    "."
+]
+
+[tool.coverage.run]
+source = ["backend"]
+omit = [
+    "*/venv/*",
+    "*/.venv/*", 
+    "*/site-packages/*",
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:"
+]
