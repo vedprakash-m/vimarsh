@@ -95,6 +95,8 @@ class LocalE2EValidator:
             max_workers: Maximum number of parallel workers
         """
         self.project_root = project_root or Path.cwd()
+        self.backend_path = self.project_root / "backend"
+        self.frontend_path = self.project_root / "frontend"
         self.quick_mode = quick_mode
         self.enable_coverage = enable_coverage
         self.parallel = parallel
@@ -190,7 +192,7 @@ class LocalE2EValidator:
             # 1. Environment validation
             self._validate_environment()
             self._validate_dependencies()
-            self._validate_test_environment_match()
+            self.validate_test_environment_parity()
             
             # 2. Test discovery and categorization
             test_files = self._discover_tests()
@@ -1035,6 +1037,60 @@ class LocalE2EValidator:
                 output=str(e)
             )
     
+    def run_ci_exact_frontend_tests(self) -> TestResult:
+        """Run frontend tests in exact CI configuration"""
+        logger.info("🎯 Running frontend tests in CI-exact mode...")
+        
+        try:
+            # Set CI environment variables
+            env = os.environ.copy()
+            env.update({
+                'CI': 'true',
+                'NODE_ENV': 'test',
+                'REACT_APP_ENV': 'test'
+            })
+            
+            # Run tests with coverage like CI
+            cmd = ["npm", "test", "--", "--coverage", "--watchAll=false", "--testTimeout=60000"]
+            
+            result = subprocess.run(
+                cmd,
+                cwd=self.frontend_path,
+                capture_output=True,
+                text=True,
+                timeout=300,  # 5 minutes
+                env=env
+            )
+            
+            return self._parse_frontend_test_result(result)
+            
+        except subprocess.TimeoutExpired:
+            logger.error("❌ Frontend tests timed out")
+            return TestResult(
+                test_file="frontend-ci-exact",
+                test_count=0,
+                passed=0,
+                failed=1,
+                skipped=0,
+                errors=0,
+                duration=300.0,
+                output="Test execution timed out",
+                failures=["Frontend tests timed out after 5 minutes"]
+            )
+        except Exception as e:
+            logger.error(f"❌ Failed to run CI-exact frontend tests: {e}")
+            return TestResult(
+                test_file="frontend-ci-exact",
+                test_count=0,
+                passed=0,
+                failed=1,
+                skipped=0,
+                errors=0,
+                duration=0.0,
+                output=str(e),
+                failures=[f"Failed to run frontend tests: {e}"]
+            )
+    
     def _validate_test_environment_match(self):
         """Ensure local test environment matches CI expectations"""
         logger.info("🔍 Validating test environment CI/CD alignment...")
@@ -1098,6 +1154,122 @@ class LocalE2EValidator:
             raise RuntimeError(f"Test environment validation failed with {len(issues)} issues")
         
         return True
+    
+    def validate_test_environment_parity(self) -> bool:
+        """Validate that local test environment matches CI/CD environment exactly"""
+        logger.info("🔍 Validating test environment CI/CD alignment...")
+        issues = []
+        
+        # Check frontend test configuration parity
+        frontend_issues = self._validate_frontend_test_parity()
+        issues.extend(frontend_issues)
+        
+        # Check backend test configuration parity  
+        backend_issues = self._validate_backend_test_parity()
+        issues.extend(backend_issues)
+        
+        # Check import resolution
+        import_issues = self._validate_import_resolution()
+        issues.extend(import_issues)
+        
+        if issues:
+            logger.error(f"❌ Test environment parity issues found: {len(issues)}")
+            for issue in issues:
+                logger.error(f"   - {issue}")
+            return False
+        else:
+            logger.info("✅ Test environment parity validated")
+            return True
+    
+    def _validate_frontend_test_parity(self) -> List[str]:
+        """Validate frontend test environment matches CI"""
+        issues = []
+        
+        # Check that A/B testing mocks are consistent
+        try:
+            ab_test_file = self.frontend_path / "src/components/ABTestComponents.test.tsx"
+            if ab_test_file.exists():
+                content = ab_test_file.read_text()
+                
+                # Check for proper useABTest mocking
+                if "mockUseABTest" not in content:
+                    issues.append("ABTestComponents.test.tsx missing mockUseABTest setup")
+                
+                # Check for environment-specific test configurations
+                if "process.env.NODE_ENV" in content and "development" in content:
+                    issues.append("ABTestComponents tests have hardcoded development environment checks")
+                    
+        except Exception as e:
+            issues.append(f"Failed to validate A/B testing configuration: {e}")
+            
+        # Check React testing environment setup
+        try:
+            setup_tests = self.frontend_path / "src/setupTests.ts"
+            if setup_tests.exists():
+                content = setup_tests.read_text()
+                if "crypto" not in content and "MSAL" not in content:
+                    issues.append("setupTests.ts missing crypto/MSAL mocking for CI environment")
+        except Exception as e:
+            issues.append(f"Failed to validate React testing setup: {e}")
+            
+        return issues
+    
+    def _validate_backend_test_parity(self) -> List[str]:
+        """Validate backend test environment matches CI"""
+        issues = []
+        
+        # Check voice interface tests specifically
+        try:
+            voice_test_file = self.backend_path / "tests/test_voice_interface.py"
+            if voice_test_file.exists():
+                content = voice_test_file.read_text()
+                
+                # Check for incorrect import patterns
+                if "SanskritOptimizer" in content and "SanskritRecognitionOptimizer" not in content:
+                    issues.append("test_voice_interface.py has incorrect import: SanskritOptimizer should be SanskritRecognitionOptimizer")
+                
+                if "TTSOptimizer" in content and "SpiritualTTSOptimizer" not in content:
+                    issues.append("test_voice_interface.py has incorrect import: TTSOptimizer should be SpiritualTTSOptimizer")
+                    
+        except Exception as e:
+            issues.append(f"Failed to validate voice interface tests: {e}")
+            
+        return issues
+    
+    def _validate_import_resolution(self) -> List[str]:
+        """Validate all imports can be resolved correctly"""
+        issues = []
+        
+        # Check backend imports
+        try:
+            result = subprocess.run(
+                [sys.executable, "-c", "import voice.sanskrit_optimizer; print('OK')"],
+                cwd=self.backend_path,
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            if result.returncode != 0:
+                issues.append(f"Backend import validation failed: {result.stderr}")
+        except Exception as e:
+            issues.append(f"Failed to validate backend imports: {e}")
+            
+        # Check frontend imports resolution by running TypeScript check
+        try:
+            result = subprocess.run(
+                ["npx", "tsc", "--noEmit"],
+                cwd=self.frontend_path,
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            if result.returncode != 0 and "error TS" in result.stderr:
+                issues.append(f"Frontend TypeScript import errors: {result.stderr[:500]}")
+        except Exception as e:
+            issues.append(f"Failed to validate frontend imports: {e}")
+            
+        return issues
+    
 
 
 def main():

@@ -103,6 +103,21 @@ class SpeechProcessor:
         self.config = config or VoiceConfig()
         self.logger = logging.getLogger(__name__)
         
+        # Supported languages
+        self.supported_languages = [
+            VoiceLanguage.ENGLISH.value,
+            VoiceLanguage.HINDI.value,
+            VoiceLanguage.SANSKRIT.value
+        ]
+        
+        # Quality settings
+        self.quality_settings = {
+            SpeechQuality.LOW.value: {"sample_rate": 16000, "timeout": 5},
+            SpeechQuality.MEDIUM.value: {"sample_rate": 22050, "timeout": 10},
+            SpeechQuality.HIGH.value: {"sample_rate": 44100, "timeout": 15},
+            SpeechQuality.PREMIUM.value: {"sample_rate": 48000, "timeout": 20}
+        }
+        
         # Recognition state
         self.is_listening = False
         self.current_session_id = None

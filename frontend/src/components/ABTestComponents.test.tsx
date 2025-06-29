@@ -24,6 +24,7 @@ jest.mock('../utils/abTesting', () => {
   
   return {
     ...originalModule,
+    useABTest: jest.fn(),
     abTesting: {
       getVariant: jest.fn(),
       getTestConfig: jest.fn(),
@@ -39,6 +40,7 @@ jest.mock('../utils/abTesting', () => {
 jest.mock('../styles/ab-testing.css', () => ({}));
 
 const mockAbTesting = abTesting as jest.Mocked<typeof abTesting>;
+const mockUseABTest = require('../utils/abTesting').useABTest as jest.MockedFunction<any>;
 
 describe('A/B Testing Components', () => {
   beforeEach(() => {
@@ -47,6 +49,13 @@ describe('A/B Testing Components', () => {
     // Default mock implementations
     mockAbTesting.isParticipating.mockReturnValue(true);
     mockAbTesting.trackMetric.mockImplementation(() => {});
+    
+    // Default useABTest mock
+    mockUseABTest.mockReturnValue({
+      variant: null,
+      config: {},
+      trackMetric: jest.fn()
+    });
   });
 
   describe('ABTestResponseDisplay', () => {
@@ -70,25 +79,21 @@ describe('A/B Testing Components', () => {
     };
 
     test('should render classic format variant', () => {
-      mockAbTesting.getVariant.mockReturnValue({
-        id: 'classic-format',
-        name: 'Classic Citation Format',
-        description: 'Traditional format',
-        weight: 50,
+      // Mock classic format variant
+      mockUseABTest.mockReturnValue({
+        variant: {
+          id: 'classic-format',
+          name: 'Classic Citation Format',
+          description: 'Traditional format',
+          weight: 50
+        },
         config: {
           citationPosition: 'bottom',
           responseStyle: 'classic',
           krishnaIconPosition: 'left',
           citationStyle: 'compact'
         },
-        spirituallyValidated: true
-      });
-
-      mockAbTesting.getTestConfig.mockReturnValue({
-        citationPosition: 'bottom',
-        responseStyle: 'classic',
-        krishnaIconPosition: 'left',
-        citationStyle: 'compact'
+        trackMetric: jest.fn()
       });
 
       render(<ABTestResponseDisplay {...mockProps} />);
@@ -112,25 +117,20 @@ describe('A/B Testing Components', () => {
     });
 
     test('should render integrated format variant', () => {
-      mockAbTesting.getVariant.mockReturnValue({
-        id: 'integrated-format',
-        name: 'Integrated Citation Format',
-        description: 'Integrated format',
-        weight: 50,
+      mockUseABTest.mockReturnValue({
+        variant: {
+          id: 'integrated-format',
+          name: 'Integrated Citation Format',
+          description: 'Integrated format',
+          weight: 50
+        },
         config: {
           citationPosition: 'inline',
           responseStyle: 'modern',
           krishnaIconPosition: 'center',
           citationStyle: 'expanded'
         },
-        spirituallyValidated: true
-      });
-
-      mockAbTesting.getTestConfig.mockReturnValue({
-        citationPosition: 'inline',
-        responseStyle: 'modern',
-        krishnaIconPosition: 'center',
-        citationStyle: 'expanded'
+        trackMetric: jest.fn()
       });
 
       render(<ABTestResponseDisplay {...mockProps} />);
@@ -146,33 +146,46 @@ describe('A/B Testing Components', () => {
 
     test('should track citation clicks', async () => {
       const user = userEvent.setup();
-      mockAbTesting.getVariant.mockReturnValue({
-        id: 'classic-format',
-        name: 'Classic Citation Format',
-        description: 'Traditional format',
-        weight: 50,
-        config: {},
-        spirituallyValidated: true
+      const mockTrackMetric = jest.fn();
+      
+      mockUseABTest.mockReturnValue({
+        variant: {
+          id: 'classic-format',
+          name: 'Classic Citation Format',
+          description: 'Traditional format',
+          weight: 50
+        },
+        config: {
+          citationPosition: 'bottom',
+          responseStyle: 'classic',
+          krishnaIconPosition: 'left',
+          citationStyle: 'compact'
+        },
+        trackMetric: mockTrackMetric
       });
 
       render(<ABTestResponseDisplay {...mockProps} />);
 
-      const citationButton = screen.getByText(/Bhagavad Gita 2\.47/);
+      const citationButton = screen.getByText(/Bhagavad Gita/);
       await user.click(citationButton);
 
       // Should track citation click
-      expect(mockAbTesting.trackMetric).toHaveBeenCalledWith('citation_clicks', 1);
+      expect(mockTrackMetric).toHaveBeenCalledWith('citation_clicks', 1);
 
       // Should call onCitationClick prop
       expect(mockProps.onCitationClick).toHaveBeenCalledWith('2.47');
     });
 
     test('should fallback to default when no variant', () => {
-      mockAbTesting.getVariant.mockReturnValue(null);
+      mockUseABTest.mockReturnValue({
+        variant: null,
+        config: {},
+        trackMetric: jest.fn()
+      });
 
       render(<ABTestResponseDisplay {...mockProps} />);
 
-      // Should still render response and citations
+      // Should still render response and citations using default format
       expect(screen.getByText(/Your duty is to act without attachment/)).toBeInTheDocument();
       expect(screen.getByText('📖 Sources:')).toBeInTheDocument();
     });

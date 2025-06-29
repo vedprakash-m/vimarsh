@@ -20,9 +20,6 @@ from voice.sanskrit_optimizer import SanskritRecognitionOptimizer
 from voice.tts_optimizer import SpiritualTTSOptimizer
 from voice.multilingual import MultilingualVoiceManager
 from voice.voice_recovery import SpiritualVoiceRecovery
-from voice.tts_optimizer import SpiritualTTSOptimizer
-from voice.multilingual import MultilingualVoiceManager
-from voice.voice_recovery import SpiritualVoiceRecovery
 from voice.quality_monitor import VoiceQualityMonitor
 from tests.fixtures import (
     VOICE_TEST_DATA, PERFORMANCE_BENCHMARKS, ERROR_TEST_SCENARIOS,
@@ -159,13 +156,13 @@ class TestSpeechProcessor:
             assert result is not None
 
 
-class TestSanskritOptimizer:
-    """Test suite for SanskritOptimizer class."""
+class TestSanskritRecognitionOptimizer:
+    """Test suite for SanskritRecognitionOptimizer class."""
     
     @pytest.fixture
     def sanskrit_optimizer(self):
-        """Create SanskritOptimizer instance for testing."""
-        return SanskritOptimizer()
+        """Create SanskritRecognitionOptimizer instance for testing."""
+        return SanskritRecognitionOptimizer()
     
     def test_sanskrit_optimizer_initialization(self, sanskrit_optimizer):
         """Test Sanskrit optimizer initialization."""
@@ -248,13 +245,13 @@ class TestSanskritOptimizer:
             assert len(stress_pattern["syllables"]) > 1
 
 
-class TestTTSOptimizer:
-    """Test suite for TTSOptimizer class."""
+class TestSpiritualTTSOptimizer:
+    """Test suite for SpiritualTTSOptimizer class."""
     
     @pytest.fixture
     def tts_optimizer(self):
-        """Create TTSOptimizer instance for testing."""
-        return TTSOptimizer()
+        """Create SpiritualTTSOptimizer instance for testing."""
+        return SpiritualTTSOptimizer()
     
     def test_tts_optimizer_initialization(self, tts_optimizer):
         """Test TTS optimizer initialization."""
@@ -732,8 +729,8 @@ class TestVoiceIntegrationFlow:
         """Test complete voice processing workflow integration."""
         # Create component instances
         speech_processor = SpeechProcessor()
-        sanskrit_optimizer = SanskritOptimizer()
-        tts_optimizer = TTSOptimizer()
+        sanskrit_optimizer = SanskritRecognitionOptimizer()
+        tts_optimizer = SpiritualTTSOptimizer()
         quality_monitor = VoiceQualityMonitor()
         
         # Mock the complete workflow
@@ -809,7 +806,7 @@ class TestVoiceIntegrationFlow:
         # Test complete voice round-trip performance
         components = {
             "speech_processor": SpeechProcessor(),
-            "tts_optimizer": TTSOptimizer(),
+            "tts_optimizer": SpiritualTTSOptimizer(),
             "quality_monitor": VoiceQualityMonitor()
         }
         

@@ -877,3 +877,101 @@ interface VedUser {
 - **Privacy**: Optional authentication for anonymous spiritual seekers
 
 ---
+
+## 12. Risk Management & Mitigation
+
+Proactive identification and mitigation of risks are critical for Vimarsh's success and reputation.
+
+### 12.1. Technical Risks:
+
+* **LLM Hallucination Despite RAG Grounding:**
+    * *Mitigation:* Strict prompt engineering (negative constraints, "answer only from context"), robust RAG retrieval (high *k*, diverse chunks), explicit "cannot answer" if not in text, and comprehensive expert review.
+* **Translation Quality Issues (Hindi):**
+    * *Mitigation:* Use high-quality, reputable translation APIs/models. Rigorous testing by native speakers. Prioritize clarity and accuracy over colloquial fluency for initial Hindi responses.
+* **Voice Recognition Accuracy in Noisy Environments:**
+    * *Mitigation:* Use robust STT services. Provide clear instructions for speaking. Consider offering a "re-record" option.
+* **System Downtime and Reliability:**
+    * *Mitigation:* Use reliable cloud infrastructure for deployment. Implement monitoring and alerting. Design for basic redundancy where feasible for MVP.
+
+### 12.2. Content & Cultural Risks:
+
+* **Misinterpretation of Sacred Texts:**
+    * *Mitigation:* **Foremost risk.** Strict adherence to RAG grounding, relying on established public domain translations. Rigorous expert review panel to vet interpretation. Explicit disclaimer that AI provides interpretations, not definitive spiritual authority.
+* **Cultural Sensitivity Across Diverse User Bases:**
+    * *Mitigation:* Comprehensive human review of persona responses. Avoid making prescriptive statements that could conflict with individual beliefs. Focus on universal philosophical principles present in the texts.
+* **Scholarly Criticism of AI-Generated Spiritual Guidance:**
+    * *Mitigation:* Transparency about AI nature. Emphasize tool for *exploration and accessibility*, not replacement for human teachers. Strong textual citations to establish credibility. Engage with scholarly communities for feedback.
+* **Religious Community Acceptance:**
+    * *Mitigation:* Early engagement with community leaders during alpha/beta. Demonstrate respect and fidelity. Highlight benefits of accessibility and preservation.
+
+### 12.3. Legal & Compliance Risks:
+
+* **Copyright Issues with Text Translations:**
+    * *Mitigation:* **Strictly use public domain translations** (e.g., Kisari Mohan Ganguli for Mahabharata/Bhagavad Gita, well-established Upanishad translations). Meticulously document the public domain status of all ingested texts.
+* **Data Privacy Regulations (GDPR, CCPA):**
+    * *Mitigation:* Implement "no persistence" policy for user data. Ensure robust encryption. Clear consent mechanisms. Comply with data subject rights (access, deletion, etc.) if any ephemeral logging implies retention.
+* **Religious Content Regulations in Different Countries:**
+    * *Mitigation:* Research local regulations for regions where the app might gain traction. Focus on non-dogmatic, informational content. Be prepared to implement geographic restrictions if necessary.
+
+---
+
+## 12.4. Enhanced Testing and Quality Assurance Framework
+
+Building on lessons learned from CI/CD failures and test-implementation drift, Vimarsh implements a comprehensive, multi-layered testing strategy that ensures **absolute environment parity** between local development and production deployment.
+
+### 12.4.1. Test Environment Parity Standards
+
+**Core Principle:** Local validation must mirror CI/CD environment exactly to eliminate deployment surprises.
+
+**Implementation:**
+* **Exact Environment Matching:** Local E2E validation runs with identical environment variables, dependencies, and configurations as CI/CD pipeline
+* **Import Resolution Validation:** Automated verification that all imports resolve correctly across both environments  
+* **Test Configuration Alignment:** A/B testing mocks, authentication setup, and API configurations must be identical locally and in CI
+* **Dependency Version Locking:** Frontend and backend dependencies locked to specific versions with automated drift detection
+
+### 12.4.2. 5-Whys Root Cause Analysis Integration
+
+**Systematic Failure Investigation:**
+* **Automated 5-Whys Triggering:** Any CI/CD failure automatically triggers root cause analysis following 5-whys methodology
+* **Pattern Recognition:** ML-based analysis to identify recurring failure patterns and systemic issues
+* **Hypothesis-Driven Testing:** Each failure generates testable hypotheses with specific expected outcomes
+* **Knowledge Base Integration:** All root causes and solutions documented in searchable knowledge base
+
+### 12.4.3. Multi-Layer Validation Strategy
+
+**Layer 1: Component-Level Testing**
+* **Interface Contract Testing:** Verify all class names, method signatures, and import paths match between tests and implementation
+* **A/B Testing Framework Validation:** Comprehensive testing of variant configurations and mock setups
+* **Voice Interface Component Testing:** Specialized testing for Sanskrit recognition, TTS optimization, and multilingual voice processing
+
+**Layer 2: Integration Testing**  
+* **Cross-Component Interaction:** Test spiritual guidance pipeline from question input to response generation
+* **Authentication Flow Testing:** Complete MSAL integration testing with crypto API mocking
+* **Voice-to-Text Pipeline:** End-to-end voice recognition testing with various audio quality scenarios
+
+**Layer 3: End-to-End Validation**
+* **User Journey Testing:** Complete spiritual guidance conversations from voice input to response
+* **Performance Under Load:** Spiritual content delivery performance testing under concurrent users
+* **Multilingual Accuracy Testing:** Hindi/English response quality validation with cultural appropriateness
+
+### 12.4.4. Spiritual Content Quality Assurance
+
+**Divine Response Standards:**
+* **Textual Fidelity Validation:** Each response verified against source text citations using automated text comparison
+* **Tone and Reverence Testing:** ML-based analysis to ensure responses maintain appropriate spiritual dignity
+* **Cultural Sensitivity Scoring:** Automated screening for language that could be culturally inappropriate or offensive
+* **Expert Panel Integration:** Streamlined workflow for scholarly review of edge cases and complex spiritual queries
+
+### 12.4.5. Continuous Improvement Framework
+
+**Automated Learning:** 
+* **Failure Pattern Analysis:** ML algorithms identify recurring test failure patterns and suggest preventive measures
+* **Test Coverage Evolution:** Dynamic test generation based on new failure modes and user interaction patterns
+* **Performance Baseline Tracking:** Continuous monitoring of spiritual guidance response quality and system performance
+
+**Proactive Prevention:**
+* **Design Review Integration:** New features undergo test-design review before implementation begins
+* **Dependency Change Impact Analysis:** Automated assessment of how dependency updates affect test environments
+* **Rollback Readiness:** All changes include automated rollback procedures tested in staging environment
+
+This enhanced framework ensures that Vimarsh maintains the highest standards of technical reliability while preserving the sacred nature of spiritual guidance interactions.
