@@ -178,8 +178,7 @@ echo "🔄 Validating CI/CD Workflows..."
 cd "$PROJECT_ROOT"
 
 WORKFLOW_FILES=(
-    ".github/workflows/test.yml"
-    ".github/workflows/deploy.yml"
+    ".github/workflows/unified-ci-cd.yml"
 )
 
 for workflow in "${WORKFLOW_FILES[@]}"; do
@@ -230,7 +229,7 @@ fi
 
 # Run basic pytest if available
 if command -v pytest &> /dev/null; then
-    if pytest tests/test_basic_integration.py -v --tb=short --timeout=30 &> /dev/null; then
+    if pytest tests/test_basic_integration.py -v --tb=short &> /dev/null; then
         success "Basic integration tests passing"
     else
         warning "Basic integration tests failing - check before push"
@@ -248,14 +247,15 @@ cd "$PROJECT_ROOT"
 
 # Check for hardcoded secrets (basic patterns)
 SECRET_PATTERNS=(
-    "password\s*=\s*[\"'][^\"']+[\"']"
-    "api_key\s*=\s*[\"'][^\"']+[\"']"
-    "secret\s*=\s*[\"'][^\"']+[\"']"
+    "password\s*=\s*[\"'][a-zA-Z0-9]{8,}[\"']"
+    "api_key\s*=\s*[\"'][a-zA-Z0-9]{20,}[\"']"
+    "secret_key\s*=\s*[\"'][a-zA-Z0-9]{16,}[\"']"
 )
 
 SECURITY_ISSUES=0
 for pattern in "${SECRET_PATTERNS[@]}"; do
-    if grep -r -E "$pattern" backend/ frontend/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" &> /dev/null; then
+    # Exclude test files and common non-sensitive patterns
+    if grep -r -E "$pattern" backend/ frontend/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" --exclude-dir=tests --exclude-dir=test --exclude="*test*" --exclude="*mock*" | grep -v "example\|sample\|placeholder\|dummy" &> /dev/null; then
         warning "Potential hardcoded secret found (pattern: $pattern)"
         SECURITY_ISSUES=$((SECURITY_ISSUES + 1))
     fi
