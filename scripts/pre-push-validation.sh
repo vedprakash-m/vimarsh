@@ -292,10 +292,16 @@ elif [[ $VALIDATION_WARNINGS -gt 0 ]]; then
     echo -e "${YELLOW}⚠️  Pre-push validation PASSED with warnings${NC}"
     echo -e "${YELLOW}Consider addressing $VALIDATION_WARNINGS warnings${NC}"
     echo ""
-    read -p "Continue with push? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
+    
+    # Check if running in git hook (non-interactive)
+    if [[ -n "$GIT_DIR" ]] || [[ ! -t 0 ]]; then
+        echo -e "${YELLOW}Running in git hook - proceeding with warnings${NC}"
+    else
+        read -p "Continue with push? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 else
     echo -e "${GREEN}🎉 Pre-push validation PASSED${NC}"
