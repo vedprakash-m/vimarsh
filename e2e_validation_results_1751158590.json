@@ -1,0 +1,129 @@
+{
+  "suite_level": "comprehensive",
+  "quick_mode": false,
+  "start_time": 1751158588.85886,
+  "results": [
+    {
+      "name": "syntax_validation",
+      "passed": true,
+      "duration": 0.04228091239929199,
+      "message": "All Python files have valid syntax",
+      "details": null
+    },
+    {
+      "name": "import_validation",
+      "passed": true,
+      "duration": 0.7755777835845947,
+      "message": "All key modules import successfully",
+      "details": null
+    },
+    {
+      "name": "basic_functionality",
+      "passed": true,
+      "duration": 0.384052038192749,
+      "message": "Basic functionality test passed",
+      "details": null
+    },
+    {
+      "name": "security_baseline",
+      "passed": true,
+      "duration": 0.0002989768981933594,
+      "message": "Basic security checks passed",
+      "details": null
+    },
+    {
+      "name": "spiritual_guidance_api",
+      "passed": true,
+      "duration": 1.3113021850585938e-05,
+      "message": "API check passed",
+      "details": null
+    },
+    {
+      "name": "rag_pipeline_basic",
+      "passed": true,
+      "duration": 4.76837158203125e-06,
+      "message": "RAG pipeline check passed",
+      "details": null
+    },
+    {
+      "name": "llm_integration",
+      "passed": true,
+      "duration": 3.0994415283203125e-06,
+      "message": "LLM integration check passed",
+      "details": null
+    },
+    {
+      "name": "error_handling",
+      "passed": true,
+      "duration": 3.814697265625e-06,
+      "message": "Error handling check passed",
+      "details": null
+    },
+    {
+      "name": "voice_interface",
+      "passed": true,
+      "duration": 5.245208740234375e-06,
+      "message": "Voice interface check passed",
+      "details": null
+    },
+    {
+      "name": "cost_management",
+      "passed": true,
+      "duration": 3.0994415283203125e-06,
+      "message": "Cost management check passed",
+      "details": null
+    },
+    {
+      "name": "monitoring_health",
+      "passed": true,
+      "duration": 3.0994415283203125e-06,
+      "message": "Monitoring check passed",
+      "details": null
+    },
+    {
+      "name": "performance_baseline",
+      "passed": true,
+      "duration": 4.0531158447265625e-06,
+      "message": "Performance check passed",
+      "details": null
+    },
+    {
+      "name": "user_journey_complete",
+      "passed": true,
+      "duration": 3.0994415283203125e-06,
+      "message": "User journey check passed",
+      "details": null
+    },
+    {
+      "name": "multilingual_support",
+      "passed": true,
+      "duration": 3.0994415283203125e-06,
+      "message": "Multilingual check passed",
+      "details": null
+    },
+    {
+      "name": "load_testing_basic",
+      "passed": true,
+      "duration": 2.86102294921875e-06,
+      "message": "Load testing check passed",
+      "details": null
+    },
+    {
+      "name": "integration_full",
+      "passed": true,
+      "duration": 3.0994415283203125e-06,
+      "message": "Integration check passed",
+      "details": null
+    }
+  ],
+  "summary": {
+    "total_checks": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "pass_rate": 100.0,
+    "total_duration": 1.2022621631622314,
+    "duration": 1.202868938446045
+  },
+  "recommendation": "\u2705 All checks passed! Safe to push to repository."
+}

@@ -1,0 +1,76 @@
+{
+  "validation_timestamp": "2025-06-28 17:47:54",
+  "tests": {
+    "dependency_validation": {
+      "name": "dependency_validation",
+      "passed": true,
+      "duration": 122.03255820274353,
+      "message": "All dependencies validate successfully",
+      "details": {
+        "backend": {
+          "success": true,
+          "message": "Backend dependencies installed successfully"
+        },
+        "frontend": {
+          "success": true,
+          "message": "Frontend dependencies installed successfully"
+        }
+      }
+    },
+    "test_environment_validation": {
+      "name": "test_environment_validation",
+      "passed": false,
+      "duration": 1.4532060623168945,
+      "message": "Environment issues: node_version: Node.js version mismatch. Expected v18.x, got v22.16.0; frontend_tests: Frontend tests failed in CI mode",
+      "details": {
+        "node_version": {
+          "success": false,
+          "error": "Node.js version mismatch. Expected v18.x, got v22.16.0",
+          "current": "v22.16.0",
+          "expected": "v18.x"
+        },
+        "python_version": {
+          "success": true,
+          "version": "3.12"
+        },
+        "frontend_tests": {
+          "success": false,
+          "error": "Frontend tests failed in CI mode",
+          "stdout": "\n> vimarsh-frontend@1.0.0 test:coverage\n> react-scripts test --coverage --watchAll=false\n\n",
+          "stderr": "We detected setupFilesAfterEnv in your package.json.\n\nRemove it from Jest configuration, and put the initialization code in src/setupTests.js.\nThis file will be loaded automatically.\n\n"
+        },
+        "test_configuration": {
+          "success": true,
+          "message": "Test configuration is valid"
+        }
+      }
+    },
+    "api_contract_validation": {
+      "name": "api_contract_validation",
+      "passed": true,
+      "duration": 0.015214920043945312,
+      "message": "API contracts and mocks are aligned",
+      "details": {
+        "spiritual_guidance_api": {
+          "success": true,
+          "message": "API structure is valid"
+        },
+        "mock_validation": {
+          "success": true,
+          "message": "Test mocks are properly configured"
+        }
+      }
+    }
+  },
+  "overall_success": false,
+  "issues_found": [
+    "node_version: Node.js version mismatch. Expected v18.x, got v22.16.0",
+    "frontend_tests: Frontend tests failed in CI mode"
+  ],
+  "recommendations": [
+    "Align local development environment with CI configuration",
+    "Update Node.js/Python versions to match CI",
+    "Address all identified issues before pushing to CI",
+    "Consider adding pre-commit hooks for validation"
+  ]
+}

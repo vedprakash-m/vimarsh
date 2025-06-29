@@ -1,0 +1,83 @@
+{
+  "validation_timestamp": "2025-06-28 17:33:32",
+  "tests": {
+    "dependency_validation": {
+      "name": "dependency_validation",
+      "passed": true,
+      "duration": 92.03793787956238,
+      "message": "All dependencies validate successfully",
+      "details": {
+        "backend": {
+          "success": true,
+          "message": "Backend dependencies installed successfully"
+        },
+        "frontend": {
+          "success": true,
+          "message": "Frontend dependencies installed successfully"
+        }
+      }
+    },
+    "test_environment_validation": {
+      "name": "test_environment_validation",
+      "passed": false,
+      "duration": 28.9254949092865,
+      "message": "Environment issues: node_version: Node.js version mismatch. Expected v18.x, got v22.16.0; frontend_tests: Frontend tests failed in CI mode; test_configuration: Test configuration issues: No Jest configuration found",
+      "details": {
+        "node_version": {
+          "success": false,
+          "error": "Node.js version mismatch. Expected v18.x, got v22.16.0",
+          "current": "v22.16.0",
+          "expected": "v18.x"
+        },
+        "python_version": {
+          "success": true,
+          "version": "3.12"
+        },
+        "frontend_tests": {
+          "success": false,
+          "error": "Frontend tests failed in CI mode",
+          "stdout": "                                                                                    \n  conversationHistory.ts         |    9.67 |     3.12 |    8.33 |   10.16 | 40-264,276-288,303-345,357-369,373                                                                        \n  deviceIntegration.ts           |       0 |        0 |       0 |       0 | 45-516                                                                                                    \n  notifications.ts               |       0 |        0 |       0 |       0 | 34-435                                                                                                    \n  pwa.ts                         |       0 |        0 |       0 |       0 | 19-350                                                                                                    \n---------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------------------\n",
+          "stderr": "2m\u001b[39m\u001b[90m 439 |\u001b[39m       expect(consoleSpy)\u001b[33m.\u001b[39mtoHaveBeenCalled()\u001b[33m;\u001b[39m\n     \u001b[90m     |\u001b[39m                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n     \u001b[90m 440 |\u001b[39m     })\u001b[33m;\u001b[39m\n     \u001b[90m 441 |\u001b[39m\n     \u001b[90m 442 |\u001b[39m     consoleSpy\u001b[33m.\u001b[39mmockRestore()\u001b[33m;\u001b[39m\u001b[0m\n\n      at src/components/NativeDeviceIntegration.test.tsx:439:26\n      at runWithExpensiveErrorDiagnosticsDisabled (node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/config.js:47:12)\n      at checkCallback (node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:127:77)\n      at checkRealTimersCallback (node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/wait-for.js:121:16)\n      at Timeout.task [as _onTimeout] (node_modules/jsdom/lib/jsdom/browser/Window.js:516:19)\n\nTest Suites: 13 failed, 3 passed, 16 total\nTests:       137 failed, 145 passed, 282 total\nSnapshots:   0 total\nTime:        25.624 s\nRan all test suites.\n"
+        },
+        "test_configuration": {
+          "success": false,
+          "error": "Test configuration issues: No Jest configuration found",
+          "issues": [
+            "No Jest configuration found"
+          ]
+        }
+      }
+    },
+    "api_contract_validation": {
+      "name": "api_contract_validation",
+      "passed": false,
+      "duration": 0.0023179054260253906,
+      "message": "API contract issues: API: SpiritualGuidanceAPI module not found",
+      "details": {
+        "spiritual_guidance_api": {
+          "success": false,
+          "error": "SpiritualGuidanceAPI module not found"
+        },
+        "mock_validation": {
+          "success": true,
+          "message": "Test mocks are properly configured"
+        }
+      }
+    }
+  },
+  "overall_success": false,
+  "issues_found": [
+    "node_version: Node.js version mismatch. Expected v18.x, got v22.16.0",
+    "frontend_tests: Frontend tests failed in CI mode",
+    "test_configuration: Test configuration issues: No Jest configuration found",
+    "API: SpiritualGuidanceAPI module not found"
+  ],
+  "recommendations": [
+    "Align local development environment with CI configuration",
+    "Update Node.js/Python versions to match CI",
+    "Fix API contract mismatches",
+    "Update test mocks to match real API responses",
+    "Address all identified issues before pushing to CI",
+    "Consider adding pre-commit hooks for validation"
+  ]
+}

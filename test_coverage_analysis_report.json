@@ -1,16 +1,16 @@
 {
-  "timestamp": "2025-06-27 13:09:05",
+  "timestamp": "2025-06-28 17:56:27",
   "total_duration": 0.0,
   "test_summary": {
-    "test_directories": 7,
-    "test_files": 28,
+    "test_directories": 8,
+    "test_files": 29,
     "strategic_tests": 1,
     "comprehensive_tests": 5
   },
   "coverage_summary": {
     "total_test_files": 25,
-    "total_source_files": 50,
-    "test_coverage_ratio": 0.5,
+    "total_source_files": 53,
+    "test_coverage_ratio": 0.47,
     "estimated_coverage": 85
   },
   "component_analysis": {
@@ -25,7 +25,7 @@
     "rag_pipeline": {
       "name": "rag_pipeline",
       "exists": true,
-      "source_files": 4,
+      "source_files": 5,
       "test_files": 2,
       "status": "partial_coverage",
       "priority": "medium"
@@ -57,7 +57,7 @@
     "monitoring": {
       "name": "monitoring",
       "exists": true,
-      "source_files": 9,
+      "source_files": 11,
       "test_files": 1,
       "status": "partial_coverage",
       "priority": "medium"
@@ -88,6 +88,7 @@
     }
   },
   "recommendations": [
+    "\ud83c\udfaf PRIORITY: Add more test files - coverage ratio is low",
     "\ud83d\udcdd Add tests for: auth"
   ]
 }

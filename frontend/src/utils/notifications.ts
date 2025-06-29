@@ -344,6 +344,8 @@ class DailyWisdomNotificationService {
 
   private async sendSubscriptionToServer(subscription: PushSubscription) {
     try {
+      // TODO: Implement push subscription endpoint in backend
+      /*
       await fetch('/api/push-subscription', {
         method: 'POST',
         headers: {
@@ -354,6 +356,8 @@ class DailyWisdomNotificationService {
           preferences: this.preferences
         }),
       });
+      */
+      console.log('[Notifications] Push subscription ready, backend endpoint needed');
     } catch (error) {
       console.error('[Notifications] Failed to send subscription to server:', error);
     }

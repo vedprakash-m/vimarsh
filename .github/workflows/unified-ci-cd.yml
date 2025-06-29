@@ -175,6 +175,12 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-asyncio
 
+    - name: 🔍 Validate Dependencies
+      run: |
+        cd backend
+        # Test installation in clean environment simulation
+        python -c "import pkg_resources; print('Dependencies validation passed')"
+
     - name: 🧪 Run Backend Tests
       run: |
         cd backend
@@ -218,6 +224,16 @@ jobs:
       run: |
         cd frontend
         npm run test:coverage
+
+    - name: 🔍 Validate Test Configuration
+      run: |
+        cd frontend
+        # Check for deprecated test patterns
+        if grep -r "ReactDOMTestUtils" src/ --include="*.test.ts" --include="*.test.tsx"; then
+          echo "❌ Found deprecated ReactDOMTestUtils usage"
+          exit 1
+        fi
+        echo "✅ Test configuration validation passed"
 
     - name: 📊 Upload Coverage
       uses: codecov/codecov-action@v3

@@ -1,5 +1,5 @@
 {
-  "validation_timestamp": "2025-06-27 13:09:02",
+  "validation_timestamp": "2025-06-28 17:56:23",
   "objectives": {
     "objective_1": {
       "name": "Fast Local E2E Validation",
@@ -9,7 +9,7 @@
         "fast_e2e_script": {
           "exists": true,
           "runs_successfully": true,
-          "duration_seconds": 1.32,
+          "duration_seconds": 2.08,
           "meets_speed_target": true,
           "output_sample": "\ud83d\ude80 Starting Fast Local E2E Validation - CORE level\n======================================================================\n\n\ud83d\udd0d Running Critical Pre-Flight Checks\n   Essential checks that must pass\n   Che"
         },
@@ -38,12 +38,7 @@
       "target_effectiveness": "No bugs escape to production",
       "tests": {
         "cicd_workflow": {
-          "exists": true,
-          "has_parallel_jobs": true,
-          "has_change_detection": true,
-          "has_coverage_check": true,
-          "has_security_scan": true,
-          "has_quality_gates": true
+          "exists": false
         },
         "multi_level_validation": {
           "core_level_works": true,
@@ -57,15 +52,15 @@
         },
         "performance_optimization": {
           "caching_configured": true,
-          "parallel_execution": true,
+          "parallel_execution": false,
           "smart_test_management": true,
           "fast_analysis_tools": true
         }
       },
-      "success": true,
-      "overall_score": 100.0
+      "success": false,
+      "overall_score": 68.8
     }
   },
-  "overall_success": true,
+  "overall_success": false,
   "recommendations": []
 }

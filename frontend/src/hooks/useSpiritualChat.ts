@@ -212,7 +212,7 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController();
       
-      const response = await fetch(`${finalConfig.apiBaseUrl}/api/spiritual-guidance`, {
+      const response = await fetch(`${finalConfig.apiBaseUrl}/api/spiritual_guidance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

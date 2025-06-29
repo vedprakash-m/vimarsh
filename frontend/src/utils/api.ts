@@ -211,7 +211,7 @@ class SpiritualGuidanceAPI {
     sessionId: string;
   }): Promise<{ success: boolean }> {
     try {
-      const response = await this.client.post('/api/feedback', feedback);
+      const response = await this.client.post('/api/feedback/collect', feedback);
       return response.data;
     } catch (error) {
       throw error;
@@ -233,8 +233,10 @@ class SpiritualGuidanceAPI {
     }>;
   }> {
     try {
-      const response = await this.client.get(`/api/conversations?limit=${limit}`);
-      return response.data;
+      // TODO: Implement conversations endpoint in backend
+      // const response = await this.client.get(`/api/conversations?limit=${limit}`);
+      // return response.data;
+      return { conversations: [] }; // Temporary placeholder
     } catch (error) {
       throw error;
     }

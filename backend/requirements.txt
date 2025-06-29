@@ -7,8 +7,7 @@ azure-storage-blob==12.19.0
 azure-identity==1.15.0
 
 # Authentication & Security
-PyJWT==2.8.0
-jwks-client==0.8.0
+PyJWT[crypto]==2.8.0
 cryptography==41.0.7
 
 # AI/ML Libraries

@@ -283,6 +283,8 @@ class PWAManager {
 
   private async sendSubscriptionToServer(subscription: PushSubscription): Promise<void> {
     try {
+      // TODO: Implement push subscription endpoint in backend
+      /*
       await fetch('/api/push-subscription', {
         method: 'POST',
         headers: {
@@ -290,7 +292,8 @@ class PWAManager {
         },
         body: JSON.stringify(subscription),
       });
-      console.log('[PWA] Push subscription sent to server');
+      */
+      console.log('[PWA] Push subscription ready, backend endpoint needed');
     } catch (error) {
       console.error('[PWA] Failed to send subscription to server:', error);
     }
