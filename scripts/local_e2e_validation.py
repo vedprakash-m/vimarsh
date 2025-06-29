@@ -189,6 +189,8 @@ class LocalE2EValidator:
         try:
             # 1. Environment validation
             self._validate_environment()
+            self._validate_dependencies()
+            self._validate_test_environment_match()
             
             # 2. Test discovery and categorization
             test_files = self._discover_tests()
@@ -254,6 +256,9 @@ class LocalE2EValidator:
         for dir_name in required_dirs:
             if not (self.project_root / dir_name).exists():
                 logger.warning(f"⚠️  Expected directory '{dir_name}' not found")
+        
+        # Validate dependencies
+        self._validate_dependencies()
         
         logger.info("✅ Environment validation passed")
     
@@ -844,6 +849,67 @@ class LocalE2EValidator:
             logger.error(f"❌ Error checking vector_storage module: {e}")
             self.test_results["validation"]["failed"] += 1
     
+    def _validate_dependencies(self):
+        """Validate that all requirements can be resolved and installed"""
+        logger.info("📦 Validating dependencies...")
+        
+        requirements_files = [
+            self.project_root / "backend" / "requirements.txt",
+            self.project_root / "frontend" / "package.json"
+        ]
+        
+        issues = []
+        
+        # Validate Python requirements
+        backend_requirements = requirements_files[0]
+        if backend_requirements.exists():
+            try:
+                with open(backend_requirements, 'r') as f:
+                    for line_num, line in enumerate(f, 1):
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            # Check for known problematic packages
+                            if 'pkg-resources' in line:
+                                issues.append(f"Line {line_num}: pkg-resources is not a valid package - remove this line")
+                            
+                            # Try to parse package specification
+                            try:
+                                import pkg_resources
+                                pkg_resources.Requirement.parse(line)
+                            except Exception as e:
+                                issues.append(f"Line {line_num}: Invalid requirement format '{line}': {e}")
+                        
+                logger.info("✅ Python requirements syntax validated")
+            except Exception as e:
+                issues.append(f"Failed to validate requirements.txt: {e}")
+        
+        # Validate Node.js package.json
+        frontend_package = requirements_files[1]
+        if frontend_package.exists():
+            try:
+                import json
+                with open(frontend_package, 'r') as f:
+                    package_data = json.load(f)
+                
+                # Check for required scripts
+                required_scripts = ['start', 'build', 'test', 'test:coverage']
+                missing_scripts = [script for script in required_scripts 
+                                 if script not in package_data.get('scripts', {})]
+                
+                if missing_scripts:
+                    issues.append(f"Missing required npm scripts: {missing_scripts}")
+                
+                logger.info("✅ Frontend package.json validated")
+            except Exception as e:
+                issues.append(f"Failed to validate package.json: {e}")
+        
+        if issues:
+            for issue in issues:
+                logger.error(f"❌ Dependency issue: {issue}")
+            raise RuntimeError(f"Dependency validation failed with {len(issues)} issues")
+        
+        return True
+
     def _run_backend_pytest(self) -> Optional[TestResult]:
         """Run actual pytest on backend to catch real failures"""
         try:
@@ -968,6 +1034,70 @@ class LocalE2EValidator:
                 exit_code=1,
                 output=str(e)
             )
+    
+    def _validate_test_environment_match(self):
+        """Ensure local test environment matches CI expectations"""
+        logger.info("🔍 Validating test environment CI/CD alignment...")
+        
+        issues = []
+        
+        # Check frontend test coverage thresholds
+        frontend_package = self.project_root / "frontend" / "package.json"
+        if frontend_package.exists():
+            try:
+                import json
+                with open(frontend_package, 'r') as f:
+                    package_data = json.load(f)
+                
+                # Check Jest configuration
+                jest_config = package_data.get('jest', {})
+                coverage_thresholds = jest_config.get('coverageThreshold', {}).get('global', {})
+                
+                required_thresholds = {
+                    'statements': 70,
+                    'branches': 70,
+                    'functions': 70,
+                    'lines': 70
+                }
+                
+                for metric, required in required_thresholds.items():
+                    actual = coverage_thresholds.get(metric, 0)
+                    if actual < required:
+                        issues.append(f"Frontend coverage threshold {metric}: {actual}% < {required}%")
+                
+                logger.info("✅ Frontend test configuration validated")
+            except Exception as e:
+                issues.append(f"Failed to validate frontend test config: {e}")
+        
+        # Check backend test environment
+        backend_pytest = self.project_root / "backend" / "pyproject.toml"
+        if backend_pytest.exists():
+            try:
+                import toml
+                with open(backend_pytest, 'r') as f:
+                    config = toml.load(f)
+                
+                # Check pytest configuration
+                tool_config = config.get('tool', {})
+                pytest_config = tool_config.get('pytest', {}).get('ini_options', {})
+                coverage_config = tool_config.get('coverage', {})
+                
+                # Validate minimum coverage settings
+                if 'minversion' not in pytest_config:
+                    issues.append("Backend: Missing pytest minimum version specification")
+                
+                logger.info("✅ Backend test configuration validated")
+            except ImportError:
+                logger.warning("⚠️ toml package not available for backend config validation")
+            except Exception as e:
+                issues.append(f"Failed to validate backend test config: {e}")
+        
+        if issues:
+            for issue in issues:
+                logger.error(f"❌ Test environment issue: {issue}")
+            raise RuntimeError(f"Test environment validation failed with {len(issues)} issues")
+        
+        return True
 
 
 def main():

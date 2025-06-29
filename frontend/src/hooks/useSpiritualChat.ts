@@ -360,6 +360,41 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
     return JSON.stringify(chatExport, null, 2);
   }, [state, finalConfig.language]);
 
+  const exportConversation = useCallback(() => {
+    return {
+      sessionId: state.currentSessionId,
+      timestamp: new Date().toISOString(),
+      language: finalConfig.language,
+      messages: state.messages.map(msg => ({
+        text: msg.text,
+        sender: msg.sender,
+        timestamp: msg.timestamp.toISOString(),
+        citations: msg.citations,
+        sanskritText: msg.sanskritText
+      }))
+    };
+  }, [state, finalConfig.language]);
+
+  const startNewSession = useCallback(() => {
+    const newSessionId = `session-${Date.now()}`;
+    setState(prev => ({
+      ...prev,
+      currentSessionId: newSessionId,
+      messages: [createWelcomeMessage()]
+    }));
+  }, []);
+
+  const cancelCurrentRequest = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setState(prev => ({
+      ...prev,
+      isLoading: false
+    }));
+  }, []);
+
   const getLastAIMessage = useCallback((): Message | null => {
     const aiMessages = state.messages.filter(msg => msg.sender === 'ai' && !msg.isLoading);
     return aiMessages.length > 0 ? aiMessages[aiMessages.length - 1] : null;
@@ -390,9 +425,12 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
     updateMessage,
     newConversation,
     loadSession,
+    startNewSession,
+    cancelCurrentRequest,
 
     // Utilities
     exportChat,
+    exportConversation,
     getLastAIMessage,
 
     // Stats

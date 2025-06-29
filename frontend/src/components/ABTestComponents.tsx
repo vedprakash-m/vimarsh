@@ -57,7 +57,7 @@ export const ABTestResponseDisplay: React.FC<ResponseDisplayProps> = ({
           <div className={`citations-section ${config.citationStyle}`}>
             <h4 className="citations-header">📖 Sacred Sources:</h4>
             <div className="citations-list">
-              {citations.map((citation, index) => (
+              {citations && citations.length > 0 ? citations.map((citation, index) => (
                 <button
                   key={index}
                   className="citation-link classic"
@@ -65,7 +65,9 @@ export const ABTestResponseDisplay: React.FC<ResponseDisplayProps> = ({
                 >
                   {citation.source} {citation.reference}
                 </button>
-              ))}
+              )) : (
+                <p>No citations available</p>
+              )}
             </div>
           </div>
         </div>

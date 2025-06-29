@@ -103,10 +103,13 @@ jest.mock('./VoiceInterface', () => {
 
 jest.mock('./ResponseDisplay', () => {
   return function MockResponseDisplay({ message }: { message: any }) {
+    if (!message) {
+      return <div data-testid="response-display">No message</div>;
+    }
     return (
       <div data-testid="response-display">
-        <div data-testid="message-text">{message.text}</div>
-        {message.citations && (
+        <div data-testid="message-text">{message.text || 'No text'}</div>
+        {message.citations && message.citations.length > 0 && (
           <div data-testid="citations">
             {message.citations.map((citation: any, index: number) => (
               <div key={index} data-testid={`citation-${index}`}>

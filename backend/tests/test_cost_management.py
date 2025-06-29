@@ -18,7 +18,7 @@ class TestCostMonitoring:
     @pytest.fixture
     def mock_cost_monitor(self):
         """Create a mock cost monitor."""
-        with patch('cost_management.cost_monitor.CostMonitor') as mock:
+        with patch('cost_management.vimarsh_cost_monitor.CostMonitor') as mock:
             monitor = Mock()
             monitor.get_current_costs.return_value = {
                 'total_cost': 45.67,
@@ -94,7 +94,7 @@ class TestRequestBatching:
     @pytest.fixture
     def mock_batch_processor(self):
         """Create a mock batch processor."""
-        with patch('cost_management.request_batching.BatchProcessor') as mock:
+        with patch('cost_management.request_batcher.RequestBatcher') as mock:
             processor = Mock()
             processor.batch_size = 5
             processor.batch_timeout = 1.0
@@ -150,7 +150,7 @@ class TestQueryDeduplication:
     @pytest.fixture
     def mock_deduplicator(self):
         """Create a mock query deduplicator."""
-        with patch('cost_management.query_deduplication.QueryDeduplicator') as mock:
+        with patch('cost_management.request_batcher.RequestBatcher') as mock:
             deduplicator = Mock()
             deduplicator.cache = {}
             deduplicator.hit_rate = 0.35
@@ -233,7 +233,7 @@ class TestCostOptimization:
     @pytest.fixture
     def mock_optimizer(self):
         """Create a mock cost optimizer."""
-        with patch('cost_management.cost_optimizer.CostOptimizer') as mock:
+        with patch('cost_management.model_switcher.ModelSwitcher') as mock:
             optimizer = Mock()
             optimizer.current_model = 'gemini-pro'
             optimizer.optimization_level = 'standard'
@@ -285,9 +285,9 @@ class TestCostIntegration:
     
     def test_end_to_end_cost_flow(self):
         """Test complete cost management flow."""
-        with patch('cost_management.cost_monitor.CostMonitor') as mock_monitor, \
-             patch('cost_management.request_batching.BatchProcessor') as mock_batch, \
-             patch('cost_management.query_deduplication.QueryDeduplicator') as mock_dedup:
+        with patch('cost_management.vimarsh_cost_monitor.CostMonitor') as mock_monitor, \
+             patch('cost_management.request_batcher.RequestBatcher') as mock_batch, \
+             patch('cost_management.request_batcher.RequestBatcher') as mock_dedup:
             
             # Configure mocks
             monitor = Mock()
@@ -325,7 +325,7 @@ class TestCostIntegration:
     
     def test_cost_alerts_integration(self):
         """Test cost alerts integration."""
-        with patch('cost_management.cost_monitor.CostMonitor') as mock_monitor:
+        with patch('cost_management.vimarsh_cost_monitor.CostMonitor') as mock_monitor:
             monitor = Mock()
             
             # Configure high cost scenario
