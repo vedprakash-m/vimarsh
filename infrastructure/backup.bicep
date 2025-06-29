@@ -1,27 +1,24 @@
 // Vimarsh Backup and Disaster Recovery Infrastructure
 // Comprehensive backup and recovery configuration for all Azure resources
+// DEPLOYMENT STRATEGY: Single environment production for cost efficiency
 
-@description('Environment name (dev, staging, prod)')
-@allowed(['dev', 'staging', 'prod'])
-param environment string = 'dev'
-
-@description('Location for all resources')
+@description('Location for all resources - single region deployment')
 param location string = resourceGroup().location
 
 @description('Project name for resource naming')
 param projectName string = 'vimarsh'
 
-@description('Recovery Services Vault name')
-param recoveryVaultName string = '${projectName}-${environment}-vault'
+@description('Recovery Services Vault name with static naming')
+param recoveryVaultName string = '${projectName}-vault'
 
-@description('Backup retention days for different environments')
-param backupRetentionDays int = environment == 'prod' ? 365 : environment == 'staging' ? 90 : 30
+@description('Backup retention days for production environment')
+param backupRetentionDays int = 365
 
-@description('Geo-redundant backup storage type')
-param storageType string = environment == 'prod' ? 'GeoRedundant' : 'LocallyRedundant'
+@description('Geo-redundant backup storage for production reliability')
+param storageType string = 'GeoRedundant'
 
-// Variables
-var resourceSuffix = '${projectName}-${environment}'
+// Variables for static resource naming
+var resourceSuffix = projectName
 
 // Recovery Services Vault for backup and disaster recovery
 resource recoveryVault 'Microsoft.RecoveryServices/vaults@2023-04-01' = {

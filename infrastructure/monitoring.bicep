@@ -1,11 +1,8 @@
 // Enhanced Monitoring and Alerting Configuration for Vimarsh
 // This template sets up comprehensive monitoring with spiritual guidance specific metrics
+// DEPLOYMENT STRATEGY: Single environment production for cost efficiency
 
-@description('Environment name (dev, staging, prod)')
-@allowed(['dev', 'staging', 'prod'])
-param environment string = 'dev'
-
-@description('Location for all resources')
+@description('Location for all resources - single region deployment')
 param location string = resourceGroup().location
 
 @description('Application name prefix')
@@ -31,8 +28,8 @@ param monthlyBudgetUsd int = 50
 @maxValue(100)
 param costAlertThreshold int = 80
 
-// Variables
-var resourceSuffix = '${appName}-${environment}'
+// Variables for production single environment deployment
+var resourceSuffix = appName
 var actionGroupName = '${resourceSuffix}-alerts'
 var smartDetectorName = '${resourceSuffix}-smart-detector'
 

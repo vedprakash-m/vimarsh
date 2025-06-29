@@ -61,7 +61,13 @@ jest.mock('../utils/conversationHistory', () => ({
       );
     }),
     deleteSession: jest.fn(),
-    exportSessions: jest.fn(() => Promise.resolve('exported-data'))
+    exportSessions: jest.fn(() => Promise.resolve('exported-data')),
+    getStorageStats: jest.fn().mockReturnValue({
+      totalSessions: 3,
+      totalMessages: 19,
+      oldestSession: new Date('2024-01-13T09:15:00Z'),
+      storageSize: 1024
+    })
   }
 }));
 

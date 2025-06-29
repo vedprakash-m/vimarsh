@@ -73,8 +73,8 @@ az login
 # Set subscription (if multiple)
 az account set --subscription "Your Subscription Name"
 
-# Run automated deployment
-./scripts/deploy.sh prod
+# Run automated deployment (single environment production strategy)
+./scripts/deploy.sh
 ```
 
 ### 2. Configure Environment

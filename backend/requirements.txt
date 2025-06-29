@@ -1,6 +1,10 @@
 # Azure Functions Core
 azure-functions==1.18.0
 
+# Essential Python packages
+setuptools>=65.0.0
+pkg-resources==0.0.0
+
 # Azure Services
 azure-cosmos==4.5.1
 azure-storage-blob==12.19.0

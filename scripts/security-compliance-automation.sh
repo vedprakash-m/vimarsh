@@ -79,7 +79,7 @@ Usage: $0 [OPTIONS]
 Vimarsh Security and Compliance Automation
 
 OPTIONS:
-    -e, --environment ENV    Target environment (dev|staging|prod) [default: dev]
+    -e, --environment ENV    Target environment (production only)
     --security-only         Run only security scanning
     --compliance-only       Run only compliance verification
     --output FORMAT         Output format (json|html|markdown) [default: json]
@@ -95,8 +95,8 @@ FEATURES:
     - Automated remediation suggestions
 
 EXAMPLES:
-    $0 --environment prod --verbose
-    $0 --security-only --environment staging
+    $0 --environment production --verbose
+    $0 --security-only --environment production
     $0 --compliance-only --output html
     $0 --dry-run --verbose
 

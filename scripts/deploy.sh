@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Vimarsh Automated Deployment Script
-# Usage: ./deploy.sh [environment] [options]
-# Environments: dev, staging, prod
+# Usage: ./deploy.sh [options]
+# Single Environment Strategy: Production-only deployment for cost efficiency
+# Two-Resource-Group Architecture: vimarsh-db-rg (persistent) + vimarsh-rg (compute)
 # Options: --skip-infrastructure, --data-only, --recovery-mode
 
 set -e  # Exit on any error
@@ -18,8 +19,8 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Default values
-ENVIRONMENT="dev"
+# Default production configuration (Single Environment Strategy)
+ENVIRONMENT="production"
 SKIP_INFRASTRUCTURE=false
 DATA_ONLY=false
 RECOVERY_MODE=false
@@ -27,10 +28,6 @@ RECOVERY_MODE=false
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        dev|staging|prod)
-            ENVIRONMENT="$1"
-            shift
-            ;;
         --skip-infrastructure)
             SKIP_INFRASTRUCTURE=true
             shift
@@ -44,13 +41,17 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -h|--help)
-            echo "Usage: $0 [environment] [options]"
-            echo "Environments: dev, staging, prod"
+            echo "Usage: $0 [options]"
+            echo "Single Environment Production Deployment Strategy"
             echo "Options:"
             echo "  --skip-infrastructure  Skip Azure resource creation"
             echo "  --data-only           Only deploy data and content"
             echo "  --recovery-mode       Deploy in disaster recovery mode"
             echo "  -h, --help           Show this help message"
+            echo ""
+            echo "Two-Resource-Group Architecture:"
+            echo "  vimarsh-db-rg   - Persistent resources (always active)"
+            echo "  vimarsh-rg      - Compute resources (pause-resume capable)"
             exit 0
             ;;
         *)
@@ -60,45 +61,20 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Environment-specific configuration with two-resource-group strategy
-case $ENVIRONMENT in
-    dev)
-        # Persistent resources (Database, Key Vault, Storage)
-        DB_RESOURCE_GROUP="vimarsh-db-rg"
-        # Compute resources (Functions, Static Web App, Insights)
-        COMPUTE_RESOURCE_GROUP="vimarsh-rg"
-        LOCATION="eastus"
-        # Static resource names for idempotency (beta cost optimization)
-        FUNCTION_APP_NAME="vimarsh-functions"
-        COSMOS_DB_NAME="vimarsh-db"
-        STATIC_WEB_APP_NAME="vimarsh-web"
-        APP_INSIGHTS_NAME="vimarsh-insights"
-        STORAGE_ACCOUNT_NAME="vimarshstorage"
-        KEY_VAULT_NAME="vimarsh-kv"
-        ;;
-    staging)
-        DB_RESOURCE_GROUP="vimarsh-db-rg"
-        COMPUTE_RESOURCE_GROUP="vimarsh-rg"
-        LOCATION="eastus"
-        FUNCTION_APP_NAME="vimarsh-functions"
-        COSMOS_DB_NAME="vimarsh-db"
-        STATIC_WEB_APP_NAME="vimarsh-web"
-        APP_INSIGHTS_NAME="vimarsh-insights"
-        STORAGE_ACCOUNT_NAME="vimarshstorage"
-        KEY_VAULT_NAME="vimarsh-kv"
-        ;;
-    prod)
-        DB_RESOURCE_GROUP="vimarsh-db-rg"
-        COMPUTE_RESOURCE_GROUP="vimarsh-rg"
-        LOCATION="eastus"
-        FUNCTION_APP_NAME="vimarsh-functions"
-        COSMOS_DB_NAME="vimarsh-db"
-        STATIC_WEB_APP_NAME="vimarsh-web"
-        APP_INSIGHTS_NAME="vimarsh-insights"
-        STORAGE_ACCOUNT_NAME="vimarshstorage"
-        KEY_VAULT_NAME="vimarsh-kv"
-        ;;
-esac
+# Single Production Environment Configuration (Two-Resource-Group Architecture)
+# Persistent resources (Database, Key Vault, Storage) - Always active
+DB_RESOURCE_GROUP="vimarsh-db-rg"
+# Compute resources (Functions, Static Web App, Insights) - Pause-resume capable
+COMPUTE_RESOURCE_GROUP="vimarsh-rg"
+LOCATION="eastus"
+
+# Static resource names for idempotent deployments (no duplicates)
+FUNCTION_APP_NAME="vimarsh-functions"
+COSMOS_DB_NAME="vimarsh-db"
+STATIC_WEB_APP_NAME="vimarsh-web"
+APP_INSIGHTS_NAME="vimarsh-insights"
+STORAGE_ACCOUNT_NAME="vimarshstorage"
+KEY_VAULT_NAME="vimarsh-kv"
 
 echo -e "${BLUE}🕉️  Vimarsh Deployment Script${NC}"
 echo -e "${BLUE}Environment: ${YELLOW}$ENVIRONMENT${NC}"

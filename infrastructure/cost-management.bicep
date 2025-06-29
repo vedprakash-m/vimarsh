@@ -1,13 +1,12 @@
 // Vimarsh Cost Management and Budget Monitoring Infrastructure
-// Comprehensive cost optimization, budget alerts, and resource monitoring
+// PRODUCTION-ONLY: Single environment deployment with cost optimization
+// RESOURCE GROUPS: vimarsh-db-rg (persistent) + vimarsh-rg (compute)
+// PAUSE-RESUME STRATEGY: Monitor costs across both resource groups
 
 targetScope = 'subscription'
 
-@description('Environment name (dev, staging, prod)')
-param environmentName string = 'dev'
-
 @description('Resource group name for cost management resources')
-param resourceGroupName string = 'vimarsh-${environmentName}-cost-mgmt'
+param resourceGroupName string = 'vimarsh-cost-mgmt'
 
 @description('Location for cost management resources')
 param location string = 'East US'
@@ -33,7 +32,7 @@ resource costMgmtResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' =
   location: location
   tags: {
     Project: projectName
-    Environment: environmentName
+    Environment: 'production'
     Purpose: 'Cost Management and Monitoring'
     Owner: ownerContact
     CostCenter: 'Engineering'
@@ -46,10 +45,10 @@ module costActionGroup 'modules/cost-action-group.bicep' = {
   name: 'vimarsh-cost-action-group'
   scope: costMgmtResourceGroup
   params: {
-    actionGroupName: 'vimarsh-${environmentName}-cost-alerts'
+    actionGroupName: 'vimarsh-cost-alerts'
     shortName: 'CostAlert'
     emailAddresses: alertEmailAddresses
-    environmentName: environmentName
+    environmentName: 'production'
     location: location
   }
 }
@@ -58,11 +57,11 @@ module costActionGroup 'modules/cost-action-group.bicep' = {
 module monthlyBudget 'modules/cost-budget.bicep' = {
   name: 'vimarsh-monthly-budget'
   params: {
-    budgetName: 'vimarsh-${environmentName}-monthly-budget'
+    budgetName: 'vimarsh-monthly-budget'
     budgetAmount: monthlyBudgetAmount
     thresholds: budgetThresholds
     actionGroupId: costActionGroup.outputs.actionGroupId
-    environmentName: environmentName
+    environmentName: 'production'
     resourceGroupName: resourceGroupName
   }
 }
@@ -71,9 +70,9 @@ module monthlyBudget 'modules/cost-budget.bicep' = {
 module costAnomalyDetector 'modules/cost-anomaly-detector.bicep' = {
   name: 'vimarsh-cost-anomaly-detector'
   params: {
-    detectorName: 'vimarsh-${environmentName}-anomaly-detector'
+    detectorName: 'vimarsh-anomaly-detector'
     actionGroupId: costActionGroup.outputs.actionGroupId
-    environmentName: environmentName
+    environmentName: 'production'
     resourceGroupName: resourceGroupName
   }
 }
@@ -83,8 +82,8 @@ module costOptimizationAdvisor 'modules/cost-optimization-advisor.bicep' = {
   name: 'vimarsh-cost-optimization'
   scope: costMgmtResourceGroup
   params: {
-    advisorName: 'vimarsh-${environmentName}-cost-advisor'
-    environmentName: environmentName
+    advisorName: 'vimarsh-cost-advisor'
+    environmentName: 'production'
     location: location
   }
 }
@@ -93,8 +92,8 @@ module costOptimizationAdvisor 'modules/cost-optimization-advisor.bicep' = {
 module resourceTaggingPolicy 'modules/resource-tagging-policy.bicep' = {
   name: 'vimarsh-resource-tagging-policy'
   params: {
-    policyName: 'vimarsh-${environmentName}-cost-tagging'
-    environmentName: environmentName
+    policyName: 'vimarsh-cost-tagging'
+    environmentName: 'production'
     requiredTags: [
       'Project'
       'Environment'
@@ -111,9 +110,9 @@ module costAnalyticsWorkspace 'modules/cost-analytics-workspace.bicep' = {
   name: 'vimarsh-cost-analytics-workspace'
   scope: costMgmtResourceGroup
   params: {
-    workspaceName: 'vimarsh-${environmentName}-cost-analytics'
+    workspaceName: 'vimarsh-cost-analytics'
     location: location
-    environmentName: environmentName
+    environmentName: 'production'
     retentionInDays: 90
   }
 }
@@ -123,9 +122,9 @@ module costDashboard 'modules/cost-dashboard.bicep' = {
   name: 'vimarsh-cost-dashboard'
   scope: costMgmtResourceGroup
   params: {
-    dashboardName: 'vimarsh-${environmentName}-cost-dashboard'
+    dashboardName: 'vimarsh-cost-dashboard'
     workspaceId: costAnalyticsWorkspace.outputs.workspaceId
-    environmentName: environmentName
+    environmentName: 'production'
     location: location
   }
 }
@@ -143,6 +142,6 @@ output costManagementConfig object = {
   budgetAmount: monthlyBudgetAmount
   thresholds: budgetThresholds
   alertEmails: alertEmailAddresses
-  environment: environmentName
+  environment: 'production'
   location: location
 }

@@ -36,14 +36,14 @@ COMMANDS:
     help                Show this help message
 
 OPTIONS:
-    --environment ENV   Target environment (dev, staging, prod)
+    --environment ENV   Target environment (production only)
     --email EMAIL       Email for backup notifications
     --dry-run          Show what would be done without executing
 
 EXAMPLES:
-    $0 install --environment prod --email admin@vimarsh.app
+    $0 install --environment production --email admin@vimarsh.app
     $0 status
-    $0 test --environment dev
+    $0 test --environment production
 
 EOF
 }

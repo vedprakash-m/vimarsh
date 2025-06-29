@@ -63,7 +63,7 @@ COMMANDS:
     help                Show this help message
 
 OPTIONS:
-    --environment ENV   Target environment (staging, prod)
+    --environment ENV   Target environment (production only)
     --base-url URL      Base URL for the deployed application
     --function-url URL  Azure Functions base URL
     --web-url URL       Static Web App URL
@@ -74,10 +74,10 @@ OPTIONS:
     --dry-run          Show what would be tested without executing
 
 EXAMPLES:
-    $0 validate --environment prod --base-url https://vimarsh-functions.azurewebsites.net
-    $0 smoke-test --environment staging --web-url https://vimarsh-web.azurestaticapps.net
-    $0 health-check --environment prod --verbose
-    $0 performance-test --environment prod --parallel
+    $0 validate --environment production --base-url https://vimarsh-functions.azurewebsites.net
+    $0 smoke-test --environment production --web-url https://vimarsh-web.azurestaticapps.net
+    $0 health-check --environment production --verbose
+    $0 performance-test --environment production --parallel
 
 EOF
 }
@@ -773,14 +773,11 @@ fi
 # Set default URLs if not provided
 if [[ -z "$FUNCTION_URL" ]]; then
     case "$ENVIRONMENT" in
-        staging)
-            FUNCTION_URL="https://vimarsh-staging-functions.azurewebsites.net"
-            ;;
-        prod)
+        production)
             FUNCTION_URL="https://vimarsh-functions.azurewebsites.net"
             ;;
         *)
-            error "Unknown environment: $ENVIRONMENT"
+            error "Unknown environment: $ENVIRONMENT. Only 'production' is supported."
             exit 1
             ;;
     esac
@@ -788,14 +785,11 @@ fi
 
 if [[ -z "$WEB_URL" ]]; then
     case "$ENVIRONMENT" in
-        staging)
-            WEB_URL="https://vimarsh-staging-web.azurestaticapps.net"
-            ;;
-        prod)
+        production)
             WEB_URL="https://vimarsh-web.azurestaticapps.net"
             ;;
         *)
-            error "Unknown environment: $ENVIRONMENT"
+            error "Unknown environment: $ENVIRONMENT. Only 'production' is supported."
             exit 1
             ;;
     esac

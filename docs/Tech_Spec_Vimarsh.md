@@ -1438,13 +1438,12 @@ vimarsh/
 ```
 
 **CI/CD Pipeline:**
-1. **Code Commit:** GitHub/GitLab repository
+1. **Code Commit:** GitHub repository
 2. **Automated Testing:** Run test suite on PR
 3. **Infrastructure Validation:** Bicep template validation and what-if deployment
 4. **Code Review:** Mandatory peer review
-5. **Staging Deployment:** Automatic Bicep deployment to staging environment
-6. **Expert Review:** Content quality validation
-7. **Production Deployment:** Manual approval for production with Bicep templates
+5. **Production Deployment:** Automatic Bicep deployment to single production environment
+6. **Expert Review:** Content quality validation and monitoring
 
 ### 13.2. Development Environment
 

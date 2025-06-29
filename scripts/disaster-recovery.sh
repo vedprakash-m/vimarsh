@@ -53,17 +53,17 @@ COMMANDS:
     help                Show this help message
 
 OPTIONS:
-    --environment ENV   Target environment (dev, staging, prod)
+    --environment ENV   Target environment (production only)
     --resource-group RG Resource group name
     --location LOC      Azure region
     --dry-run          Show what would be done without executing
     --verbose          Enable verbose output
 
 EXAMPLES:
-    $0 deploy --environment prod --resource-group vimarsh-prod-rg
-    $0 backup --environment staging
-    $0 validate --environment prod
-    $0 test-dr --environment dev --dry-run
+    $0 deploy --environment production --resource-group vimarsh-rg
+    $0 backup --environment production
+    $0 validate --environment production
+    $0 test-dr --environment production --dry-run
 
 EOF
 }

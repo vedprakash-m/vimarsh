@@ -54,14 +54,13 @@ OPERATIONS:
     help            Show this help message
 
 ENVIRONMENTS:
-    development     Local development environment
-    staging         Staging environment for testing
-    production      Production environment
+    development     Local development environment (for local testing only)
+    production      Production environment (single Azure deployment)
 
 EXAMPLES:
-    $0 setup development           # Set up development environment
+    $0 setup development           # Set up local development environment
     $0 validate production         # Validate production configuration
-    $0 deploy staging             # Deploy staging configuration
+    $0 deploy production          # Deploy production configuration
     $0 switch production          # Switch to production environment
     $0 status                     # Show current environment status
 
@@ -358,7 +357,7 @@ switch_environment() {
     local env="${1:-}"
     
     if [ -z "$env" ]; then
-        error "Environment not specified. Use: development, staging, or production"
+        error "Environment not specified. Use: development (local) or production"
     fi
     
     log "🔄 Switching to environment: $env"

@@ -2,22 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "environment": {
-      "value": "prod"
-    },
     "location": {
-      "value": "eastus"
-    },
-    "appName": {
-      "value": "vimarsh"
-    },
-    "projectName": {
-      "value": "vimarsh"
+      "value": "East US"
     },
     "geminiApiKey": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/vimarsh-shared/providers/Microsoft.KeyVault/vaults/vimarsh-shared-kv"
+          "id": "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/vimarsh-db-rg/providers/Microsoft.KeyVault/vaults/vimarsh-kv"
         },
         "secretName": "gemini-api-key"
       }

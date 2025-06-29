@@ -108,7 +108,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   };
 
   const getStorageStats = () => {
-    return conversationHistory.getStorageStats();
+    return conversationHistory.getStorageStats() || { totalSessions: 0, totalMessages: 0 };
   };
 
   const stats = getStorageStats();

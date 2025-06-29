@@ -56,14 +56,13 @@ OPERATIONS:
     help            Show this help message
 
 ENVIRONMENTS:
-    development     Local development monitoring
-    staging         Staging environment monitoring  
-    production      Production environment monitoring
+    development     Local development monitoring (for testing only)
+    production      Production environment monitoring (single Azure deployment)
 
 EXAMPLES:
     $0 deploy production      # Deploy production monitoring
-    $0 configure staging      # Configure staging alerts
-    $0 test development       # Test development monitoring
+    $0 configure production   # Configure production alerts
+    $0 test development       # Test local development monitoring
     $0 status                # Show current monitoring status
     $0 dashboard production   # Open production dashboard
 
