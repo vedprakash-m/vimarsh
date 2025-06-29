@@ -780,3 +780,100 @@ Vimarsh has global appeal, necessitating a thoughtful approach to internationali
   - Academic research tools and datasets
   - Cross-cultural philosophical dialogue facilitation
   - Global spiritual heritage documentation and accessibility
+
+---
+
+## 5.1. Authentication Architecture
+
+### Unified Vedprakash Domain Authentication Standard
+
+**Strategic Requirement:** Vimarsh **MUST** implement Microsoft Entra ID as the sole authentication provider to align with the unified Vedprakash domain authentication strategy, eliminating fragmented authentication across all `.vedprakash.net` applications.
+
+#### 🔐 **Core Authentication Requirements**
+
+| Requirement | Specification |
+|------------|---------------|
+| **Identity Provider** | Microsoft Entra ID (`vedid.onmicrosoft.com`) |
+| **Authentication Method** | OAuth 2.0 / OpenID Connect |
+| **Token Format** | JWT tokens from Microsoft Entra ID |
+| **Session Management** | Stateless authentication via JWT |
+| **Single Sign-On** | Cross-domain SSO across `.vedprakash.net` |
+
+#### 📋 **Implementation Standards**
+
+**Frontend Requirements:**
+- **Library**: `@azure/msal-react` (v2.0.12+) with `@azure/msal-browser` (v3.5.0+)
+- **Provider Wrapper**: MsalProvider wrapping the entire application
+- **Token Management**: Automatic token acquisition and refresh
+- **Anonymous Access**: Supported for basic spiritual guidance (no account required)
+
+**Backend Requirements:**
+- **JWT Validation**: Full signature verification with JWKS caching
+- **Security Headers**: Complete security header implementation
+- **User Object**: Standardized VedUser interface compliance
+- **API Authentication**: Bearer token validation for all protected endpoints
+
+**User Object Standard:**
+```typescript
+interface VedUser {
+  id: string;                    // Microsoft Entra ID user identifier
+  email: string;                 // Primary email address
+  name: string;                  // Display name
+  givenName: string;             // First name
+  familyName: string;            // Last name
+  permissions: string[];         // Role-based permissions
+  vedProfile: {
+    profileId: string;           // Unique profile identifier
+    subscriptionTier: string;    // free, premium, enterprise
+    appsEnrolled: string[];      // List of enrolled Vedprakash apps
+    preferences: Record<string, any>; // User preferences and settings
+  };
+}
+```
+
+#### 🚀 **Business Benefits**
+
+- **Unified User Experience**: Single credentials across all Vedprakash applications
+- **Enterprise Security**: Microsoft's enterprise-grade authentication with MFA support
+- **Cost Optimization**: Eliminates third-party authentication provider costs
+- **Development Efficiency**: Consistent authentication patterns and shared libraries
+- **Spiritual Community**: Unified user profiles enable cross-app spiritual journey tracking
+- **Enterprise Readiness**: B2B customers get required SSO functionality
+
+#### 🔒 **Security Requirements**
+
+- **JWT Signature Verification**: Mandatory with proper JWKS caching
+- **Security Headers**: X-Content-Type-Options, X-Frame-Options, CSP implementation
+- **Token Refresh**: Automatic silent token refresh without user intervention
+- **Error Handling**: Graceful authentication error handling with user feedback
+- **Session Timeout**: Configurable session management with spiritual context
+
+#### 📱 **User Experience Integration**
+
+- **Optional Authentication**: Users can explore spiritual guidance without creating accounts
+- **Progressive Enhancement**: Account creation prompted for personalized features
+- **Spiritual Context**: Authentication messaging maintains reverent tone
+- **Cross-App Navigation**: Seamless movement between Vedprakash applications
+
+#### 🎯 **Compliance Requirements**
+
+- **Apps_Auth_Requirement.md**: Full compliance with unified domain standard
+- **GDPR Compliance**: User data protection and privacy controls
+- **Cultural Sensitivity**: Authentication flows respect spiritual context
+- **Accessibility**: WCAG 2.1 AA compliance for all authentication interfaces
+
+#### 🚀 **Business Benefits for Vimarsh**
+- **Unified User Experience**: Users access Vimarsh with same credentials as other Vedprakash apps
+- **Enterprise Security**: Microsoft's battle-tested authentication with MFA support
+- **Cost Optimization**: Eliminates third-party auth provider costs
+- **Development Efficiency**: Consistent authentication patterns across all apps
+- **Spiritual Community**: Enables cross-app spiritual journey tracking
+
+#### 📋 **Implementation Requirements**
+- **Frontend**: MSAL.js integration with React components
+- **Backend**: JWT token validation with proper signature verification
+- **User Object**: Standardized VedUser interface for consistency
+- **API Security**: Bearer token authentication for all spiritual guidance requests
+- **Privacy**: Optional authentication for anonymous spiritual seekers
+
+---

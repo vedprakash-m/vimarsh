@@ -1,72 +1,128 @@
-// Microsoft Authentication Library (MSAL) Configuration
-// This will be used in production with Microsoft Entra External ID
+import { Configuration, LogLevel } from '@azure/msal-browser';
 
-// Environment variables for MSAL configuration
-export const msalConfig = {
+// Microsoft Authentication Library (MSAL) Configuration
+// Implements unified Vedprakash domain authentication standard
+
+// ✅ Corrected MSAL Configuration
+export const msalConfig: Configuration = {
   auth: {
     clientId: process.env.REACT_APP_CLIENT_ID || 'your-vimarsh-app-client-id',
-    authority: process.env.REACT_APP_AUTHORITY || 'https://vedid.onmicrosoft.com/vedid.onmicrosoft.com',
-    redirectUri: process.env.REACT_APP_REDIRECT_URI || window.location.origin + '/auth/callback',
+    authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/vedid.onmicrosoft.com', // ✅ Fixed authority
+    redirectUri: process.env.REACT_APP_REDIRECT_URI || `${window.location.origin}/auth/callback`,
     postLogoutRedirectUri: process.env.REACT_APP_POST_LOGOUT_REDIRECT_URI || window.location.origin,
     navigateToLoginRequestUrl: false,
   },
   cache: {
-    cacheLocation: 'localStorage', // Options: 'localStorage', 'sessionStorage'
+    cacheLocation: 'localStorage',
     storeAuthStateInCookie: false, // Set to true for IE11 support
   },
   system: {
+    allowNativeBroker: false, // Disable native broker for web
+    windowHashTimeout: 60000,
+    iframeHashTimeout: 6000,
+    loadFrameTimeout: 0,
     loggerOptions: {
-      loggerCallback: (level: any, message: string, containsPii: boolean) => {
+      loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
         if (containsPii) {
-          return;
+          return; // Don't log PII
         }
         switch (level) {
-          case 'error':
-            console.error('MSAL Error:', message);
+          case LogLevel.Error:
+            console.error('🔐 MSAL Error:', message);
             break;
-          case 'warning':
-            console.warn('MSAL Warning:', message);
+          case LogLevel.Warning:
+            console.warn('🔐 MSAL Warning:', message);
             break;
-          case 'info':
-            console.info('MSAL Info:', message);
+          case LogLevel.Info:
+            console.info('🔐 MSAL Info:', message);
+            break;
+          case LogLevel.Verbose:
+            console.debug('🔐 MSAL Debug:', message);
             break;
           default:
-            console.log('MSAL:', message);
+            console.log('🔐 MSAL:', message);
             break;
         }
       },
+      logLevel: LogLevel.Info,
+      piiLoggingEnabled: false
     },
   },
 };
 
-// Login request configuration
+// Login request configuration for initial authentication
 export const loginRequest = {
   scopes: ['openid', 'profile', 'email'],
-  prompt: 'select_account' // Options: 'login', 'select_account', 'consent', 'none'
+  prompt: 'select_account', // Options: 'login', 'select_account', 'consent', 'none'
+  extraQueryParameters: {
+    domain_hint: 'vedid.onmicrosoft.com' // Help with tenant routing
+  }
 };
 
-// Token request for API calls
-export const tokenRequest = {
-  scopes: [`https://vedid.onmicrosoft.com/vimarsh-api/access_as_user`],
-  account: null, // Will be set dynamically
+// Token request for accessing Vimarsh API
+export const apiTokenRequest = {
+  scopes: ['openid', 'profile', 'email'], // Basic scopes for now
+  account: null as any, // Will be set at runtime
 };
 
-// Graph API endpoint for user profile (optional)
-export const graphConfig = {
-  graphMeEndpoint: 'https://graph.microsoft.com/v1.0/me',
+// Silent token refresh request
+export const silentRequest = {
+  scopes: ['openid', 'profile', 'email'],
+  account: null as any, // Will be set at runtime
+  forceRefresh: false
 };
 
-// Environment configuration
-export const isDevelopment = process.env.NODE_ENV === 'development';
-export const isProduction = process.env.NODE_ENV === 'production';
+// Logout request configuration
+export const logoutRequest = {
+  account: null as any, // Will be set at runtime
+  postLogoutRedirectUri: window.location.origin,
+  mainWindowRedirectUri: window.location.origin
+};
 
-// Feature flags for authentication
+// Production environment validation
+export const validateMsalConfig = (): boolean => {
+  const requiredEnvVars = [
+    'REACT_APP_CLIENT_ID',
+    'REACT_APP_AUTHORITY'
+  ];
+
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error('🔐 Missing required environment variables:', missingVars);
+    return false;
+  }
+
+  // Validate authority format
+  const authority = process.env.REACT_APP_AUTHORITY;
+  if (authority && !authority.includes('login.microsoftonline.com')) {
+    console.error('🔐 Invalid authority format. Should use login.microsoftonline.com');
+    return false;
+  }
+
+  console.info('🔐 MSAL configuration validated successfully');
+  return true;
+};
+
+// Environment-specific configuration
 export const authConfig = {
-  // Use placeholder auth in development, MSAL in production
-  usePlaceholder: isDevelopment && !process.env.REACT_APP_USE_MSAL,
-  requireAuth: process.env.REACT_APP_REQUIRE_AUTH !== 'false',
-  enableGuest: process.env.REACT_APP_ENABLE_GUEST === 'true',
+  usePlaceholder: process.env.NODE_ENV === 'development' && !validateMsalConfig(),
+  enableLogging: process.env.NODE_ENV === 'development',
+  tenantId: 'vedid.onmicrosoft.com',
+  domain: 'vedprakash.net'
 };
+
+// Error messages for authentication failures
+export const AUTH_ERROR_MESSAGES = {
+  NO_ACCOUNT: 'No user account found. Please sign in.',
+  TOKEN_EXPIRED: 'Your session has expired. Please sign in again.',
+  NETWORK_ERROR: 'Network error during authentication. Please try again.',
+  INVALID_TOKEN: 'Invalid authentication token. Please sign in again.',
+  PERMISSION_DENIED: 'You do not have permission to access this resource.',
+  GENERAL_ERROR: 'Authentication error occurred. Please try again.'
+};
+
+export default msalConfig;
 
 // Spiritual user roles and permissions
 export const spiritualRoles = {

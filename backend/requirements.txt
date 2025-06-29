@@ -6,6 +6,11 @@ azure-cosmos==4.5.1
 azure-storage-blob==12.19.0
 azure-identity==1.15.0
 
+# Authentication & Security
+PyJWT==2.8.0
+jwks-client==0.8.0
+cryptography==41.0.7
+
 # AI/ML Libraries
 google-generativeai==0.7.2
 sentence-transformers==2.7.0

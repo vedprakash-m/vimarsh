@@ -258,6 +258,84 @@ User State: Wanting to customize experience
 Design Goal: Provide control while maintaining simplicity
 ```
 
+#### 🔐 **Authentication User Experience**
+
+**3.1.5 Unified Vedprakash Authentication**
+
+**Anonymous to Authenticated Journey:**
+```
+User Context: Currently exploring spiritual guidance anonymously
+Trigger: User accesses advanced features or personalization options
+
+System Response:
+- Gentle prompt: "Create your spiritual journey account"
+- Clear benefits: "Save conversations, track progress, access all Vedprakash apps"
+- Microsoft sign-in button with reverent styling
+- Alternative: "Continue exploring without account"
+- Cultural context: "Your spiritual journey, preserved with dignity"
+
+User State: Considering account creation
+Design Goal: Respectful invitation without pressure
+```
+
+**Microsoft Entra ID Sign-In Flow:**
+```
+User Action: Clicks "Sign in with Microsoft"
+System Experience:
+1. Redirect to Microsoft authentication (vimarsh.vedprakash.net → login.microsoftonline.com)
+2. Clean, professional Microsoft login interface
+3. Multi-factor authentication support (if configured)
+4. Redirect back to Vimarsh with seamless transition
+5. Welcome message: "Welcome back, [Name]. Your spiritual journey continues."
+
+User State: Authenticated and ready to engage
+Design Goal: Seamless transition maintaining spiritual context
+```
+
+**Cross-App SSO Experience:**
+```
+User Context: Already signed into another Vedprakash app (Sutra, Vigor, etc.)
+User Action: Visits vimarsh.vedprakash.net
+
+System Response:
+- Automatic recognition: "Welcome, [Name]"
+- No additional login required
+- Immediate access to personalized features
+- Subtle indication: "Connected to your Vedprakash account"
+
+User State: Delighted by seamless experience
+Design Goal: Demonstrate unified ecosystem value
+```
+
+**Authentication Error Handling:**
+```
+Error Scenarios: Token expiration, network issues, permission problems
+System Response:
+- Graceful degradation to anonymous access
+- Clear, non-technical error messages with spiritual context
+- Recovery options: "Your session has ended. Continue your journey by signing in again."
+- Preserve current conversation context where possible
+- Clear action buttons: "Sign In Again" or "Continue as Guest"
+
+User State: Experiencing technical difficulty
+Design Goal: Maintain spiritual reverence while resolving issues
+```
+
+**Token Management (Transparent to User):**
+```
+Background Process: Automatic token refresh
+User Experience:
+- No interruption to spiritual conversations
+- No unexpected logout during deep contemplation
+- Seamless experience across browser sessions
+- Privacy-first: No unnecessary data collection
+
+Technical Implementation:
+- Silent token refresh every 55 minutes
+- Graceful handling of refresh failures
+- Secure storage of authentication state
+```
+
 **3.2 Account Closure & Data Deletion**
 ```
 User Action: Requests account deletion

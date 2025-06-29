@@ -3,16 +3,29 @@
 
 import { authConfig, spiritualRoles, type SpiritualRole } from './msalConfig';
 
+// Unified VedUser interface from Apps_Auth_Requirement.md
 export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  preferredLanguage: 'English' | 'Hindi';
-  spiritualInterests: string[];
-  role: SpiritualRole;
-  joinedDate: string;
-  sessionCount: number;
-  lastActiveDate: string;
+  // Core VedUser interface (required)
+  id: string;           // Entra ID subject claim (primary user identifier)
+  email: string;        // User's email address
+  name: string;         // Full display name
+  givenName: string;    // First name
+  familyName: string;   // Last name
+  permissions: string[]; // App-specific permissions from JWT claims
+  vedProfile: {
+    profileId: string;                           // Vedprakash domain profile ID
+    subscriptionTier: 'free' | 'premium' | 'enterprise';
+    appsEnrolled: string[];                      // List of enrolled apps
+    preferences: Record<string, any>;            // User preferences
+  };
+  
+  // Vimarsh-specific fields (backward compatibility)
+  preferredLanguage?: 'English' | 'Hindi';
+  spiritualInterests?: string[];
+  role?: SpiritualRole;
+  joinedDate?: string;
+  sessionCount?: number;
+  lastActiveDate?: string;
   profilePicture?: string;
 }
 
@@ -26,8 +39,9 @@ export interface AuthState {
 export interface AuthService {
   login(options?: any): Promise<AuthUser>;
   logout(): Promise<void>;
-  getCurrentUser(): Promise<AuthUser | null>;
-  refreshToken(): Promise<string | null>;
+  getUser(): Promise<AuthUser | null>;  // Changed from getCurrentUser to match MSALAuthService
+  getToken(): Promise<string>;  // Changed from refreshToken and returns string not string | null
+  refreshToken(): Promise<string>; // Added explicit refreshToken method
   isAuthenticated(): boolean;
 }
 
@@ -39,6 +53,19 @@ class PlaceholderAuthService implements AuthService {
       id: 'dev-user-arjuna',
       name: 'Arjuna Dev',
       email: 'arjuna@vimarsh.dev',
+      givenName: 'Arjuna',
+      familyName: 'Dev',
+      permissions: ['user', 'seeker'],
+      vedProfile: {
+        profileId: 'dev-user-arjuna',
+        subscriptionTier: 'free',
+        appsEnrolled: ['vimarsh'],
+        preferences: {
+          language: 'English',
+          spiritualInterests: ['Bhagavad Gita', 'Dharma', 'Self-realization', 'Karma Yoga'],
+          communicationStyle: 'contemplative'
+        }
+      },
       preferredLanguage: 'English',
       spiritualInterests: ['Bhagavad Gita', 'Dharma', 'Self-realization', 'Karma Yoga'],
       role: spiritualRoles.SEEKER,
@@ -51,6 +78,19 @@ class PlaceholderAuthService implements AuthService {
       id: 'dev-user-meera',
       name: 'Meera भक्त',
       email: 'meera@vimarsh.dev',
+      givenName: 'Meera',
+      familyName: 'भक्त',
+      permissions: ['user', 'devotee'],
+      vedProfile: {
+        profileId: 'dev-user-meera',
+        subscriptionTier: 'premium',
+        appsEnrolled: ['vimarsh', 'sutra'],
+        preferences: {
+          language: 'Hindi',
+          spiritualInterests: ['Krishna Bhakti', 'Devotional Songs', 'Temple Worship', 'Raas Leela'],
+          communicationStyle: 'devotional'
+        }
+      },
       preferredLanguage: 'Hindi',
       spiritualInterests: ['Krishna Bhakti', 'Devotional Songs', 'Temple Worship', 'Raas Leela'],
       role: spiritualRoles.DEVOTEE,
@@ -63,6 +103,19 @@ class PlaceholderAuthService implements AuthService {
       id: 'dev-user-scholar',
       name: 'Pandit सत्यार्थी',
       email: 'scholar@vimarsh.dev',
+      givenName: 'Pandit',
+      familyName: 'सत्यार्थी',
+      permissions: ['user', 'scholar', 'expert'],
+      vedProfile: {
+        profileId: 'dev-user-scholar',
+        subscriptionTier: 'enterprise',
+        appsEnrolled: ['vimarsh', 'sutra', 'pathfinder'],
+        preferences: {
+          language: 'English',
+          spiritualInterests: ['Vedanta', 'Sanskrit Studies', 'Philosophical Inquiry', 'Upanishads'],
+          communicationStyle: 'scholarly'
+        }
+      },
       preferredLanguage: 'English',
       spiritualInterests: ['Vedanta', 'Sanskrit Studies', 'Philosophical Inquiry', 'Upanishads'],
       role: spiritualRoles.SCHOLAR,
@@ -89,7 +142,7 @@ class PlaceholderAuthService implements AuthService {
     // Update session info
     selectedUser = {
       ...selectedUser,
-      sessionCount: selectedUser.sessionCount + 1,
+      sessionCount: (selectedUser.sessionCount || 0) + 1,
       lastActiveDate: new Date().toISOString()
     };
 
@@ -110,7 +163,7 @@ class PlaceholderAuthService implements AuthService {
     console.log('🙏 Placeholder auth: Spiritual seeker disconnected peacefully');
   }
 
-  async getCurrentUser(): Promise<AuthUser | null> {
+  async getUser(): Promise<AuthUser | null> {
     if (this.currentUser) {
       return this.currentUser;
     }
@@ -141,41 +194,24 @@ class PlaceholderAuthService implements AuthService {
     return null;
   }
 
-  async refreshToken(): Promise<string | null> {
+  async getToken(): Promise<string> {
     // In placeholder mode, return a mock token
-    return this.currentUser ? `mock-token-${Date.now()}` : null;
+    if (!this.currentUser) {
+      throw new Error('No authenticated user');
+    }
+    return `mock-token-${Date.now()}`;
+  }
+
+  async refreshToken(): Promise<string> {
+    // In placeholder mode, return a mock token
+    if (!this.currentUser) {
+      throw new Error('No authenticated user');
+    }
+    return `mock-refreshed-token-${Date.now()}`;
   }
 
   isAuthenticated(): boolean {
     return this.currentUser !== null;
-  }
-}
-
-// MSAL Authentication Service (Production)
-class MSALAuthService implements AuthService {
-  async login(): Promise<AuthUser> {
-    // TODO: Implement actual MSAL login
-    throw new Error('MSAL authentication not yet implemented');
-  }
-
-  async logout(): Promise<void> {
-    // TODO: Implement actual MSAL logout
-    throw new Error('MSAL authentication not yet implemented');
-  }
-
-  async getCurrentUser(): Promise<AuthUser | null> {
-    // TODO: Implement actual MSAL user retrieval
-    return null;
-  }
-
-  async refreshToken(): Promise<string | null> {
-    // TODO: Implement actual MSAL token refresh
-    return null;
-  }
-
-  isAuthenticated(): boolean {
-    // TODO: Implement actual MSAL auth check
-    return false;
   }
 }
 
@@ -186,6 +222,8 @@ export const createAuthService = (): AuthService => {
     return new PlaceholderAuthService();
   } else {
     console.log('🔐 Creating MSAL authentication service for production');
+    // Import the actual MSALAuthService implementation
+    const { MSALAuthService } = require('./msalAuthService');
     return new MSALAuthService();
   }
 };
@@ -195,7 +233,7 @@ export const authService = createAuthService();
 
 // Auth utilities
 export const getAuthHeaders = async (): Promise<Record<string, string>> => {
-  const token = await authService.refreshToken();
+  const token = await authService.getToken().catch(() => null);
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
