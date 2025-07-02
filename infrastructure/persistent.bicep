@@ -13,7 +13,7 @@ param geminiApiKey string
 
 // Static resource names for idempotent deployments - no duplicates
 var cosmosDbName = 'vimarsh-db'
-var keyVaultName = 'vimarsh-kv'
+var keyVaultName = 'vimarsh-kv-${uniqueString(resourceGroup().id)}'
 var storageAccountName = 'vimarshstorage'
 
 // Cosmos DB with Vector Search - Single Region for Cost Efficiency

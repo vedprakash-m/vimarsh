@@ -329,49 +329,51 @@ const SpiritualGuidanceInterface: React.FC = () => {
             </section>
 
           {/* Input Area */}
-          <div className="input-area bg-white p-4 rounded-lg shadow-sm border border-neutral-200 mt-4">
-            <div className="flex gap-4 items-end">
-              <div className="flex-1">
-                <textarea
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={
-                    currentLanguage === 'Hindi'
-                      ? 'अपना प्रश्न यहाँ लिखें... (Enter दबाएं)'
-                      : 'Ask your question here... (Press Enter to send)'
-                  }
-                  className="w-full p-3 border border-neutral-300 rounded-lg resize-none focus:ring-2 focus:ring-saffron-primary focus:border-transparent"
-                  rows={3}
-                  disabled={isLoading}
-                />
-              </div>
-              
-              <div className="input-actions flex flex-col gap-2">
-                <div className={getVoiceButtonSize()}>
-                  <VoiceInterface
-                    onVoiceInput={handleVoiceInput}
-                    language={languageCode}
+          </div>
+          <div className="w-full px-4">
+            <div className="input-area bg-white p-4 rounded-lg shadow-sm border border-neutral-200 mt-4 w-full">
+              <div className="flex gap-4 items-end w-full max-w-none">
+                <div className="flex-1 w-full min-w-0">
+                  <textarea
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={
+                      currentLanguage === 'Hindi'
+                        ? 'अपना प्रश्न यहाँ लिखें... (Enter दबाएं)'
+                        : 'Ask your spiritual question here... (Press Enter to send)'
+                    }
+                    className="w-full p-3 border border-neutral-300 rounded-lg resize-none focus:ring-2 focus:ring-saffron-primary focus:border-transparent min-w-0"
+                    rows={3}
                     disabled={isLoading}
                   />
                 </div>
-                
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!inputMessage.trim() || isLoading}
-                  className="btn btn-primary px-6"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>{t('sending')}</span>
-                    </div>
-                  ) : (
-                    <span>{t('send')}</span>
-                  )}
-                </button>
+              
+                <div className="input-actions flex flex-col gap-2">
+                  <div className={getVoiceButtonSize()}>
+                    <VoiceInterface
+                      onVoiceInput={handleVoiceInput}
+                      language={languageCode}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!inputMessage.trim() || isLoading}
+                    className="btn btn-primary px-6"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>{t('sending')}</span>
+                      </div>
+                    ) : (
+                      <span>{t('send')}</span>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
             </div>
           </div>
         </main>

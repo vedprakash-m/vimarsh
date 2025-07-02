@@ -13,9 +13,11 @@ __author__ = "Vimarsh Development Team"
 from .api import SpiritualGuidanceAPI
 from .persona import LordKrishnaPersona
 from .validator import SpiritualResponseValidator
+from .enhanced_service import SpiritualGuidanceService
 
 __all__ = [
     "SpiritualGuidanceAPI",
     "LordKrishnaPersona", 
-    "SpiritualResponseValidator"
+    "SpiritualResponseValidator",
+    "SpiritualGuidanceService"
 ]

@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 import asyncio
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 
-from error_classifier import ErrorClassifier, ErrorCategory, ErrorSeverity, RecoveryStrategy
+from .error_classifier import ErrorClassifier, ErrorCategory, ErrorSeverity, RecoveryStrategy
 
 logger = logging.getLogger(__name__)
 

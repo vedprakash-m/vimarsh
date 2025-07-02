@@ -40,7 +40,7 @@ const AuthenticationWrapper: React.FC<AuthenticationWrapperProps> = ({ children 
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
-        const currentUser = await authService.getCurrentUser();
+        const currentUser = await authService.getUser();
         if (currentUser) {
           setIsAuthenticated(true);
           setUser(currentUser);

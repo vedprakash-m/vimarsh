@@ -416,3 +416,49 @@ class SpiritualTextProcessor:
             List of TextChunk objects
         """
         return self.process_text(text, max_chunk_size=max_chunk_size)
+    
+    def process_english_text(self, text: str) -> 'ProcessedText':
+        """Process English text and preserve spiritual terms."""
+        # Extract spiritual terms
+        preserved_terms = self.extract_sanskrit_terms(text)
+        
+        # Basic processing using existing methods
+        preprocessed = self.preprocess_text(text)
+        
+        # Create result object
+        result = ProcessedText(text=preprocessed, preserved_terms=preserved_terms)
+        return result
+    
+    def clean_and_normalize(self, text: str) -> str:
+        """Clean and normalize text by removing extra whitespace."""
+        import re
+        # Remove extra whitespace, newlines, and tabs
+        cleaned = re.sub(r'\s+', ' ', text.strip())
+        return cleaned
+    
+    def extract_metadata(self, text: str) -> Dict[str, Any]:
+        """Extract metadata from spiritual text."""
+        metadata = {}
+        
+        # Try to extract chapter information
+        chapter_info = self.extract_chapter_info(text)
+        if chapter_info:
+            metadata.update(chapter_info)
+        
+        # Count verses
+        verse_boundaries = self.identify_verse_boundaries(text)
+        metadata['verse_count'] = len(verse_boundaries)
+        
+        # Extract Sanskrit terms
+        sanskrit_terms = self.extract_sanskrit_terms(text)
+        metadata['sanskrit_terms'] = sanskrit_terms
+        
+        return metadata
+
+
+# Helper class for process_english_text result
+class ProcessedText:
+    """Result object for processed text with preserved terms."""
+    def __init__(self, text: str, preserved_terms: List[str]):
+        self.text = text
+        self.preserved_terms = preserved_terms

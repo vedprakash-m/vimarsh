@@ -91,28 +91,20 @@ jobs:
         SHOULD_BUILD="false"
         SHOULD_DEPLOY="false"
         
-        # Store GitHub context in variables to prevent shell injection
-        REF="${{ github.ref }}"
-        EVENT_NAME="${{ github.event_name }}"
-        FORCE_PIPELINE="${{ github.event.inputs.force_full_pipeline }}"
-        BACKEND_CHANGED="${{ steps.changes.outputs.backend }}"
-        FRONTEND_CHANGED="${{ steps.changes.outputs.frontend }}"
-        INFRA_CHANGED="${{ steps.changes.outputs.infrastructure }}"
-        
         # Force full pipeline for main branch pushes and manual triggers
-        if [[ "$REF" == "refs/heads/main" || "$EVENT_NAME" == "workflow_dispatch" || "$FORCE_PIPELINE" == "true" ]]; then
+        if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event.inputs.force_full_pipeline }}" == "true" ]]; then
           SHOULD_TEST="true"
           SHOULD_BUILD="true"
           SHOULD_DEPLOY="true"
         else
           # For other branches, run based on changes
-          if [[ "$BACKEND_CHANGED" == "true" || "$FRONTEND_CHANGED" == "true" || "$INFRA_CHANGED" == "true" ]]; then
+          if [[ "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.frontend }}" == "true" || "${{ steps.changes.outputs.infrastructure }}" == "true" ]]; then
             SHOULD_TEST="true"
             SHOULD_BUILD="true"
           fi
           
           # Deploy main branch to production (single environment strategy)
-          if [[ "$REF" == "refs/heads/main" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             SHOULD_DEPLOY="true"
           fi
         fi

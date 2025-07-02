@@ -9,9 +9,24 @@ import re
 import logging
 from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
+from dataclasses import dataclass
 import unicodedata
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class TextMetadata:
+    """Metadata extracted from spiritual text."""
+    source: Optional[str] = None
+    chapter: Optional[int] = None
+    verse: Optional[int] = None
+    text_type: Optional[str] = None
+    line_count: int = 0
+    word_count: int = 0
+    character_count: int = 0
+    chapter_reference: Optional[str] = None
+    contains_sanskrit: bool = False
+    sanskrit_terms_count: int = 0
 
 
 class SpiritualTextProcessor:
@@ -405,3 +420,96 @@ class SpiritualTextProcessor:
                     current_verse += 1
         
         return verses
+    
+    def process_english_text(self, text: str) -> 'ProcessedText':
+        """Process English text and preserve spiritual terms."""
+        # Extract spiritual terms (using basic term detection)
+        preserved_terms = []
+        spiritual_terms = ['dharma', 'karma', 'moksha', 'yoga', 'guru', 'ashram', 'mantra', 'meditation', 'enlightenment']
+        for term in spiritual_terms:
+            if term.lower() in text.lower():
+                preserved_terms.append(term)
+        
+        # Basic processing using existing clean_text method
+        preprocessed = self.clean_text(text)
+        
+        # Create result object
+        result = ProcessedText(text=preprocessed, preserved_terms=preserved_terms)
+        return result
+    
+    def preprocess_text(self, text: str) -> str:
+        """Preprocess text using clean_text method."""
+        return self.clean_text(text)
+    
+    def clean_and_normalize(self, text: str) -> str:
+        """Clean and normalize text by removing extra whitespace."""
+        import re
+        # Remove extra whitespace, newlines, and tabs
+        cleaned = re.sub(r'\s+', ' ', text.strip())
+        return cleaned
+    
+    def extract_metadata(self, text: str) -> TextMetadata:
+        """Extract metadata from spiritual text."""
+        # Basic metadata
+        lines = text.split('\n')
+        line_count = len(lines)
+        word_count = len(text.split())
+        character_count = len(text)
+        
+        # Initialize metadata object
+        metadata = TextMetadata(
+            line_count=line_count,
+            word_count=word_count,
+            character_count=character_count
+        )
+        
+        # Look for chapter information
+        chapter_reference = None
+        for line in lines[:10]:  # Check first 10 lines
+            if 'chapter' in line.lower() or 'adhyaya' in line.lower():
+                chapter_reference = line.strip()
+                metadata.chapter_reference = chapter_reference
+                break
+        
+        # Extract source, chapter, and verse from text
+        import re
+        
+        # Look for Bhagavad Gita references
+        if 'bhagavad gita' in text.lower() or 'gita' in text.lower():
+            metadata.source = "Bhagavad Gita"
+            metadata.text_type = "verse"
+            
+            # Extract chapter number
+            chapter_match = re.search(r'chapter\s*(\d+)', text.lower())
+            if chapter_match:
+                metadata.chapter = int(chapter_match.group(1))
+            
+            # Extract verse number  
+            verse_match = re.search(r'verse\s*(\d+)', text.lower())
+            if verse_match:
+                metadata.verse = int(verse_match.group(1))
+        
+        # Look for Mahabharata references
+        elif 'mahabharata' in text.lower():
+            metadata.source = "Mahabharata"
+            metadata.text_type = "section"
+        
+        # Look for Srimad Bhagavatam references
+        elif 'bhagavatam' in text.lower() or 'srimad' in text.lower():
+            metadata.source = "Srimad Bhagavatam"
+            metadata.text_type = "verse"
+        
+        # Check for Sanskrit content
+        sanskrit_matches = re.findall(self.sanskrit_patterns['devanagari'], text)
+        metadata.contains_sanskrit = len(sanskrit_matches) > 0
+        metadata.sanskrit_terms_count = len(sanskrit_matches)
+        
+        return metadata
+
+
+# Helper class for process_english_text result  
+class ProcessedText:
+    """Result object for processed text with preserved terms."""
+    def __init__(self, text: str, preserved_terms: List[str]):
+        self.text = text
+        self.preserved_terms = preserved_terms

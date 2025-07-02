@@ -23,8 +23,8 @@ try:
     from .error_classifier import ErrorCategory, ErrorSeverity
     from .llm_fallback import LLMFallbackSystem, FallbackTrigger
 except ImportError:
-    from error_classifier import ErrorCategory, ErrorSeverity
-    from llm_fallback import LLMFallbackSystem, FallbackTrigger
+    from .error_classifier import ErrorCategory, ErrorSeverity
+    from .llm_fallback import LLMFallbackSystem, FallbackTrigger
 
 
 class CircuitState(Enum):

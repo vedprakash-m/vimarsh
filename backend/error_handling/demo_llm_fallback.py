@@ -14,11 +14,11 @@ from datetime import datetime, timedelta
 
 # Import the system under test
 try:
-    from llm_fallback import (
+    from .llm_fallback import (
         LLMFallbackSystem, SpiritualQuery, FallbackResponse,
         FallbackStrategy, FallbackTrigger, TemplatePattern
     )
-    from error_classifier import ErrorCategory, ErrorSeverity
+    from .error_classifier import ErrorCategory, ErrorSeverity
 except ImportError:
     print("Please run this from the backend/error_handling directory")
     exit(1)

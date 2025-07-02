@@ -254,8 +254,8 @@ SECRET_PATTERNS=(
 
 SECURITY_ISSUES=0
 for pattern in "${SECRET_PATTERNS[@]}"; do
-    # Exclude test files, venv, and common non-sensitive patterns
-    if grep -r -E "$pattern" backend/ frontend/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" --exclude-dir=tests --exclude-dir=test --exclude-dir=venv --exclude-dir=node_modules --exclude="*test*" --exclude="*mock*" | grep -v "example\|sample\|placeholder\|dummy\|pydantic\|fsspec" &> /dev/null; then
+    # Exclude test files and common non-sensitive patterns
+    if grep -r -E "$pattern" backend/ frontend/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" --exclude-dir=tests --exclude-dir=test --exclude="*test*" --exclude="*mock*" | grep -v "example\|sample\|placeholder\|dummy" &> /dev/null; then
         warning "Potential hardcoded secret found (pattern: $pattern)"
         SECURITY_ISSUES=$((SECURITY_ISSUES + 1))
     fi

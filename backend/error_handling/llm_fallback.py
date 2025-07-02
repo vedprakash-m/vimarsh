@@ -21,8 +21,8 @@ try:
     from .error_classifier import ErrorCategory, ErrorSeverity
     from .graceful_degradation import GracefulDegradationManager
 except ImportError:
-    from error_classifier import ErrorCategory, ErrorSeverity
-    from graceful_degradation import GracefulDegradationManager
+    from .error_classifier import ErrorCategory, ErrorSeverity
+    from .graceful_degradation import GracefulDegradationManager
 
 
 class FallbackStrategy(Enum):

@@ -6,9 +6,47 @@ import json
 import logging
 from functools import wraps, lru_cache
 from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from azure.functions import HttpRequest, HttpResponse
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class VedUser:
+    """Standardized user object for Vedprakash domain applications"""
+    id: str
+    email: str
+    name: str
+    givenName: str
+    familyName: str
+    permissions: list
+    vedProfile: dict
+
+    @classmethod
+    def from_token_data(cls, token_data: Dict[str, Any]) -> 'VedUser':
+        """Create VedUser from JWT token claims"""
+        return cls(
+            id=token_data.get("sub", ""),
+            email=token_data.get("email", ""),
+            name=token_data.get("name", ""),
+            givenName=token_data.get("given_name", ""),
+            familyName=token_data.get("family_name", ""),
+            permissions=token_data.get("roles", []),
+            vedProfile={
+                "profileId": token_data.get("sub", ""),
+                "subscriptionTier": "free",
+                "appsEnrolled": ["vimarsh"],
+                "preferences": {
+                    "language": "English",
+                    "spiritualInterests": [],
+                    "communicationStyle": "reverent"
+                }
+            }
+        )
+
+class AuthenticationError(Exception):
+    """Custom exception for authentication errors"""
+    pass
 
 class EntraIDJWTValidator:
     """Microsoft Entra ID JWT token validator with proper signature verification."""
@@ -108,26 +146,9 @@ class EntraIDJWTValidator:
             logger.error(f"❌ Token validation error: {e}")
             raise ValueError("Token validation failed")
     
-    def extract_ved_user(self, token_data: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_ved_user(self, token_data: Dict[str, Any]) -> VedUser:
         """Extract standardized VedUser from token claims."""
-        return {
-            "id": token_data.get("sub", ""),
-            "email": token_data.get("email", ""),
-            "name": token_data.get("name", ""),
-            "givenName": token_data.get("given_name", ""),
-            "familyName": token_data.get("family_name", ""),
-            "permissions": token_data.get("roles", []),
-            "vedProfile": {
-                "profileId": token_data.get("sub", ""),
-                "subscriptionTier": "free",
-                "appsEnrolled": ["vimarsh"],
-                "preferences": {
-                    "language": "English",
-                    "spiritualInterests": [],
-                    "communicationStyle": "reverent"
-                }
-            }
-        }
+        return VedUser.from_token_data(token_data)
     
     def extract_token_from_request(self, req: HttpRequest) -> Optional[str]:
         """Extract Bearer token from request headers."""
@@ -274,6 +295,14 @@ def validate_auth_config():
         raise ValueError(f"Missing required environment variables: {missing_vars}")
     
     logger.info("✅ Authentication configuration validated")
+
+def validate_jwt_token(token: str) -> Dict[str, Any]:
+    """Validate JWT token and return claims"""
+    validator = EntraIDJWTValidator()
+    return validator.validate_token(token)
+
+# Create module-level middleware instance for convenience
+EntraExternalIDMiddleware = EntraIDJWTValidator
 
 # Call validation on import
 try:

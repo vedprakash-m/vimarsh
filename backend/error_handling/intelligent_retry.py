@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import functools
 import inspect
 
-from error_classifier import ErrorClassifier, ErrorCategory, RecoveryStrategy, ClassifiedError
+from .error_classifier import ErrorClassifier, ErrorCategory, RecoveryStrategy, ClassifiedError
 
 logger = logging.getLogger(__name__)
 

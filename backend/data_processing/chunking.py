@@ -59,6 +59,11 @@ class TextChunk:
     metadata: ChunkMetadata
     embedding: Optional[np.ndarray] = None
     created_at: datetime = field(default_factory=datetime.now)
+    
+    @property
+    def text(self) -> str:
+        """Alias for content for backward compatibility."""
+        return self.content
 
 
 class SemanticChunker:
@@ -73,7 +78,8 @@ class SemanticChunker:
                  chunk_size: int = 512,
                  overlap_size: int = 50,
                  strategy: ChunkingStrategy = ChunkingStrategy.HYBRID,
-                 preserve_verses: bool = True):
+                 preserve_verses: bool = True,
+                 respect_boundaries: bool = None):  # Added for backward compatibility
         """
         Initialize semantic chunker
         
@@ -82,7 +88,11 @@ class SemanticChunker:
             overlap_size: Overlap between chunks in tokens
             strategy: Chunking strategy to use
             preserve_verses: Whether to preserve verse boundaries
+            respect_boundaries: Alias for preserve_verses (for backward compatibility)
         """
+        # Handle backward compatibility
+        if respect_boundaries is not None:
+            preserve_verses = respect_boundaries
         self.chunk_size = chunk_size
         self.overlap_size = overlap_size
         self.strategy = strategy
@@ -130,14 +140,14 @@ class SemanticChunker:
         logger.info(f"SemanticChunker initialized: {chunk_size} tokens, {strategy.value} strategy")
     
     def chunk_text(self, text: str, 
-                   source_id: str, 
+                   source_id: str = "unknown", 
                    text_type: TextType = TextType.GENERAL_SPIRITUAL) -> List[TextChunk]:
         """
         Chunk text using semantic analysis
         
         Args:
             text: Input text to chunk
-            source_id: Identifier for the source text
+            source_id: Identifier for the source text (default: "unknown")
             text_type: Type of spiritual text
             
         Returns:

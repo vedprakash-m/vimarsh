@@ -1,5 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { conversationHistory, ConversationSession } from '../utils/conversationHistory';
+import { API_BASE_URL } from '../config/environment';
+
+// Debug log
+console.log('useSpiritualChat - API_BASE_URL:', API_BASE_URL);
 
 export interface Message {
   id: string;
@@ -45,7 +49,7 @@ interface SpiritualChatConfig {
 }
 
 const DEFAULT_CONFIG: SpiritualChatConfig = {
-  apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071',
+  apiBaseUrl: API_BASE_URL,
   language: 'en',
   autoSave: true,
   maxRetries: 3,
@@ -212,19 +216,21 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController();
       
-      const response = await fetch(`${finalConfig.apiBaseUrl}/api/spiritual_guidance`, {
+      const apiUrl = `${finalConfig.apiBaseUrl}/spiritual_guidance`;
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           query: text.trim(),
-          language: finalConfig.language,
-          sessionId: state.currentSessionId,
-          context: state.messages.slice(-5) // Send last 5 messages for context
+          language: finalConfig.language === 'hi' ? 'Hindi' : 'English',
+          user_id: `user-${Date.now()}`,
+          include_citations: true,
+          voice_enabled: false
         }),
-        signal: abortControllerRef.current.signal,
-        credentials: 'same-origin'
+        signal: abortControllerRef.current.signal
       });
 
       if (!response.ok) {

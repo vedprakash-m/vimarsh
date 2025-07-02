@@ -1,3 +1,11 @@
+// Debug logging for build-time debugging
+console.log('Environment debug info:', {
+  NODE_ENV: process.env.NODE_ENV,
+  REACT_APP_ENVIRONMENT: process.env.REACT_APP_ENVIRONMENT,
+  REACT_APP_API_BASE_URL: process.env.REACT_APP_API_BASE_URL,
+  buildTime: new Date().toISOString()
+});
+
 // Environment Configuration Manager for React Frontend
 // This module provides type-safe access to environment variables
 
@@ -35,6 +43,13 @@ class EnvironmentConfigManager {
   }
 
   private loadConfiguration(): EnvironmentConfig {
+    // Debug logging for environment variables - Build v2.0
+    console.log('Environment variables loaded:', {
+      REACT_APP_ENVIRONMENT: process.env.REACT_APP_ENVIRONMENT,
+      REACT_APP_API_BASE_URL: process.env.REACT_APP_API_BASE_URL,
+      NODE_ENV: process.env.NODE_ENV
+    });
+    
     return {
       environment: process.env.REACT_APP_ENVIRONMENT || 'development',
       apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071',

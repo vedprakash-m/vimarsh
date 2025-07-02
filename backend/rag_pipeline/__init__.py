@@ -7,14 +7,15 @@ and verse boundary preservation.
 """
 
 from .text_processor import SpiritualTextProcessor, TextChunk
-from .vector_storage import LocalVectorStorage
+from .vector_storage import LocalVectorStorage, CosmosVectorSearch
 from .document_loader import SpiritualDocumentLoader
 from .rag_pipeline import RAGPipeline, create_rag_pipeline
 
 __all__ = [
     'SpiritualTextProcessor',
     'TextChunk',
-    'LocalVectorStorage', 
+    'LocalVectorStorage',
+    'CosmosVectorSearch',
     'SpiritualDocumentLoader',
     'RAGPipeline',
     'create_rag_pipeline'

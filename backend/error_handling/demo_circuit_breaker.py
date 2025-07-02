@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Import the system under test
 try:
-    from circuit_breaker import (
+    from .circuit_breaker import (
         CircuitBreaker, HealthMonitor, HealthAndCircuitMonitor,
         CircuitBreakerConfig, HealthCheckConfig, CircuitBreakerError,
         ServiceHealthChecks, initialize_vimarsh_monitoring

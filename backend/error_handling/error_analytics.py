@@ -20,7 +20,7 @@ import re
 try:
     from .error_classifier import ErrorClassifier, ErrorCategory, ErrorSeverity, ErrorContext
 except ImportError:
-    from error_classifier import ErrorClassifier, ErrorCategory, ErrorSeverity, ErrorContext
+    from .error_classifier import ErrorClassifier, ErrorCategory, ErrorSeverity, ErrorContext
 
 
 class AnalyticsMetric(Enum):

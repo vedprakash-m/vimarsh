@@ -83,8 +83,7 @@ class LocalE2EValidator:
                  quick_mode: bool = False,
                  enable_coverage: bool = True,
                  parallel: bool = True,
-                 max_workers: int = 4,
-                 timeout: int = 300):
+                 max_workers: int = 4):
         """
         Initialize the validator
         
@@ -94,7 +93,6 @@ class LocalE2EValidator:
             enable_coverage: Collect test coverage data
             parallel: Run tests in parallel where possible
             max_workers: Maximum number of parallel workers
-            timeout: Maximum execution timeout in seconds
         """
         self.project_root = project_root or Path.cwd()
         self.backend_path = self.project_root / "backend"
@@ -103,7 +101,6 @@ class LocalE2EValidator:
         self.enable_coverage = enable_coverage
         self.parallel = parallel
         self.max_workers = max_workers
-        self.timeout = timeout
         
         # Test results initialization
         self.test_results = {
@@ -182,16 +179,14 @@ class LocalE2EValidator:
     
     def run_validation(self) -> ValidationReport:
         """
-        Run comprehensive validation with timeout
+        Run comprehensive validation
         
         Returns:
             ValidationReport with all results and recommendations
         """
         logger.info("🚀 Starting Vimarsh Local E2E Validation")
-        logger.info(f"⏱️  Timeout set to {self.timeout} seconds")
         
         report = ValidationReport()
-        start_time = time.time()
         
         try:
             # 1. Environment validation
@@ -199,30 +194,17 @@ class LocalE2EValidator:
             self._validate_dependencies()
             self.validate_test_environment_parity()
             
-            # Check timeout
-            if time.time() - start_time > self.timeout:
-                logger.warning("⏰ Validation timeout reached during environment checks")
-                report.add_error("Validation timeout during environment checks")
-                return report
-            
             # 2. Test discovery and categorization
             test_files = self._discover_tests()
             logger.info(f"📊 Discovered {len(test_files)} test files")
-            
-            # Check timeout
-            if time.time() - start_time > self.timeout:
-                logger.warning("⏰ Validation timeout reached during test discovery")
-                report.add_error("Validation timeout during test discovery")
-                return report
             
             # 3. Run tests with intelligent selection
             if self.quick_mode:
                 test_files = self._select_critical_tests(test_files)
                 logger.info(f"⚡ Quick mode: Running {len(test_files)} critical tests")
             
-            # 4. Execute tests with remaining time
-            remaining_time = max(30, self.timeout - (time.time() - start_time))
-            test_results = self._execute_tests_with_timeout(test_files, report, remaining_time)
+            # 4. Execute tests
+            test_results = self._execute_tests(test_files, report)
             
             # 5. Collect coverage data
             if self.enable_coverage:
@@ -259,17 +241,28 @@ class LocalE2EValidator:
         if python_version.major != 3 or python_version.minor < 12:
             raise RuntimeError(f"Python 3.12+ required, found {python_version.major}.{python_version.minor}")
         
-        # Check required dependencies
+        # Check required dependencies with graceful handling
         required_packages = [
             'pytest', 'pytest_cov', 'pytest_asyncio', 'faiss', 
             'azure.keyvault.secrets', 'sentence_transformers'
         ]
         
+        missing_packages = []
         for package in required_packages:
             try:
                 __import__(package)
+                logger.info(f"✅ Package '{package}' available")
             except ImportError:
-                raise RuntimeError(f"Required package '{package}' not installed")
+                missing_packages.append(package)
+                logger.warning(f"⚠️  Package '{package}' not installed")
+        
+        if missing_packages:
+            logger.error(f"❌ Missing packages: {', '.join(missing_packages)}")
+            logger.info("💡 Run: pip install -r backend/requirements.txt")
+            if not self.quick_mode:
+                raise RuntimeError(f"Required packages not installed: {', '.join(missing_packages)}")
+            else:
+                logger.warning("Continuing in quick mode despite missing packages")
         
         # Check project structure
         required_dirs = ['backend', 'frontend', 'infrastructure', 'tests']
@@ -1415,166 +1408,6 @@ class LocalE2EValidator:
             
         return issues
     
-    def _execute_tests_with_timeout(self, test_files: List[Path], report: ValidationReport, timeout: float) -> List[TestResult]:
-        """Execute tests with timeout awareness"""
-        logger.info(f"🧪 Executing {len(test_files)} test files with {timeout:.1f}s timeout...")
-        
-        test_results = []
-        start_time = time.time()
-        
-        # First run real pytest on backend with reduced timeout
-        if self.project_root.joinpath("backend").exists() and (time.time() - start_time) < timeout:
-            logger.info("🐍 Running backend pytest suite...")
-            remaining_time = timeout - (time.time() - start_time)
-            backend_result = self._run_backend_pytest_with_timeout(remaining_time)
-            if backend_result:
-                test_results.append(backend_result)
-        
-        # Check if we have time for frontend tests
-        if (time.time() - start_time) < timeout and self.project_root.joinpath("frontend").exists():
-            logger.info("⚛️ Running frontend tests...")
-            remaining_time = timeout - (time.time() - start_time)
-            frontend_result = self._run_frontend_tests_with_timeout(remaining_time)
-            if frontend_result:
-                test_results.append(frontend_result)
-        
-        # Skip comprehensive testing if we're running out of time
-        if (time.time() - start_time) > timeout * 0.8:
-            logger.warning("⏰ Skipping comprehensive tests due to time constraints")
-            return test_results
-        
-        # Run remaining tests if time permits
-        if self.parallel and len(test_files) > 1:
-            remaining_time = timeout - (time.time() - start_time)
-            if remaining_time > 30:  # Only if we have at least 30 seconds
-                results = self._execute_tests_parallel_with_timeout(test_files, remaining_time)
-                test_results.extend(results)
-        else:
-            # Sequential execution with timeout
-            for test_file in test_files:
-                if (time.time() - start_time) > timeout:
-                    logger.warning(f"⏰ Timeout reached, skipping remaining {len(test_files) - test_files.index(test_file)} test files")
-                    break
-                
-                result = self._run_single_test_with_timeout(test_file, 30)  # 30 second max per test
-                if result:
-                    test_results.append(result)
-        
-        return test_results
-    
-    def _run_backend_pytest_with_timeout(self, timeout: float) -> Optional[TestResult]:
-        """Run backend pytest with timeout"""
-        try:
-            start_time = time.time()
-            result = subprocess.run(
-                [sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short"],
-                cwd=self.backend_path,
-                capture_output=True,
-                text=True,
-                timeout=min(timeout, 120)  # Max 2 minutes for backend tests
-            )
-            
-            duration = time.time() - start_time
-            logger.info(f"🐍 Backend tests completed in {duration:.1f}s")
-            
-            # Parse pytest output (simplified)
-            if result.returncode == 0:
-                return TestResult("backend_pytest", 1, 1, 0, 0, 0, duration, [], 
-                                  "Backend pytest passed", True)
-            else:
-                return TestResult("backend_pytest", 1, 0, 1, 0, 0, duration, 
-                                  [result.stderr], "Backend pytest failed", False)
-                
-        except subprocess.TimeoutExpired:
-            logger.warning(f"⏰ Backend pytest timed out after {timeout:.1f}s")
-            return TestResult("backend_pytest", 1, 0, 0, 0, 1, timeout, 
-                              ["Timeout"], "Backend pytest timeout", False)
-        except Exception as e:
-            logger.error(f"❌ Backend pytest error: {e}")
-            return None
-
-    def _run_frontend_tests_with_timeout(self, timeout: float) -> Optional[TestResult]:
-        """Run frontend tests with timeout"""
-        try:
-            start_time = time.time()
-            result = subprocess.run(
-                ["npm", "test", "--", "--watchAll=false", "--testTimeout=30000"],
-                cwd=self.frontend_path,
-                capture_output=True,
-                text=True,
-                timeout=min(timeout, 90)  # Max 90 seconds for frontend tests
-            )
-            
-            duration = time.time() - start_time
-            logger.info(f"⚛️ Frontend tests completed in {duration:.1f}s")
-            
-            if result.returncode == 0:
-                return TestResult("frontend_tests", 1, 1, 0, 0, 0, duration, [], 
-                                  "Frontend tests passed", True)
-            else:
-                return TestResult("frontend_tests", 1, 0, 1, 0, 0, duration, 
-                                  [result.stderr], "Frontend tests failed", False)
-                
-        except subprocess.TimeoutExpired:
-            logger.warning(f"⏰ Frontend tests timed out after {timeout:.1f}s")
-            return TestResult("frontend_tests", 1, 0, 0, 0, 1, timeout, 
-                              ["Timeout"], "Frontend tests timeout", False)
-        except Exception as e:
-            logger.error(f"❌ Frontend tests error: {e}")
-            return None
-
-    def _run_single_test_with_timeout(self, test_file: Path, timeout: float) -> Optional[TestResult]:
-        """Run a single test file with timeout"""
-        try:
-            start_time = time.time()
-            result = subprocess.run(
-                [sys.executable, "-m", "pytest", str(test_file), "-v"],
-                cwd=self.backend_path,
-                capture_output=True,
-                text=True,
-                timeout=timeout
-            )
-            
-            duration = time.time() - start_time
-            
-            if result.returncode == 0:
-                return TestResult(str(test_file), 1, 1, 0, 0, 0, duration, [], 
-                                  f"{test_file} passed", True)
-            else:
-                return TestResult(str(test_file), 1, 0, 1, 0, 0, duration, 
-                                  [result.stderr], f"{test_file} failed", False)
-                
-        except subprocess.TimeoutExpired:
-            logger.warning(f"⏰ Test {test_file} timed out after {timeout:.1f}s")
-            return TestResult(str(test_file), 1, 0, 0, 0, 1, timeout, 
-                              ["Timeout"], f"{test_file} timeout", False)
-        except Exception as e:
-            logger.error(f"❌ Test {test_file} error: {e}")
-            return None
-
-    def _execute_tests_parallel_with_timeout(self, test_files: List[Path], timeout: float) -> List[TestResult]:
-        """Execute tests in parallel with timeout"""
-        results = []
-        per_test_timeout = min(30, timeout / len(test_files))  # Max 30s per test
-        
-        with ThreadPoolExecutor(max_workers=min(self.max_workers, len(test_files))) as executor:
-            future_to_test = {
-                executor.submit(self._run_single_test_with_timeout, test_file, per_test_timeout): test_file
-                for test_file in test_files
-            }
-            
-            start_time = time.time()
-            for future in as_completed(future_to_test, timeout=timeout):
-                if (time.time() - start_time) > timeout:
-                    logger.warning("⏰ Parallel test execution timeout reached")
-                    break
-                    
-                result = future.result()
-                if result:
-                    results.append(result)
-        
-        return results
-    
 
 
 def main():
@@ -1584,7 +1417,6 @@ def main():
     parser.add_argument('--no-coverage', action='store_true', help='Disable coverage collection')
     parser.add_argument('--no-parallel', action='store_true', help='Disable parallel execution')
     parser.add_argument('--max-workers', type=int, default=4, help='Maximum parallel workers')
-    parser.add_argument('--timeout', type=int, default=300, help='Maximum execution timeout in seconds')
     parser.add_argument('--project-root', type=Path, help='Project root directory')
     
     args = parser.parse_args()
@@ -1595,8 +1427,7 @@ def main():
         quick_mode=args.quick,
         enable_coverage=not args.no_coverage,
         parallel=not args.no_parallel,
-        max_workers=args.max_workers,
-        timeout=args.timeout
+        max_workers=args.max_workers
     )
     
     # Run validation

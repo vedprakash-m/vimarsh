@@ -228,8 +228,10 @@ function isStaticAsset(request) {
 
 function isAPIRequest(request) {
   const url = new URL(request.url);
-  return url.pathname.startsWith('/api/') ||
-         CACHEABLE_API_ENDPOINTS.some(endpoint => url.pathname.includes(endpoint));
+  // Only cache API requests to the same origin, not external APIs
+  return url.origin === self.location.origin && 
+         (url.pathname.startsWith('/api/') ||
+          CACHEABLE_API_ENDPOINTS.some(endpoint => url.pathname.includes(endpoint)));
 }
 
 function isNavigationRequest(request) {

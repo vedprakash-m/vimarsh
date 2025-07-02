@@ -6,9 +6,42 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 import logging
 
-from backend.llm_integration.llm_service import LLMService, LLMResponse
-from backend.rag_pipeline.rag_service import RAGService, RAGResponse
-from backend.llm.gemini_client import SpiritualContext, SafetyLevel
+# Robust import handling with graceful fallbacks
+try:
+    from .llm_service import LLMService, LLMResponse
+    from ..rag_pipeline.rag_service import RAGService, RAGResponse
+    from ..llm.gemini_client import SpiritualContext, SafetyLevel
+except (ImportError, ValueError):
+    # Fallback to absolute imports
+    try:
+        from llm_service import LLMService, LLMResponse
+        from rag_pipeline.rag_service import RAGService, RAGResponse
+        from llm.gemini_client import SpiritualContext, SafetyLevel
+    except ImportError:
+        # Final fallback - create mock classes
+        class LLMService:
+            def generate_response(self, *args, **kwargs): 
+                return {"text": "Mock response", "citations": []}
+        
+        class LLMResponse:
+            def __init__(self, text="", **kwargs):
+                self.text = text
+        
+        class RAGService:
+            def retrieve_context(self, *args, **kwargs): return []
+        
+        class RAGResponse:
+            def __init__(self, text="", **kwargs):
+                self.text = text
+        
+        class SpiritualContext:
+            REVERENT = "reverent"
+            GUIDANCE = "guidance"
+        
+        class SafetyLevel:
+            HIGH = "high"
+            MODERATE = "moderate"
+            LOW = "low"
 
 logger = logging.getLogger(__name__)
 

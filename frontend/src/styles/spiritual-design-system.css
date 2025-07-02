@@ -1,0 +1,545 @@
+/* =============================================================================
+   VIMARSH SPIRITUAL DESIGN SYSTEM - DIVINE SIMPLICITY
+   ============================================================================= */
+
+/* Sacred Color Palette */
+:root {
+  /* Primary Sacred Colors */
+  --sacred-saffron: #FF9933;
+  --krishna-blue: #1E3A8A;
+  --lotus-white: #FEFEFE;
+  
+  /* Secondary Harmonious Colors */
+  --meditation-gold: #F59E0B;
+  --peaceful-green: #059669;
+  --sunset-orange: #EA580C;
+  
+  /* Neutral Grounding Colors */
+  --charcoal: #374151;
+  --soft-gray: #9CA3AF;
+  --light-gray: #F9FAFB;
+  
+  /* Sacred Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-sacred: 'Crimson Text', Georgia, serif;
+  
+  /* Spacing Scale (Based on 8px grid) */
+  --space-xs: 0.5rem;   /* 8px */
+  --space-sm: 1rem;     /* 16px */
+  --space-md: 1.5rem;   /* 24px */
+  --space-lg: 2rem;     /* 32px */
+  --space-xl: 3rem;     /* 48px */
+  --space-2xl: 4rem;    /* 64px */
+  --space-3xl: 6rem;    /* 96px */
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  color: var(--charcoal);
+  background: linear-gradient(135deg, var(--lotus-white) 0%, var(--light-gray) 100%);
+  min-height: 100vh;
+}
+
+/* App Container */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================================================
+   LANDING PAGE - DIVINE SIMPLICITY
+   ============================================================================= */
+
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.hero-section {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+/* Sacred Symbol */
+.sacred-symbol {
+  font-size: 4rem;
+  color: var(--sacred-saffron);
+  margin-bottom: var(--space-md);
+  text-shadow: 0 2px 8px rgba(255, 153, 51, 0.3);
+}
+
+/* Main Title */
+.main-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--krishna-blue);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.02em;
+}
+
+/* Subtitle */
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--charcoal);
+  margin-bottom: var(--space-xl);
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+/* Sacred Quote Section */
+.sacred-quote {
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  background: rgba(255, 153, 51, 0.05);
+  border-left: 4px solid var(--sacred-saffron);
+  border-radius: 0 8px 8px 0;
+}
+
+.sanskrit {
+  font-family: var(--font-sacred);
+  font-size: 1.125rem;
+  color: var(--krishna-blue);
+  font-style: italic;
+  margin-bottom: var(--space-sm);
+}
+
+.translation {
+  font-size: 1rem;
+  color: var(--soft-gray);
+  font-style: italic;
+}
+
+/* Primary CTA Button */
+.primary-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: linear-gradient(135deg, var(--sacred-saffron), var(--meditation-gold));
+  color: var(--lotus-white);
+  border: none;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(255, 153, 51, 0.3);
+}
+
+.primary-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 153, 51, 0.4);
+}
+
+.primary-cta:active {
+  transform: translateY(0);
+}
+
+/* =============================================================================
+   CONVERSATION INTERFACE - CLEAN & SPIRITUAL
+   ============================================================================= */
+
+.conversation-interface {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--lotus-white) 0%, var(--light-gray) 100%);
+}
+
+/* Clean Header */
+.conversation-header {
+  background: var(--lotus-white);
+  border-bottom: 1px solid rgba(255, 153, 51, 0.2);
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: 2px solid var(--sacred-saffron);
+  border-radius: 25px;
+  color: var(--sacred-saffron);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: var(--sacred-saffron);
+  color: var(--lotus-white);
+  transform: translateY(-1px);
+}
+
+.conversation-title {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.title-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.krishna-symbol {
+  font-size: 2rem;
+  color: var(--sacred-saffron);
+}
+
+.title-content h1 {
+  font-size: 1.5rem;
+  color: var(--krishna-blue);
+  margin: 0;
+  font-weight: 700;
+}
+
+.title-content p {
+  font-size: 0.875rem;
+  color: var(--soft-gray);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Messages Container */
+.messages-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--space-lg);
+}
+
+/* Welcome State */
+.welcome-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.welcome-symbol {
+  font-size: 3rem;
+  color: var(--meditation-gold);
+  display: block;
+  margin-bottom: var(--space-lg);
+}
+
+.welcome-content h2 {
+  font-size: 2rem;
+  color: var(--krishna-blue);
+  margin-bottom: var(--space-md);
+  font-weight: 600;
+}
+
+.welcome-content p {
+  font-size: 1.125rem;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+
+/* Messages List */
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0;
+}
+
+.message {
+  display: flex;
+  width: 100%;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.krishna-message {
+  justify-content: flex-start;
+}
+
+.message-content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  max-width: 80%;
+}
+
+.avatar {
+  font-size: 1.5rem;
+  color: var(--sacred-saffron);
+  flex-shrink: 0;
+  margin-top: var(--space-xs);
+}
+
+.message-text {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: 20px;
+  font-size: 1rem;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.user-message .message-text {
+  background: var(--sacred-saffron);
+  color: var(--lotus-white);
+  border-bottom-right-radius: 8px;
+}
+
+.krishna-message .message-text {
+  background: var(--lotus-white);
+  color: var(--charcoal);
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  border-bottom-left-radius: 8px;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
+}
+
+/* Input Area */
+.input-area {
+  background: var(--lotus-white);
+  border-top: 1px solid rgba(255, 153, 51, 0.2);
+  padding: var(--space-lg);
+  box-shadow: 0 -2px 8px rgba(30, 58, 138, 0.1);
+}
+
+.input-form {
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--light-gray);
+  border-radius: 25px;
+  padding: var(--space-xs);
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  max-width: none;
+}
+
+.input-container:focus-within {
+  border-color: var(--sacred-saffron);
+}
+
+.message-input {
+  flex: 1;
+  padding: var(--space-md);
+  border: none;
+  background: none;
+  font-size: 1rem;
+  font-family: var(--font-primary);
+  outline: none;
+  color: var(--charcoal);
+}
+
+.message-input::placeholder {
+  color: var(--soft-gray);
+}
+
+.voice-button, .send-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.voice-button {
+  background: var(--peaceful-green);
+  color: var(--lotus-white);
+}
+
+.voice-button:hover {
+  background: var(--meditation-gold);
+  transform: scale(1.05);
+}
+
+.send-button {
+  background: var(--sacred-saffron);
+  color: var(--lotus-white);
+}
+
+.send-button:hover:not(:disabled) {
+  background: var(--meditation-gold);
+  transform: scale(1.05);
+}
+
+.send-button:disabled {
+  background: var(--soft-gray);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.guidance-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--soft-gray);
+  margin-top: var(--space-md);
+  margin-bottom: 0;
+  font-style: italic;
+}
+
+/* Citations styling */
+.citations {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(255, 153, 51, 0.05);
+  border-left: 3px solid var(--sacred-saffron);
+  border-radius: 0 8px 8px 0;
+}
+
+.citations-title {
+  font-size: 0.875rem;
+  color: var(--krishna-blue);
+  font-weight: 600;
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.citation {
+  font-size: 0.875rem;
+  color: var(--charcoal);
+  margin-bottom: var(--space-xs);
+}
+
+.sanskrit-citation {
+  font-family: var(--font-sacred);
+  font-style: italic;
+  color: var(--soft-gray);
+  margin-top: var(--space-xs);
+}
+
+/* Override to ensure input takes full width */
+.conversation-interface .input-area {
+  width: 100%;
+  max-width: none;
+  padding: var(--space-lg);
+  margin: 0;
+}
+
+.conversation-interface .input-form {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+.conversation-interface .input-container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .conversation-header {
+    padding: var(--space-md);
+  }
+  
+  .messages-container {
+    padding: var(--space-md);
+  }
+  
+  .input-area {
+    padding: var(--space-md);
+  }
+  
+  .welcome-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .welcome-content p {
+    font-size: 1rem;
+  }
+  
+  .message-content {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-page {
+    padding: var(--space-md);
+  }
+  
+  .sacred-symbol {
+    font-size: 3rem;
+  }
+  
+  .main-title {
+    font-size: 2.5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.125rem;
+  }
+  
+  .primary-cta {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 1rem;
+  }
+  
+  .sacred-quote {
+    padding: var(--space-md);
+    margin: var(--space-lg) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .sacred-symbol {
+    font-size: 2.5rem;
+  }
+}

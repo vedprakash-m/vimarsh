@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Azure Functions app
-app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 
 async def health_check_impl(req: func.HttpRequest) -> func.HttpResponse:
@@ -64,7 +64,7 @@ async def health_check_impl(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="health", methods=["GET"])
+@app.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 async def health_check(req: func.HttpRequest) -> func.HttpResponse:
     """Azure Functions wrapper for health check."""
     return await health_check_impl(req)
@@ -162,7 +162,7 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="spiritual_guidance", methods=["POST"])
+@app.route(route="spiritual_guidance", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
 async def spiritual_guidance(req: func.HttpRequest) -> func.HttpResponse:
     """Azure Functions wrapper for spiritual guidance."""
     return await spiritual_guidance_impl(req)
@@ -218,7 +218,7 @@ async def supported_languages_impl(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="languages", methods=["GET"])
+@app.route(route="languages", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 async def supported_languages(req: func.HttpRequest) -> func.HttpResponse:
     """Azure Functions wrapper for supported languages."""
     return await supported_languages_impl(req)
@@ -324,7 +324,7 @@ async def handle_options_impl(req: func.HttpRequest) -> func.HttpResponse:
 
 # CORS handling for browser requests
 @app.function_name("options_handler")
-@app.route(route="{*route}", methods=["OPTIONS"])
+@app.route(route="{*route}", methods=["OPTIONS"], auth_level=func.AuthLevel.ANONYMOUS)
 async def handle_options(req: func.HttpRequest) -> func.HttpResponse:
     """Azure Functions wrapper for CORS preflight requests."""
     return await handle_options_impl(req)
@@ -630,7 +630,7 @@ async def export_feedback_report_impl(req: func.HttpRequest) -> func.HttpRespons
 
 
 @app.route(route="feedback/export_report", methods=["POST"])
-async def export_feedback_report(req: func.HttpRequest) -> func.HttpResponse:
+async def export_feedback_report_basic(req: func.HttpRequest) -> func.HttpResponse:
     """Azure Functions wrapper for feedback report export."""
     return await export_feedback_report_impl(req)
 
@@ -680,10 +680,10 @@ if FEEDBACK_API_AVAILABLE:
 
     @app.function_name("export_feedback_report")
     @app.route(route="feedback/export-report", methods=["GET"])
-    async def export_report(req: func.HttpRequest) -> func.HttpResponse:
+    async def export_report_conditional(req: func.HttpRequest) -> func.HttpResponse:
         """Export feedback report endpoint."""
         try:
-            return await export_feedback_report(req)
+            return await export_feedback_report_impl(req)
         except Exception as e:
             logger.error(f"Error in report export: {e}")
             return func.HttpResponse(

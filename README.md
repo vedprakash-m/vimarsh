@@ -114,11 +114,11 @@ Vimarsh pioneered a **two-resource-group architecture** that dramatically reduce
 - **Security**: Azure Key Vault, comprehensive error handling
 
 ### Frontend (React 18 + TypeScript)
-- **Framework**: Modern React with TypeScript and Create React App
+- **Framework**: Modern React with TypeScript and Vite build system
 - **Voice Interface**: Web Speech API with Sanskrit pronunciation support
 - **PWA**: Service Worker with offline spiritual guidance caching
 - **Design**: Cultural aesthetics honoring Indian spiritual traditions
-- **Testing**: Jest + React Testing Library (100% critical path coverage)
+- **Testing**: Jest + React Testing Library with comprehensive coverage
 
 ### Infrastructure (Azure Cloud + Bicep IaC)
 - **Single Region**: East US deployment for optimal cost and performance
@@ -265,8 +265,8 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 - **[PRD_Vimarsh.md](docs/PRD_Vimarsh.md)** - Product requirements and spiritual vision
 - **[Tech_Spec_Vimarsh.md](docs/Tech_Spec_Vimarsh.md)** - Detailed technical specifications
 - **[User_Experience.md](docs/User_Experience.md)** - User journey and interaction design
-- **[Authentication Setup](docs/Authentication_Setup_Guide.md)** - Microsoft Entra ID configuration
-- **[Deployment Guide](docs/deployment-guide.md)** - Production deployment procedures
+- **[Apps_Auth_Requirement.md](docs/Apps_Auth_Requirement.md)** - Authentication requirements and standards
+- **[vimarsh_tasks.md](docs/vimarsh_tasks.md)** - Development tasks and roadmap
 
 ## 🙏 Acknowledgments
 
