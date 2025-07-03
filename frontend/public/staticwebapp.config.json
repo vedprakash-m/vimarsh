@@ -3,16 +3,20 @@
     {
       "route": "/api/*",
       "allowedRoles": ["anonymous"]
-    },
-    {
-      "route": "/*",
-      "serve": "/index.html",
-      "statusCode": 200
     }
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif}", "/css/*", "/js/*"]
+    "exclude": [
+      "/static/*",
+      "/images/*.{png,jpg,gif}",
+      "/css/*",
+      "/js/*",
+      "/favicon.ico",
+      "/asset-manifest.json",
+      "/manifest.json",
+      "/robots.txt"
+    ]
   },
   "responseOverrides": {
     "404": {
@@ -23,7 +27,7 @@
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.azurewebsites.net https://*.gemini.ai https://fonts.googleapis.com;"
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://vimarsh-functions.azurewebsites.net https://vimarsh.vedprakash.net https://*.gemini.ai https://fonts.googleapis.com;"
   },
   "mimeTypes": {
     ".json": "application/json",
