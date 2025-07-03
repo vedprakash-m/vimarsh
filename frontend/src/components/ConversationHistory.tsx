@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { conversationHistory, ConversationSession } from '../utils/conversationHistory';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from './AuthenticationWrapper';
+import { useMsal } from '@azure/msal-react';
 
 interface ConversationHistoryProps {
   onSessionSelect: (sessionId: string) => void;
@@ -15,7 +15,8 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   onNewConversation
 }) => {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { accounts } = useMsal();
+  const user = accounts[0] || null;
   const [sessions, setSessions] = useState<ConversationSession[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSessions, setFilteredSessions] = useState<ConversationSession[]>([]);

@@ -7,7 +7,7 @@ import SessionManager from './SessionManager';
 import PWAManager from './PWAManager';
 import PrivacySettings from './PrivacySettings';
 import { useSpiritualChat } from '../hooks/useSpiritualChat';
-import { useAuth } from './AuthenticationWrapper';
+import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useLanguage, getLanguageCode } from '../contexts/LanguageContext';
 import { usePWA } from '../utils/pwa';
 import { useSpiritualGuidanceTest } from '../hooks/useABTest';
@@ -21,7 +21,9 @@ interface Citation {
 }
 
 const SpiritualGuidanceInterface: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const isAuthenticated = useIsAuthenticated();
+  const { accounts } = useMsal();
+  const user = accounts[0] || null;
   const { currentLanguage, t } = useLanguage();
   const [inputMessage, setInputMessage] = useState('');
   const [showHistory, setShowHistory] = useState(false);

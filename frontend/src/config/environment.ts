@@ -1,206 +1,117 @@
-// Debug logging for build-time debugging
-console.log('Environment debug info:', {
-  NODE_ENV: process.env.NODE_ENV,
-  REACT_APP_ENVIRONMENT: process.env.REACT_APP_ENVIRONMENT,
-  REACT_APP_API_BASE_URL: process.env.REACT_APP_API_BASE_URL,
-  buildTime: new Date().toISOString()
-});
+/**
+ * Environment Configuration for Vimarsh Frontend
+ * Handles custom domain vimarsh.vedprakash.net
+ * Provides proper Entra ID settings per Apps_Auth_Requirement.md
+ */
 
-// Environment Configuration Manager for React Frontend
-// This module provides type-safe access to environment variables
+// Environment detection
+export const isProduction = process.env.NODE_ENV === 'production';
+export const isDevelopment = process.env.NODE_ENV === 'development';
 
-export interface EnvironmentConfig {
-  environment: string;
-  apiBaseUrl: string;
-  authConfig: {
-    clientId: string;
-    tenantId: string;
-    redirectUri: string;
-  };
-  features: {
-    analytics: boolean;
-    voiceInterface: boolean;
-    expertReview: boolean;
-    pwaFeatures: boolean;
-  };
-  settings: {
-    defaultLanguage: string;
-    maxQueryLength: number;
-    rateLimitPerMinute: number;
-  };
-  debug: {
-    debugMode: boolean;
-    showDetailedErrors: boolean;
-  };
-}
-
-class EnvironmentConfigManager {
-  private config: EnvironmentConfig;
-
-  constructor() {
-    this.config = this.loadConfiguration();
-    this.validateConfiguration();
+// Custom domain configuration for vimarsh.vedprakash.net
+export const DOMAIN_CONFIG = {
+  production: {
+    domain: 'https://vimarsh.vedprakash.net',
+    redirectUri: 'https://vimarsh.vedprakash.net/auth/callback',
+    postLogoutRedirectUri: 'https://vimarsh.vedprakash.net',
+  },
+  development: {
+    domain: 'http://localhost:3000',
+    redirectUri: 'http://localhost:3000/auth/callback',
+    postLogoutRedirectUri: 'http://localhost:3000',
   }
+};
 
-  private loadConfiguration(): EnvironmentConfig {
-    // Debug logging for environment variables - Build v2.0
-    console.log('Environment variables loaded:', {
-      REACT_APP_ENVIRONMENT: process.env.REACT_APP_ENVIRONMENT,
-      REACT_APP_API_BASE_URL: process.env.REACT_APP_API_BASE_URL,
-      NODE_ENV: process.env.NODE_ENV
-    });
-    
-    return {
-      environment: process.env.REACT_APP_ENVIRONMENT || 'development',
-      apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071',
-      authConfig: {
-        clientId: process.env.REACT_APP_AUTH_CLIENT_ID || '',
-        tenantId: process.env.REACT_APP_AUTH_TENANT_ID || '',
-        redirectUri: process.env.REACT_APP_AUTH_REDIRECT_URI || 'http://localhost:3000/auth/callback',
-      },
-      features: {
-        analytics: process.env.REACT_APP_ENABLE_ANALYTICS === 'true',
-        voiceInterface: process.env.REACT_APP_ENABLE_VOICE_INTERFACE === 'true',
-        expertReview: process.env.REACT_APP_ENABLE_EXPERT_REVIEW === 'true',
-        pwaFeatures: process.env.REACT_APP_ENABLE_PWA_FEATURES === 'true',
-      },
-      settings: {
-        defaultLanguage: process.env.REACT_APP_DEFAULT_LANGUAGE || 'en',
-        maxQueryLength: parseInt(process.env.REACT_APP_MAX_QUERY_LENGTH || '1000'),
-        rateLimitPerMinute: parseInt(process.env.REACT_APP_RATE_LIMIT_PER_MINUTE || '60'),
-      },
-      debug: {
-        debugMode: process.env.REACT_APP_DEBUG_MODE === 'true',
-        showDetailedErrors: process.env.REACT_APP_SHOW_DETAILED_ERRORS === 'true',
-      },
-    };
-  }
+// Get current domain configuration
+export const getCurrentDomainConfig = () => {
+  return isProduction ? DOMAIN_CONFIG.production : DOMAIN_CONFIG.development;
+};
 
-  private validateConfiguration(): void {
-    const { environment, authConfig, apiBaseUrl } = this.config;
+// Entra ID Configuration for Vedprakash Domain
+export const ENTRA_ID_CONFIG = {
+  tenantId: 'vedid.onmicrosoft.com',
+  authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/vedid.onmicrosoft.com',
+  clientId: process.env.REACT_APP_CLIENT_ID || 'your-vimarsh-app-client-id',
+  scopes: ['openid', 'profile', 'email'],
+};
 
-    // Validate required configuration
-    if (!apiBaseUrl) {
-      throw new Error('API base URL is required');
+// Environment-aware configuration
+export const AUTH_CONFIG = {
+  ...ENTRA_ID_CONFIG,
+  ...getCurrentDomainConfig(),
+  enableDebugLogging: isDevelopment,
+  usePlaceholder: isDevelopment && !process.env.REACT_APP_CLIENT_ID,
+};
+
+// API Configuration
+export const API_CONFIG = {
+  baseUrl: isProduction 
+    ? 'https://vimarsh-backend.azurewebsites.net/api'
+    : process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api',
+  scopes: ENTRA_ID_CONFIG.scopes,
+  timeout: 30000,
+};
+
+// Feature Flags
+export const FEATURE_FLAGS = {
+  enableAnalytics: isProduction || process.env.REACT_APP_ENABLE_ANALYTICS === 'true',
+  enablePWA: process.env.REACT_APP_ENABLE_PWA !== 'false',
+  enableVoice: process.env.REACT_APP_ENABLE_VOICE !== 'false',
+  enableOfflineMode: process.env.REACT_APP_ENABLE_OFFLINE !== 'false',
+  debugAuth: isDevelopment && process.env.REACT_APP_DEBUG_AUTH === 'true',
+};
+
+// Application Information
+export const APP_CONFIG = {
+  name: 'Vimarsh',
+  description: 'AI-powered spiritual guidance from Lord Krishna',
+  version: process.env.REACT_APP_VERSION || '1.0.0',
+  domain: 'vimarsh.vedprakash.net',
+  supportEmail: 'support@vedprakash.net',
+  environment: process.env.NODE_ENV || 'development',
+};
+
+// Validation function for environment configuration
+export const validateEnvironmentConfig = (): boolean => {
+  const issues: string[] = [];
+
+  // Check required environment variables in production
+  if (isProduction) {
+    if (!process.env.REACT_APP_CLIENT_ID || process.env.REACT_APP_CLIENT_ID === 'your-vimarsh-app-client-id') {
+      issues.push('REACT_APP_CLIENT_ID is not properly configured for production');
     }
-
-    // Validate authentication configuration for non-development environments
-    if (environment !== 'development') {
-      if (!authConfig.clientId || !authConfig.tenantId) {
-        throw new Error('Authentication configuration is required for non-development environments');
-      }
-    }
-
-    // Validate URLs
-    try {
-      new URL(apiBaseUrl);
-      new URL(authConfig.redirectUri);
-    } catch (error) {
-      throw new Error('Invalid URL configuration');
-    }
-
-    console.log(`✅ Environment configuration validated for: ${environment}`);
   }
 
-  // Public getters
-  public get(): EnvironmentConfig {
-    return { ...this.config };
+  // Validate domain configuration
+  const domainConfig = getCurrentDomainConfig();
+  if (!domainConfig.redirectUri.includes('/auth/callback')) {
+    issues.push('Redirect URI must include /auth/callback path');
   }
 
-  public getEnvironment(): string {
-    return this.config.environment;
+  // Validate authority URL
+  const validAuthorities = [
+    'vedid.onmicrosoft.com',
+    'common',
+    'consumers'
+  ];
+  const authorityValid = validAuthorities.some(part => ENTRA_ID_CONFIG.authority.includes(part));
+  if (!authorityValid) {
+    issues.push('Authority must be vedid.onmicrosoft.com, common, or consumers');
   }
 
-  public getApiBaseUrl(): string {
-    return this.config.apiBaseUrl;
+  if (issues.length > 0) {
+    console.error('🔐 Environment configuration issues:', issues);
+    return false;
   }
 
-  public getAuthConfig(): EnvironmentConfig['authConfig'] {
-    return { ...this.config.authConfig };
-  }
+  console.info('🔐 Environment configuration validated successfully');
+  console.info('🌐 Domain:', domainConfig.domain);
+  console.info('🔗 Redirect URI:', domainConfig.redirectUri);
+  return true;
+};
 
-  public getFeatures(): EnvironmentConfig['features'] {
-    return { ...this.config.features };
-  }
+// Export environment-specific configuration
+export default AUTH_CONFIG;
 
-  public getSettings(): EnvironmentConfig['settings'] {
-    return { ...this.config.settings };
-  }
-
-  public isDebugMode(): boolean {
-    return this.config.debug.debugMode;
-  }
-
-  public isProduction(): boolean {
-    return this.config.environment === 'production';
-  }
-
-  public isDevelopment(): boolean {
-    return this.config.environment === 'development';
-  }
-
-  public isStaging(): boolean {
-    return this.config.environment === 'staging';
-  }
-
-  // Feature flags
-  public isFeatureEnabled(feature: keyof EnvironmentConfig['features']): boolean {
-    return this.config.features[feature];
-  }
-
-  // Environment-specific configurations
-  public getApiEndpoint(path: string): string {
-    const baseUrl = this.config.apiBaseUrl.replace(/\/$/, '');
-    const cleanPath = path.replace(/^\//, '');
-    return `${baseUrl}/${cleanPath}`;
-  }
-
-  public getLogLevel(): 'debug' | 'info' | 'warn' | 'error' {
-    if (this.config.debug.debugMode) {
-      return 'debug';
-    }
-    return this.config.environment === 'development' ? 'debug' : 'info';
-  }
-
-  // Configuration summary for debugging
-  public getSummary(): Record<string, any> {
-    return {
-      environment: this.config.environment,
-      apiBaseUrl: this.config.apiBaseUrl,
-      authConfigured: !!(this.config.authConfig.clientId && this.config.authConfig.tenantId),
-      featuresEnabled: Object.entries(this.config.features)
-        .filter(([, enabled]) => enabled)
-        .map(([feature]) => feature),
-      debugMode: this.config.debug.debugMode,
-    };
-  }
-}
-
-// Create singleton instance
-const environmentConfig = new EnvironmentConfigManager();
-
-// Export singleton instance and class for testing
-export default environmentConfig;
-export { EnvironmentConfigManager };
-
-// Export configuration constants
-export const ENV = environmentConfig.get();
-export const API_BASE_URL = environmentConfig.getApiBaseUrl();
-export const AUTH_CONFIG = environmentConfig.getAuthConfig();
-export const FEATURES = environmentConfig.getFeatures();
-export const SETTINGS = environmentConfig.getSettings();
-export const IS_DEVELOPMENT = environmentConfig.isDevelopment();
-export const IS_PRODUCTION = environmentConfig.isProduction();
-export const IS_STAGING = environmentConfig.isStaging();
-export const DEBUG_MODE = environmentConfig.isDebugMode();
-
-// Utility functions
-export const getApiEndpoint = (path: string): string => environmentConfig.getApiEndpoint(path);
-export const isFeatureEnabled = (feature: keyof EnvironmentConfig['features']): boolean => 
-  environmentConfig.isFeatureEnabled(feature);
-export const getLogLevel = (): 'debug' | 'info' | 'warn' | 'error' => environmentConfig.getLogLevel();
-
-// Development utilities
-if (IS_DEVELOPMENT && DEBUG_MODE) {
-  console.log('🔧 Environment Configuration:', environmentConfig.getSummary());
-}
+// Export commonly used values for compatibility
+export const API_BASE_URL = API_CONFIG.baseUrl;
