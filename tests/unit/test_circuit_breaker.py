@@ -71,4 +71,37 @@ async def test_circuit_breaker_state_transitions():
     # Sanity-check metrics updated as expected.
     metrics = breaker.get_state()["metrics"]
     assert metrics["failed_calls"] == 2
-    assert metrics["successful_calls"] >= 1 
+    assert metrics["successful_calls"] >= 1
+
+
+@pytest.mark.asyncio
+async def test_circuit_breaker_resets_after_timeout_and_success():
+    """Breaker should move OPEN → HALF_OPEN after timeout, and back to CLOSED after a success."""
+
+    config = CircuitBreakerConfig(
+        failure_threshold=1,
+        success_threshold=1,
+        timeout_seconds=0.05,
+        minimum_throughput=1,
+    )
+    breaker = CircuitBreaker("reset-test", config=config)
+
+    async def _fail():
+        raise RuntimeError("boom")
+
+    # Trigger open state.
+    with pytest.raises(RuntimeError):
+        await breaker.call(_fail)
+    with pytest.raises(CircuitBreakerError):
+        await breaker.call(_fail)
+    assert breaker.state == CircuitState.OPEN
+
+    # wait and then succeed
+    await asyncio.sleep(config.timeout_seconds + 0.02)
+
+    async def _succeed():
+        return "ok"
+
+    result = await breaker.call(_succeed)
+    assert result == "ok"
+    assert breaker.state == CircuitState.CLOSED 

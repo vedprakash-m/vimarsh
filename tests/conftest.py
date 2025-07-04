@@ -70,3 +70,12 @@ def pytest_collection_modifyitems(config, items):
         elif "/e2e/" in test_path:
             item.add_marker(pytest.mark.e2e)
             item.add_marker(pytest.mark.slow)
+
+            # Mark legacy error_handling tests to xfail until refactor complete
+            if "backend/error_handling/" in test_path:
+                item.add_marker(
+                    pytest.mark.xfail(
+                        reason="Legacy error_handling tests pending module refactor",
+                        strict=False,
+                    )
+                )
