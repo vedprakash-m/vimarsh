@@ -48,7 +48,23 @@ const AuthCallback: React.FC = () => {
         }
       } catch (error) {
         console.error('❌ MSAL handleRedirectPromise error:', error);
-        navigate('/', { replace: true });
+        
+        // Check for specific error types
+        if (error && typeof error === 'object' && 'errorCode' in error) {
+          const msalError = error as any;
+          
+          if (msalError.errorCode === 'post_request_failed') {
+            console.error('🚨 CORS/Network error - check Azure App Registration redirect URI configuration');
+            console.error('💡 Ensure redirect URI is registered as type "SPA" in Azure Portal');
+          }
+          
+          if (msalError.errorCode === 'network_error') {
+            console.error('🚨 Network error - check CSP and network connectivity');
+          }
+        }
+        
+        // Redirect to home with error state
+        navigate('/?auth_error=true', { replace: true });
       }
     };
 

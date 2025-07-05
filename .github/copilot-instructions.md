@@ -12,7 +12,7 @@ format: Markdown (token-optimized)
 
 **Purpose**: AI-powered spiritual guidance system providing personalized advice from Hindu sacred texts through Lord Krishna's divine persona using RAG architecture.
 
-**Stack**: Python 3.12, Azure Functions, React 18, TypeScript, Google Gemini Pro, Azure Cosmos DB, Microsoft Entra ID, Azure Key Vault, Bicep IaC, GitHub Actions
+**Stack**: Python 3.12, Azure Functions, React 18, TypeScript, Google Gemini 2.5 Flash, Azure Cosmos DB, Microsoft Entra ID, Azure Key Vault, Bicep IaC, GitHub Actions
 
 **Architecture**: Serverless RAG pipeline, Two-resource-group pause-resume cost architecture, Single production environment, Vector search with citation system
 
@@ -113,6 +113,6 @@ class SpiritualRAGService:
 
 **Known Bugs**:
 - Test failures: 247 failing tests in CI/CD pipeline
-- LLM Integration: Currently using placeholder responses, Gemini Pro not connected
+- LLM Integration: Currently using placeholder responses, Gemini 2.5 Flash not connected
 - RAG Pipeline: Vector database queries not implemented, using static responses
 - Authentication: Disabled for clean UX during development phase

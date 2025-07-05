@@ -414,8 +414,11 @@ $RECYCLE.BIN/
 # Vimarsh Specific
 # ===========================
 
+# Archive directories (Phase 2, 3 legacy code)
+.archives/
+
 # Spiritual texts and data (large files, will be handled separately)
-data/sources/*.txt
+data/sources/
 data/processed/
 data/vectors/
 data/embeddings/

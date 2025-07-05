@@ -1,4 +1,4 @@
-# User Experience Design Document: Vimarsh
+   # User Experience Design Document: Vimarsh
 
 ---
 
@@ -1497,6 +1497,118 @@ Design Review Workflow:
 3. Development team assesses technical feasibility
 4. User research validates with target users
 5. Stakeholder approval and implementation planning
+
+---
+
+## 16. Administrative Interface Design
+
+### 16.1. Admin Dashboard Overview
+
+**Access Control:**
+- **URL Pattern**: `/admin/dashboard` (protected route)
+- **Authentication**: Microsoft Entra ID with admin role verification
+- **Security**: Multi-factor authentication required for admin access
+- **Session**: Enhanced security with 1-hour timeout and activity monitoring
+
+**Layout & Navigation:**
+```
+Admin Dashboard Structure:
+┌─ Header: Admin Controls & User Profile ─┐
+├─ Sidebar: Navigation & Quick Actions ───┤
+├─ Main Content: Cost Analytics Dashboard ─┤
+├─ Secondary: User Management Panel ──────┤
+└─ Footer: System Status & Emergency Controls
+```
+
+### 16.2. Cost Management Interface
+
+**Cost Analytics Dashboard:**
+- **Real-time Metrics**: Current spend, daily/monthly trends, budget utilization
+- **Visual Elements**: Charts and graphs with spiritual color palette
+- **User Breakdown**: Cost per user with usage patterns
+- **Alert System**: Budget warnings with Krishna-inspired messaging
+- **Export Functions**: Downloadable reports for financial analysis
+
+**Budget Controls Interface:**
+```
+Cost Management Controls:
+┌─ Global Budget Settings ────────────────┐
+├─ Individual User Limits ───────────────┤
+├─ Emergency Cost Controls ──────────────┤
+├─ Automated Action Configuration ───────┤
+└─ Cost Optimization Recommendations ────┘
+```
+
+### 16.3. User Management Interface
+
+**User Overview Panel:**
+- **User List**: Searchable, sortable list with usage metrics
+- **Status Indicators**: Active, blocked, high-usage, new user states
+- **Quick Actions**: Block/unblock, set limits, send notifications
+- **Detail View**: Individual user spiritual journey and cost analysis
+
+**User Action Controls:**
+```
+User Management Actions:
+┌─ Block/Unblock Users ──────────────────┐
+├─ Set Individual Cost Limits ───────────┤
+├─ Send Notifications ───────────────────┤
+├─ View Usage History ───────────────────┤
+└─ Role Management (Admin Promotion) ────┘
+```
+
+### 16.4. Admin User Journey
+
+**Initial Admin Setup:**
+1. **Environment Configuration**: Admin email added to `ADMIN_EMAILS`
+2. **First Login**: Authentication through Microsoft Entra ID
+3. **Role Recognition**: System automatically assigns admin role
+4. **Dashboard Access**: Redirected to admin dashboard interface
+5. **Setup Completion**: Admin can now manage costs and users
+
+**Daily Admin Workflow:**
+1. **Morning Review**: Check overnight cost metrics and alerts
+2. **User Management**: Review flagged users and take necessary actions
+3. **Budget Monitoring**: Assess budget utilization and adjust limits
+4. **System Health**: Monitor service performance and cost efficiency
+5. **Report Generation**: Export daily/weekly cost and usage reports
+
+### 16.5. Emergency Controls Interface
+
+**Critical System Controls:**
+- **Emergency Shutdown**: Immediate service suspension for cost protection
+- **Budget Override**: Temporary budget increase for critical operations
+- **Mass User Actions**: Bulk user management for system protection
+- **Service Degradation**: Manual fallback mode activation
+- **Alert Broadcasting**: System-wide user notifications
+
+**Visual Design Elements:**
+```
+Emergency Control Styling:
+- Critical Actions: Red (#E53E3E) with confirmation dialogs
+- Warning Actions: Orange (#FF9933) with impact assessment
+- Safe Actions: Krishna Blue (#1E3A8A) with standard confirmation
+- Status Indicators: Traffic light system for system health
+- Spiritual Context: All emergency messages maintain reverent tone
+```
+
+### 16.6. Admin Accessibility & Usability
+
+**Enhanced Accessibility:**
+- **Keyboard Navigation**: Full keyboard access for all admin functions
+- **Screen Reader**: Comprehensive ARIA labels and semantic structure
+- **High Contrast**: Admin interface supports high contrast mode
+- **Mobile Responsive**: Admin dashboard accessible on tablets and phones
+- **Error Prevention**: Confirmation dialogs for destructive actions
+
+**Security Features:**
+- **Session Monitoring**: Real-time tracking of admin activity
+- **Action Logging**: Complete audit trail for all admin actions
+- **Privilege Escalation**: Clear indicators when using elevated permissions
+- **Secure Logout**: Automatic logout on inactivity
+- **Emergency Access**: Super admin controls for critical situations
+
+This administrative interface ensures comprehensive cost management and user oversight while maintaining the spiritual integrity and user experience quality of the Vimarsh platform.
 
 Change Management:
 - Impact assessment for all modifications

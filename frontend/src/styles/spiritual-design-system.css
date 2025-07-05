@@ -46,6 +46,11 @@ body {
   color: var(--charcoal);
   background: linear-gradient(135deg, var(--lotus-white) 0%, var(--light-gray) 100%);
   min-height: 100vh;
+  /* Ensure body takes full width and centers content */
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* App Container */
@@ -65,27 +70,51 @@ body {
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
+  /* Ensure proper centering on all screen sizes */
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  /* Use flexbox for perfect centering */
+  position: relative;
 }
 
 .hero-section {
   width: 100%;
   max-width: 600px;
   text-align: center;
+  /* Perfect centering with flexbox */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Ensure no content overflow */
+  overflow: hidden;
 }
 
 .hero-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-lg);
+  justify-content: center;
+  gap: var(--space-md); /* Reduced from var(--space-lg) */
+  width: 100%;
+  max-width: 100%;
+  /* Perfect centering within hero-section */
+  margin: 0 auto;
+  text-align: center;
 }
 
 /* Sacred Symbol */
 .sacred-symbol {
   font-size: 4rem;
   color: var(--sacred-saffron);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-xs); /* Reduced from var(--space-md) */
   text-shadow: 0 2px 8px rgba(255, 153, 51, 0.3);
+  /* Perfect centering */
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 /* Main Title */
@@ -93,26 +122,40 @@ body {
   font-size: 3.5rem;
   font-weight: 700;
   color: var(--krishna-blue);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs); /* Reduced from var(--space-sm) */
   letter-spacing: -0.02em;
+  /* Ensure title is properly centered */
+  width: 100%;
+  text-align: center;
 }
 
 /* Subtitle */
 .subtitle {
   font-size: 1.25rem;
   color: var(--charcoal);
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg); /* Reduced from var(--space-xl) */
   max-width: 500px;
   line-height: 1.5;
+  /* Center the subtitle and ensure it doesn't exceed container */
+  width: 100%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Sacred Quote Section */
 .sacred-quote {
-  margin: var(--space-xl) 0;
-  padding: var(--space-lg);
+  margin: var(--space-lg) 0; /* Reduced from var(--space-xl) 0 */
+  padding: var(--space-md); /* Reduced from var(--space-lg) */
   background: rgba(255, 153, 51, 0.05);
   border-left: 4px solid var(--sacred-saffron);
   border-radius: 0 8px 8px 0;
+  /* Ensure sacred quote is properly centered */
+  width: 100%;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left; /* Keep text left-aligned within the quote box */
 }
 
 .sanskrit {
@@ -154,6 +197,32 @@ body {
 
 .primary-cta:active {
   transform: translateY(0);
+}
+
+/* Authentication Section */
+.auth-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm); /* Reduced spacing in auth section */
+  /* Perfect centering for auth section */
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.auth-message {
+  font-size: 1rem;
+  color: var(--soft-gray);
+  margin-bottom: var(--space-xs); /* Minimal spacing before button */
+  text-align: center;
+  /* Center the auth message */
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* =============================================================================
@@ -505,41 +574,127 @@ body {
 @media (max-width: 768px) {
   .landing-page {
     padding: var(--space-md);
+    /* Perfect centering on mobile */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .hero-section {
+    /* Full-width centering on mobile */
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 var(--space-sm);
+  }
+  
+  .hero-content {
+    /* Ensure content is centered */
+    width: 100%;
+    align-items: center;
+    text-align: center;
   }
   
   .sacred-symbol {
     font-size: 3rem;
+    /* Ensure symbol is centered */
+    text-align: center;
+    width: 100%;
   }
   
   .main-title {
     font-size: 2.5rem;
+    /* Perfect title centering on mobile */
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
   }
   
   .subtitle {
     font-size: 1.125rem;
+    /* Perfect subtitle centering on mobile */
+    text-align: center;
+    max-width: 100%;
+    width: 100%;
+    padding: 0 var(--space-sm);
+    margin: 0 auto;
   }
   
   .primary-cta {
     padding: var(--space-sm) var(--space-lg);
     font-size: 1rem;
+    /* Perfect button centering */
+    align-self: center;
+    margin: 0 auto;
   }
   
   .sacred-quote {
     padding: var(--space-md);
-    margin: var(--space-lg) 0;
+    margin: var(--space-lg) auto; /* Center with auto margins */
+    /* Ensure quote doesn't exceed screen width */
+    max-width: calc(100% - var(--space-md));
+  }
+  
+  .auth-section {
+    /* Ensure auth section is centered on mobile */
+    width: 100%;
+    align-items: center;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
+  .landing-page {
+    /* Ensure proper centering on very small screens */
+    padding: var(--space-sm);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero-section {
+    /* Full width on small screens */
+    width: 100%;
+    max-width: 100%;
+  }
+  
   .main-title {
     font-size: 2rem;
+    /* Ensure title fits and is centered */
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 var(--space-xs);
   }
   
   .subtitle {
     font-size: 1rem;
+    /* Ensure subtitle is readable and centered */
+    text-align: center;
+    padding: 0 var(--space-sm);
+    line-height: 1.4;
   }
   
   .sacred-symbol {
     font-size: 2.5rem;
+  }
+  
+  .sacred-quote {
+    /* Ensure quote fits on small screens */
+    margin: var(--space-md) auto;
+    padding: var(--space-sm);
+    max-width: calc(100% - var(--space-sm));
+  }
+  
+  .primary-cta {
+    /* Ensure button is appropriately sized */
+    padding: var(--space-sm) var(--space-md);
+    font-size: 1rem;
+    width: auto;
+    min-width: 200px;
   }
 }

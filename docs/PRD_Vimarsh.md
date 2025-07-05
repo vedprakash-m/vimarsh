@@ -975,3 +975,104 @@ Building on lessons learned from CI/CD failures and test-implementation drift, V
 * **Rollback Readiness:** All changes include automated rollback procedures tested in staging environment
 
 This enhanced framework ensures that Vimarsh maintains the highest standards of technical reliability while preserving the sacred nature of spiritual guidance interactions.
+
+---
+
+## 13. AI Cost Management & Operational Efficiency
+
+**Objective:** Implement automated actions to manage AI costs while maintaining service quality and user experience through intelligent resource optimization and dynamic fallback mechanisms.
+
+### 13.1. Cost Management Automation
+
+**Budget Monitoring & Enforcement:**
+* **Real-time Tracking:** Monitor AI operation costs across all LLM calls with sub-second precision
+* **Predictive Analytics:** Forecast daily/monthly spending based on current usage patterns
+* **Automated Alerts:** Multi-tier alert system (INFO/WARNING/CRITICAL/EMERGENCY) for budget thresholds
+* **Spending Limits:** Per-user and system-wide spending limits with automatic enforcement
+* **Emergency Shutdown:** Automated service degradation when budget limits are exceeded
+
+**Azure Cost Management Integration:**
+* **Budget API Integration:** Real-time budget validation before expensive LLM operations
+* **Resource Scaling:** Automated scaling down of AI-related compute resources during off-peak hours
+* **Cost Attribution:** Detailed cost breakdown by user, operation type, and model usage
+* **Billing Optimization:** Intelligent use of Azure's pause-resume architecture for cost efficiency
+
+### 13.2. Dynamic Fallback Mechanisms
+
+**Intelligent Service Degradation:**
+* **Model Switching:** Automatic downgrade from premium models (Gemini Pro) to cost-effective alternatives (Gemini Flash) during budget constraints
+* **Response Caching:** Aggressive caching of spiritual guidance responses using semantic similarity matching
+* **Request Batching:** Intelligent batching and deduplication to reduce API calls by 20-40%
+* **Quality Graceful Degradation:** Maintain spiritual authenticity while reducing response complexity during cost constraints
+
+**User Experience Preservation:**
+* **Transparent Communication:** Krishna-inspired messaging explaining service adaptations
+* **Priority User Management:** VIP users maintain premium service during cost constraints
+* **Progressive Enhancement:** Gradual service restoration as budget constraints ease
+* **Offline Capabilities:** Enhanced local fallback responses during service limitations
+
+### 13.3. Administrative Cost Controls
+
+**User Management & Abuse Prevention:**
+* **Usage Analytics Dashboard:** Real-time monitoring of per-user AI consumption patterns
+* **Abuse Detection:** Automated identification of unusual usage patterns and potential cost abuse
+* **User Blocking/Rate Limiting:** Administrative tools to block or limit high-cost users
+* **Override Capabilities:** Admin controls to bypass cost restrictions for legitimate high-value users
+
+**Operational Intelligence:**
+* **Cost Forecasting:** Predictive models for budget planning and resource allocation
+* **Optimization Recommendations:** AI-driven suggestions for cost reduction without quality loss
+* **Performance Metrics:** Cost per spiritual guidance session, user satisfaction correlation with spend
+* **Reporting Dashboard:** Executive-level cost management reporting with actionable insights
+
+### 13.4. Technical Implementation Standards
+
+**Performance Requirements:**
+* **Response Time:** Cost management operations must not add >100ms to user response times
+* **Availability:** 99.9% uptime during budget constraint periods through intelligent fallbacks
+* **Scalability:** Cost management system must scale with user growth without proportional cost increase
+* **Reliability:** Failsafe mechanisms ensure service continues even if cost management systems fail
+
+**Integration Requirements:**
+* **API Compatibility:** All cost management features maintain existing API contracts
+* **Database Efficiency:** Cost tracking with minimal impact on database performance
+* **Monitoring Integration:** Azure Application Insights integration for comprehensive cost visibility
+* **Security Compliance:** Cost data protection with same standards as spiritual content
+
+### 13.5. Administrative Role & Access Control
+
+**Admin Role Definition:**
+* **Primary Purpose:** Administrative oversight and control of AI cost management systems
+* **Scope:** Full access to cost analytics, user management, and system configuration
+* **Authority:** Ability to block users, modify budgets, and implement emergency cost controls
+* **Responsibility:** Ensuring system financial sustainability while maintaining service quality
+
+**Admin User Setup & Management:**
+* **Initial Admin Assignment:** Environment variable configuration (`ADMIN_EMAILS`) for first admin
+* **Self-Assignment Process:** Secure endpoint for initial admin to assign themselves during first deployment
+* **Role Hierarchy:** 
+  - `USER`: Standard spiritual guidance access
+  - `ADMIN`: Cost management dashboard and user control access
+  - `SUPER_ADMIN`: Emergency system controls and admin role management
+* **Role Verification:** JWT claims validation with role-based endpoint protection
+
+**Admin Authentication & Authorization:**
+* **Microsoft Entra ID Integration:** Admin roles stored as claims in JWT tokens
+* **Email-Based Assignment:** Admin roles tied to verified email addresses in authentication system
+* **Session Management:** Admin sessions with enhanced security and audit logging
+* **Multi-Factor Authentication:** Required for admin access to sensitive cost management functions
+
+**Admin Access Controls:**
+* **Dashboard Access:** Admin-only cost analytics and user management interface
+* **API Endpoints:** Protected `/admin/*` routes with role validation middleware
+* **Emergency Controls:** Super admin access to emergency shutdown and budget override functions
+* **Audit Trail:** All admin actions logged for compliance and security monitoring
+
+**Becoming an Admin (Setup Process):**
+1. **Initial Setup:** Add your email to `ADMIN_EMAILS` environment variable during deployment
+2. **First Login:** Use Microsoft Entra ID authentication with your configured email
+3. **Role Activation:** System automatically assigns admin role based on email match
+4. **Dashboard Access:** Navigate to `/admin/dashboard` for cost management interface
+5. **Additional Admins:** Use admin interface to promote other authenticated users
+
+This cost management framework ensures Vimarsh remains financially sustainable while preserving the sacred quality of spiritual guidance interactions.

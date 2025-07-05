@@ -14,6 +14,8 @@
 
 > **Sanskrit**: *विमर्श (Vimarsh)* - "spiritual contemplation" or "divine reflection"
 
+**🌐 Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh-web.azurestaticapps.net)
+
 ### ✨ Key Features
 
 **🎯 For Spiritual Seekers:**
@@ -25,7 +27,7 @@
 
 **💻 For Developers:**
 - **Modern Architecture**: React 18 + TypeScript frontend, Python 3.12 Azure Functions backend
-- **RAG Pipeline**: Advanced vector search with Azure Cosmos DB and Google Gemini Pro
+- **RAG Pipeline**: Advanced vector search with Azure Cosmos DB and Google Gemini 2.5 Flash
 - **Cost-Optimized**: Innovative pause-resume architecture reducing costs by 90%
 - **Production Ready**: Comprehensive CI/CD, monitoring, and security
 - **Microsoft Authentication**: Enterprise-grade security with Entra ID
@@ -34,7 +36,7 @@
 
 ### For End Users
 
-**Web Application**: [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) *(coming soon)*
+**🌐 Live Web Application**: [https://vimarsh-web.azurestaticapps.net](https://vimarsh-web.azurestaticapps.net)
 
 **Try it locally:**
 ```bash
@@ -301,6 +303,12 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 
 This project is licensed under the GNU Affero General Public License, version 3 (AGPLv3). See the [LICENSE](LICENSE) file for the full license text and the [NOTICE](NOTICE) file for additional details.
 
+**Key License Points:**
+- **Open Source**: Complete source code available for learning and contribution
+- **Copyleft**: Derived works must also be open source under AGPLv3
+- **Network Use**: Web services using this code must provide source access
+- **Commercial Use**: Permitted with proper attribution and source sharing
+
 ### Sacred Text Attributions
 
 All sacred texts used are in the public domain:
@@ -316,6 +324,8 @@ All sacred texts used are in the public domain:
 *"Focus on your action, not on the results"* - Bhagavad Gita 2.47
 
 **Vimarsh** - Where Ancient Wisdom Meets Modern Technology
+
+🌐 **Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh-web.azurestaticapps.net)
 
 Built with 🕉️ by [Vedprakash Mishra](https://github.com/vedprakash-m) | [Visit Project](https://github.com/vedprakash-m/vimarsh)
 

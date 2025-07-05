@@ -46,7 +46,7 @@ export const AUTH_CONFIG = {
 // API Configuration
 export const API_CONFIG = {
   baseUrl: isProduction 
-    ? 'https://vimarsh-backend.azurewebsites.net/api'
+    ? 'https://vimarsh-backend-app.azurewebsites.net/api'
     : process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api',
   scopes: ENTRA_ID_CONFIG.scopes,
   timeout: 30000,

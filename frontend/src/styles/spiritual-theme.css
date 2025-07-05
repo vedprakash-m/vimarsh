@@ -303,3 +303,32 @@ body {
     font-size: 14px;
   }
 }
+
+/* Markdown styling for spiritual messages */
+.message-text {
+  line-height: 1.6;
+}
+
+.message-text strong {
+  color: #ff6b35;
+  font-weight: 600;
+}
+
+.message-text em {
+  color: #2c5aa0;
+  font-style: italic;
+}
+
+.message-text p {
+  margin-bottom: 8px;
+}
+
+.message-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Sanskrit text styling */
+.message-text em[lang="sa"] {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 0.95em;
+}

@@ -1,1 +1,29 @@
+# Azure Functions ignore file
+# Exclude from deployment package
+
+# Python virtual environments
 venv
+.venv
+__pycache__
+
+# Archives and legacy code
+../.archives
+LEGACY_*
+*ARCHIVED*
+
+# Test files
+test_*
+tests/
+.pytest_cache
+.coverage
+htmlcov
+
+# Development files
+.git
+.env
+*.log
+logs/
+
+# Build artifacts
+*.pyc
+*.pyo

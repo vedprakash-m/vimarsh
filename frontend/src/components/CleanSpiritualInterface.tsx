@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Mic, MicOff } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import '../styles/spiritual-theme.css';
 
 interface Message {
@@ -31,24 +32,65 @@ export default function CleanSpiritualInterface() {
     setInputText('');
     setIsLoading(true);
 
-    // Simulate API response
-    setTimeout(() => {
-      const response: Message = {
+    try {
+      // Get conversation context (last 4 messages for context)
+      const recentMessages = messages.slice(-4).map(msg => ({
+        role: msg.isUser ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      // Call real spiritual guidance API with conversation context
+      const response = await fetch('https://vimarsh-backend-app.azurewebsites.net/api/spiritual_guidance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: question,
+          language: 'English',
+          include_citations: true,
+          voice_enabled: false,
+          conversation_context: recentMessages
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      const apiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: `🙏 Thank you for asking: "${question}"\n\nThis is a spiritual guidance response. In the Bhagavad Gita, Krishna teaches us about finding peace through self-realization and dharma. Your question touches upon the eternal wisdom that guides us toward inner harmony.`,
+        text: data.response,
         isUser: false,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, response]);
+      
+      setMessages(prev => [...prev, apiResponse]);
+      
+    } catch (error) {
+      console.error('Error calling spiritual guidance API:', error);
+      
+      // Fallback response for errors
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "🙏 I'm having trouble connecting to the spiritual guidance service. Please check your connection and try again, dear soul. (Frontend Error)",
+        isUser: false,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const quickPrompts = [
-    "What is the meaning of life according to the Bhagavad Gita?",
-    "How can I find inner peace?",
-    "What does Krishna teach about duty?",
-    "How to practice mindfulness?"
+    "How can I find my dharma and live according to my true purpose?",
+    "How can I maintain equanimity during life's ups and downs?",
+    "What are the different paths of yoga and which one suits me?",
+    "How do I overcome anger and jealousy through spiritual practice?"
   ];
 
   return (
@@ -95,17 +137,23 @@ export default function CleanSpiritualInterface() {
       <div className="messages">
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.isUser ? 'user' : 'assistant'}`}>
-            <div className="message-content">
-              {!message.isUser && (
-                <div className="persona">
-                  <span>🎭</span> Lord Krishna
+              <div className="message-content">
+                {!message.isUser && (
+                  <div className="persona">
+                    <span>🎭</span> Lord Krishna
+                  </div>
+                )}
+                <div className="message-text">
+                  {message.isUser ? (
+                    <div>{message.text}</div>
+                  ) : (
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                  )}
                 </div>
-              )}
-              <div>{message.text}</div>
-              <div className="timestamp">
-                {message.timestamp.toLocaleTimeString()}
+                <div className="timestamp">
+                  {message.timestamp.toLocaleTimeString()}
+                </div>
               </div>
-            </div>
           </div>
         ))}
       </div>

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "bg_2_47",
+    "title": "On Duty Without Attachment",
+    "content": "You have a right to perform your prescribed duty, but not to the fruits of action. Never consider yourself to be the cause of the results of your activities, and never be attached to not doing your duty.",
+    "source": "Bhagavad Gita",
+    "chapter": "2",
+    "verse": "47",
+    "category": "dharma",
+    "language": "English",
+    "created_at": "2025-07-04T22:24:51.732849"
+  },
+  {
+    "id": "bg_6_19",
+    "title": "Steady Mind in Meditation",
+    "content": "As a lamp in a windless place does not waver, so the transcendentalist, whose mind is controlled, remains always steady in his meditation on the transcendent Self.",
+    "source": "Bhagavad Gita",
+    "chapter": "6",
+    "verse": "19",
+    "category": "meditation",
+    "language": "English",
+    "created_at": "2025-07-04T22:24:51.732878"
+  },
+  {
+    "id": "bg_12_6_7",
+    "title": "Devotion and Surrender",
+    "content": "But those who worship Me, giving up all their activities unto Me and being devoted to Me without deviation, engaged in devotional service and always meditating upon Me, having fixed their minds upon Me, O son of Pritha—for them I am the swift deliverer from the ocean of birth and death.",
+    "source": "Bhagavad Gita",
+    "chapter": "12",
+    "verse": "6-7",
+    "category": "devotion",
+    "language": "English",
+    "created_at": "2025-07-04T22:24:51.732884"
+  },
+  {
+    "id": "bg_2_14",
+    "title": "Accepting Pleasure and Pain",
+    "content": "O son of Kunti, the nonpermanent appearance of happiness and distress, and their disappearance in due course, are like the appearance and disappearance of winter and summer seasons. They arise from sense perception, O scion of Bharata, and one must learn to tolerate them without being disturbed.",
+    "source": "Bhagavad Gita",
+    "chapter": "2",
+    "verse": "14",
+    "category": "equanimity",
+    "language": "English",
+    "created_at": "2025-07-04T22:24:51.732889"
+  },
+  {
+    "id": "bg_2_20",
+    "title": "Eternal Nature of the Soul",
+    "content": "For the soul there is neither birth nor death nor, having once been, does he ever cease to be. He is unborn, eternal, permanent, and primeval. He is not slain when the body is slain.",
+    "source": "Bhagavad Gita",
+    "chapter": "2",
+    "verse": "20",
+    "category": "soul",
+    "language": "English",
+    "created_at": "2025-07-04T22:24:51.732904"
+  },
+  {
+    "id": "test_add_2503144057",
+    "title": "Test Addition",
+    "content": "Testing database add functionality.",
+    "source": "Test Suite",
+    "chapter": null,
+    "verse": null,
+    "category": "test",
+    "language": "English",
+    "created_at": "2025-07-04T22:24:51.734035"
+  }
+]

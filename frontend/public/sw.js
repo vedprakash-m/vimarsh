@@ -78,6 +78,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Skip Google Fonts - let them be handled by the browser directly to avoid CSP issues
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+    return; // Don't intercept, let browser handle directly
+  }
+  
   // Handle different types of requests
   if (isStaticAsset(request)) {
     event.respondWith(cacheFirstStrategy(request, STATIC_CACHE_NAME));
@@ -221,9 +226,7 @@ function isStaticAsset(request) {
          url.pathname.endsWith('.js') ||
          url.pathname.endsWith('.css') ||
          url.pathname.endsWith('.png') ||
-         url.pathname.endsWith('.ico') ||
-         url.hostname === 'fonts.googleapis.com' ||
-         url.hostname === 'fonts.gstatic.com';
+         url.pathname.endsWith('.ico');
 }
 
 function isAPIRequest(request) {

@@ -65,7 +65,7 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ onBack })
       
       const errorResponse = {
         id: (Date.now() + 2).toString(),
-        text: "I apologize, dear devotee, but I am experiencing some difficulty in providing guidance at this moment. Please try again shortly, and I shall guide you with wisdom from the eternal teachings.",
+        text: "I apologize, dear devotee, but I am having trouble connecting to the spiritual guidance service. Please check your connection and try again shortly. (Frontend Error)",
         isUser: false
       };
       setMessages(prev => [...prev, errorResponse]);

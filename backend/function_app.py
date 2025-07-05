@@ -16,16 +16,39 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import asyncio
+
+# Import centralized configuration
+try:
+    from backend.core.config import get_config
+    CONFIG_AVAILABLE = True
+except ImportError:
+    CONFIG_AVAILABLE = False
+
+# Import centralized logging and health checks
+try:
+    from backend.core.logging import get_logger, LogContext, PerformanceMetrics
+    from backend.core.health import get_health_checker
+    MONITORING_AVAILABLE = True
+except ImportError:
+    MONITORING_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Setup structured logging if available
+if MONITORING_AVAILABLE:
+    structured_logger = get_logger("vimarsh.api")
+    health_checker = get_health_checker()
+else:
+    structured_logger = None
+    health_checker = None
+
 # Import authentication middleware
 try:
-    from backend.auth.entra_external_id_middleware import auth_required, VedUser
+    from auth.entra_external_id_middleware import auth_required, VedUser
     AUTHENTICATION_ENABLED = True
 except ImportError:
     AUTHENTICATION_ENABLED = False
@@ -44,13 +67,52 @@ async def health_check_impl(req: func.HttpRequest) -> func.HttpResponse:
         HTTP 500: Service has issues
     """
     try:
-        health_status = {
-            "status": "healthy",
-            "service": "vimarsh-spiritual-guidance",
-            "version": "1.0.0",
-            "timestamp": datetime.utcnow().isoformat(),
-            "environment": os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "unknown")
+        # Use comprehensive health checker if available
+        if MONITORING_AVAILABLE and health_checker:
+            health_summary = health_checker.perform_full_health_check()
+            
+            # Determine HTTP status based on health
+            if health_summary.overall_status.value in ["healthy", "degraded"]:
+                status_code = 200
+            else:
+                status_code = 500
+            
+            return func.HttpResponse(
+                json.dumps(health_summary.to_dict()),
+                mimetype="application/json",
+                status_code=status_code
+            )
+        else:
+            # Fallback to simple health check
+            health_status = {
+                "status": "healthy",
+                "service": "vimarsh-spiritual-guidance",
+                "version": "1.0.0",
+                "timestamp": datetime.utcnow().isoformat(),
+                "environment": os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "unknown"),
+                "monitoring": "basic"
+            }
+            
+            return func.HttpResponse(
+                json.dumps(health_status),
+                mimetype="application/json",
+                status_code=200
+            )
+    
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        
+        error_response = {
+            "status": "critical",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
         }
+        
+        return func.HttpResponse(
+            json.dumps(error_response),
+            mimetype="application/json",
+            status_code=500
+        )
         
         logger.info("Health check successful")
         return func.HttpResponse(
@@ -76,6 +138,64 @@ async def health_check_impl(req: func.HttpRequest) -> func.HttpResponse:
 async def health_check(req: func.HttpRequest) -> func.HttpResponse:
     """Azure Functions wrapper for health check."""
     return await health_check_impl(req)
+
+
+@app.route(route="health/quick", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def quick_health_check(req: func.HttpRequest) -> func.HttpResponse:
+    """Quick health check for load balancers."""
+    try:
+        if MONITORING_AVAILABLE and health_checker:
+            status = health_checker.get_quick_health_status()
+        else:
+            status = {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "uptime": True
+            }
+        
+        return func.HttpResponse(
+            json.dumps(status),
+            mimetype="application/json",
+            status_code=200
+        )
+    
+    except Exception as e:
+        return func.HttpResponse(
+            json.dumps({"status": "error", "message": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="health/detailed", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def detailed_health_check(req: func.HttpRequest) -> func.HttpResponse:
+    """Detailed health check with full component analysis."""
+    try:
+        if MONITORING_AVAILABLE and health_checker:
+            # Force fresh health check
+            health_summary = health_checker.perform_full_health_check(use_cache=False)
+            
+            status_code = 200 if health_summary.overall_status.value in ["healthy", "degraded"] else 500
+            
+            return func.HttpResponse(
+                json.dumps(health_summary.to_dict()),
+                mimetype="application/json",
+                status_code=status_code
+            )
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Detailed health monitoring not available"}),
+                mimetype="application/json",
+                status_code=503
+            )
+    
+    except Exception as e:
+        logger.error(f"Detailed health check failed: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({"status": "critical", "error": str(e)}),
+            mimetype="application/json",
+            status_code=500
+        )
 
 
 async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
@@ -134,6 +254,7 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         language = query_data.get('language', 'English')
         include_citations = query_data.get('include_citations', True)
         voice_enabled = query_data.get('voice_enabled', False)
+        conversation_context = query_data.get('conversation_context', [])  # New parameter
         
         # Validate required parameters
         if not user_query:
@@ -146,7 +267,7 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         
         # Generate response with enhanced API integration
         response_data = await _generate_spiritual_response(
-            user_query, language, include_citations, voice_enabled
+            user_query, language, include_citations, voice_enabled, conversation_context
         )
         
         # Add authentication metadata if available
@@ -259,16 +380,11 @@ async def _generate_spiritual_response(
     query: str, 
     language: str, 
     include_citations: bool,
-    voice_enabled: bool
+    voice_enabled: bool,
+    conversation_context: List[Dict[str, str]] = None
 ) -> Dict[str, Any]:
     """
-    Generate spiritual guidance response using integrated RAG pipeline and LLM.
-    
-    This implementation now connects to real components:
-    - RAG pipeline for context retrieval
-    - Gemini Pro API for response generation
-    - Vector database queries for dynamic content
-    - Real-time citation extraction
+    Generate spiritual guidance response using simplified LLM service.
     
     Args:
         query: User's spiritual question
@@ -280,84 +396,50 @@ async def _generate_spiritual_response(
         Structured response with guidance, citations, and metadata
     """
     try:
-        # Initialize spiritual guidance API
-        from backend.spiritual_guidance.api import SpiritualGuidanceAPI
-        spiritual_api = SpiritualGuidanceAPI()
+        # Use simplified LLM service
+        from services.llm_service import llm_service
         
-        # Use the enhanced API with RAG and LLM integration
-        response_data = await spiritual_api.process_query(
-            query=query,
-            language=language,
-            include_citations=include_citations,
-            voice_enabled=voice_enabled,
-            user_context=None  # Can be enhanced with user context in future
+        # Get spiritual guidance with conversation context
+        spiritual_response = await llm_service.get_spiritual_guidance(
+            query, context="general", conversation_context=conversation_context
         )
         
-        logger.info("✅ Generated response using enhanced spiritual guidance API")
-        return response_data
-        
-    except Exception as e:
-        logger.error(f"Enhanced API failed, falling back to basic response: {e}")
-        
-        # Fallback to basic response generation
-        base_response = {
-            "response": "",
-            "citations": [],
+        # Structure the response
+        response_data = {
+            "response": spiritual_response.content,
+            "citations": spiritual_response.citations if include_citations else [],
             "metadata": {
-                "query_processed": query,
                 "language": language,
-                "processing_time_ms": 150,
-                "model_version": "gemini-pro-1.0",
-                "persona": "Lord Krishna",
-                "confidence_score": 0.85,
-                "spiritual_authenticity": "validated",
-                "fallback_mode": True
+                "confidence": spiritual_response.confidence,
+                "processing_time_ms": 150,  # Simulated
+                "voice_enabled": voice_enabled,
+                "service_version": "simplified_v1.0",
+                **spiritual_response.metadata
             }
         }
         
-        # Basic response based on language
-        if language == "Hindi":
-            base_response["response"] = (
-                "प्रिय भक्त, आपका प्रश्न अत्यंत महत्वपूर्ण है। गीता के अनुसार, "
-                "जीवन में आने वाली चुनौतियों का सामना धैर्य और स्थिर बुद्धि से करना चाहिए। "
-                "मैं आपको सदैव सत्य के मार्ग पर चलने की प्रेरणा देता हूँ।"
-            )
-            if include_citations:
-                base_response["citations"] = [
-                    {
-                        "source": "भगवद्गीता",
-                        "chapter": 2,
-                        "verse": 47,
-                        "text": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन",
-                        "relevance_score": 0.92
-                    }
-                ]
-        else:  # English
-            base_response["response"] = (
-                "Dear devotee, your question touches the very essence of spiritual wisdom. "
-                "As I taught Arjuna on the battlefield of Kurukshetra, life's challenges "
-                "are opportunities for spiritual growth. Remember that you have the right "
-                "to perform your duties, but never to the fruits of action. Let Me guide "
-                "you toward the path of righteousness and inner peace."
-            )
-            if include_citations:
-                base_response["citations"] = [
-                    {
-                        "source": "Bhagavad Gita",
-                        "chapter": 2,
-                        "verse": 47,
-                        "text": "You have a right to perform your prescribed duty, but not to the fruits of action.",
-                        "sanskrit": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।",
-                        "relevance_score": 0.92
-                    }
-                ]
-        
-        # Add voice URL if enabled (placeholder for future implementation)
+        # Add audio URL if voice enabled (placeholder for now)
         if voice_enabled:
-            base_response["audio_url"] = f"https://vimarsh-audio.blob.core.windows.net/responses/{hash(query)}.mp3"
+            response_data["audio_url"] = None  # TODO: Implement TTS
         
-        return base_response
-
+        logger.info("✅ Generated response using simplified LLM service")
+        return response_data
+        
+    except Exception as e:
+        logger.error(f"LLM service failed: {e}")
+        # Return basic fallback
+        return {
+            "response": "🙏 The spiritual guidance service is experiencing technical difficulties. Our divine wisdom is temporarily unavailable. Please try again in a moment, dear soul. (Backend Error)",
+            "citations": [],
+            "metadata": {
+                "language": language,
+                "confidence": 0.3,
+                "processing_time_ms": 50,
+                "voice_enabled": voice_enabled,
+                "service_version": "backend_fallback_v1.0",
+                "error": str(e)
+            }
+        }
 
 async def handle_options_impl(req: func.HttpRequest) -> func.HttpResponse:
     """Handle CORS preflight requests for all routes."""

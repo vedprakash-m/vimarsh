@@ -1718,3 +1718,490 @@ This optimization maintains the proven Gemini Pro + Google Cloud Speech stack wh
 - Integration with meditation apps and wellness platforms
 
 > **Note:** These enhancements will be prioritized based on user feedback, market demands, and platform performance metrics gathered during MVP and beta phases.
+
+---
+
+## 19. AI Cost Management & Dynamic Fallbacks
+
+**Architecture Overview:** Comprehensive cost management system with real-time monitoring, intelligent caching, dynamic fallbacks, and automated cost optimization to ensure financial sustainability while maintaining service quality.
+
+### 19.1. Real-time Token Usage Tracking
+
+**Enhanced Token Monitoring:**
+```python
+@dataclass
+class TokenUsageTracker:
+    """Enhanced token usage tracking with real-time monitoring"""
+    user_id: str
+    session_id: str
+    operation_type: str
+    model_name: str
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float
+    timestamp: datetime
+    context_metadata: Dict[str, Any]
+    
+    def track_usage(self) -> None:
+        """Track usage with real-time cost calculation"""
+        # Real-time cost calculation
+        # Per-user spending tracking
+        # Budget validation integration
+        # Alert system triggers
+```
+
+**Cost Calculation Engine:**
+* **Model-specific Pricing:** Dynamic pricing based on current Azure/Google rates
+* **Token Estimation:** Accurate token counting with fallback estimation
+* **Cost Attribution:** User-level, session-level, and operation-level cost tracking
+* **Budget Integration:** Real-time budget validation before expensive operations
+
+### 19.2. Budget Validation & Enforcement
+
+**Pre-operation Budget Checks:**
+```python
+class BudgetValidator:
+    """Budget validation before expensive LLM operations"""
+    
+    async def validate_operation(
+        self, 
+        user_id: str, 
+        estimated_cost: float,
+        operation_type: str
+    ) -> BudgetValidationResult:
+        """Validate if operation is within budget limits"""
+        # Check user-specific limits
+        # Check system-wide limits
+        # Check daily/monthly budgets
+        # Return validation result with alternatives
+        
+    async def suggest_alternatives(
+        self, 
+        rejected_operation: OperationRequest
+    ) -> List[AlternativeOption]:
+        """Suggest cost-effective alternatives"""
+        # Model downgrading options
+        # Cached response alternatives
+        # Queue-based batching options
+```
+
+**Budget Enforcement Levels:**
+1. **Soft Limits (80% of budget):** Warning notifications, request batching
+2. **Hard Limits (95% of budget):** Model switching, aggressive caching
+3. **Emergency Limits (100% of budget):** Fallback responses only
+4. **Critical Limits (105% of budget):** Service degradation with user notification
+
+### 19.3. Intelligent Caching Layer
+
+**Semantic Similarity Caching:**
+```python
+from functools import lru_cache
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+class SpiritualGuidanceCache:
+    """Intelligent caching with semantic similarity matching"""
+    
+    def __init__(self):
+        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        self.cache_threshold = 0.85  # Similarity threshold
+        
+    @lru_cache(maxsize=1000)
+    def get_cached_response(self, query_embedding: tuple) -> Optional[str]:
+        """Get cached response based on semantic similarity"""
+        # Vector similarity search
+        # Spiritual context preservation
+        # Citation accuracy validation
+        
+    def cache_response(
+        self, 
+        query: str, 
+        response: SpiritualResponse,
+        context: SpiritualContext
+    ) -> None:
+        """Cache response with metadata for future retrieval"""
+        # Embedding generation
+        # Metadata preservation
+        # Cache invalidation strategy
+```
+
+**Caching Strategy:**
+* **Query Similarity:** Semantic matching with 85% similarity threshold
+* **Context Preservation:** Maintain spiritual context and citation accuracy
+* **Cache Invalidation:** Time-based and content-based invalidation
+* **Hit Rate Optimization:** Target 40-60% cache hit rate for cost reduction
+
+### 19.4. Dynamic Fallback Mechanisms
+
+**Progressive Service Degradation:**
+```python
+class DynamicFallbackManager:
+    """Manage fallback mechanisms based on budget constraints"""
+    
+    async def get_response_with_fallback(
+        self, 
+        query: str,
+        budget_status: BudgetStatus,
+        user_priority: UserPriority
+    ) -> SpiritualResponse:
+        """Get response with appropriate fallback based on constraints"""
+        
+        if budget_status == BudgetStatus.NORMAL:
+            return await self.premium_llm_response(query)
+        elif budget_status == BudgetStatus.WARNING:
+            return await self.optimized_response(query)
+        elif budget_status == BudgetStatus.CRITICAL:
+            return await self.cached_or_template_response(query)
+        else:
+            return self.emergency_fallback_response(query)
+```
+
+**Fallback Hierarchy:**
+1. **Premium Service:** Full Gemini Pro with unlimited context
+2. **Optimized Service:** Gemini Flash with reduced context
+3. **Cached Service:** Intelligent cache matching with high-quality templates
+4. **Template Service:** High-quality static responses with spiritual authenticity
+5. **Emergency Service:** Basic guidance with service restoration messaging
+
+### 19.5. Request Batching & Optimization
+
+**Intelligent Batching System:**
+```python
+class RequestBatcher:
+    """Batch and optimize requests for cost efficiency"""
+    
+    def __init__(self):
+        self.batch_size = 5
+        self.batch_timeout = 2.0  # seconds
+        self.pending_requests = []
+        
+    async def batch_process(
+        self, 
+        requests: List[SpiritualGuidanceRequest]
+    ) -> List[SpiritualResponse]:
+        """Process batched requests with cost optimization"""
+        # Request deduplication
+        # Context sharing optimization
+        # Parallel processing
+        # Cost-aware scheduling
+        
+    def deduplicate_requests(
+        self, 
+        requests: List[SpiritualGuidanceRequest]
+    ) -> List[SpiritualGuidanceRequest]:
+        """Remove duplicate or similar requests"""
+        # Semantic similarity checking
+        # User context consideration
+        # Response sharing strategies
+```
+
+**Optimization Techniques:**
+* **Request Deduplication:** 20-40% cost reduction through duplicate detection
+* **Context Sharing:** Shared context for similar queries from different users
+* **Parallel Processing:** Efficient batch processing for multiple requests
+* **Priority Queuing:** VIP users get priority processing during constraints
+
+### 19.6. Azure Cost Management Integration
+
+**Azure API Integration:**
+```python
+class AzureCostManager:
+    """Integration with Azure Cost Management APIs"""
+    
+    async def get_current_spend(self, resource_group: str) -> float:
+        """Get current spending from Azure Cost Management API"""
+        # Real-time cost retrieval
+        # Resource-specific costs
+        # Trend analysis
+        
+    async def check_budget_alerts(self) -> List[BudgetAlert]:
+        """Check for Azure budget alerts and triggers"""
+        # Budget threshold monitoring
+        # Alert escalation
+        # Automated action triggers
+        
+    async def trigger_cost_actions(self, alert: BudgetAlert) -> None:
+        """Trigger automated cost management actions"""
+        # Resource scaling
+        # Service throttling
+        # Emergency procedures
+```
+
+**Automated Cost Actions:**
+* **Resource Scaling:** Automatic scaling down during off-peak hours
+* **Pause-Resume:** Intelligent use of two-resource-group architecture
+* **Alert Integration:** Real-time budget monitoring with automated responses
+* **Cost Attribution:** Detailed breakdown by service, user, and operation
+
+### 19.7. Admin Dashboard & User Management
+
+**Cost Analytics Dashboard:**
+```typescript
+interface AdminCostDashboard {
+  realTimeMetrics: {
+    currentSpend: number;
+    dailyBudget: number;
+    userCount: number;
+    requestsPerMinute: number;
+  };
+  
+  userAnalytics: {
+    topUsers: UserCostAnalytics[];
+    abusivePatterns: AbusiveUsagePattern[];
+    costPerUser: number;
+  };
+  
+  systemHealth: {
+    cacheHitRate: number;
+    fallbackActivations: number;
+    budgetStatus: BudgetStatus;
+  };
+}
+```
+
+**User Management Features:**
+* **Usage Analytics:** Real-time monitoring of per-user AI consumption
+* **Abuse Detection:** ML-based detection of unusual usage patterns
+* **User Controls:** Blocking, rate limiting, and custom budget assignment
+* **Override Capabilities:** Admin bypass for legitimate high-value users
+
+### 19.8. Performance & Monitoring
+
+**Cost Performance Metrics:**
+* **Response Time Impact:** <100ms additional latency for cost management operations
+* **Cache Performance:** 40-60% hit rate with 90% accuracy preservation
+* **Fallback Quality:** Maintain 85%+ user satisfaction during budget constraints
+* **Cost Reduction:** Target 30-50% cost optimization through intelligent management
+
+**Monitoring Integration:**
+```python
+# Azure Application Insights integration
+def log_cost_metrics(operation: CostOperation):
+    """Log cost management metrics to Azure Application Insights"""
+    telemetry_client.track_custom_event(
+        'CostManagement',
+        {
+            'operation_type': operation.type,
+            'cost_saved': operation.savings,
+            'user_impact': operation.user_impact,
+            'fallback_used': operation.fallback_type
+        }
+    )
+```
+
+### 19.9. Security & Compliance
+
+**Cost Data Protection:**
+* **Encryption:** All cost and usage data encrypted at rest and in transit
+* **Access Control:** Role-based access for cost management functions
+* **Audit Logging:** Complete audit trail for all cost management actions
+* **Privacy Compliance:** Cost tracking compliant with data protection regulations
+
+**Failsafe Mechanisms:**
+* **Service Continuity:** Cost management failures don't interrupt spiritual guidance
+* **Manual Override:** Emergency procedures for critical cost management system failures
+* **Data Integrity:** Cost tracking doesn't affect spiritual content accuracy
+* **Rollback Procedures:** Automated rollback for cost management updates
+
+### 19.10. Administrative Role System & Authorization
+
+**Role-Based Access Control (RBAC) Implementation:**
+
+```python
+# User Role Enumeration
+class UserRole(Enum):
+    USER = "user"           # Standard spiritual guidance access
+    ADMIN = "admin"         # Cost management and user control access  
+    SUPER_ADMIN = "super_admin"  # Emergency controls and role management
+
+# User Model with Role Support
+@dataclass
+class VedUser:
+    user_id: str
+    email: str
+    name: str
+    role: UserRole = UserRole.USER
+    created_at: datetime
+    last_login: datetime
+    is_active: bool = True
+    permissions: List[str] = field(default_factory=list)
+```
+
+**JWT Claims Enhancement:**
+
+```python
+# Enhanced JWT Token with Role Claims
+def create_admin_jwt_token(user: VedUser) -> str:
+    """Create JWT token with admin role claims"""
+    payload = {
+        'sub': user.user_id,
+        'email': user.email,
+        'name': user.name,
+        'role': user.role.value,
+        'permissions': user.permissions,
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(hours=24),
+        'aud': 'vimarsh-api',
+        'iss': 'vimarsh-auth'
+    }
+    return jwt.encode(payload, get_jwt_secret(), algorithm='HS256')
+
+# Role Validation Middleware
+def require_admin_role(required_role: UserRole = UserRole.ADMIN):
+    """Decorator for admin-only endpoints"""
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(req: func.HttpRequest) -> func.HttpResponse:
+            try:
+                token = extract_bearer_token(req)
+                payload = jwt.decode(token, get_jwt_secret(), algorithms=['HS256'])
+                user_role = UserRole(payload.get('role', 'user'))
+                
+                if user_role.value == UserRole.SUPER_ADMIN.value:
+                    # Super admin has access to everything
+                    pass
+                elif user_role.value == UserRole.ADMIN.value and required_role == UserRole.ADMIN:
+                    # Admin has access to admin functions
+                    pass
+                else:
+                    return func.HttpResponse("Forbidden: Insufficient privileges", status_code=403)
+                    
+                return await func(req)
+            except Exception as e:
+                return func.HttpResponse("Unauthorized", status_code=401)
+        return wrapper
+    return decorator
+```
+
+**Admin User Management System:**
+
+```python
+# Admin Setup and Role Assignment
+class AdminUserService:
+    def __init__(self):
+        self.admin_emails = os.getenv('ADMIN_EMAILS', '').split(',')
+        
+    async def setup_initial_admin(self, user_email: str) -> bool:
+        """Setup initial admin during first deployment"""
+        if user_email.strip() in self.admin_emails:
+            user = await self.get_or_create_user(user_email)
+            user.role = UserRole.ADMIN
+            user.permissions = ['cost_management', 'user_management', 'system_monitoring']
+            await self.save_user(user)
+            return True
+        return False
+    
+    async def promote_user_to_admin(self, admin_user: VedUser, target_email: str) -> bool:
+        """Allow existing admin to promote another user"""
+        if admin_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+            raise PermissionError("Insufficient privileges to promote users")
+            
+        target_user = await self.get_user_by_email(target_email)
+        if target_user:
+            target_user.role = UserRole.ADMIN
+            target_user.permissions = ['cost_management', 'user_management']
+            await self.save_user(target_user)
+            return True
+        return False
+```
+
+**Admin API Endpoints:**
+
+```python
+# Protected Admin Endpoints
+@require_admin_role(UserRole.ADMIN)
+async def admin_cost_dashboard(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin-only cost management dashboard data"""
+    try:
+        cost_analytics = await get_cost_analytics()
+        user_usage = await get_user_usage_analytics()
+        system_metrics = await get_system_performance_metrics()
+        
+        dashboard_data = {
+            'cost_analytics': cost_analytics,
+            'user_usage': user_usage,
+            'system_metrics': system_metrics,
+            'admin_controls': get_available_admin_actions()
+        }
+        
+        return func.HttpResponse(
+            json.dumps(dashboard_data),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Admin dashboard error: {e}")
+        return func.HttpResponse("Internal server error", status_code=500)
+
+@require_admin_role(UserRole.ADMIN)
+async def admin_user_management(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin user blocking and management"""
+    try:
+        if req.method == "POST":
+            data = req.get_json()
+            action = data.get('action')  # 'block', 'unblock', 'set_limit'
+            user_id = data.get('user_id')
+            
+            if action == 'block':
+                await block_user(user_id, reason=data.get('reason'))
+            elif action == 'set_limit':
+                await set_user_cost_limit(user_id, limit=data.get('limit'))
+                
+        users = await get_all_users_with_usage()
+        return func.HttpResponse(json.dumps(users), mimetype="application/json")
+        
+    except Exception as e:
+        logger.error(f"User management error: {e}")
+        return func.HttpResponse("Internal server error", status_code=500)
+```
+
+**Environment Configuration for Admin Setup:**
+
+```bash
+# Azure Function App Configuration
+ADMIN_EMAILS="your-email@vedprakash.net,admin2@vedprakash.net"
+ENABLE_ADMIN_SELF_ASSIGNMENT="true"  # Only for initial setup
+ADMIN_SESSION_TIMEOUT="3600"  # 1 hour for enhanced security
+SUPER_ADMIN_EMAIL="your-email@vedprakash.net"  # Emergency access
+```
+
+**Frontend Admin Route Protection:**
+
+```typescript
+// Admin Route Guard
+export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!user?.role || !['admin', 'super_admin'].includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Admin Dashboard Component
+export const AdminDashboard: React.FC = () => {
+  const [costData, setCostData] = useState(null);
+  const [userManagement, setUserManagement] = useState(null);
+  
+  useEffect(() => {
+    // Fetch admin data with proper error handling
+    fetchAdminDashboardData();
+  }, []);
+  
+  return (
+    <AdminRoute>
+      <div className="admin-dashboard">
+        <CostAnalytics data={costData} />
+        <UserManagement users={userManagement} />
+        <SystemControls />
+      </div>
+    </AdminRoute>
+  );
+};
+```
+
+This comprehensive cost management system ensures Vimarsh remains financially sustainable while preserving the sacred quality and availability of spiritual guidance services.

@@ -1,8 +1,8 @@
 // Vimarsh Infrastructure as Code Template
 // DEPLOYMENT STRATEGY: Single environment (production), single region, single slot for cost efficiency
 // RESOURCE ORGANIZATION: This template orchestrates deployment to two resource groups:
-// - vimarsh-db-rg: Persistent resources (Cosmos DB, Key Vault, Storage) for data retention  
-// - vimarsh-rg: Compute resources (Functions, Static Web App, App Insights) for pause-resume cost strategy
+// - vimarsh-persistent-rg: Persistent resources (Cosmos DB, Key Vault, Storage) for data retention  
+// - vimarsh-compute-rg: Compute resources (Functions, Static Web App, App Insights) for pause-resume cost strategy
 
 targetScope = 'subscription'
 
@@ -19,7 +19,7 @@ param expertReviewEmail string = 'vedprakash.m@me.com'
 // Resource Group for Persistent Resources (Database, Secrets, Storage)
 // This resource group contains data that must persist through deployment cycles
 resource persistentResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'vimarsh-db-rg'
+  name: 'vimarsh-persistent-rg'
   location: location
   tags: {
     project: 'vimarsh'
@@ -32,7 +32,7 @@ resource persistentResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01'
 // Resource Group for Compute Resources (Functions, Web App, Monitoring)
 // This resource group can be deleted/recreated for cost savings while preserving data
 resource computeResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'vimarsh-rg'
+  name: 'vimarsh-compute-rg'
   location: location
   tags: {
     project: 'vimarsh'
@@ -76,9 +76,9 @@ output keyVaultName string = persistentResources.outputs.keyVaultName
 // Deployment Strategy Documentation
 // 
 // PAUSE-RESUME COST STRATEGY:
-// 1. To pause costs: Delete vimarsh-rg resource group (keeps data in vimarsh-db-rg)
+// 1. To pause costs: Delete vimarsh-compute-rg resource group (keeps data in vimarsh-persistent-rg)
 // 2. To resume: Re-deploy this template (recreates compute resources, connects to existing data)
-// 3. Data persistence: All user data, configurations, and content remain in vimarsh-db-rg
+// 3. Data persistence: All user data, configurations, and content remain in vimarsh-persistent-rg
 // 4. Cost savings: Only pay for storage costs during pause periods
 //
 // IDEMPOTENT DEPLOYMENTS:
