@@ -5,7 +5,7 @@ import requests
 import json
 import logging
 from functools import wraps, lru_cache
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Callable
 from dataclasses import dataclass
 from azure.functions import HttpRequest, HttpResponse
 
@@ -47,6 +47,177 @@ class VedUser:
 class AuthenticationError(Exception):
     """Custom exception for authentication errors"""
     pass
+
+class AuthenticationMiddleware:
+    """Production-ready authentication middleware for Vimarsh."""
+    
+    def __init__(self):
+        self.jwks_cache = {}
+        self.tenant_id = os.getenv('AZURE_TENANT_ID', 'vedprakashentraidtenant.onmicrosoft.com')
+        self.client_id = os.getenv('AZURE_CLIENT_ID', '')
+        self.authority = os.getenv('AZURE_AUTHORITY', 'https://vedprakashentraidtenant.b2clogin.com/vedprakashentraidtenant.onmicrosoft.com/B2C_1_SignUpSignIn')
+        
+    @lru_cache(maxsize=1)
+    def get_jwks_uri(self) -> str:
+        """Get JWKS URI from OpenID configuration."""
+        try:
+            config_url = f"{self.authority}/v2.0/.well-known/openid_configuration"
+            response = requests.get(config_url, timeout=10)
+            response.raise_for_status()
+            config = response.json()
+            return config.get('jwks_uri', '')
+        except Exception as e:
+            logger.error(f"Failed to get JWKS URI: {e}")
+            # Fallback to standard format
+            return f"{self.authority}/discovery/v2.0/keys"
+    
+    @lru_cache(maxsize=1)
+    def get_jwks(self) -> Dict[str, Any]:
+        """Fetch and cache JWKS (JSON Web Key Set)."""
+        try:
+            jwks_uri = self.get_jwks_uri()
+            response = requests.get(jwks_uri, timeout=10)
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            logger.error(f"Failed to fetch JWKS: {e}")
+            return {"keys": []}
+    
+    def validate_token(self, token: str) -> Optional[Dict[str, Any]]:
+        """Validate JWT token and return claims."""
+        try:
+            # Decode token header to get key ID
+            unverified_header = jwt.get_unverified_header(token)
+            key_id = unverified_header.get('kid')
+            
+            if not key_id:
+                raise AuthenticationError("Token missing key ID")
+            
+            # Get JWKS and find matching key
+            jwks = self.get_jwks()
+            public_key = None
+            
+            for key in jwks.get('keys', []):
+                if key.get('kid') == key_id:
+                    public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+                    break
+            
+            if not public_key:
+                raise AuthenticationError("Public key not found for token")
+            
+            # Validate and decode token
+            claims = jwt.decode(
+                token,
+                public_key,
+                algorithms=['RS256'],
+                audience=self.client_id,
+                issuer=self.authority
+            )
+            
+            return claims
+            
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationError("Token has expired")
+        except jwt.InvalidTokenError as e:
+            raise AuthenticationError(f"Invalid token: {str(e)}")
+        except Exception as e:
+            logger.error(f"Token validation error: {e}")
+            raise AuthenticationError("Token validation failed")
+    
+    def extract_user_from_request(self, req: HttpRequest) -> Optional[VedUser]:
+        """Extract and validate user from request."""
+        try:
+            # Get authorization header
+            auth_header = req.headers.get('Authorization', '')
+            
+            if not auth_header.startswith('Bearer '):
+                return None
+            
+            token = auth_header[7:]  # Remove 'Bearer ' prefix
+            
+            # Validate token and extract claims
+            claims = self.validate_token(token)
+            
+            if claims:
+                user = VedUser.from_token_data(claims)
+                logger.info(f"🔐 Authenticated user: {user.email}")
+                return user
+            
+            return None
+            
+        except AuthenticationError as e:
+            logger.warning(f"Authentication failed: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"User extraction failed: {e}")
+            return None
+
+# Global middleware instance
+auth_middleware = AuthenticationMiddleware()
+
+def auth_required(f: Callable) -> Callable:
+    """Decorator to require authentication for Azure Functions endpoints."""
+    @wraps(f)
+    async def decorated_function(req: HttpRequest) -> HttpResponse:
+        # Check if authentication is enabled
+        if not os.getenv('ENABLE_AUTH', 'false').lower() == 'true':
+            # Authentication disabled - proceed without user context
+            return await f(req)
+        
+        try:
+            user = auth_middleware.extract_user_from_request(req)
+            
+            if not user:
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Authentication required",
+                        "message": "Valid access token must be provided",
+                        "code": "UNAUTHORIZED"
+                    }),
+                    status_code=401,
+                    mimetype="application/json",
+                    headers={
+                        "WWW-Authenticate": "Bearer",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                )
+            
+            # Add user to request context
+            req.user = user  # type: ignore
+            return await f(req)
+            
+        except Exception as e:
+            logger.error(f"Authentication middleware error: {e}")
+            return HttpResponse(
+                json.dumps({
+                    "error": "Authentication error",
+                    "message": "Internal authentication error",
+                    "code": "AUTH_ERROR"
+                }),
+                status_code=500,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+    
+    return decorated_function
+
+def optional_auth(f: Callable) -> Callable:
+    """Decorator to add optional authentication context without requiring it."""
+    @wraps(f)
+    async def decorated_function(req: HttpRequest) -> HttpResponse:
+        # Always add user context (None if not authenticated)
+        user = None
+        
+        if os.getenv('ENABLE_AUTH', 'false').lower() == 'true':
+            try:
+                user = auth_middleware.extract_user_from_request(req)
+            except Exception as e:
+                logger.debug(f"Optional auth failed (continuing): {e}")
+        
+        req.user = user  # type: ignore
+        return await f(req)
+    
+    return decorated_function
 
 class EntraIDJWTValidator:
     """Microsoft Entra ID JWT token validator with proper signature verification."""

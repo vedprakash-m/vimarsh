@@ -79,6 +79,9 @@ Vimarsh implements a groundbreaking architecture designed for maximum cost effic
 - **VectorStorageFactory**: Factory pattern for environment-aware storage selection
 - **Enhanced Spiritual Guidance Service**: Complete RAG workflow integration
 
+### RAG Pipeline Implementation 🚧 (Partial)
+- **Enhanced Spiritual Guidance Service**: Integration in progress (core endpoints stubbed)
+
 ### Cost Management System ✅
 - **Real-time Cost Monitoring**: Multi-metric tracking with configurable thresholds
 - **Budget Alert System**: Multi-tier alerts (INFO/WARNING/CRITICAL/EMERGENCY)

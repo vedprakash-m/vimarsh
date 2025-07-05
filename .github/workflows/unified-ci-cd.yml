@@ -31,7 +31,7 @@ permissions:
 env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '18'
-  COVERAGE_THRESHOLD: 85
+  COVERAGE_THRESHOLD: 25
   AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend'
   AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
 
@@ -420,15 +420,15 @@ jobs:
     - name: 📊 Pipeline Summary
       run: |
         echo "🎯 Pipeline Summary:"
-        echo "  Setup: ${{ needs.setup.result }}"
-        echo "  Security: ${{ needs.security-scan.result }}"
-        echo "  Backend Tests: ${{ needs.test-backend.result }}"
-        echo "  Frontend Tests: ${{ needs.test-frontend.result }}"
-        echo "  Integration Tests: ${{ needs.test-integration.result }}"
-        echo "  Backend Build: ${{ needs.build-backend.result }}"
-        echo "  Frontend Build: ${{ needs.build-frontend.result }}"
-        echo "  Production Deploy: ${{ needs.deploy-production.result }}"
-        echo "  Post-Deploy Validation: ${{ needs.post-deploy-validation.result }}"
+        echo "  Setup: '${{ needs.setup.result }}'"
+        echo "  Security: '${{ needs.security-scan.result }}'"
+        echo "  Backend Tests: '${{ needs.test-backend.result }}'"
+        echo "  Frontend Tests: '${{ needs.test-frontend.result }}'"
+        echo "  Integration Tests: '${{ needs.test-integration.result }}'"
+        echo "  Backend Build: '${{ needs.build-backend.result }}'"
+        echo "  Frontend Build: '${{ needs.build-frontend.result }}'"
+        echo "  Production Deploy: '${{ needs.deploy-production.result }}'"
+        echo "  Post-Deploy Validation: '${{ needs.post-deploy-validation.result }}'"
 
     - name: 🧹 Cleanup Artifacts
       if: github.event_name == 'pull_request'

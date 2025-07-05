@@ -217,14 +217,26 @@ class PlaceholderAuthService implements AuthService {
 
 // Authentication Service Factory
 export const createAuthService = (): AuthService => {
-  if (authConfig.usePlaceholder) {
-    console.log('🔧 Creating placeholder authentication service for development');
-    return new PlaceholderAuthService();
-  } else {
+  // Check environment variables for auth configuration
+  const enableAuth = process.env.REACT_APP_ENABLE_AUTH === 'true';
+  const hasValidClientId = process.env.REACT_APP_CLIENT_ID && 
+                           process.env.REACT_APP_CLIENT_ID !== 'placeholder-client-id' &&
+                           process.env.REACT_APP_CLIENT_ID !== 'your-vimarsh-app-client-id';
+  
+  if (enableAuth && hasValidClientId && !authConfig.usePlaceholder) {
     console.log('🔐 Creating MSAL authentication service for production');
     // Import the actual MSALAuthService implementation
-    const { MSALAuthService } = require('./msalAuthService');
-    return new MSALAuthService();
+    try {
+      const { MSALAuthService } = require('./msalAuthService');
+      return new MSALAuthService();
+    } catch (error) {
+      console.warn('🔧 MSAL service not available, falling back to placeholder:', error);
+      console.log('🔧 Creating placeholder authentication service for development');
+      return new PlaceholderAuthService();
+    }
+  } else {
+    console.log('🔧 Creating placeholder authentication service for development');
+    return new PlaceholderAuthService();
   }
 };
 

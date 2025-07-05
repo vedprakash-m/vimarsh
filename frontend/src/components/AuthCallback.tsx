@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMsal } from '@azure/msal-react';
 
 /**
  * AuthCallback Component
@@ -8,29 +9,51 @@ import { useNavigate } from 'react-router-dom';
  */
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
+  const { instance } = useMsal();
 
   useEffect(() => {
     // Handle the authentication callback
     const handleCallback = async () => {
       try {
-        // The MSAL library will automatically handle the callback
-        // After successful authentication, redirect to the main guidance page
-        console.log('🔐 Authentication callback processed');
-        
-        // Small delay to ensure auth state is updated
-        setTimeout(() => {
-          navigate('/guidance', { replace: true });
-        }, 1000);
-        
+        // Explicitly process the redirect and acquire the auth result
+        const accountsBefore = instance.getAllAccounts();
+        console.log('🛠️ MSAL Debug → Accounts BEFORE handleRedirectPromise:', accountsBefore);
+
+        const authResult = await instance.handleRedirectPromise();
+        console.log('🛠️ MSAL Debug → Auth result from handleRedirectPromise:', authResult);
+
+        const accountsAfter = instance.getAllAccounts();
+        console.log('🛠️ MSAL Debug → Accounts AFTER handleRedirectPromise:', accountsAfter);
+
+        // Determine account either from redirect result or existing cache
+        let activeAccount = authResult?.account;
+        if (!activeAccount) {
+          const cached = instance.getAllAccounts();
+          if (cached.length > 0) {
+            activeAccount = cached[0];
+          }
+        }
+
+        if (activeAccount) {
+          instance.setActiveAccount(activeAccount);
+          console.info('🔐 Authentication successful for', activeAccount.username);
+
+          // Allow msal-react context to propagate account state before routing
+          setTimeout(() => {
+            navigate('/guidance', { replace: true });
+          }, 250);
+        } else {
+          console.error('❌ Authentication completed but no account found');
+          navigate('/', { replace: true });
+        }
       } catch (error) {
-        console.error('❌ Authentication callback error:', error);
-        // Redirect to home page on error
+        console.error('❌ MSAL handleRedirectPromise error:', error);
         navigate('/', { replace: true });
       }
     };
 
     handleCallback();
-  }, [navigate]);
+  }, [navigate, instance]);
 
   return (
     <div className="vimarsh-auth-callback">
