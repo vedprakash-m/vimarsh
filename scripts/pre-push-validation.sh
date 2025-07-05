@@ -92,7 +92,8 @@ cd "$PROJECT_ROOT/backend"
 # Check Python syntax for key files
 KEY_PYTHON_FILES=(
     "function_app.py"
-    "spiritual_guidance/api.py"
+    "services/llm_service.py"
+    "core/config.py"
     "monitoring/app_insights.py"
 )
 
@@ -215,7 +216,8 @@ if python3 -c "
 import sys
 sys.path.insert(0, '.')
 try:
-    import spiritual_guidance.api
+    import services.llm_service
+    import core.config
     import monitoring.app_insights
     print('✅ Core imports successful')
 except ImportError as e:

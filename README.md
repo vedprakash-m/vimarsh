@@ -14,7 +14,7 @@
 
 > **Sanskrit**: *विमर्श (Vimarsh)* - "spiritual contemplation" or "divine reflection"
 
-**🌐 Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh-web.azurestaticapps.net)
+**🌐 Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
 
 ### ✨ Key Features
 
@@ -36,7 +36,7 @@
 
 ### For End Users
 
-**🌐 Live Web Application**: [https://vimarsh-web.azurestaticapps.net](https://vimarsh-web.azurestaticapps.net)
+**🌐 Live Web Application**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
 
 **Try it locally:**
 ```bash
@@ -325,7 +325,7 @@ All sacred texts used are in the public domain:
 
 **Vimarsh** - Where Ancient Wisdom Meets Modern Technology
 
-🌐 **Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh-web.azurestaticapps.net)
+🌐 **Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
 
 Built with 🕉️ by [Vedprakash Mishra](https://github.com/vedprakash-m) | [Visit Project](https://github.com/vedprakash-m/vimarsh)
 
