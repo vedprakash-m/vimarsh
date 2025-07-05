@@ -1,5 +1,46 @@
 /* Clean Spiritual Interface - Minimal CSS */
 
+/* Enhanced Spiritual Theme Styles */
+
+/* Google Fonts for better typography */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+/* Add Sanskrit/Devanagari font support */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600&display=swap');
+
+/* Sacred color palette */
+:root {
+  --sacred-saffron: #FF9933;
+  --sacred-saffron-light: #FFB366;
+  --sacred-saffron-dark: #E6851A;
+  --krishna-blue: #1E3A8A;
+  --krishna-blue-light: #3B82F6;
+  --lotus-white: #FEFEFE;
+  --lotus-cream: #FEF3E2;
+  --divine-gold: #F59E0B;
+  --wisdom-purple: #7C3AED;
+  --peace-green: #10B981;
+  --shadow-soft: rgba(255, 153, 51, 0.1);
+  --shadow-medium: rgba(255, 153, 51, 0.2);
+  --gradient-spiritual: linear-gradient(135deg, #fef3e2 0%, #e6f2ff 50%, #f0f9ff 100%);
+}
+
+/* Enhanced typography */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gradient-spiritual);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Sanskrit text support */
+.sanskrit-text {
+  font-family: 'Noto Sans Devanagari', 'Crimson Text', serif;
+  font-weight: 500;
+  color: var(--sacred-saffron-dark);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -15,274 +56,967 @@ body {
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.header {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 30px;
+/* Enhanced header styling */
+.header.enhanced {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 153, 51, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 10px rgba(255, 153, 51, 0.1);
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: #ff9933;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-.logo-text h1 {
-  font-size: 20px;
-  color: #333;
-  font-weight: 600;
-}
-
-.logo-text p {
-  font-size: 12px;
-  color: #666;
-}
-
-.voice-btn {
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: #f5f5f5;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.voice-btn:hover {
-  background: #e8e8e8;
-}
-
-.voice-btn.active {
-  background: #fee;
-  color: #dc2626;
-}
-
-.welcome {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.welcome-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #ff9933, #ff7a00);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 36px;
-}
-
-.welcome h2 {
-  font-size: 28px;
-  color: #333;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-.welcome p {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 30px;
-  line-height: 1.5;
-}
-
-.quick-prompts {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 30px;
-}
-
-@media (min-width: 768px) {
-  .quick-prompts {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.prompt-btn {
-  background: white;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 16px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #555;
-}
-
-.prompt-btn:hover {
-  border-color: #ff9933;
-  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.15);
-  transform: translateY(-1px);
-}
-
-.messages {
-  flex: 1;
-  margin-bottom: 20px;
-}
-
-.message {
-  margin-bottom: 20px;
-  display: flex;
-}
-
-.message.user {
-  justify-content: flex-end;
-}
-
-.message.assistant {
-  justify-content: flex-start;
-}
-
-.message-content {
-  max-width: 70%;
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-.message.user .message-content {
-  background: #ff9933;
-  color: white;
-}
-
-.message.assistant .message-content {
-  background: white;
-  color: #333;
-  border: 1px solid #e5e5e5;
-}
-
-.persona {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 8px;
+.logo.enhanced {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.timestamp {
-  font-size: 11px;
-  color: #999;
-  margin-top: 4px;
-}
-
-.message.user .timestamp {
-  text-align: right;
-}
-
-.loading {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 20px;
-}
-
-.loading-content {
-  background: white;
-  border: 1px solid #e5e5e5;
-  border-radius: 16px;
-  padding: 12px 16px;
+.logo-icon.enhanced {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--sacred-saffron), var(--divine-gold));
+  border-radius: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 1px 4px rgba(255, 153, 51, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-icon.enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logo-icon.enhanced:hover::before {
+  opacity: 1;
+}
+
+.om-symbol {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  animation: subtleRotate 20s linear infinite;
+}
+
+@keyframes subtleRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.logo-text.enhanced h1 {
+  font-family: 'Crimson Text', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--krishna-blue);
+  margin: 0;
+  background: linear-gradient(135deg, var(--krishna-blue), var(--krishna-blue-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-text.enhanced p {
+  font-size: 10px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.header-actions {
+  display: flex;
   gap: 8px;
-}
-
-.loading-dots {
-  display: flex;
-  gap: 4px;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  background: #ff9933;
-  border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out;
-}
-
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
-}
-
-.input-form {
-  background: white;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.input-field {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  background: transparent;
-}
-
-.input-field::placeholder {
-  color: #999;
-}
-
-.send-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: #ff9933;
-  color: white;
-  border-radius: 50%;
+.voice-btn, .menu-btn {
+  background: rgba(255, 153, 51, 0.1);
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  border-radius: 12px;
+  padding: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  color: var(--sacred-saffron);
 }
 
-.send-btn:hover:not(:disabled) {
-  background: #e6851a;
+.voice-btn:hover, .menu-btn:hover {
+  background: var(--sacred-saffron);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 153, 51, 0.3);
 }
 
-.send-btn:disabled {
-  background: #ddd;
+.voice-btn.active {
+  background: var(--divine-gold);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+}
+
+/* Enhanced Welcome Section */
+.welcome.enhanced {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(255, 153, 51, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.welcome-hero {
+  margin-bottom: 48px;
+}
+
+.welcome-icon.enhanced {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, var(--sacred-saffron), var(--divine-gold));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 32px;
+  font-size: 48px;
+  box-shadow: 0 12px 32px rgba(255, 153, 51, 0.3);
+  animation: gentleFloat 4s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes gentleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.welcome-icon.enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.lotus-symbol {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+  animation: subtleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes subtleGlow {
+  0% {
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+  }
+  100% {
+    filter: drop-shadow(0 2px 12px rgba(255, 153, 51, 0.3));
+  }
+}
+
+.welcome.enhanced h2 {
+  font-family: 'Crimson Text', serif;
+  font-size: 2.4rem;
+  color: var(--krishna-blue);
+  margin-bottom: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--krishna-blue), var(--krishna-blue-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.welcome-subtitle {
+  color: #4a5568;
+  font-size: 1.2rem;
+  margin-bottom: 32px;
+  line-height: 1.8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 400;
+}
+
+.welcome-features {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 153, 51, 0.1);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--krishna-blue);
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(255, 153, 51, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.2);
+}
+
+.feature-icon {
+  font-size: 16px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.quick-prompts-section {
+  margin-bottom: 40px;
+}
+
+.quick-prompts-section h3 {
+  font-family: 'Crimson Text', serif;
+  font-size: 1.4rem;
+  color: var(--krishna-blue);
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.quick-prompts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.prompt-btn.enhanced {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.prompt-btn.enhanced:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  border-color: var(--sacred-saffron);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 153, 51, 0.2);
+}
+
+.prompt-btn.enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--sacred-saffron), var(--divine-gold));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.prompt-btn.enhanced:hover::before {
+  opacity: 1;
+}
+
+.prompt-icon {
+  font-size: 24px;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 153, 51, 0.1);
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.prompt-content {
+  flex: 1;
+}
+
+.prompt-question {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--krishna-blue);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.prompt-description {
+  font-size: 13px;
+  color: #6b7280;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.welcome-footer {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+.sanskrit-verse {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.sanskrit-text {
+  font-family: 'Noto Sans Devanagari', 'Crimson Text', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--sacred-saffron-dark);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  margin-bottom: 8px;
+}
+
+.verse-translation {
+  font-size: 14px;
+  color: var(--krishna-blue);
+  font-style: italic;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.verse-citation {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.messages {
+  flex: 1;
+  margin-bottom: 6px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scroll-behavior: smooth;
+}
+
+.messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 3px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background: var(--sacred-saffron);
+  border-radius: 3px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background: var(--sacred-saffron-dark);
+}
+
+.message {
+  margin-bottom: 4px;
+  display: flex;
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.message.user {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.message.assistant {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.message.typing {
+  opacity: 0.8;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-content {
+  display: inline-block;
+  max-width: 88%;
+  background: var(--lotus-white);
+  border-radius: 6px;
+  padding: 6px 10px;
+  box-shadow: 0 1px 8px var(--shadow-soft);
+  position: relative;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.message.user .message-content {
+  background: linear-gradient(135deg, var(--sacred-saffron-dark), var(--sacred-saffron));
+  color: white;
+  border-radius: 6px 6px 2px 6px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.message.assistant .message-content {
+  background: var(--lotus-white);
+  color: #2d3748;
+  border-radius: 6px 6px 6px 2px;
+  border-left: 2px solid var(--sacred-saffron);
+}
+
+/* Enhanced persona styling */
+.persona {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--krishna-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.persona-icon {
+  font-size: 12px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.persona-name {
+  background: linear-gradient(135deg, var(--krishna-blue), var(--krishna-blue-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Message actions */
+.message-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3px;
+  padding-top: 2px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background: var(--shadow-soft);
+  color: var(--sacred-saffron);
+  transform: translateY(-1px);
+}
+
+.action-btn.active {
+  color: var(--divine-gold);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* Enhanced timestamp */
+.timestamp {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.typing-indicator .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sacred-saffron);
+  animation: typingPulse 1.5s infinite;
+}
+
+.typing-indicator .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingPulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Enhanced markdown styling */
+.message-text h1, .message-text h2, .message-text h3 {
+  color: var(--krishna-blue);
+  margin: 3px 0 2px 0;
+  font-family: 'Crimson Text', serif;
+}
+
+.message-text h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.message-text h2 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.message-text h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.message-text p {
+  margin: 2px 0;
+  line-height: 1.4;
+}
+
+.message-text blockquote {
+  border-left: 2px solid var(--sacred-saffron);
+  padding-left: 8px;
+  margin: 4px 0;
+  font-style: italic;
+  color: var(--krishna-blue);
+  background: rgba(255, 153, 51, 0.05);
+  border-radius: 0 4px 4px 0;
+  padding: 6px 8px;
+}
+
+.message-text strong {
+  color: var(--sacred-saffron-dark);
+  font-weight: 600;
+}
+
+.message-text em {
+  color: var(--krishna-blue);
+  font-style: italic;
+}
+
+/* Enhanced loading animation */
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.loading-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--sacred-saffron);
+  animation: loadingBounce 1.2s infinite;
+}
+
+.loading-dots .dot:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.loading-dots .dot:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+@keyframes loadingBounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Enhanced input form styling */
+.input-form.enhanced {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 6px;
+  box-shadow: 0 2px 12px var(--shadow-medium);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-field.enhanced {
+  flex: 1;
+  border: 2px solid rgba(255, 153, 51, 0.2);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  background: var(--lotus-white);
+  color: #2d3748;
+  transition: all 0.3s ease;
+  outline: none;
+  min-height: 48px;
+  line-height: 1.5;
+}
+
+.input-field.enhanced:focus {
+  border-color: var(--sacred-saffron);
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.1);
+  background: #fff;
+}
+
+.input-field.enhanced:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
+}
+
+.input-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.voice-btn-input {
+  background: var(--lotus-white);
+  border: 2px solid rgba(255, 153, 51, 0.2);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--sacred-saffron);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-btn-input:hover {
+  background: var(--sacred-saffron);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.voice-btn-input.active {
+  background: var(--divine-gold);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+}
+
+.send-btn.enhanced {
+  background: linear-gradient(135deg, var(--sacred-saffron), var(--sacred-saffron-dark));
+  border: none;
+  border-radius: 6px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.3);
+  min-height: 48px;
+}
+
+.send-btn.enhanced:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.4);
+}
+
+.send-btn.enhanced:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.input-hint {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 4px;
+  }
+  
+  .welcome.enhanced {
+    padding: 16px 12px;
+    margin-bottom: 16px;
+  }
+  
+  .welcome-icon.enhanced {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+  
+  .welcome.enhanced h2 {
+    font-size: 1.6rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1rem;
+    margin-bottom: 16px;
+  }
+  
+  .welcome-features {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .feature-item {
+    justify-content: center;
+  }
+  
+  .quick-prompts-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+  }
+  
+  .quick-prompts {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .prompt-btn.enhanced {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .prompt-icon {
+    font-size: 16px;
+    min-width: 24px;
+    height: 24px;
+  }
+  
+  .prompt-question {
+    font-size: 13px;
+  }
+  
+  .prompt-description {
+    font-size: 11px;
+  }
+  
+  .welcome-footer {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+  
+  .sanskrit-text {
+    font-size: 14px;
+  }
+  
+  .verse-translation {
+    font-size: 12px;
+  }
+  
+  .verse-citation {
+    font-size: 10px;
+  }
+  
+  .message-content {
+    max-width: 85%;
+  }
+  
+  .welcome h2 {
+    font-size: 20px;
+  }
+  
+  .welcome p {
+    font-size: 13px;
+  }
+  
+  .input-form.enhanced {
+    padding: 12px;
+    margin-top: 8px;
+  }
+  
+  .input-field.enhanced {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+  
+  .input-actions {
+    gap: 6px;
+  }
+  
+  .voice-btn-input, .send-btn.enhanced {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+  
+  .welcome-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+  
+  .welcome h2 {
+    font-size: 1.4rem;
+  }
+  
+  .welcome p {
+    font-size: 0.9rem;
+  }
+  
+  .header.enhanced {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+  }
+  
+  .logo.enhanced {
+    gap: 8px;
+  }
+  
+  .logo-icon.enhanced {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .logo-text.enhanced h1 {
+    font-size: 18px;
+  }
+  
+  .logo-text.enhanced p {
+    font-size: 11px;
+  }
+  
+  .header-actions {
+    gap: 4px;
+  }
+  
+  .voice-btn, .menu-btn {
+    padding: 6px;
+  }
+}
+
+/* Smooth focus transitions */
+.input-field.enhanced,
+.voice-btn-input,
+.send-btn.enhanced,
+.prompt-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced loading state */
+.loading-content span {
+  color: var(--krishna-blue);
+  font-style: italic;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* Spiritual flourishes */
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 153, 51, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(124, 58, 237, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Mobile responsive */
@@ -304,31 +1038,113 @@ body {
   }
 }
 
-/* Markdown styling for spiritual messages */
-.message-text {
-  line-height: 1.6;
+/* Compact Welcome Section - Override enhanced styles */
+.welcome.compact {
+  padding: 4px 0;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 4px;
+  background: none;
+  box-shadow: none;
+  border: none;
+  backdrop-filter: none;
 }
 
-.message-text strong {
-  color: #ff6b35;
+.welcome.compact .welcome-hero {
+  margin-bottom: 3px;
+}
+
+.welcome.compact .welcome-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sacred-saffron), var(--sacred-saffron-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 3px;
+  box-shadow: 0 1px 6px rgba(255, 153, 51, 0.3);
+}
+
+.welcome.compact .welcome-icon .lotus-symbol {
+  font-size: 16px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.welcome.compact h2 {
+  font-family: 'Crimson Text', serif;
+  font-size: 18px;
+  color: var(--krishna-blue);
+  margin-bottom: 1px;
   font-weight: 600;
 }
 
-.message-text em {
-  color: #2c5aa0;
-  font-style: italic;
-}
-
-.message-text p {
-  margin-bottom: 8px;
-}
-
-.message-text p:last-child {
+.welcome.compact .welcome-subtitle {
+  color: #666;
+  font-size: 11px;
+  line-height: 1.2;
   margin-bottom: 0;
 }
 
-/* Sanskrit text styling */
-.message-text em[lang="sa"] {
-  font-family: 'Noto Sans Devanagari', sans-serif;
-  font-size: 0.95em;
+/* Compact Quick Prompts */
+.quick-prompts.compact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.prompt-btn.compact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 11px;
+}
+
+.prompt-btn.compact:hover {
+  background: var(--lotus-cream);
+  border-color: var(--sacred-saffron-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.15);
+}
+
+.prompt-btn.compact .prompt-icon {
+  font-size: 12px;
+  min-width: 14px;
+}
+
+.prompt-btn.compact .prompt-text {
+  color: #374151;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+/* Mobile responsive adjustments for compact */
+@media (max-width: 768px) {
+  .welcome.compact {
+    padding: 8px 0;
+  }
+  
+  .welcome.compact h2 {
+    font-size: 20px;
+  }
+  
+  .welcome.compact .welcome-subtitle {
+    font-size: 13px;
+  }
+  
+  .prompt-btn.compact {
+    padding: 8px 10px;
+  }
+  
+  .prompt-btn.compact .prompt-text {
+    font-size: 12px;
+  }
 }

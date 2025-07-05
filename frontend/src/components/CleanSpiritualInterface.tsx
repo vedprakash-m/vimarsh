@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Copy, Heart } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import '../styles/spiritual-theme.css';
 
@@ -8,13 +8,56 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  isTyping?: boolean;
+  isFavorite?: boolean;
 }
 
 export default function CleanSpiritualInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + Enter to send message
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (inputText.trim() && !isLoading) {
+          handleSubmit(e as any);
+        }
+      }
+      // Escape to clear input
+      if (e.key === 'Escape') {
+        setInputText('');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [inputText, isLoading]);
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // Could add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const toggleFavorite = (messageId: string) => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId ? { ...msg, isFavorite: !msg.isFavorite } : msg
+    ));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +74,17 @@ export default function CleanSpiritualInterface() {
     const question = inputText;
     setInputText('');
     setIsLoading(true);
+    setIsTyping(true);
+
+    // Add typing indicator
+    const typingMessage: Message = {
+      id: `typing-${Date.now()}`,
+      text: '',
+      isUser: false,
+      timestamp: new Date(),
+      isTyping: true
+    };
+    setMessages(prev => [...prev, typingMessage]);
 
     try {
       // Get conversation context (last 4 messages for context)
@@ -67,7 +121,8 @@ export default function CleanSpiritualInterface() {
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, apiResponse]);
+      // Remove typing indicator and add real response
+      setMessages(prev => prev.filter(msg => !msg.isTyping).concat(apiResponse));
       
     } catch (error) {
       console.error('Error calling spiritual guidance API:', error);
@@ -80,55 +135,94 @@ export default function CleanSpiritualInterface() {
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, errorResponse]);
+      // Remove typing indicator and add error response
+      setMessages(prev => prev.filter(msg => !msg.isTyping).concat(errorResponse));
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
   const quickPrompts = [
-    "How can I find my dharma and live according to my true purpose?",
-    "How can I maintain equanimity during life's ups and downs?",
-    "What are the different paths of yoga and which one suits me?",
-    "How do I overcome anger and jealousy through spiritual practice?"
+    {
+      category: "dharma",
+      icon: "🎯",
+      question: "How can I find my dharma and live according to my true purpose?",
+      description: "Discover your life's sacred mission"
+    },
+    {
+      category: "equanimity",
+      icon: "⚖️",
+      question: "How can I maintain equanimity during life's ups and downs?",
+      description: "Find balance through life's challenges"
+    },
+    {
+      category: "yoga",
+      icon: "🧘",
+      question: "What are the different paths of yoga and which one suits me?",
+      description: "Explore the sacred paths of union"
+    },
+    {
+      category: "emotions",
+      icon: "💫",
+      question: "How do I overcome anger and jealousy through spiritual practice?",
+      description: "Transform negative emotions into wisdom"
+    },
+    {
+      category: "meditation",
+      icon: "🪷",
+      question: "What is the best way to start a meditation practice?",
+      description: "Begin your journey into inner peace"
+    },
+    {
+      category: "karma",
+      icon: "🔄",
+      question: "How does karma work and how can I create positive karma?",
+      description: "Understand the law of cause and effect"
+    }
   ];
 
   return (
     <div className="container">
       {/* Header */}
-      <header className="header">
-        <div className="logo">
-          <div className="logo-icon">🕉</div>
-          <div className="logo-text">
+      <header className="header enhanced">
+        <div className="logo enhanced">
+          <div className="logo-icon enhanced">
+            <span className="om-symbol">🕉</span>
+          </div>
+          <div className="logo-text enhanced">
             <h1>Vimarsh</h1>
             <p>Spiritual Guidance</p>
           </div>
         </div>
-        <button
-          className={`voice-btn ${isListening ? 'active' : ''}`}
-          onClick={() => setIsListening(!isListening)}
-        >
-          {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-        </button>
       </header>
 
-      {/* Welcome Section */}
+      {/* Compact Welcome Section */}
       {messages.length === 0 && (
-        <div className="welcome">
-          <div className="welcome-icon">🏵️</div>
-          <h2>Welcome to Your Spiritual Journey</h2>
-          <p>Ask questions about spirituality, philosophy, and find wisdom from ancient teachings.</p>
+        <div className="welcome compact">
+          <div className="welcome-hero">
+            <div className="welcome-icon">
+              <span className="lotus-symbol">🪷</span>
+            </div>
+            <h2>Seek Wisdom from Lord Krishna</h2>
+            <p className="welcome-subtitle">
+              Ask questions about dharma, karma, meditation, and the path to inner peace.
+            </p>
+          </div>
           
-          <div className="quick-prompts">
-            {quickPrompts.map((prompt, index) => (
-              <button
-                key={index}
-                className="prompt-btn"
-                onClick={() => setInputText(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
+          <div className="quick-prompts-section">
+            <div className="quick-prompts compact">
+              {quickPrompts.slice(0, 3).map((prompt, index) => (
+                <button
+                  key={index}
+                  className="prompt-btn compact"
+                  onClick={() => setInputText(prompt.question)}
+                >
+                  <span className="prompt-icon">{prompt.icon}</span>
+                  <span className="prompt-text">{prompt.question}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -136,26 +230,56 @@ export default function CleanSpiritualInterface() {
       {/* Messages */}
       <div className="messages">
         {messages.map((message) => (
-          <div key={message.id} className={`message ${message.isUser ? 'user' : 'assistant'}`}>
+          <div key={message.id} className={`message ${message.isUser ? 'user' : 'assistant'} ${message.isTyping ? 'typing' : ''}`}>
               <div className="message-content">
                 {!message.isUser && (
                   <div className="persona">
-                    <span>🎭</span> Lord Krishna
+                    <span className="persona-icon">🎭</span> 
+                    <span className="persona-name">Lord Krishna</span>
                   </div>
                 )}
                 <div className="message-text">
-                  {message.isUser ? (
+                  {message.isTyping ? (
+                    <div className="typing-indicator">
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                    </div>
+                  ) : message.isUser ? (
                     <div>{message.text}</div>
                   ) : (
                     <ReactMarkdown>{message.text}</ReactMarkdown>
                   )}
                 </div>
-                <div className="timestamp">
-                  {message.timestamp.toLocaleTimeString()}
-                </div>
+                {!message.isTyping && (
+                  <div className="message-actions">
+                    <div className="timestamp">
+                      {message.timestamp.toLocaleTimeString()}
+                    </div>
+                    {!message.isUser && (
+                      <div className="action-buttons">
+                        <button 
+                          className="action-btn"
+                          onClick={() => copyToClipboard(message.text)}
+                          title="Copy message"
+                        >
+                          <Copy size={14} />
+                        </button>
+                        <button 
+                          className={`action-btn ${message.isFavorite ? 'active' : ''}`}
+                          onClick={() => toggleFavorite(message.id)}
+                          title="Add to favorites"
+                        >
+                          <Heart size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Loading */}
@@ -173,21 +297,30 @@ export default function CleanSpiritualInterface() {
       )}
 
       {/* Input Form */}
-      <form className="input-form" onSubmit={handleSubmit}>
-        <input
-          className="input-field"
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Ask your spiritual question..."
-        />
-        <button
-          className="send-btn"
-          type="submit"
-          disabled={!inputText.trim() || isLoading}
-        >
-          <Send size={16} />
-        </button>
+      <form className="input-form enhanced" onSubmit={handleSubmit}>
+        <div className="input-container">
+          <input
+            className="input-field enhanced"
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Ask your spiritual question..."
+            disabled={isLoading}
+          />
+          <div className="input-actions">
+            <button
+              className="send-btn enhanced"
+              type="submit"
+              disabled={!inputText.trim() || isLoading}
+              title="Send message (Ctrl+Enter)"
+            >
+              <Send size={16} />
+            </button>
+          </div>
+        </div>
+        <div className="input-hint">
+          <span>Press Enter to send • Ctrl+Enter for quick send • Esc to clear</span>
+        </div>
       </form>
     </div>
   );
