@@ -59,8 +59,8 @@ export default function CleanSpiritualInterface() {
       }));
 
       // Call real spiritual guidance API with conversation context
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:7071';
-      const response = await fetch(`${apiUrl}/api/spiritual_guidance`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api';
+      const response = await fetch(`${apiUrl}/spiritual_guidance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -97,7 +97,7 @@ export interface RoleData {
  * 4. Zero-trust admin validation
  */
 class AdminService {
-  private baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:7071';
+  private baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api';
   
   // Development mode tokens for testing
   private devTokens: { [key: string]: string } = {};
