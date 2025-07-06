@@ -9,6 +9,9 @@ from typing import Dict, Any, Optional, Callable
 from dataclasses import dataclass
 from azure.functions import HttpRequest, HttpResponse
 
+# Import admin role system
+from core.user_roles import UserRole, UserPermissions, admin_role_manager
+
 logger = logging.getLogger(__name__)
 
 @dataclass
@@ -21,13 +24,22 @@ class VedUser:
     familyName: str
     permissions: list
     vedProfile: dict
+    # Admin role system
+    role: UserRole
+    user_permissions: UserPermissions
 
     @classmethod
     def from_token_data(cls, token_data: Dict[str, Any]) -> 'VedUser':
         """Create VedUser from JWT token claims"""
+        email = token_data.get("email", "")
+        
+        # Determine user role and permissions
+        role = admin_role_manager.get_user_role(email)
+        user_permissions = admin_role_manager.get_user_permissions(email)
+        
         return cls(
             id=token_data.get("sub", ""),
-            email=token_data.get("email", ""),
+            email=email,
             name=token_data.get("name", ""),
             givenName=token_data.get("given_name", ""),
             familyName=token_data.get("family_name", ""),
@@ -41,8 +53,22 @@ class VedUser:
                     "spiritualInterests": [],
                     "communicationStyle": "reverent"
                 }
-            }
+            },
+            role=role,
+            user_permissions=user_permissions
         )
+    
+    def is_admin(self) -> bool:
+        """Check if user has admin privileges"""
+        return self.role in [UserRole.ADMIN, UserRole.SUPER_ADMIN]
+    
+    def is_super_admin(self) -> bool:
+        """Check if user has super admin privileges"""
+        return self.role == UserRole.SUPER_ADMIN
+    
+    def can_access_admin_endpoints(self) -> bool:
+        """Check if user can access admin endpoints"""
+        return self.user_permissions.can_access_admin_endpoints
 
 class AuthenticationError(Exception):
     """Custom exception for authentication errors"""
@@ -198,6 +224,214 @@ def auth_required(f: Callable) -> Callable:
                 mimetype="application/json",
                 headers={"Access-Control-Allow-Origin": "*"}
             )
+    
+    return decorated_function
+
+
+def admin_required(f: Callable) -> Callable:
+    """Decorator to require admin privileges for Azure Functions endpoints."""
+    @wraps(f)
+    async def decorated_function(req: HttpRequest) -> HttpResponse:
+        # Check if authentication is enabled
+        if not os.getenv('ENABLE_AUTH', 'false').lower() == 'true':
+            # Authentication disabled - Development mode
+            # Still validate admin status using email header for security
+            user_email = req.headers.get('x-user-email')
+            if not user_email:
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Development mode: User email required",
+                        "message": "x-user-email header must be provided in development mode",
+                        "code": "DEV_EMAIL_REQUIRED"
+                    }),
+                    status_code=400,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Check if user is admin using the role manager
+            if not admin_role_manager.is_admin(user_email):
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Admin access required",
+                        "message": f"User {user_email} does not have admin privileges",
+                        "code": "FORBIDDEN",
+                        "userRole": str(admin_role_manager.get_user_role(user_email))
+                    }),
+                    status_code=403,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Create a development mode user object
+            dev_user = VedUser(
+                id=user_email,
+                email=user_email,
+                name=user_email,
+                givenName=user_email.split('@')[0],
+                familyName="",
+                permissions=[],
+                vedProfile={},
+                role=admin_role_manager.get_user_role(user_email),
+                user_permissions=admin_role_manager.get_user_permissions(user_email)
+            )
+            
+            req.user = dev_user  # type: ignore
+            return await f(req)
+        
+        try:
+            user = auth_middleware.extract_user_from_request(req)
+            
+            if not user:
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Authentication required",
+                        "message": "Valid access token must be provided for admin access",
+                        "code": "UNAUTHORIZED"
+                    }),
+                    status_code=401,
+                    mimetype="application/json",
+                    headers={
+                        "WWW-Authenticate": "Bearer",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                )
+            
+            # Check admin privileges
+            if not user.is_admin():
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Admin access required",
+                        "message": "This endpoint requires admin privileges",
+                        "code": "FORBIDDEN",
+                        "userRole": str(user.role)
+                    }),
+                    status_code=403,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Add user to request context
+            req.user = user  # type: ignore
+            return await f(req)
+            
+        except Exception as e:
+            logger.error(f"Admin authentication middleware error: {e}")
+            return HttpResponse(
+                json.dumps({
+                    "error": "Authentication error",
+                    "message": "Internal authentication error",
+                    "code": "AUTH_ERROR"
+                }),
+                status_code=500,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+    
+    return decorated_function
+
+
+def super_admin_required(f: Callable) -> Callable:
+    """Decorator to require super admin privileges for Azure Functions endpoints."""
+    @wraps(f)
+    async def decorated_function(req: HttpRequest) -> HttpResponse:
+        # Check if authentication is enabled
+        if not os.getenv('ENABLE_AUTH', 'false').lower() == 'true':
+            # Authentication disabled - Development mode
+            # Still validate super admin status using email header for security
+            user_email = req.headers.get('x-user-email')
+            if not user_email:
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Development mode: User email required",
+                        "message": "x-user-email header must be provided in development mode",
+                        "code": "DEV_EMAIL_REQUIRED"
+                    }),
+                    status_code=400,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Check if user is super admin using the role manager
+            if not admin_role_manager.is_super_admin(user_email):
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Super admin access required",
+                        "message": f"User {user_email} does not have super admin privileges",
+                        "code": "FORBIDDEN",
+                        "userRole": str(admin_role_manager.get_user_role(user_email))
+                    }),
+                    status_code=403,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Create a development mode user object
+            dev_user = VedUser(
+                id=user_email,
+                email=user_email,
+                name=user_email,
+                givenName=user_email.split('@')[0],
+                familyName="",
+                permissions=[],
+                vedProfile={},
+                role=admin_role_manager.get_user_role(user_email),
+                user_permissions=admin_role_manager.get_user_permissions(user_email)
+            )
+            
+            req.user = dev_user  # type: ignore
+            return await f(req)
+        
+        try:
+            user = auth_middleware.extract_user_from_request(req)
+            
+            if not user:
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Authentication required",
+                        "message": "Valid access token must be provided for super admin access",
+                        "code": "UNAUTHORIZED"
+                    }),
+                    status_code=401,
+                    mimetype="application/json",
+                    headers={
+                        "WWW-Authenticate": "Bearer",
+                        "Access-Control-Allow-Origin": "*"
+                    }
+                )
+            
+            # Check super admin privileges
+            if not user.is_super_admin():
+                return HttpResponse(
+                    json.dumps({
+                        "error": "Super admin access required",
+                        "message": "This endpoint requires super admin privileges",
+                        "code": "FORBIDDEN",
+                        "userRole": str(user.role)
+                    }),
+                    status_code=403,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Add user to request context
+            req.user = user  # type: ignore
+            return await f(req)
+            
+        except Exception as e:
+            logger.error(f"Super admin authentication middleware error: {e}")
+            return HttpResponse(
+                json.dumps({
+                    "error": "Authentication error",
+                    "message": "Internal authentication error",
+                    "code": "AUTH_ERROR"
+                }),
+                status_code=500,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+    
+    return decorated_function
     
     return decorated_function
 

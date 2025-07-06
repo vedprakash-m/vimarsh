@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 // Context Providers
 import { LanguageProvider } from './contexts/LanguageContext';
+import { AdminProvider } from './contexts/AdminContext';
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -75,28 +76,30 @@ function App() {
     <div className="App">
       <MsalProvider instance={msalInstance}>
         <LanguageProvider>
-          <Router>
-            <Routes>
-              {/* Landing Page - Public Route */}
-              <Route path="/" element={<LandingPage />} />
-              
-              {/* Authentication Callback - Public Route */}
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              
-              {/* Spiritual Guidance Interface - Protected Route */}
-              <Route 
-                path="/guidance" 
-                element={
-                  <ProtectedRoute>
-                    <CleanSpiritualInterface />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Fallback Route - Redirect to Landing */}
-              <Route path="*" element={<LandingPage />} />
-            </Routes>
-          </Router>
+          <AdminProvider>
+            <Router>
+              <Routes>
+                {/* Landing Page - Public Route */}
+                <Route path="/" element={<LandingPage />} />
+                
+                {/* Authentication Callback - Public Route */}
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                
+                {/* Spiritual Guidance Interface - Protected Route */}
+                <Route 
+                  path="/guidance" 
+                  element={
+                    <ProtectedRoute>
+                      <CleanSpiritualInterface />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Fallback Route - Redirect to Landing */}
+                <Route path="*" element={<LandingPage />} />
+              </Routes>
+            </Router>
+          </AdminProvider>
         </LanguageProvider>
       </MsalProvider>
     </div>

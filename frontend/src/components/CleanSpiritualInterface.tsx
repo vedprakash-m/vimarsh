@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import { Send, Mic, MicOff, Shield, MessageSquare } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useAdmin } from '../contexts/AdminContext';
+import AdminDashboard from './admin/AdminDashboard';
 import '../styles/spiritual-theme.css';
+import '../styles/admin.css';
 
 interface Message {
   id: string;
@@ -10,11 +13,27 @@ interface Message {
   timestamp: Date;
 }
 
+type AppTab = 'guidance' | 'admin';
+
 export default function CleanSpiritualInterface() {
+  const { user } = useAdmin();
+  const [activeTab, setActiveTab] = useState<AppTab>('guidance');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+
+  // Debug logging for admin user
+  React.useEffect(() => {
+    console.log('🎨 CleanSpiritualInterface - user state:', user);
+    if (user) {
+      console.log('🔍 Admin check details:', {
+        isAdmin: user.isAdmin,
+        role: user.role,
+        email: user.email
+      });
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +59,8 @@ export default function CleanSpiritualInterface() {
       }));
 
       // Call real spiritual guidance API with conversation context
-      const response = await fetch('https://vimarsh-backend-app.azurewebsites.net/api/spiritual_guidance', {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:7071';
+      const response = await fetch(`${apiUrl}/api/spiritual_guidance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,6 +80,8 @@ export default function CleanSpiritualInterface() {
 
       const data = await response.json();
       
+      // Use the response as-is from the backend
+      // The backend should handle inline citations if needed
       const apiResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: data.response,
@@ -104,6 +126,28 @@ export default function CleanSpiritualInterface() {
             <p>Spiritual Guidance</p>
           </div>
         </div>
+        
+        {/* Tab Navigation */}
+        <div className="tab-navigation">
+          <button
+            className={`tab-btn ${activeTab === 'guidance' ? 'active' : ''}`}
+            onClick={() => setActiveTab('guidance')}
+          >
+            <MessageSquare size={18} />
+            <span>Guidance</span>
+          </button>
+          
+          {user?.isAdmin && (
+            <button
+              className={`tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+            >
+              <Shield size={18} />
+              <span>Admin</span>
+            </button>
+          )}
+        </div>
+        
         <button
           className={`voice-btn ${isListening ? 'active' : ''}`}
           onClick={() => setIsListening(!isListening)}
@@ -112,16 +156,21 @@ export default function CleanSpiritualInterface() {
         </button>
       </header>
 
-      {/* Welcome Section */}
-      {messages.length === 0 && (
-        <div className="welcome">
-          <div className="welcome-icon">🏵️</div>
-          <h2>Welcome to Your Spiritual Journey</h2>
-          <p>Ask questions about spirituality, philosophy, and find wisdom from ancient teachings.</p>
-          
-          <div className="quick-prompts">
-            {quickPrompts.map((prompt, index) => (
-              <button
+      {/* Content based on active tab */}
+      {activeTab === 'admin' && user?.isAdmin ? (
+        <AdminDashboard />
+      ) : (
+        <>
+          {/* Welcome Section */}
+          {messages.length === 0 && (
+            <div className="welcome">
+              <div className="welcome-icon">🏵️</div>
+              <h2>Welcome to Your Spiritual Journey</h2>
+              <p>Ask questions about spirituality, philosophy, and find wisdom from ancient teachings.</p>
+              
+              <div className="quick-prompts">
+                {quickPrompts.map((prompt, index) => (
+                  <button
                 key={index}
                 className="prompt-btn"
                 onClick={() => setInputText(prompt)}
@@ -189,6 +238,8 @@ export default function CleanSpiritualInterface() {
           <Send size={16} />
         </button>
       </form>
+        </>
+      )}
     </div>
   );
 }
