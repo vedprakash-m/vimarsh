@@ -504,13 +504,13 @@ export DEFAULT_REQUEST_BUDGET="0.50"
 ### Innovative Two-Resource-Group Architecture
 Vimarsh implements a groundbreaking architecture designed for maximum cost efficiency:
 
-#### Resource Group 1: vimarsh-db-rg (Persistent Resources)
+#### Resource Group 1: vimarsh-persistent-rg (Persistent Resources)
 - **Purpose**: Data retention and persistence through deployment cycles
 - **Resources**: Cosmos DB (vimarsh-db), Key Vault (vimarsh-kv), Storage Account (vimarshstorage)
 - **Cost Behavior**: Always active, minimal storage costs (~$5-10/month)
 - **Strategy**: Preserves all user data, configurations, and spiritual content
 
-#### Resource Group 2: vimarsh-rg (Compute Resources)
+#### Resource Group 2: vimarsh-compute-rg (Compute Resources)
 - **Purpose**: Application execution and user interaction
 - **Resources**: Function App (vimarsh-functions), Static Web App (vimarsh-web), App Insights (vimarsh-insights)
 - **Cost Behavior**: Can be completely deleted during inactive periods
@@ -519,13 +519,13 @@ Vimarsh implements a groundbreaking architecture designed for maximum cost effic
 #### Pause-Resume Operations
 1. **Pause (Cost Savings)**: Delete entire vimarsh-rg resource group
    - Eliminates all compute costs (Functions, hosting, monitoring)
-   - Retains all data in vimarsh-db-rg
+   - Retains all data in vimarsh-persistent-rg
    - Reduces monthly costs to ~$5-10/month
 
 2. **Resume (Restore Service)**: Redeploy compute infrastructure
-   - Recreate vimarsh-rg with identical resource names
+   - Recreate vimarsh-persistent-db with identical resource names
    - Automatically reconnects to existing data
-   - Full service restoration within minutes
+   - Full service restoration within minutesusee
 
 ### Single Environment Production Strategy
 - **Environment Strategy**: Single production environment for cost efficiency

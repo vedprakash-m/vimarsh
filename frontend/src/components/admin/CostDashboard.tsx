@@ -35,7 +35,7 @@ export default function CostDashboard() {
       }
 
       // Always pass the user's email for security verification
-      const dashboardData = await adminService.getCostDashboard(accessToken, user?.email);
+      const dashboardData = await adminService.getCostDashboard(accessToken);
       setData(dashboardData);
     } catch (err) {
       console.error('❌ Cost dashboard fetch failed:', err);

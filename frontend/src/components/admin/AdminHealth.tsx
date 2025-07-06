@@ -20,13 +20,13 @@ export default function AdminHealth() {
         throw new Error('No authenticated account found');
       }
 
-      const accessToken = await instance.acquireTokenSilent({
+      const tokenResponse = await instance.acquireTokenSilent({
         scopes: ['openid', 'profile', 'email'],
         account: accounts[0]
       });
 
       // Always pass the user's email for security verification
-      const healthData = await adminService.getHealthStatus(accessToken.accessToken, user?.email);
+      const healthData = await adminService.getHealthStatus(tokenResponse.accessToken);
       setHealth(healthData);
     } catch (err) {
       console.error('❌ Health status fetch failed:', err);

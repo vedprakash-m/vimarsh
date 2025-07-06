@@ -23,9 +23,9 @@ from core.admin_monitoring import (
     admin_metrics_collector
 )
 from admin.admin_endpoints import (
-    admin_metrics_dashboard,
-    admin_alerts_management,
-    admin_system_maintenance
+    admin_cost_dashboard,
+    admin_system_health,
+    admin_user_management
 )
 from auth.enhanced_auth_middleware import VedUser
 from core.user_roles import UserRole, UserPermissions
@@ -320,7 +320,7 @@ class TestMonitoringEndpoints:
         # Mock authentication
         with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
                   return_value=mock_request.user):
-            response = await admin_metrics_dashboard(mock_request)
+            response = await admin_cost_dashboard(mock_request)
         
         assert response.status_code == 200
         
@@ -360,7 +360,7 @@ class TestMonitoringEndpoints:
         # Mock authentication
         with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
                   return_value=mock_request.user):
-            response = await admin_alerts_management(mock_request)
+            response = await admin_system_health(mock_request)
         
         assert response.status_code == 200
         
@@ -393,7 +393,7 @@ class TestMonitoringEndpoints:
         # Mock authentication
         with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
                   return_value=mock_request.user):
-            response = await admin_system_maintenance(mock_request)
+            response = await admin_user_management(mock_request)
         
         assert response.status_code == 200
         

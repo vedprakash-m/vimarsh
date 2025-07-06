@@ -21,13 +21,12 @@ export default function UserManagement() {
         throw new Error('No authenticated account found');
       }
 
-      const accessToken = await instance.acquireTokenSilent({
+      const tokenResponse = await instance.acquireTokenSilent({
         scopes: ['openid', 'profile', 'email'],
         account: accounts[0]
       });
 
-      // Always pass the user's email for security verification
-      const usersData = await adminService.getUserList(accessToken.accessToken, user?.email);
+      const usersData = await adminService.getUserList(tokenResponse.accessToken);
       setUsers(usersData.users);
     } catch (err) {
       console.error('❌ User list fetch failed:', err);
@@ -45,17 +44,15 @@ export default function UserManagement() {
         throw new Error('No authenticated account found');
       }
 
-      const accessToken = await instance.acquireTokenSilent({
+      const tokenResponse = await instance.acquireTokenSilent({
         scopes: ['openid', 'profile', 'email'],
         account: accounts[0]
       });
 
       if (isBlocked) {
-        // Always pass the user's email for security verification
-        await adminService.unblockUser(userId, accessToken.accessToken, user?.email);
+        await adminService.unblockUser(userId, tokenResponse.accessToken);
       } else {
-        // Always pass the user's email for security verification
-        await adminService.blockUser(userId, accessToken.accessToken, user?.email);
+        await adminService.blockUser(userId, tokenResponse.accessToken);
       }
 
       // Refresh user list

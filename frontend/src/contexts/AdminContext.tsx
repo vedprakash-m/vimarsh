@@ -79,7 +79,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         
         try {
           // Use the actual logged-in user's email for admin check
-          const roleResponse = await adminService.getUserRole(undefined, userEmail);
+          const roleResponse = await adminService.getUserRole(undefined);
           console.log('🔍 Raw role response for', userEmail, ':', roleResponse);
           
           const adminUser: AdminUser = {
@@ -138,13 +138,13 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       // Production mode - use MSAL with proper tokens
       try {
         // Get access token
-        const accessToken = await instance.acquireTokenSilent({
+        const tokenResponse = await instance.acquireTokenSilent({
           scopes: ['openid', 'profile', 'email'],
           account
         });
 
         // Check user role with backend using access token
-        const roleResponse = await adminService.getUserRole(accessToken.accessToken);
+        const roleResponse = await adminService.getUserRole(tokenResponse.accessToken);
         
         const adminUser: AdminUser = {
           id: account.homeAccountId,
