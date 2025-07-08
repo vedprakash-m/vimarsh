@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database Migration Script for Vimarsh
+Database Migration Script for Vimarsh - PRODUCTION SAFE VERSION
 Initializes Cosmos DB with production-aligned structure and default data
 
 Production Setup:
@@ -8,9 +8,11 @@ Production Setup:
 - Containers: spiritual-texts, conversations
 
 This script initializes:
-1. Default personality configurations (Krishna, Buddha, etc.)
-2. Sample spiritual texts with personality associations
+1. Default personality configurations (Krishna, Buddha, etc.) - ONLY IF MISSING
+2. Sample spiritual texts with personality associations - ONLY IF MISSING
 3. Database structure validation
+4. NEVER deletes or modifies existing data
+5. Creates backup before any changes
 """
 
 import asyncio
@@ -36,8 +38,8 @@ from services.database_service import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class DatabaseMigration:
-    """Database migration for comprehensive Vimarsh setup with production safety"""
+class SafeDatabaseMigration:
+    """Production-safe database migration for Vimarsh"""
     
     def __init__(self):
         self.db = db_service
@@ -47,11 +49,11 @@ class DatabaseMigration:
         
     async def run_migration(self):
         """Run complete database migration with safety checks"""
-        logger.info("🚀 Starting Vimarsh database migration...")
+        logger.info("🚀 Starting PRODUCTION-SAFE Vimarsh database migration...")
         
         if self.is_production:
             logger.warning("🔥 PRODUCTION ENVIRONMENT DETECTED!")
-            logger.warning("This migration will only ADD new data, never DELETE or MODIFY existing data")
+            logger.warning("This migration will ONLY ADD new data, NEVER DELETE or MODIFY existing data")
             await self.confirm_production_migration()
         
         if self.dry_run:
@@ -246,73 +248,42 @@ class DatabaseMigration:
                 logger.info(f"✅ Created personality: {personality.displayName}")
             else:
                 logger.warning(f"⚠️ Failed to create personality: {personality.displayName}")
-                vectorNamespace="jesus",
-                isActive=True
-            ),
-            PersonalityConfig(
-                id="lao_tzu_config",
-                personalityName="lao_tzu",
-                displayName="Lao Tzu",
-                description="Ancient Chinese philosopher and founder of Taoism, teaching about the Way",
-                systemPrompt="""You are Lao Tzu, sage of the Tao. Share wisdom about wu wei, 
-                natural harmony, and the Way that cannot be named.""",
-                associatedBooks=["Tao Te Ching", "Zhuangzi"],
-                vectorNamespace="lao_tzu",
-                isActive=True
-            ),
-            PersonalityConfig(
-                id="rumi_config",
-                personalityName="rumi",
-                displayName="Rumi",
-                description="Sufi mystic poet, teaching about divine love and spiritual union",
-                systemPrompt="""You are Rumi, the Sufi mystic poet. Share wisdom about divine love, 
-                spiritual union, and the journey of the soul to the Beloved.""",
-                associatedBooks=["Masnavi", "Divan-e Shams-e Tabrizi"],
-                vectorNamespace="rumi",
-                isActive=True
-            )
-        ]
-        
-        for personality in personalities:
-            success = await self.db.save_personality_config(personality)
-            if success:
-                logger.info(f"✅ Saved personality: {personality.displayName}")
-            else:
-                logger.warning(f"⚠️ Failed to save personality: {personality.displayName}")
     
     async def init_enhanced_spiritual_texts(self):
-        """Initialize enhanced spiritual texts with personality associations"""
+        """Initialize enhanced spiritual texts (only if missing)"""
         logger.info("📚 Initializing enhanced spiritual texts...")
         
         enhanced_texts = [
             # Krishna texts
             EnhancedSpiritualText(
-                id="krishna_bg_2_47",
-                title="On Duty Without Attachment",
-                content="You have a right to perform your prescribed duty, but not to the fruits of action. Never consider yourself to be the cause of the results of your activities, and never be attached to not doing your duty.",
+                id="bg_2_47",
+                title="Right to Action, Not to Fruits",
+                content="कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
                 source="Bhagavad Gita",
                 chapter="2",
                 verse="47",
-                category="dharma",
+                category="karma",
                 personality="krishna",
-                vectorNamespace="krishna"
+                vectorNamespace="krishna",
+                englishTranslation="You have the right to perform your prescribed duty, but not to the fruits of action. Never consider yourself the cause of the results of your activities, and never be attached to not doing your duty."
             ),
             EnhancedSpiritualText(
-                id="krishna_bg_6_19",
-                title="Steady Mind in Meditation", 
-                content="As a lamp in a windless place does not waver, so the transcendentalist, whose mind is controlled, remains always steady in his meditation on the transcendent Self.",
+                id="bg_18_66",
+                title="Surrender to the Divine",
+                content="सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज। अहं त्वां सर्वपापेभ्यो मोक्षयिष्यामि मा शुचः॥",
                 source="Bhagavad Gita",
-                chapter="6",
-                verse="19",
-                category="meditation",
+                chapter="18",
+                verse="66",
+                category="surrender",
                 personality="krishna",
-                vectorNamespace="krishna"
+                vectorNamespace="krishna",
+                englishTranslation="Abandon all varieties of religion and just surrender unto Me. I shall deliver you from all sinful reactions. Do not fear."
             ),
             
             # Buddha texts
             EnhancedSpiritualText(
-                id="buddha_dhp_1",
-                title="Mind is Everything",
+                id="dhammapada_1",
+                title="The Mind is Everything",
                 content="All that we are is the result of what we have thought. The mind is everything. What we think we become.",
                 source="Dhammapada",
                 chapter="1",
@@ -321,23 +292,12 @@ class DatabaseMigration:
                 personality="buddha",
                 vectorNamespace="buddha"
             ),
-            EnhancedSpiritualText(
-                id="buddha_dhp_183",
-                title="The Teaching of All Buddhas",
-                content="Avoid all evil, cultivate good, purify your mind - this is the teaching of all the Buddhas.",
-                source="Dhammapada",
-                chapter="14",
-                verse="183",
-                category="ethics",
-                personality="buddha",
-                vectorNamespace="buddha"
-            ),
             
             # Jesus texts
             EnhancedSpiritualText(
-                id="jesus_mt_5_44",
+                id="matthew_5_44",
                 title="Love Your Enemies",
-                content="But I tell you, love your enemies and pray for those who persecute you, that you may be children of your Father in heaven.",
+                content="But I tell you, love your enemies and pray for those who persecute you.",
                 source="Gospel of Matthew",
                 chapter="5",
                 verse="44",
@@ -374,14 +334,23 @@ class DatabaseMigration:
         ]
         
         for text in enhanced_texts:
+            # Check if text already exists
+            if await self.check_data_exists("text", text.id):
+                logger.info(f"⏭️  Text already exists: {text.title}")
+                continue
+                
+            if self.dry_run:
+                logger.info(f"🔍 DRY RUN: Would create text: {text.title} ({text.personality})")
+                continue
+                
             success = await self.db.save_enhanced_spiritual_text(text)
             if success:
-                logger.info(f"✅ Saved enhanced text: {text.title} ({text.personality})")
+                logger.info(f"✅ Created text: {text.title} ({text.personality})")
             else:
-                logger.warning(f"⚠️ Failed to save text: {text.title}")
+                logger.warning(f"⚠️ Failed to create text: {text.title}")
     
     async def init_sample_admin_data(self):
-        """Initialize sample admin data for testing"""
+        """Initialize sample admin data for testing - DEVELOPMENT ONLY"""
         logger.info("📊 Initializing sample admin data...")
         
         # Sample user stats
@@ -403,9 +372,12 @@ class DatabaseMigration:
             isBlocked=False
         )
         
-        success = await self.db.save_user_stats(sample_stats)
-        if success:
-            logger.info("✅ Saved sample user stats")
+        if self.dry_run:
+            logger.info("🔍 DRY RUN: Would create sample user stats")
+        else:
+            success = await self.db.save_user_stats(sample_stats)
+            if success:
+                logger.info("✅ Created sample user stats")
         
         # Sample usage record
         sample_usage = UsageRecord(
@@ -424,9 +396,12 @@ class DatabaseMigration:
             personality="krishna"
         )
         
-        success = await self.db.save_usage_record(sample_usage)
-        if success:
-            logger.info("✅ Saved sample usage record")
+        if self.dry_run:
+            logger.info("🔍 DRY RUN: Would create sample usage record")
+        else:
+            success = await self.db.save_usage_record(sample_usage)
+            if success:
+                logger.info("✅ Created sample usage record")
         
         # Sample conversation
         sample_conversation = Conversation(
@@ -447,9 +422,12 @@ class DatabaseMigration:
             }
         )
         
-        success = await self.db.save_conversation(sample_conversation)
-        if success:
-            logger.info("✅ Saved sample conversation")
+        if self.dry_run:
+            logger.info("🔍 DRY RUN: Would create sample conversation")
+        else:
+            success = await self.db.save_conversation(sample_conversation)
+            if success:
+                logger.info("✅ Created sample conversation")
     
     async def validate_database(self):
         """Validate database structure and data"""
@@ -476,17 +454,17 @@ class DatabaseMigration:
 
 async def main():
     """Run the database migration"""
-    migration = DatabaseMigration()
+    migration = SafeDatabaseMigration()
     await migration.run_migration()
 
 if __name__ == "__main__":
     # Check if we're in the correct environment
-    print("🚀 Vimarsh Database Migration")
-    print("=" * 50)
+    print("🚀 Vimarsh PRODUCTION-SAFE Database Migration")
+    print("=" * 60)
     print(f"Environment: {'Production' if db_service.is_cosmos_enabled else 'Development'}")
     print(f"Database: vimarsh-db")
     print(f"Containers: spiritual-texts, conversations")
-    print("=" * 50)
+    print("=" * 60)
     
     # Run migration
     asyncio.run(main())

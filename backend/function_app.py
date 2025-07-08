@@ -1182,6 +1182,77 @@ if ADMIN_AVAILABLE:
                 status_code=503,
                 mimetype="application/json"
             )
+
+    @app.function_name("admin_dev_token")
+    @app.route(route="vimarsh-admin/dev-token", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_dev_token_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Generate development token for specific user - Development mode only."""
+        try:
+            # Only allow in development mode
+            if os.getenv('ENVIRONMENT', 'production') != 'development':
+                return func.HttpResponse(
+                    json.dumps({"error": "Development tokens only available in development mode"}),
+                    status_code=403,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Parse request body
+            try:
+                req_body = req.get_json()
+                user_email = req_body.get('email')
+                if not user_email:
+                    return func.HttpResponse(
+                        json.dumps({"error": "Email is required"}),
+                        status_code=400,
+                        mimetype="application/json",
+                        headers={"Access-Control-Allow-Origin": "*"}
+                    )
+            except Exception:
+                return func.HttpResponse(
+                    json.dumps({"error": "Invalid JSON body"}),
+                    status_code=400,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Use simple dev token format: dev:email:timestamp:signature
+            import hashlib
+            import hmac
+            from datetime import datetime
+            
+            dev_secret = os.getenv('DEV_AUTH_SECRET', 'dev-secret-change-in-production')
+            timestamp = str(int(datetime.utcnow().timestamp()))
+            payload = f"{user_email}:{timestamp}"
+            signature = hmac.new(
+                dev_secret.encode(),
+                payload.encode(),
+                hashlib.sha256
+            ).hexdigest()
+            
+            dev_token = f"dev:{user_email}:{timestamp}:{signature}"
+            
+            logger.info(f"🔑 Generated development token for user: {user_email}")
+            
+            return func.HttpResponse(
+                json.dumps({
+                    "token": dev_token,
+                    "email": user_email,
+                    "expires_in": "24h"
+                }),
+                status_code=200,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+            
+        except Exception as e:
+            logger.error(f"Error generating development token: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": f"Token generation failed: {str(e)}"}),
+                status_code=500,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
 else:
     @app.function_name("admin_unavailable")
     @app.route(route="vimarsh-admin/{*route}", methods=["GET", "POST"])

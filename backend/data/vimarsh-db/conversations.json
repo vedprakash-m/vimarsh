@@ -292,5 +292,53 @@
     "responseQuality": "high",
     "personality": "krishna",
     "type": "usage_tracking"
+  },
+  {
+    "id": "conv_dev_user_1_20250707_214227",
+    "userId": "dev_user_1",
+    "userEmail": "dev@example.com",
+    "sessionId": "session_dev_user_1",
+    "timestamp": "2025-07-07T21:42:27.709305",
+    "question": "What are the different paths of yoga and which one suits me?",
+    "response": "Dear soul,  the paths of Yoga—Karma, Bhakti, Jnana, and Raja—all lead to union with the Divine.  The best path is the one that resonates most deeply with your heart.\n\nAs I teach in Bhagavad Gita 18.46: **योगः कर्मसु कौशलम्** (*yogaḥ karmasu kauśalam*) - Yoga is skill in action.\n\nFind your path through dedicated practice and self-reflection. May you find your way. 🕉️\n",
+    "citations": [
+      "Bhagavad Gita 18.46"
+    ],
+    "personality": "krishna",
+    "metadata": {
+      "language": "English",
+      "confidence": 0.7,
+      "model": "gemini-2.5-flash",
+      "tokens": 850,
+      "cost": 0.000533,
+      "responseTime": 5.462763071060181,
+      "voiceEnabled": false,
+      "includeCitations": true
+    },
+    "type": "conversation"
+  },
+  {
+    "id": "conv_dev_user_1_20250707_214325",
+    "userId": "dev_user_1",
+    "userEmail": "dev@example.com",
+    "sessionId": "session_dev_user_1",
+    "timestamp": "2025-07-07T21:43:25.408633",
+    "question": "What are the different paths of yoga and which one suits me?",
+    "response": "Dear soul,  the path of yoga best suited for you depends on your nature.  There are four primary paths: Karma, Bhakti, Jnana, and Raja Yoga.\n\nAs I teach in Bhagavad Gita 18.46: **कर्मण्यकर्म यः पश्येदकर्मणि च कर्म यः।।स बुद्धिमान्मनुष्येषु स युक्तः कृत्स्नकर्मकृत्** (*karmaṇy akarma yaḥ paśyed akarmaṇi ca karma yaḥ || sa buddhimān manuṣyeṣu sa yuktaḥ kṛtsnakarmakṛt*) - He who sees inaction in action and action in inaction, is wise among men; he is a yogi, a doer of all actions.\n\nReflect on your strengths and inclinations to discover your natural path. May your journey be blessed. 🕉️\n",
+    "citations": [
+      "Bhagavad Gita 18.46"
+    ],
+    "personality": "krishna",
+    "metadata": {
+      "language": "English",
+      "confidence": 0.7,
+      "model": "gemini-2.5-flash",
+      "tokens": 933,
+      "cost": 0.0006575000000000001,
+      "responseTime": 1.9392518997192383,
+      "voiceEnabled": false,
+      "includeCitations": true
+    },
+    "type": "conversation"
   }
 ]

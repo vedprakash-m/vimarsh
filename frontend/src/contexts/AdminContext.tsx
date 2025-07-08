@@ -78,8 +78,26 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('🔧 Development mode: Checking admin status for actual user');
         
         try {
-          // Use the actual logged-in user's email for admin check
-          const roleResponse = await adminService.getUserRole(undefined);
+          // Generate a development token for the specific logged-in user
+          const devTokenResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/vimarsh-admin/dev-token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: userEmail })
+          });
+          
+          let userSpecificToken = undefined;
+          if (devTokenResponse.ok) {
+            const tokenData = await devTokenResponse.json();
+            userSpecificToken = tokenData.token;
+            console.log('🔑 Generated user-specific dev token for', userEmail);
+          } else {
+            console.warn('⚠️ Could not generate user-specific token, using generic token');
+          }
+          
+          // Use the user-specific token for admin check
+          const roleResponse = await adminService.getUserRole(userSpecificToken);
           console.log('🔍 Raw role response for', userEmail, ':', roleResponse);
           
           const adminUser: AdminUser = {
