@@ -102,7 +102,7 @@ class ConfigManager:
                 "ENVIRONMENT": "development",
                 "DEBUG": "true",
                 "AZURE_COSMOS_CONNECTION_STRING": "dev-mode-local-storage",
-                "GEMINI_API_KEY": "AIzaSyATbCT4AKDLRzqWc7LPxP9dVFykQ-b6DD4",
+                "GEMINI_API_KEY": "Gemini-Key",
                 "AZURE_STORAGE_CONNECTION_STRING": "",
                 "GOOGLE_CLOUD_PROJECT": "",
                 "AUTH_DEVELOPMENT_MODE": "true",
