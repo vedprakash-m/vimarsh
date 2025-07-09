@@ -10,7 +10,7 @@
     "AZURE_COSMOS_CONTAINER_NAME": "spiritual_texts",
     "AZURE_STORAGE_CONNECTION_STRING": "",
     
-    "GEMINI_API_KEY": "AIzaSyATbCT4AKDLRzqWc7LPxP9dVFykQ-b6DD4",
+    "GEMINI_API_KEY": "GEMINI-KEY",
     "GOOGLE_CLOUD_PROJECT": "",
     
     "LLM_MODEL": "gemini-2.5-flash",
