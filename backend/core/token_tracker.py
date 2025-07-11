@@ -13,12 +13,21 @@ from collections import defaultdict
 import os
 import asyncio
 
-# Import database service for persistent storage
+# Import database service and transaction manager for persistent storage
 try:
     from services.database_service import db_service, UsageRecord, UserStats
+    from services.transaction_manager import transaction_manager, atomic_token_operation
     DATABASE_AVAILABLE = True
+    TRANSACTION_MANAGER_AVAILABLE = True
 except ImportError:
     DATABASE_AVAILABLE = False
+    TRANSACTION_MANAGER_AVAILABLE = False
+    
+    # Fallback UserStats class for when database service is not available
+    class UserStats:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +124,7 @@ class TokenUsageTracker:
                     request_type: str = 'spiritual_guidance',
                     response_quality: str = 'high',
                     personality: str = 'krishna') -> TokenUsage:
-        """Record a new token usage event with database persistence"""
+        """Record a new token usage event with atomic database persistence"""
         
         total_tokens = input_tokens + output_tokens
         cost_usd = self.calculate_cost(model, input_tokens, output_tokens)
@@ -139,8 +148,11 @@ class TokenUsageTracker:
         self._update_user_stats(usage)
         self._update_session_stats(usage)
         
-        # Save to database asynchronously
-        if DATABASE_AVAILABLE:
+        # Save to database with atomic transaction
+        if DATABASE_AVAILABLE and TRANSACTION_MANAGER_AVAILABLE:
+            asyncio.create_task(self._save_usage_atomic(usage, personality))
+        elif DATABASE_AVAILABLE:
+            # Fallback to non-atomic save
             asyncio.create_task(self._save_usage_to_db(usage, personality))
         
         logger.info(f"💰 Token usage recorded - User: {user_email}, Tokens: {total_tokens}, Cost: ${cost_usd:.4f}")
@@ -173,6 +185,111 @@ class TokenUsageTracker:
         except Exception as e:
             logger.error(f"Failed to save usage record to database: {e}")
     
+    async def _save_usage_atomic(self, usage: TokenUsage, personality: str):
+        """Save usage record and user stats atomically using transaction manager"""
+        try:
+            # Convert to database format
+            usage_record = UsageRecord(
+                id=f"usage_{usage.user_id}_{usage.timestamp.strftime('%Y%m%d_%H%M%S')}",
+                userId=usage.user_id,
+                userEmail=usage.user_email,
+                sessionId=usage.session_id,
+                timestamp=usage.timestamp.isoformat(),
+                model=usage.model,
+                inputTokens=usage.input_tokens,
+                outputTokens=usage.output_tokens,
+                totalTokens=usage.total_tokens,
+                costUsd=usage.cost_usd,
+                requestType=usage.request_type,
+                responseQuality=usage.response_quality,
+                personality=personality
+            )
+            
+            # Generate updated user stats
+            user_stats = await self._generate_user_stats(usage.user_id, usage.user_email, personality)
+            
+            # Save both records atomically
+            await atomic_token_operation(usage_record, user_stats)
+            logger.debug(f"🔄 Atomic save completed for user: {usage.user_id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Atomic save failed for usage record: {e}")
+            # Fallback to non-atomic save
+            await self._save_usage_to_db(usage, personality)
+    
+    async def _generate_user_stats(self, user_id: str, user_email: str, personality: str) -> UserStats:
+        """Generate user statistics for atomic save"""
+        try:
+            # Get current stats from database
+            current_stats = await db_service.get_user_stats(user_id)
+            
+            # Calculate new stats from in-memory data
+            user_usage = [u for u in self.usage_records if u.user_id == user_id]
+            
+            if not user_usage:
+                raise ValueError(f"No usage data found for user: {user_id}")
+            
+            total_tokens = sum(u.total_tokens for u in user_usage)
+            total_cost = sum(u.cost_usd for u in user_usage)
+            
+            # Current month calculations
+            current_month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            current_month_usage = [u for u in user_usage if u.timestamp >= current_month_start]
+            
+            current_month_tokens = sum(u.total_tokens for u in current_month_usage)
+            current_month_cost = sum(u.cost_usd for u in current_month_usage)
+            
+            # Calculate personality usage
+            personality_counts = {}
+            for u in user_usage:
+                # Use the personality from current request or default
+                p = getattr(u, 'personality', personality)
+                personality_counts[p] = personality_counts.get(p, 0) + 1
+            
+            # Calculate quality breakdown
+            quality_counts = {}
+            for u in user_usage:
+                quality_counts[u.response_quality] = quality_counts.get(u.response_quality, 0) + 1
+            
+            if current_stats:
+                # Update existing stats
+                current_stats.totalRequests = len(user_usage)
+                current_stats.totalTokens = total_tokens
+                current_stats.totalCostUsd = total_cost
+                current_stats.currentMonthTokens = current_month_tokens
+                current_stats.currentMonthCostUsd = current_month_cost
+                current_stats.lastRequest = max(u.timestamp for u in user_usage).isoformat()
+                current_stats.avgTokensPerRequest = total_tokens / len(user_usage)
+                current_stats.updatedAt = datetime.utcnow().isoformat()
+                current_stats.personalityUsage = personality_counts
+                current_stats.qualityBreakdown = quality_counts
+                
+                return current_stats
+            else:
+                # Create new stats
+                return UserStats(
+                    id=f"stats_{user_id}",
+                    userId=user_id,
+                    userEmail=user_email,
+                    totalRequests=len(user_usage),
+                    totalTokens=total_tokens,
+                    totalCostUsd=total_cost,
+                    currentMonthTokens=current_month_tokens,
+                    currentMonthCostUsd=current_month_cost,
+                    lastRequest=max(u.timestamp for u in user_usage).isoformat(),
+                    avgTokensPerRequest=total_tokens / len(user_usage),
+                    favoriteModel=max(set(u.model for u in user_usage), key=lambda x: [u.model for u in user_usage].count(x)),
+                    personalityUsage=personality_counts,
+                    qualityBreakdown=quality_counts,
+                    riskScore=0.0,
+                    isBlocked=False,
+                    blockReason=None
+                )
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to generate user stats: {e}")
+            raise
+
     async def _update_user_stats_in_db(self, user_id: str, user_email: str):
         """Update user statistics in database"""
         try:

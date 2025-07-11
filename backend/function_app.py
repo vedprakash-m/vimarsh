@@ -19,9 +19,9 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 import asyncio
 
-# Import centralized configuration
+# Import unified configuration system
 try:
-    from backend.core.config import get_config
+    from config.unified_config import get_config, is_development_mode, is_production_mode
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False
@@ -48,11 +48,13 @@ else:
 
 # Import authentication middleware
 try:
-    from auth.enhanced_auth_middleware import auth_required, optional_auth, VedUser
+    from auth.unified_auth_service import auth_service, require_auth, require_admin, AuthenticatedUser
+    from auth.models import AuthenticatedUser
     AUTHENTICATION_ENABLED = True
-except ImportError:
+    logger.info("✅ Unified authentication service loaded successfully")
+except ImportError as e:
     AUTHENTICATION_ENABLED = False
-    logger.warning("Authentication modules not available, running without auth")
+    logger.warning(f"⚠️ Authentication modules not available, running without auth: {e}")
 
 # Initialize Azure Functions app
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -84,12 +86,15 @@ async def health_check_impl(req: func.HttpRequest) -> func.HttpResponse:
             )
         else:
             # Fallback to simple health check
+            config = get_config() if CONFIG_AVAILABLE else None
+            environment = config.environment.value if config else "unknown"
+            
             health_status = {
                 "status": "healthy",
                 "service": "vimarsh-spiritual-guidance",
                 "version": "1.0.0",
                 "timestamp": datetime.utcnow().isoformat(),
-                "environment": os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "unknown"),
+                "environment": environment,
                 "monitoring": "basic"
             }
             
@@ -1017,7 +1022,11 @@ try:
         admin_budget_management,
         super_admin_role_management,
         admin_system_health,
-        admin_get_user_role
+        admin_get_user_role,
+        admin_metrics_dashboard,
+        admin_performance_report,
+        admin_real_time_metrics,
+        admin_alerts_dashboard
     )
     ADMIN_AVAILABLE = True
     logger.info("✅ Admin endpoints loaded successfully")
@@ -1028,9 +1037,10 @@ except ImportError as e:
 # Register admin endpoints if available
 if ADMIN_AVAILABLE:
     @app.function_name("admin_cost_dashboard")
-    @app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin cost dashboard endpoint - Requires authentication."""
+        """Admin cost dashboard endpoint - Requires admin authentication."""
         try:
             return await admin_cost_dashboard(req)
         except Exception as e:
@@ -1044,9 +1054,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_user_list")
-    @app.route(route="vimarsh-admin/users", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/users", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_user_list_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin user list endpoint - Requires authentication."""
+        """Admin user list endpoint - Requires admin authentication."""
         try:
             return await admin_user_management(req)
         except Exception as e:
@@ -1058,9 +1069,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_user_block")
-    @app.route(route="vimarsh-admin/users/{user_id}/block", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/users/{user_id}/block", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_user_block_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin user block endpoint - Requires authentication."""
+        """Admin user block endpoint - Requires admin authentication."""
         try:
             return await admin_user_management(req)
         except Exception as e:
@@ -1072,9 +1084,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_user_unblock")
-    @app.route(route="vimarsh-admin/users/{user_id}/unblock", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/users/{user_id}/unblock", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_user_unblock_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin user unblock endpoint - Requires authentication."""
+        """Admin user unblock endpoint - Requires admin authentication."""
         try:
             return await admin_user_management(req)
         except Exception as e:
@@ -1086,9 +1099,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_budget_list")
-    @app.route(route="vimarsh-admin/budgets", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/budgets", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_budget_list_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin budget list endpoint - Requires authentication."""
+        """Admin budget list endpoint - Requires admin authentication."""
         try:
             return await admin_budget_management(req)
         except Exception as e:
@@ -1100,9 +1114,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_budget_create")
-    @app.route(route="vimarsh-admin/budgets", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/budgets", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_budget_create_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin budget create endpoint - Requires authentication."""
+        """Admin budget create endpoint - Requires admin authentication."""
         try:
             return await admin_budget_management(req)
         except Exception as e:
@@ -1114,9 +1129,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_budget_override")
-    @app.route(route="vimarsh-admin/budgets/{user_id}/override", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/budgets/{user_id}/override", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_budget_override_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin budget override endpoint - Requires authentication."""
+        """Admin budget override endpoint - Requires admin authentication."""
         try:
             return await admin_budget_management(req)
         except Exception as e:
@@ -1128,9 +1144,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("super_admin_role_list")
-    @app.route(route="vimarsh-admin/roles", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/roles", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def super_admin_role_list_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Super admin role list endpoint - Requires authentication."""
+        """Super admin role list endpoint - Requires admin authentication."""
         try:
             return await super_admin_role_management(req)
         except Exception as e:
@@ -1142,9 +1159,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("super_admin_role_create")
-    @app.route(route="vimarsh-admin/roles", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/roles", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def super_admin_role_create_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Super admin role create endpoint - Requires authentication."""
+        """Super admin role create endpoint - Requires admin authentication."""
         try:
             return await super_admin_role_management(req)
         except Exception as e:
@@ -1156,9 +1174,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_system_health")
-    @app.route(route="vimarsh-admin/health", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_system_health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin system health endpoint - Requires authentication."""
+        """Admin system health endpoint - Requires admin authentication."""
         try:
             return await admin_system_health(req)
         except Exception as e:
@@ -1170,9 +1189,10 @@ if ADMIN_AVAILABLE:
             )
 
     @app.function_name("admin_get_role")
-    @app.route(route="vimarsh-admin/role", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+    @app.route(route="vimarsh-admin/role", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
     async def admin_get_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-        """Admin get user role endpoint - Requires authentication."""
+        """Admin get user role endpoint - Requires admin authentication."""
         try:
             return await admin_get_user_role(req)
         except Exception as e:
@@ -1253,6 +1273,36 @@ if ADMIN_AVAILABLE:
                 mimetype="application/json",
                 headers={"Access-Control-Allow-Origin": "*"}
             )
+    @app.function_name("admin_real_time_metrics")
+    @app.route(route="vimarsh-admin/real-time-metrics", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_real_time_metrics_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin real-time metrics endpoint - Requires admin authentication."""
+        try:
+            return await admin_real_time_metrics(req)
+        except Exception as e:
+            logger.error(f"Error in admin real-time metrics: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Real-time metrics service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_alerts_dashboard")
+    @app.route(route="vimarsh-admin/alerts", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_alerts_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin alerts dashboard endpoint - Requires admin authentication."""
+        try:
+            return await admin_alerts_dashboard(req)
+        except Exception as e:
+            logger.error(f"Error in admin alerts dashboard: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Alerts dashboard service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
 else:
     @app.function_name("admin_unavailable")
     @app.route(route="vimarsh-admin/{*route}", methods=["GET", "POST"])

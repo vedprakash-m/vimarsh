@@ -27,7 +27,7 @@ from admin.admin_endpoints import (
     admin_system_health,
     admin_user_management
 )
-from auth.enhanced_auth_middleware import VedUser
+from auth.unified_auth_service import AuthenticatedUser
 from core.user_roles import UserRole, UserPermissions
 from azure.functions import HttpRequest
 
@@ -220,14 +220,13 @@ class TestAdminMonitoringDecorator:
         
         # Create mock request with user
         mock_request = Mock()
-        mock_request.user = VedUser(
+        mock_request.user = AuthenticatedUser(
             id="test-user",
             email="admin@example.com",
             name="Test Admin",
-            givenName="Test",
-            familyName="Admin",
+            given_name="Test",
+            family_name="Admin",
             permissions=[],
-            vedProfile={},
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
@@ -255,14 +254,13 @@ class TestAdminMonitoringDecorator:
             raise ValueError("Test error message")
         
         mock_request = Mock()
-        mock_request.user = VedUser(
+        mock_request.user = AuthenticatedUser(
             id="test-user",
             email="error@example.com",
             name="Error Admin",
-            givenName="Error",
-            familyName="Admin",
+            given_name="Error",
+            family_name="Admin",
             permissions=[],
-            vedProfile={},
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
@@ -303,22 +301,25 @@ class TestMonitoringEndpoints:
         
         # Create mock request
         mock_request = Mock()
-        mock_request.user = VedUser(
+        mock_request.user = AuthenticatedUser(
             id="admin-user",
             email="admin@example.com",
             name="Admin User",
-            givenName="Admin",
-            familyName="User",
+            given_name="Admin",
+            family_name="User",
             permissions=[],
-            vedProfile={},
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
         mock_request.method = "GET"
         mock_request.params = {"hours": "24"}
+        mock_request.headers = {"X-Forwarded-For": "192.168.1.1"}
+        mock_request.url = "/admin/cost-dashboard"
+        mock_request.route_params = {}
+        mock_request.get_json = Mock(return_value={})
         
         # Mock authentication
-        with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
+        with patch('auth.unified_auth_service.auth_service.authenticate_request', 
                   return_value=mock_request.user):
             response = await admin_cost_dashboard(mock_request)
         
@@ -343,14 +344,13 @@ class TestMonitoringEndpoints:
         )
         
         mock_request = Mock()
-        mock_request.user = VedUser(
+        mock_request.user = AuthenticatedUser(
             id="admin-user",
             email="admin@example.com",
             name="Admin User",
-            givenName="Admin",
-            familyName="User",
+            given_name="Admin",
+            family_name="User",
             permissions=[],
-            vedProfile={},
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
@@ -358,7 +358,7 @@ class TestMonitoringEndpoints:
         mock_request.params = {"limit": "10"}
         
         # Mock authentication
-        with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
+        with patch('auth.unified_auth_service.auth_service.authenticate_request', 
                   return_value=mock_request.user):
             response = await admin_system_health(mock_request)
         
@@ -374,14 +374,13 @@ class TestMonitoringEndpoints:
     async def test_admin_system_maintenance(self):
         """Test system maintenance endpoint"""
         mock_request = Mock()
-        mock_request.user = VedUser(
+        mock_request.user = AuthenticatedUser(
             id="admin-user",
             email="admin@example.com",
             name="Admin User",
-            givenName="Admin",
-            familyName="User",
+            given_name="Admin",
+            family_name="User",
             permissions=[],
-            vedProfile={},
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
@@ -391,7 +390,7 @@ class TestMonitoringEndpoints:
         }
         
         # Mock authentication
-        with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
+        with patch('auth.unified_auth_service.auth_service.authenticate_request', 
                   return_value=mock_request.user):
             response = await admin_user_management(mock_request)
         

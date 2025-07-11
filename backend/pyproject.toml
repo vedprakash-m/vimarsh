@@ -15,7 +15,8 @@ markers = [
     "spiritual: Tests specifically for spiritual content validation",
     "voice: Tests for voice interface components",
     "rag: Tests for RAG pipeline components",
-    "llm: Tests for LLM integration components"
+    "llm: Tests for LLM integration components",
+    "asyncio: Async test support"
 ]
 
 # Test execution options
@@ -159,3 +160,15 @@ module = [
     "sentence_transformers.*"
 ]
 ignore_missing_imports = true
+
+# Python package configuration
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+
+[tool.setuptools.package-dir]
+"" = "."
+
+# Python path configuration for development
+[tool.python-path]
+paths = ["."]

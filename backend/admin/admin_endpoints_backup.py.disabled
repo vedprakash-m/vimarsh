@@ -10,7 +10,7 @@ from azure.functions import HttpRequest, HttpResponse
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
 
-from auth.enhanced_auth_middleware import admin_required, super_admin_required
+from auth.unified_auth_service import admin_required, super_admin_required, AuthenticatedUser
 from core.token_tracker import token_tracker
 from core.budget_validator import budget_validator
 from core.user_roles import admin_role_manager

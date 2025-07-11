@@ -4,7 +4,7 @@ Admin role management endpoint
 import json
 import logging
 from azure.functions import HttpRequest, HttpResponse
-from ..auth.entra_external_id_middleware import admin_required
+from ..auth.unified_auth_service import admin_required
 from ..core.user_roles import admin_role_manager
 
 logger = logging.getLogger(__name__)

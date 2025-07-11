@@ -20,7 +20,8 @@ os.environ['SUPER_ADMIN_EMAILS'] = 'superadmin@test.com'
 
 # Import the components we need to test
 from core import token_tracker, budget_validator, admin_role_manager
-from auth.enhanced_auth_middleware import VedUser, UserRole, UserPermissions
+from auth.unified_auth_service import AuthenticatedUser, auth_service
+from core.user_roles import UserRole, UserPermissions
 from admin import (
     admin_cost_dashboard,
     admin_user_management,
@@ -40,9 +41,19 @@ class MockHttpRequest:
         self.headers = headers or {}
         self.params = params or {}
         self._body = body
+        self.route_params = {}
         
     def get_body(self) -> bytes:
         return self._body
+    
+    def get_json(self):
+        """Mock get_json method"""
+        if self._body:
+            try:
+                return json.loads(self._body.decode())
+            except:
+                return None
+        return None
 
 
 class TestAdminE2EWorkflows:
@@ -92,7 +103,7 @@ class TestAdminE2EWorkflows:
         )
         
         # Mock authentication success
-        with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
+        with patch('auth.unified_auth_service.auth_service.authenticate_request', 
                   return_value=mock_admin_user):
             response = await admin_cost_dashboard(req_with_auth)
             assert response.status_code == 200
@@ -137,20 +148,19 @@ class TestAdminE2EWorkflows:
             params={"days": "7", "limit": "10"}
         )
         
-        # Create a mock VedUser for admin
-        mock_admin_user = VedUser(
+        # Create a mock AuthenticatedUser for admin
+        mock_admin_user = AuthenticatedUser(
             id="test-admin-id",
             email=self.admin_email,
             name="Test Admin",
-            givenName="Test",
-            familyName="Admin",
+            given_name="Test",
+            family_name="Admin",
             permissions=["admin"],
-            vedProfile={},
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
         
-        with patch('auth.enhanced_auth_middleware.auth_middleware.extract_user_from_request', 
+        with patch('auth.unified_auth_service.auth_service.authenticate_request', 
                   return_value=mock_admin_user):
             response = await admin_cost_dashboard(req)
             dashboard_data = json.loads(response.get_body())

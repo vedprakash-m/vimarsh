@@ -6,6 +6,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:analyze": "npm run build && npx webpack-bundle-analyzer build/static/js/*.js",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:ci": "react-scripts test --coverage --watchAll=false --ci",
@@ -51,7 +52,8 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.1.0",
-    "start-server-and-test": "^2.0.12"
+    "start-server-and-test": "^2.0.12",
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "jest": {
     "collectCoverageFrom": [

@@ -9,7 +9,11 @@ from .admin_endpoints import (
     admin_budget_management,
     super_admin_role_management,
     admin_system_health,
-    admin_get_user_role
+    admin_get_user_role,
+    admin_metrics_dashboard,
+    admin_performance_report,
+    admin_real_time_metrics,
+    admin_alerts_dashboard
 )
 
 __all__ = [
@@ -18,5 +22,9 @@ __all__ = [
     'admin_budget_management',
     'super_admin_role_management',
     'admin_system_health',
-    'admin_get_user_role'
+    'admin_get_user_role',
+    'admin_metrics_dashboard',
+    'admin_performance_report',
+    'admin_real_time_metrics',
+    'admin_alerts_dashboard'
 ]

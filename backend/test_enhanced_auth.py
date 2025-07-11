@@ -18,12 +18,12 @@ os.environ['AUTH_DEVELOPMENT_MODE'] = 'true'
 os.environ['ADMIN_EMAILS'] = 'vedprakash.m@outlook.com'
 os.environ['SUPER_ADMIN_EMAILS'] = 'vedprakash.m@outlook.com'
 
-from auth.enhanced_auth_middleware import (
-    get_admin_dev_token, 
-    get_super_admin_dev_token,
-    SecureDevAuthenticator,
-    AuthenticationMiddleware
+from auth.unified_auth_service import (
+    auth_service,
+    AuthenticatedUser
 )
+# Note: Some functions like get_admin_dev_token may need to be implemented 
+# in the unified auth service or removed if no longer needed
 
 def test_dev_token_generation():
     """Test development token generation and validation"""

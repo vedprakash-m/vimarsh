@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch
 from core.user_roles import UserRole, UserPermissions, AdminRoleManager
 from core.token_tracker import TokenUsageTracker, TokenUsage
 from core.budget_validator import BudgetValidator, BudgetLevel, BudgetLimit
-from auth.entra_external_id_middleware import VedUser
+from auth.models import AuthenticatedUser
 
 
 class TestUserRoleSystem:
@@ -97,7 +97,8 @@ class TestTokenUsageTracker:
         assert usage_dict["total_tokens"] == 300
         assert "timestamp" in usage_dict
     
-    def test_token_usage_tracker(self):
+    @pytest.mark.asyncio
+    async def test_token_usage_tracker(self):
         """Test TokenUsageTracker functionality"""
         tracker = TokenUsageTracker()
         
@@ -105,17 +106,21 @@ class TestTokenUsageTracker:
         cost = tracker.calculate_cost("gemini-2.5-flash", 1000, 1000)
         assert cost > 0  # Should have some cost
         
-        # Test recording usage
-        usage = tracker.record_usage(
-            user_id="test_user",
-            user_email="test@example.com",
-            session_id="session_123",
-            model="gemini-2.5-flash",
-            input_tokens=100,
-            output_tokens=200,
-            request_type="spiritual_guidance",
-            response_quality="high"
-        )
+        # Mock the database operations to avoid event loop issues
+        with patch.object(tracker, '_save_usage_atomic') as mock_save_atomic, \
+             patch.object(tracker, '_save_usage_to_db') as mock_save_db:
+            
+            # Test recording usage
+            usage = tracker.record_usage(
+                user_id="test_user",
+                user_email="test@example.com",
+                session_id="session_123",
+                model="gemini-2.5-flash",
+                input_tokens=100,
+                output_tokens=200,
+                request_type="spiritual_guidance",
+                response_quality="high"
+            )
         
         assert usage.user_id == "test_user"
         assert usage.total_tokens == 300
@@ -129,13 +134,18 @@ class TestTokenUsageTracker:
         assert user_stats.total_tokens == 300
         assert user_stats.user_email == "test@example.com"
     
-    def test_system_usage_statistics(self):
+    @pytest.mark.asyncio
+    async def test_system_usage_statistics(self):
         """Test system-wide usage statistics"""
         tracker = TokenUsageTracker()
         
-        # Record some usage
-        tracker.record_usage("user1", "user1@example.com", "session1", "gemini-2.5-flash", 100, 200)
-        tracker.record_usage("user2", "user2@example.com", "session2", "gemini-2.5-flash", 150, 250)
+        # Mock database operations
+        with patch.object(tracker, '_save_usage_atomic') as mock_save_atomic, \
+             patch.object(tracker, '_save_usage_to_db') as mock_save_db:
+            
+            # Record some usage
+            tracker.record_usage("user1", "user1@example.com", "session1", "gemini-2.5-flash", 100, 200)
+            tracker.record_usage("user2", "user2@example.com", "session2", "gemini-2.5-flash", 150, 250)
         
         # Get system stats
         stats = tracker.get_system_usage(7)
@@ -237,11 +247,11 @@ class TestBudgetValidator:
         assert "pause" in emergency_msg.lower()
 
 
-class TestVedUserEnhancements:
-    """Test VedUser enhancements with admin roles"""
+class TestAuthenticatedUserEnhancements:
+    """Test AuthenticatedUser enhancements with admin roles"""
     
-    def test_veduser_with_admin_role(self):
-        """Test VedUser with admin role functionality"""
+    def test_authenticated_user_with_admin_role(self):
+        """Test AuthenticatedUser with admin role functionality"""
         # Mock token data
         token_data = {
             "sub": "test_user_id",
@@ -253,23 +263,23 @@ class TestVedUserEnhancements:
         }
         
         # Mock admin role manager
-        with patch('auth.entra_external_id_middleware.admin_role_manager') as mock_manager:
+        with patch('core.user_roles.admin_role_manager') as mock_manager:
             mock_manager.get_user_role.return_value = UserRole.ADMIN
             mock_manager.get_user_permissions.return_value = UserPermissions.for_role(UserRole.ADMIN)
             
-            user = VedUser.from_token_data(token_data)
+            user = AuthenticatedUser.from_token_data(token_data)
             
             assert user.email == "admin@example.com"
             assert user.role == UserRole.ADMIN
             assert user.is_admin() == True
-            assert user.is_super_admin() == False
-            assert user.can_access_admin_endpoints() == True
+            assert user.has_permission('can_access_admin_endpoints') == True
 
 
 class TestIntegration:
     """Integration tests for admin features"""
     
-    def test_complete_admin_workflow(self):
+    @pytest.mark.asyncio
+    async def test_complete_admin_workflow(self):
         """Test complete admin workflow"""
         # Setup components
         tracker = TokenUsageTracker()
@@ -287,8 +297,12 @@ class TestIntegration:
             per_request_limit=0.1
         )
         
-        # Record some usage
-        usage = tracker.record_usage(
+        # Mock database operations to avoid event loop issues
+        with patch.object(tracker, '_save_usage_atomic') as mock_save_atomic, \
+             patch.object(tracker, '_save_usage_to_db') as mock_save_db:
+            
+            # Record some usage
+            usage = tracker.record_usage(
             user_id=user_id,
             user_email=user_email,
             session_id="session_123",
