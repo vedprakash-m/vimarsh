@@ -21,9 +21,34 @@ const AuthCallback: React.FC = () => {
     // Handle the authentication callback using SmartAuthFlow
     const handleCallback = async () => {
       try {
-        console.log('🔐 AuthCallback: Processing callback with SmartAuthFlow...');
+        console.log('🔐 AuthCallback: Starting callback processing...');
         
-        // Use SmartAuthFlow to handle the redirect callback (if not in popup-only mode)
+        // Check if this is actually a redirect callback by looking for redirect parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasCode = urlParams.has('code');
+        const hasError = urlParams.has('error');
+        const hasState = urlParams.has('state');
+        
+        const isActualRedirect = hasCode || hasError || hasState;
+        
+        console.log('🔍 AuthCallback: URL analysis:', {
+          hasCode,
+          hasError, 
+          hasState,
+          isActualRedirect,
+          url: window.location.href
+        });
+        
+        if (!isActualRedirect) {
+          console.log('ℹ️ AuthCallback: No redirect parameters found - likely popup flow or direct navigation');
+          console.log('🔄 AuthCallback: Redirecting to home page...');
+          setProcessing(false);
+          navigate('/', { replace: true });
+          return;
+        }
+        
+        // Only process redirect if we have actual redirect parameters
+        console.log('🔄 AuthCallback: Processing actual redirect callback...');
         const result = await smartAuth.handleRedirectCallback();
         
         if (result.success) {

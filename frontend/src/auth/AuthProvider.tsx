@@ -96,20 +96,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       setError(null);
       
-      // Use smart authentication flow to avoid CORS issues
+      // Use smart authentication flow (popup-only to avoid CORS issues)
       const result = await smartAuth.authenticate(['openid', 'profile', 'email']);
       
       if (result.success) {
         if (result.account) {
           setAccount(result.account);
           console.log('✅ Authentication successful via', result.method);
-        } else if (result.pending) {
-          console.log('🔄 Redirect authentication initiated');
-          // Don't set loading to false for redirect flow
-          return;
+        } else {
+          console.warn('⚠️ Authentication succeeded but no account returned');
+          setError('Authentication succeeded but no account information received');
         }
       } else {
-        setError(result.error || 'Authentication failed');
+        console.error('❌ Authentication failed:', result.error);
+        setError(result.error || 'Authentication failed. Please ensure popups are enabled.');
       }
     } catch (err: any) {
       console.error('❌ AuthProvider: Login error:', err);
