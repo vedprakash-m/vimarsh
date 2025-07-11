@@ -125,20 +125,22 @@ class EnhancedLLMService:
             safety_config: Spiritual safety configuration
         """
         # Load configuration from unified config system
-        if CONFIG_AVAILABLE:
-            try:
-                config = get_unified_config()
-                self.api_key = api_key or config.get_value("LLM", "GEMINI_API_KEY", fallback="")
-                self.model_name = config.get_value("LLM", "MODEL", fallback="gemini-2.5-flash")
-                self.temperature = float(config.get_value("LLM", "TEMPERATURE", fallback=0.7))
-                self.max_tokens = int(config.get_value("LLM", "MAX_TOKENS", fallback=150))
-                self.safety_settings_level = config.get_value("LLM", "SAFETY_SETTINGS", fallback="BLOCK_MEDIUM_AND_ABOVE")
-                logger.info("🔧 LLM service configured using unified configuration")
-            except Exception as e:
-                logger.warning(f"Failed to load unified config for LLM service: {e}")
-                CONFIG_AVAILABLE = False
+        config_loaded = False
+        try:
+            from backend.config.unified_config import get_unified_config
+            config = get_unified_config()
+            self.api_key = api_key or config.get_value("LLM", "GEMINI_API_KEY", fallback="")
+            self.model_name = config.get_value("LLM", "MODEL", fallback="gemini-2.5-flash")
+            self.temperature = float(config.get_value("LLM", "TEMPERATURE", fallback=0.7))
+            self.max_tokens = int(config.get_value("LLM", "MAX_TOKENS", fallback=150))
+            self.safety_settings_level = config.get_value("LLM", "SAFETY_SETTINGS", fallback="BLOCK_MEDIUM_AND_ABOVE")
+            logger.info("🔧 LLM service configured using unified configuration")
+            config_loaded = True
+        except Exception as e:
+            logger.warning(f"Failed to load unified config for LLM service: {e}")
+            # Fall back to manual configuration
         
-        if not CONFIG_AVAILABLE:
+        if not config_loaded:
             # Fallback to environment variables
             self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_AI_API_KEY")
             self.model_name = os.getenv("LLM_MODEL", "gemini-2.5-flash")

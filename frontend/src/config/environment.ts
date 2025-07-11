@@ -29,8 +29,8 @@ export const getCurrentDomainConfig = () => {
 
 // Entra ID Configuration for Vedprakash Domain
 export const ENTRA_ID_CONFIG = {
-  tenantId: 'vedid.onmicrosoft.com',
-  authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/vedid.onmicrosoft.com',
+  tenantId: 'common', // Allow both personal and work accounts
+  authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/common',
   clientId: process.env.REACT_APP_CLIENT_ID || 'your-vimarsh-app-client-id',
   scopes: ['openid', 'profile', 'email'],
 };
@@ -45,9 +45,9 @@ export const AUTH_CONFIG = {
 
 // API Configuration
 export const API_CONFIG = {
-  baseUrl: isProduction 
+  baseUrl: process.env.REACT_APP_API_BASE_URL || (isProduction 
     ? 'https://vimarsh-backend-app.azurewebsites.net/api'
-    : process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api',
+    : 'http://localhost:7071/api'),
   scopes: ENTRA_ID_CONFIG.scopes,
   timeout: 30000,
 };

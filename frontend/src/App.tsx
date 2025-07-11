@@ -16,6 +16,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 // Context Providers
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AdminProvider } from './contexts/AdminContext';
+import { AuthProvider } from './auth/AuthProvider';
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -82,11 +83,12 @@ function App() {
   return (
     <div className="App">
       <MsalProvider instance={msalInstance}>
-        <LanguageProvider>
-          <AdminProvider>
-            <Router>
-              <Suspense fallback={<SpiritualLoadingSpinner />}>
-                <Routes>
+        <AuthProvider>
+          <LanguageProvider>
+            <AdminProvider>
+              <Router>
+                <Suspense fallback={<SpiritualLoadingSpinner />}>
+                  <Routes>
                   {/* Landing Page - Public Route */}
                   <Route path="/" element={<LandingPage />} />
                   
@@ -120,7 +122,8 @@ function App() {
             </Router>
           </AdminProvider>
         </LanguageProvider>
-      </MsalProvider>
+      </AuthProvider>
+    </MsalProvider>
     </div>
   );
 }

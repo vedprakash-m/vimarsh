@@ -1,85 +1,95 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
+import { useAuth } from '../auth/AuthProvider';
+import SmartAuthFlow from '../auth/SmartAuthFlow';
 
 /**
  * AuthCallback Component
- * Handles Microsoft Entra ID OAuth callback
- * Redirects users to main app after successful authentication
+ * Handles Microsoft Entra ID OAuth callback with centralized state management
+ * Only responsible for processing the redirect, AuthProvider manages state
  */
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const { instance } = useMsal();
+  const { refreshAuth } = useAuth();
+  const [processing, setProcessing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [smartAuth] = useState(() => new SmartAuthFlow(instance));
 
   useEffect(() => {
-    // Handle the authentication callback
+    // Handle the authentication callback using SmartAuthFlow
     const handleCallback = async () => {
       try {
-        // Explicitly process the redirect and acquire the auth result
-        const accountsBefore = instance.getAllAccounts();
-        console.log('🛠️ MSAL Debug → Accounts BEFORE handleRedirectPromise:', accountsBefore);
-
-        const authResult = await instance.handleRedirectPromise();
-        console.log('🛠️ MSAL Debug → Auth result from handleRedirectPromise:', authResult);
-
-        const accountsAfter = instance.getAllAccounts();
-        console.log('🛠️ MSAL Debug → Accounts AFTER handleRedirectPromise:', accountsAfter);
-
-        // Determine account either from redirect result or existing cache
-        let activeAccount = authResult?.account;
-        if (!activeAccount) {
-          const cached = instance.getAllAccounts();
-          if (cached.length > 0) {
-            activeAccount = cached[0];
+        console.log('🔐 AuthCallback: Processing callback with SmartAuthFlow...');
+        
+        // Use SmartAuthFlow to handle the redirect callback (if not in popup-only mode)
+        const result = await smartAuth.handleRedirectCallback();
+        
+        if (result.success) {
+          if (result.account) {
+            console.log('✅ AuthCallback: Account processed successfully');
+          } else if (result.noResult) {
+            console.log('ℹ️ AuthCallback: No redirect result (normal for popup flow)');
+          } else if (result.skipped) {
+            console.log('ℹ️ AuthCallback: Redirect handling skipped:', result.reason);
           }
-        }
-
-        if (activeAccount) {
-          instance.setActiveAccount(activeAccount);
-          console.info('🔐 Authentication successful for', activeAccount.username);
-
-          // Allow msal-react context to propagate account state before routing
-          setTimeout(() => {
-            navigate('/guidance', { replace: true });
-          }, 250);
         } else {
-          console.error('❌ Authentication completed but no account found');
-          navigate('/', { replace: true });
+          throw new Error(result.error || 'Redirect processing failed');
         }
+
+        // Refresh the centralized auth state
+        await refreshAuth();
+        console.log('✅ AuthCallback: Auth state refreshed');
+
+        setProcessing(false);
+        
+        // Navigate to guidance page after successful processing
+        setTimeout(() => {
+          console.log('🔄 AuthCallback: Redirecting to /guidance...');
+          navigate('/guidance', { replace: true });
+        }, 1000);
+
       } catch (error) {
-        console.error('❌ MSAL handleRedirectPromise error:', error);
+        console.error('❌ AuthCallback: Error processing redirect:', error);
+        setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        setProcessing(false);
         
-        // Check for specific error types
-        if (error && typeof error === 'object' && 'errorCode' in error) {
-          const msalError = error as any;
-          
-          if (msalError.errorCode === 'post_request_failed') {
-            console.error('🚨 CORS/Network error - check Azure App Registration redirect URI configuration');
-            console.error('💡 Ensure redirect URI is registered as type "SPA" in Azure Portal');
-          }
-          
-          if (msalError.errorCode === 'network_error') {
-            console.error('🚨 Network error - check CSP and network connectivity');
-          }
-        }
-        
-        // Redirect to home with error state
-        navigate('/?auth_error=true', { replace: true });
+        // Redirect with error info
+        setTimeout(() => {
+          navigate('/?auth_error=callback_failed', { replace: true });
+        }, 3000);
       }
     };
 
     handleCallback();
-  }, [navigate, instance]);
+  }, [navigate, smartAuth, refreshAuth]);
 
   return (
     <div className="vimarsh-auth-callback">
       <div className="callback-container">
         <div className="callback-content">
-          <div className="spiritual-loader">
-            <div className="om-symbol">🕉️</div>
-            <h2>Connecting you to divine wisdom...</h2>
-            <p>Please wait while we complete your authentication.</p>
-          </div>
+          {processing ? (
+            <div className="spiritual-loader">
+              <div className="om-symbol">🕉️</div>
+              <h2>Connecting you to divine wisdom...</h2>
+              <p>Please wait while we complete your authentication.</p>
+              <div className="loading-spinner"></div>
+            </div>
+          ) : error ? (
+            <div className="auth-error">
+              <div className="error-symbol">⚠️</div>
+              <h2>Authentication Issue</h2>
+              <p>{error}</p>
+              <p>Redirecting you back to the home page...</p>
+            </div>
+          ) : (
+            <div className="auth-success">
+              <div className="success-symbol">✅</div>
+              <h2>Authentication Successful</h2>
+              <p>Taking you to your spiritual guidance...</p>
+            </div>
+          )}
         </div>
       </div>
       
@@ -90,12 +100,14 @@ const AuthCallback: React.FC = () => {
           align-items: center;
           justify-content: center;
           background: linear-gradient(135deg, var(--sacred-saffron, #ff9933) 0%, var(--krishna-blue, #1e3a8a) 100%);
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         .callback-container {
           text-align: center;
           padding: 2rem;
-          max-width: 400px;
+          max-width: 500px;
+          width: 100%;
         }
         
         .callback-content {
@@ -106,34 +118,74 @@ const AuthCallback: React.FC = () => {
           backdrop-filter: blur(10px);
         }
         
-        .spiritual-loader {
-          color: var(--krishna-blue, #1e3a8a);
+        .spiritual-loader, .auth-error, .auth-success {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
         }
         
-        .om-symbol {
+        .om-symbol, .error-symbol, .success-symbol {
           font-size: 3rem;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
           animation: pulse 2s infinite;
         }
         
-        .spiritual-loader h2 {
-          margin: 1rem 0;
-          font-size: 1.5rem;
-          font-weight: 600;
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid #f3f3f3;
+          border-top: 3px solid var(--krishna-blue, #1e3a8a);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-top: 1rem;
         }
         
-        .spiritual-loader p {
-          color: var(--text-secondary, #6b7280);
-          font-size: 1rem;
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
         
         @keyframes pulse {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.1); opacity: 0.8; }
         }
+        
+        .spiritual-loader {
+          color: var(--krishna-blue, #1e3a8a);
+        }
+        
+        .auth-error {
+          color: #dc2626;
+        }
+        
+        .auth-success {
+          color: #059669;
+        }
+        
+        h2 {
+          color: #374151;
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+        
+        p {
+          color: #6b7280;
+          margin: 0;
+          line-height: 1.5;
+        }
+        
+        .auth-error h2 {
+          color: #dc2626;
+        }
+        
+        .auth-success h2 {
+          color: #059669;
+        }
       `}</style>
     </div>
   );
 };
 
-export default AuthCallback; 
+export default AuthCallback;
