@@ -19,14 +19,14 @@ export const msalConfig: Configuration = {
     authority: ENTRA_ID_CONFIG.authority,
     redirectUri: domainConfig.redirectUri,
     postLogoutRedirectUri: domainConfig.postLogoutRedirectUri,
-    navigateToLoginRequestUrl: false, // Disable automatic navigation to avoid redirect issues
+    navigateToLoginRequestUrl: true, // Enable navigation to login request URL for proper redirect handling
     // Remove B2C specific knownAuthorities - not needed for regular Entra ID
   },
   cache: {
-    cacheLocation: 'localStorage', // Use localStorage for better persistence across redirects
+    cacheLocation: 'sessionStorage', // Use sessionStorage to avoid cross-tab issues with redirect flow
     storeAuthStateInCookie: false,  // Disable cookies to avoid domain-related issues  
     claimsBasedCachingEnabled: true, // Enable claims-based caching for better account management
-    secureCookies: false,            // Disable secure cookies since we're using localStorage
+    secureCookies: false,            // Disable secure cookies since we're using sessionStorage
   },
   system: {
     allowNativeBroker: false, // ✅ Ensures consistent web experience per requirements
@@ -34,8 +34,8 @@ export const msalConfig: Configuration = {
     iframeHashTimeout: 6000,
     loadFrameTimeout: 0,
     navigateFrameWait: 1000, // Add delay for frame navigation
-    asyncPopups: true, // Enable async popups for better popup support
-    allowRedirectInIframe: false, // Disable redirect in iframe to prevent CORS issues
+    asyncPopups: false, // Disable async popups since we're using redirect flow
+    allowRedirectInIframe: true, // Allow redirect in iframe for proper redirect handling
     loggerOptions: {
       loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
         if (containsPii) {

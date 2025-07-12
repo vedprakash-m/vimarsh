@@ -21,33 +21,32 @@ const AuthCallback: React.FC = () => {
     // Handle the authentication callback using SmartAuthFlow
     const handleCallback = async () => {
       try {
-        console.log('🔐 AuthCallback: Starting callback processing...');
+        console.log('🔐 AuthCallback: Processing redirect callback...');
         
-        // Check if this is actually a redirect callback by looking for redirect parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const hasCode = urlParams.has('code');
-        const hasError = urlParams.has('error');
-        const hasState = urlParams.has('state');
+        // Use SmartAuthFlow to handle the redirect callback
+        const result = await smartAuth.handleRedirectCallback();
         
-        const isActualRedirect = hasCode || hasError || hasState;
-        
-        console.log('🔍 AuthCallback: URL analysis:', {
-          hasCode,
-          hasError, 
-          hasState,
-          isActualRedirect,
-          url: window.location.href
-        });
-        
-        if (!isActualRedirect) {
-          console.log('ℹ️ AuthCallback: No redirect parameters found - likely popup flow or direct navigation');
-          console.log('🔄 AuthCallback: Redirecting to home page...');
-          setProcessing(false);
-          navigate('/', { replace: true });
-          return;
+        if (result.success) {
+          if (result.account) {
+            console.log('✅ AuthCallback: Account processed successfully');
+          } else if (result.noResult) {
+            console.log('ℹ️ AuthCallback: No redirect result found');
+          }
+        } else {
+          throw new Error(result.error || 'Redirect processing failed');
         }
+
+        // Refresh the centralized auth state
+        await refreshAuth();
+        console.log('✅ AuthCallback: Auth state refreshed');
+
+        setProcessing(false);
         
-        // Only process redirect if we have actual redirect parameters
+        // Navigate to guidance page after successful processing
+        setTimeout(() => {
+          console.log('🔄 AuthCallback: Redirecting to /guidance...');
+          navigate('/guidance', { replace: true });
+        }, 1000);
         console.log('🔄 AuthCallback: Processing actual redirect callback...');
         const result = await smartAuth.handleRedirectCallback();
         

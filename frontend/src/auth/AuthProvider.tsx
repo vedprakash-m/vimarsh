@@ -96,25 +96,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       setError(null);
       
-      // Use smart authentication flow (popup-only to avoid CORS issues)
+      // Use redirect authentication flow
       const result = await smartAuth.authenticate(['openid', 'profile', 'email']);
       
       if (result.success) {
         if (result.account) {
           setAccount(result.account);
           console.log('✅ Authentication successful via', result.method);
+        } else if (result.pending) {
+          console.log('🔄 Redirect authentication initiated');
+          // Don't set loading to false for redirect flow - user will be redirected
+          return;
         } else {
           console.warn('⚠️ Authentication succeeded but no account returned');
           setError('Authentication succeeded but no account information received');
         }
       } else {
         console.error('❌ Authentication failed:', result.error);
-        setError(result.error || 'Authentication failed. Please ensure popups are enabled.');
+        setError(result.error || 'Authentication failed');
       }
     } catch (err: any) {
       console.error('❌ AuthProvider: Login error:', err);
       setError(err.message || 'Login failed');
     } finally {
+      // Only set loading false if we're not doing a redirect
       setIsLoading(false);
     }
   }, [smartAuth]);
@@ -126,19 +131,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const account = instance.getActiveAccount();
       if (account) {
-        // Use popup logout to avoid redirect-related CORS issues
-        try {
-          await instance.logoutPopup({
-            account,
-            postLogoutRedirectUri: window.location.origin
-          });
-          console.log('✅ Popup logout successful');
-        } catch (popupError) {
-          console.warn('⚠️ Popup logout failed, falling back to local logout:', popupError);
-          // Fall back to local logout if popup fails
-          instance.setActiveAccount(null);
-          setAccount(null);
-        }
+        await instance.logoutRedirect({
+          account,
+          postLogoutRedirectUri: window.location.origin
+        });
+        console.log('✅ Logout redirect initiated');
       }
     } catch (err: any) {
       console.error('❌ AuthProvider: Logout error:', err);
