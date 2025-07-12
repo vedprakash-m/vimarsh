@@ -47,32 +47,6 @@ const AuthCallback: React.FC = () => {
           console.log('🔄 AuthCallback: Redirecting to /guidance...');
           navigate('/guidance', { replace: true });
         }, 1000);
-        console.log('🔄 AuthCallback: Processing actual redirect callback...');
-        const result = await smartAuth.handleRedirectCallback();
-        
-        if (result.success) {
-          if (result.account) {
-            console.log('✅ AuthCallback: Account processed successfully');
-          } else if (result.noResult) {
-            console.log('ℹ️ AuthCallback: No redirect result (normal for popup flow)');
-          } else if (result.skipped) {
-            console.log('ℹ️ AuthCallback: Redirect handling skipped:', result.reason);
-          }
-        } else {
-          throw new Error(result.error || 'Redirect processing failed');
-        }
-
-        // Refresh the centralized auth state
-        await refreshAuth();
-        console.log('✅ AuthCallback: Auth state refreshed');
-
-        setProcessing(false);
-        
-        // Navigate to guidance page after successful processing
-        setTimeout(() => {
-          console.log('🔄 AuthCallback: Redirecting to /guidance...');
-          navigate('/guidance', { replace: true });
-        }, 1000);
 
       } catch (error) {
         console.error('❌ AuthCallback: Error processing redirect:', error);

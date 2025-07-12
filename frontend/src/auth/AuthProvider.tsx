@@ -100,16 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await smartAuth.authenticate(['openid', 'profile', 'email']);
       
       if (result.success) {
-        if (result.account) {
-          setAccount(result.account);
-          console.log('✅ Authentication successful via', result.method);
-        } else if (result.pending) {
+        if (result.pending) {
           console.log('🔄 Redirect authentication initiated');
           // Don't set loading to false for redirect flow - user will be redirected
           return;
         } else {
-          console.warn('⚠️ Authentication succeeded but no account returned');
-          setError('Authentication succeeded but no account information received');
+          // For redirect flow, the account will be available after redirect callback
+          console.log('✅ Authentication initiated via', result.method);
         }
       } else {
         console.error('❌ Authentication failed:', result.error);
