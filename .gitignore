@@ -223,8 +223,10 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.development
 .env.development.local
 .env.test.local
+.env.production
 .env.production.local
 .env.local
 
@@ -280,11 +282,23 @@ bin
 obj
 appsettings.json
 local.settings.json
+local.settings.*.json
 .azure/
 
 # Azure Functions build artifacts
 .vscode/
 .vs/
+
+# Additional sensitive configuration files
+*.secrets.json
+*secret*.json
+*password*.json
+*key*.json
+*token*.json
+
+# Azure App Registration manifest updates
+app-manifest-update.json
+temp-app-update.json
 
 # ===========================
 # React / Frontend Build
