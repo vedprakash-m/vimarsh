@@ -7,10 +7,10 @@ import {
 } from '@azure/msal-browser';
 import { 
   msalConfig, 
-  loginRequest, 
+  createLoginRequest, 
   apiTokenRequest, 
   silentRequest,
-  logoutRequest,
+  createLogoutRequest,
   AUTH_ERROR_MESSAGES 
 } from './msalConfig';
 import { AuthService, AuthUser } from './authService';
@@ -46,6 +46,7 @@ export class MSALAuthService implements AuthService {
       console.info('🔐 Starting MSAL login process');
       
       // Use redirect flow for better mobile support
+      const loginRequest = createLoginRequest();
       await this.msalInstance.loginRedirect(loginRequest);
       
       // After redirect, this won't execute immediately
@@ -74,6 +75,7 @@ export class MSALAuthService implements AuthService {
         return;
       }
 
+      const logoutRequest = createLogoutRequest();
       const logoutRequestWithAccount: EndSessionRequest = {
         ...logoutRequest,
         account: this.accounts[0]

@@ -8,6 +8,16 @@
 export const isProduction = process.env.NODE_ENV === 'production';
 export const isDevelopment = process.env.NODE_ENV === 'development';
 
+// Detect current runtime domain for Azure Static Web Apps support
+export const getCurrentRuntimeDomain = (): string => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // Fallback for SSR/build time - return placeholder, will be resolved at runtime
+  return 'runtime-domain-placeholder';
+};
+
 // Custom domain configuration for vimarsh.vedprakash.net
 export const DOMAIN_CONFIG = {
   production: {
@@ -22,9 +32,27 @@ export const DOMAIN_CONFIG = {
   }
 };
 
-// Get current domain configuration
+// Get current domain configuration with Azure Static Web App support
 export const getCurrentDomainConfig = () => {
-  return isProduction ? DOMAIN_CONFIG.production : DOMAIN_CONFIG.development;
+  if (isDevelopment) {
+    return DOMAIN_CONFIG.development;
+  }
+  
+  // Production environment - check for Azure Static Web App deployment at runtime
+  if (typeof window !== 'undefined') {
+    const runtimeDomain = window.location.origin;
+    if (runtimeDomain.includes('.azurestaticapps.net')) {
+      console.info('🌐 Azure Static Web App deployment detected:', runtimeDomain);
+      return {
+        domain: runtimeDomain,
+        redirectUri: `${runtimeDomain}/auth/callback`,
+        postLogoutRedirectUri: runtimeDomain,
+      };
+    }
+  }
+  
+  // Default to custom domain configuration
+  return DOMAIN_CONFIG.production;
 };
 
 // Entra ID Configuration for Vedprakash Domain
@@ -36,9 +64,19 @@ export const ENTRA_ID_CONFIG = {
 };
 
 // Environment-aware configuration
+export const getAuthConfig = () => {
+  const domainConfig = getCurrentDomainConfig();
+  return {
+    ...ENTRA_ID_CONFIG,
+    ...domainConfig,
+    enableDebugLogging: isDevelopment,
+    usePlaceholder: isDevelopment && !process.env.REACT_APP_CLIENT_ID,
+  };
+};
+
+// For backward compatibility - but this will use static config
 export const AUTH_CONFIG = {
   ...ENTRA_ID_CONFIG,
-  ...getCurrentDomainConfig(),
   enableDebugLogging: isDevelopment,
   usePlaceholder: isDevelopment && !process.env.REACT_APP_CLIENT_ID,
 };
@@ -50,6 +88,24 @@ export const API_CONFIG = {
     : 'http://localhost:7071/api'),
   scopes: ENTRA_ID_CONFIG.scopes,
   timeout: 30000,
+};
+
+// Get API base URL with proper environment detection
+export const getApiBaseUrl = (): string => {
+  // Always prefer environment variable
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  
+  // If we're on the production domain, force production API URL
+  if (typeof window !== 'undefined' && window.location.hostname === 'vimarsh.vedprakash.net') {
+    return 'https://vimarsh-backend-app.azurewebsites.net/api';
+  }
+  
+  // Fallback based on environment
+  return isProduction 
+    ? 'https://vimarsh-backend-app.azurewebsites.net/api'
+    : 'http://localhost:7071/api';
 };
 
 // Feature Flags

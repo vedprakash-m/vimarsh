@@ -10,11 +10,11 @@ import { MSALAuthService } from './msalAuthService';
 jest.mock('@azure/msal-browser');
 jest.mock('./msalConfig', () => ({
   msalConfig: { auth: { clientId: 'test-client-id' } },
-  authConfig: { usePlaceholder: true }, // Force placeholder mode for tests
-  loginRequest: {},
+  getAuthConfigStatic: () => ({ usePlaceholder: true }), // Force placeholder mode for tests
+  createLoginRequest: () => ({}),
   apiTokenRequest: {},
   silentRequest: {},
-  logoutRequest: {},
+  createLogoutRequest: () => ({}),
   spiritualRoles: {
     SEEKER: 'seeker',
     DEVOTEE: 'devotee',

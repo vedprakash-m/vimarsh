@@ -3,6 +3,7 @@ import { Send, Mic, MicOff, Shield, MessageSquare } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useAdmin } from '../contexts/AdminContext';
 import AdminDashboard from './admin/AdminDashboard';
+import { getApiBaseUrl } from '../config/environment';
 import '../styles/spiritual-theme.css';
 import '../styles/admin.css';
 
@@ -59,7 +60,7 @@ export default function CleanSpiritualInterface() {
       }));
 
       // Call real spiritual guidance API with conversation context
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api';
+      const apiUrl = getApiBaseUrl();
       const response = await fetch(`${apiUrl}/spiritual_guidance`, {
         method: 'POST',
         headers: {

@@ -18,6 +18,16 @@ from core.budget_validator import budget_validator
 from core.user_roles import admin_role_manager
 from monitoring.admin_metrics import get_admin_metrics_collector, AdminOperationType
 
+# Helper function for consistent CORS headers
+def get_cors_headers() -> Dict[str, str]:
+    """Get standardized CORS headers for admin endpoints"""
+    return {
+        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
+    }
+
 logger = logging.getLogger(__name__)
 
 
@@ -136,7 +146,7 @@ async def admin_cost_dashboard(req: HttpRequest) -> HttpResponse:
             json.dumps(response_data),
             mimetype="application/json",
             status_code=200,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
         
     except Exception as e:
@@ -148,7 +158,7 @@ async def admin_cost_dashboard(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -188,7 +198,7 @@ async def admin_user_management(req: HttpRequest) -> HttpResponse:
                 }),
                 mimetype="application/json",
                 status_code=200,
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
         
         elif method == "POST":
@@ -214,7 +224,7 @@ async def admin_user_management(req: HttpRequest) -> HttpResponse:
                             }),
                             mimetype="application/json",
                             status_code=200,
-                            headers={"Access-Control-Allow-Origin": "*"}
+                            headers=get_cors_headers()
                         )
                     
                     elif action == "unblock":
@@ -229,14 +239,14 @@ async def admin_user_management(req: HttpRequest) -> HttpResponse:
                             }),
                             mimetype="application/json",
                             status_code=200 if success else 404,
-                            headers={"Access-Control-Allow-Origin": "*"}
+                            headers=get_cors_headers()
                         )
             
             return HttpResponse(
                 json.dumps({'error': 'Invalid action or user ID'}),
                 status_code=400,
                 mimetype="application/json",
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
         
         else:
@@ -244,7 +254,7 @@ async def admin_user_management(req: HttpRequest) -> HttpResponse:
                 json.dumps({'error': 'Method not allowed'}),
                 status_code=405,
                 mimetype="application/json",
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
             
     except Exception as e:
@@ -256,7 +266,7 @@ async def admin_user_management(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -294,7 +304,7 @@ async def admin_budget_management(req: HttpRequest) -> HttpResponse:
                 }),
                 mimetype="application/json",
                 status_code=200,
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
         
         elif method == "POST":
@@ -323,7 +333,7 @@ async def admin_budget_management(req: HttpRequest) -> HttpResponse:
                         }),
                         mimetype="application/json",
                         status_code=200 if success else 404,
-                        headers={"Access-Control-Allow-Origin": "*"}
+                        headers=get_cors_headers()
                     )
             
             else:
@@ -339,7 +349,7 @@ async def admin_budget_management(req: HttpRequest) -> HttpResponse:
                         json.dumps({'error': 'user_id and user_email are required'}),
                         status_code=400,
                         mimetype="application/json",
-                        headers={"Access-Control-Allow-Origin": "*"}
+                        headers=get_cors_headers()
                     )
                 
                 budget = budget_validator.set_user_budget(
@@ -357,7 +367,7 @@ async def admin_budget_management(req: HttpRequest) -> HttpResponse:
                     }),
                     mimetype="application/json",
                     status_code=200,
-                    headers={"Access-Control-Allow-Origin": "*"}
+                    headers=get_cors_headers()
                 )
         
         else:
@@ -365,7 +375,7 @@ async def admin_budget_management(req: HttpRequest) -> HttpResponse:
                 json.dumps({'error': 'Method not allowed'}),
                 status_code=405,
                 mimetype="application/json",
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
             
     except Exception as e:
@@ -377,7 +387,7 @@ async def admin_budget_management(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -405,7 +415,7 @@ async def super_admin_role_management(req: HttpRequest) -> HttpResponse:
                 }),
                 mimetype="application/json",
                 status_code=200,
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
         
         elif method == "POST":
@@ -418,7 +428,7 @@ async def super_admin_role_management(req: HttpRequest) -> HttpResponse:
                     json.dumps({'error': 'action and email are required'}),
                     status_code=400,
                     mimetype="application/json",
-                    headers={"Access-Control-Allow-Origin": "*"}
+                    headers=get_cors_headers()
                 )
             
             super_admin_user = getattr(req, 'user', None)
@@ -435,7 +445,7 @@ async def super_admin_role_management(req: HttpRequest) -> HttpResponse:
                     json.dumps({'error': 'Invalid action. Use "add" or "remove"'}),
                     status_code=400,
                     mimetype="application/json",
-                    headers={"Access-Control-Allow-Origin": "*"}
+                    headers=get_cors_headers()
                 )
             
             return HttpResponse(
@@ -448,7 +458,7 @@ async def super_admin_role_management(req: HttpRequest) -> HttpResponse:
                 }),
                 mimetype="application/json",
                 status_code=200,
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
         
         else:
@@ -456,7 +466,7 @@ async def super_admin_role_management(req: HttpRequest) -> HttpResponse:
                 json.dumps({'error': 'Method not allowed'}),
                 status_code=405,
                 mimetype="application/json",
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
             
     except Exception as e:
@@ -468,7 +478,7 @@ async def super_admin_role_management(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -516,7 +526,7 @@ async def admin_system_health(req: HttpRequest) -> HttpResponse:
             }),
             mimetype="application/json",
             status_code=200,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
         
     except Exception as e:
@@ -528,7 +538,7 @@ async def admin_system_health(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -552,7 +562,7 @@ async def admin_get_user_role(req: HttpRequest) -> HttpResponse:
                 }),
                 status_code=401,
                 mimetype="application/json",
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
         
         user_email = user.email
@@ -584,7 +594,7 @@ async def admin_get_user_role(req: HttpRequest) -> HttpResponse:
             }),
             mimetype="application/json",
             status_code=200,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
         
     except Exception as e:
@@ -596,7 +606,7 @@ async def admin_get_user_role(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -677,7 +687,7 @@ async def admin_metrics_dashboard(req: HttpRequest) -> HttpResponse:
                 json.dumps(response_data),
                 mimetype="application/json",
                 status_code=200,
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
             
         except Exception as service_error:
@@ -715,7 +725,7 @@ async def admin_metrics_dashboard(req: HttpRequest) -> HttpResponse:
                 json.dumps(response_data),
                 mimetype="application/json",
                 status_code=200,
-                headers={"Access-Control-Allow-Origin": "*"}
+                headers=get_cors_headers()
             )
             
     except Exception as e:
@@ -727,7 +737,7 @@ async def admin_metrics_dashboard(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -785,7 +795,7 @@ async def admin_performance_report(req: HttpRequest) -> HttpResponse:
             json.dumps(response_data),
             mimetype="application/json",
             status_code=200,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
         
     except Exception as e:
@@ -797,7 +807,7 @@ async def admin_performance_report(req: HttpRequest) -> HttpResponse:
             }),
             status_code=500,
             mimetype="application/json",
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -902,7 +912,7 @@ async def admin_real_time_metrics(req: HttpRequest) -> HttpResponse:
             json.dumps(response_data),
             mimetype="application/json",
             status_code=200,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
         
     except Exception as e:
@@ -929,7 +939,7 @@ async def admin_real_time_metrics(req: HttpRequest) -> HttpResponse:
             }),
             mimetype="application/json",
             status_code=500,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
 
 
@@ -1063,7 +1073,7 @@ async def admin_alerts_dashboard(req: HttpRequest) -> HttpResponse:
             json.dumps(response_data),
             mimetype="application/json",
             status_code=200,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )
         
     except Exception as e:
@@ -1090,5 +1100,5 @@ async def admin_alerts_dashboard(req: HttpRequest) -> HttpResponse:
             }),
             mimetype="application/json",
             status_code=500,
-            headers={"Access-Control-Allow-Origin": "*"}
+            headers=get_cors_headers()
         )

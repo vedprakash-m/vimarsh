@@ -40,28 +40,42 @@ const AuthCallback: React.FC = () => {
         await refreshAuth();
         console.log('✅ AuthCallback: Auth state refreshed');
 
+        // Wait a moment for state to settle, then validate authentication
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Validate that authentication is actually successful
+        const accounts = instance.getAllAccounts();
+        const activeAccount = instance.getActiveAccount();
+        
+        if (accounts.length === 0 || !activeAccount) {
+          throw new Error('Authentication completed but no valid account found');
+        }
+
+        console.log('✅ AuthCallback: Authentication validated successfully');
         setProcessing(false);
         
-        // Navigate to guidance page after successful processing
+        // Navigate to guidance page after successful processing and validation
         setTimeout(() => {
           console.log('🔄 AuthCallback: Redirecting to /guidance...');
           navigate('/guidance', { replace: true });
-        }, 1000);
+        }, 800);
 
       } catch (error) {
         console.error('❌ AuthCallback: Error processing redirect:', error);
-        setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+        setError(errorMessage);
         setProcessing(false);
         
-        // Redirect with error info
+        // Redirect with error info after showing error for a moment
         setTimeout(() => {
-          navigate('/?auth_error=callback_failed', { replace: true });
+          console.log('🔄 AuthCallback: Redirecting to home with error');
+          navigate('/?auth_error=callback_failed&message=' + encodeURIComponent(errorMessage), { replace: true });
         }, 3000);
       }
     };
 
     handleCallback();
-  }, [navigate, smartAuth, refreshAuth]);
+  }, [navigate, smartAuth, refreshAuth, instance]);
 
   return (
     <div className="vimarsh-auth-callback">

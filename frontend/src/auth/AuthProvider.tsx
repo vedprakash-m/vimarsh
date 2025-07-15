@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [smartAuth] = useState(() => new SmartAuthFlow(instance));
 
-  // Centralized function to update account state
+  // Centralized function to update account state with validation
   const updateAccountState = useCallback(() => {
     const accounts = instance.getAllAccounts();
     const activeAccount = instance.getActiveAccount();
@@ -44,47 +44,87 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log('🔄 AuthProvider: Updating account state', {
       accountsFound: accounts.length,
       activeAccount: activeAccount?.username,
-      isAuthenticated
+      isAuthenticated,
+      msalInstanceReady: !!instance.getConfiguration()
     });
 
     if (accounts.length > 0) {
       // If we have accounts but no active account, set the first one as active
       if (!activeAccount) {
-        instance.setActiveAccount(accounts[0]);
-        setAccount(accounts[0]);
-        console.log('✅ AuthProvider: Set active account to', accounts[0].username);
+        try {
+          instance.setActiveAccount(accounts[0]);
+          setAccount(accounts[0]);
+          console.log('✅ AuthProvider: Set active account to', accounts[0].username);
+        } catch (err) {
+          console.error('❌ AuthProvider: Failed to set active account:', err);
+          setError('Failed to set active account');
+        }
       } else {
         setAccount(activeAccount);
       }
     } else {
       setAccount(null);
+      // Clear any existing errors if no accounts (user logged out)
+      if (!isAuthenticated) {
+        setError(null);
+      }
     }
   }, [instance, isAuthenticated]);
 
-  // Initialize authentication state on mount
+  // Validate authentication state - ensures MSAL and AuthProvider are in sync
+  const validateAuthenticationState = useCallback((): boolean => {
+    const accounts = instance.getAllAccounts();
+    const activeAccount = instance.getActiveAccount();
+    const hasValidAccount = accounts.length > 0 && activeAccount;
+    
+    console.log('🔍 AuthProvider: Validating authentication state', {
+      msalAuthenticated: isAuthenticated,
+      hasAccounts: accounts.length > 0,
+      hasActiveAccount: !!activeAccount,
+      stateValid: hasValidAccount === isAuthenticated
+    });
+
+    // Return true if MSAL state matches our expected state
+    return hasValidAccount === isAuthenticated;
+  }, [instance, isAuthenticated]);
+
+  // Initialize authentication state on mount with validation
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
         
         // Wait for MSAL to be fully initialized
+        let retries = 0;
+        while (!instance.getConfiguration() && retries < 5) {
+          console.log('⏳ AuthProvider: Waiting for MSAL initialization...', retries + 1);
+          await new Promise(resolve => setTimeout(resolve, 500));
+          retries++;
+        }
+
         if (!instance.getConfiguration()) {
-          console.log('⏳ AuthProvider: Waiting for MSAL initialization...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          throw new Error('MSAL instance failed to initialize');
         }
 
         updateAccountState();
-        setError(null);
+        
+        // Validate authentication state consistency
+        if (!validateAuthenticationState()) {
+          console.warn('⚠️ AuthProvider: Authentication state inconsistency detected');
+          setError('Authentication state synchronization issue. Please try signing in again.');
+        } else {
+          setError(null);
+        }
       } catch (err) {
         console.error('❌ AuthProvider: Initialization error:', err);
-        setError('Failed to initialize authentication');
+        setError(err instanceof Error ? err.message : 'Failed to initialize authentication');
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeAuth();
-  }, [instance, updateAccountState]);
+  }, [instance, updateAccountState, validateAuthenticationState]);
 
   // Update account state when authentication status changes
   useEffect(() => {
@@ -149,28 +189,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshAuth = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      
+      console.log('🔄 AuthProvider: Refreshing authentication state...');
+      
+      // Update account state first
       updateAccountState();
       
-      // Force a token refresh to validate the current account
-      const account = instance.getActiveAccount();
-      if (account) {
+      // Validate authentication state consistency
+      if (!validateAuthenticationState()) {
+        console.warn('⚠️ AuthProvider: Authentication state inconsistency after refresh');
+        setError('Authentication validation failed. Please sign in again.');
+        return;
+      }
+
+      // If we have an account, try to refresh tokens to ensure they're valid
+      const activeAccount = instance.getActiveAccount();
+      if (activeAccount) {
         try {
           await instance.acquireTokenSilent({
             scopes: ['openid', 'profile', 'email'],
-            account
+            account: activeAccount
           });
           console.log('✅ AuthProvider: Token refresh successful');
         } catch (tokenError) {
-          console.warn('⚠️ AuthProvider: Token refresh failed, account may be stale');
+          console.warn('⚠️ AuthProvider: Token refresh failed (may require re-auth):', tokenError);
+          // Don't set this as an error yet - the user might still be authenticated
         }
       }
+
+      console.log('✅ AuthProvider: Authentication refresh completed');
     } catch (err: any) {
-      console.error('❌ AuthProvider: Refresh error:', err);
-      setError(err.message || 'Failed to refresh authentication');
+      console.error('❌ AuthProvider: Auth refresh error:', err);
+      setError(err.message || 'Authentication refresh failed');
     } finally {
       setIsLoading(false);
     }
-  }, [instance, updateAccountState]);
+  }, [instance, updateAccountState, validateAuthenticationState]);
 
   const value: AuthContextType = {
     isAuthenticated,

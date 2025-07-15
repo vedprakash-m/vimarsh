@@ -87,6 +87,8 @@ export interface RoleData {
   permissions: UserPermissions;
 }
 
+import { getApiBaseUrl } from '../config/environment';
+
 /**
  * AdminService - Enhanced authentication admin API service
  * 
@@ -97,7 +99,7 @@ export interface RoleData {
  * 4. Zero-trust admin validation
  */
 class AdminService {
-  private baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api';
+  private baseUrl = getApiBaseUrl();
   
   // Development mode tokens for testing
   private devTokens: { [key: string]: string } = {};
@@ -153,6 +155,7 @@ class AdminService {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
+      credentials: 'include',
     };
 
     const response = await fetch(url, options);
@@ -168,40 +171,40 @@ class AdminService {
   // ADMIN ENDPOINTS - Enhanced authentication implementation
   
   async getCostDashboard(accessToken?: string): Promise<CostDashboardData> {
-    return this.makeRequest<CostDashboardData>('/api/vimarsh-admin/cost-dashboard', 'GET', null, accessToken);
+    return this.makeRequest<CostDashboardData>('/vimarsh-admin/cost-dashboard', 'GET', null, accessToken);
   }
 
   async getUserList(accessToken?: string): Promise<{ users: UserData[]; total_users: number; blocked_users: number }> {
-    return this.makeRequest('/api/vimarsh-admin/users', 'GET', null, accessToken);
+    return this.makeRequest('/vimarsh-admin/users', 'GET', null, accessToken);
   }
 
   async updateUserBudget(userId: string, budgetData: BudgetData, accessToken?: string): Promise<{ success: boolean }> {
-    return this.makeRequest(`/api/vimarsh-admin/budget/${userId}`, 'PUT', budgetData, accessToken);
+    return this.makeRequest(`/vimarsh-admin/budget/${userId}`, 'PUT', budgetData, accessToken);
   }
 
   async blockUser(userId: string, accessToken?: string): Promise<{ success: boolean }> {
-    return this.makeRequest(`/api/vimarsh-admin/users/${userId}/block`, 'POST', null, accessToken);
+    return this.makeRequest(`/vimarsh-admin/users/${userId}/block`, 'POST', null, accessToken);
   }
 
   async unblockUser(userId: string, accessToken?: string): Promise<{ success: boolean }> {
-    return this.makeRequest(`/api/vimarsh-admin/users/${userId}/unblock`, 'POST', null, accessToken);
+    return this.makeRequest(`/vimarsh-admin/users/${userId}/unblock`, 'POST', null, accessToken);
   }
 
   async getHealthStatus(accessToken?: string): Promise<HealthData> {
-    return this.makeRequest<HealthData>('/api/vimarsh-admin/health', 'GET', null, accessToken);
+    return this.makeRequest<HealthData>('/vimarsh-admin/health', 'GET', null, accessToken);
   }
 
   async getUserRole(accessToken?: string): Promise<RoleData> {
-    return this.makeRequest<RoleData>('/api/vimarsh-admin/role', 'GET', null, accessToken);
+    return this.makeRequest<RoleData>('/vimarsh-admin/role', 'GET', null, accessToken);
   }
 
   // USER ENDPOINTS - Standard user functionality
   async getUserBudgetStatus(accessToken: string): Promise<BudgetData> {
-    return this.makeRequest<BudgetData>('/api/user/budget', 'GET', null, accessToken);
+    return this.makeRequest<BudgetData>('/user/budget', 'GET', null, accessToken);
   }
 
   async getSpiritualGuidance(accessToken: string, query: string, language: string = 'English'): Promise<any> {
-    return this.makeRequest('/api/spiritual_guidance', 'POST', { query, language }, accessToken);
+    return this.makeRequest('/spiritual_guidance', 'POST', { query, language }, accessToken);
   }
 }
 

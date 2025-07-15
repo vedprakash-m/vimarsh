@@ -1,0 +1,8 @@
+{
+  "spa": {
+    "redirectUris": [
+      "https://vimarsh.vedprakash.net/auth/callback",
+      "https://white-forest-05c196d0f.2.azurestaticapps.net/auth/callback"
+    ]
+  }
+}
