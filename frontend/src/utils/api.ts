@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { getApiBaseUrl } from '../config/environment';
 
 interface ApiConfig {
   baseURL: string;
@@ -45,7 +46,7 @@ interface ApiError {
 }
 
 const DEFAULT_CONFIG: ApiConfig = {
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071',
+  baseURL: getApiBaseUrl(),
   timeout: 30000, // 30 seconds
   retries: 3,
   retryDelay: 1000 // 1 second

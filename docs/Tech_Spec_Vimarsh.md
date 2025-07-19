@@ -20,7 +20,7 @@ This document provides detailed technical specifications for implementing the Vi
 
 ### 2.2. Two-Resource-Group Architecture
 
-**vimarsh-db-rg (Persistent Resources):**
+**vimarsh-persistent-rg (Persistent Resources):**
 * **Purpose**: Data retention and persistence through deployment cycles
 * **Resources**: 
   - Cosmos DB (`vimarsh-db`) - Spiritual texts and user data
@@ -29,7 +29,7 @@ This document provides detailed technical specifications for implementing the Vi
 * **Cost Behavior**: Always active, minimal storage costs (~$5-10/month)
 * **Lifecycle**: Never deleted, preserves all application state
 
-**vimarsh-rg (Compute Resources):**
+**vimarsh-compute-rg (Compute Resources):**
 * **Purpose**: Application execution and user interaction
 * **Resources**:
   - Function App (`vimarsh-functions`) - Backend API
@@ -41,13 +41,13 @@ This document provides detailed technical specifications for implementing the Vi
 ### 2.3. Pause-Resume Cost Strategy
 
 **Pause Operation (Cost Savings):**
-1. Delete entire `vimarsh-rg` resource group
+1. Delete entire `vimarsh-compute-rg` resource group
 2. Eliminates compute costs (~$40-90/month)
-3. Retains all data in `vimarsh-db-rg`
+3. Retains all data in `vimarsh-persistent-rg`
 4. Reduces costs to storage fees only
 
 **Resume Operation (Service Restoration):**
-1. Redeploy `vimarsh-rg` infrastructure via Bicep
+1. Redeploy `vimarsh-compute-rg` infrastructure via Bicep
 2. Automatic reconnection to existing data
 3. Full service restoration in <10 minutes
 4. Zero data loss or configuration required
@@ -109,7 +109,7 @@ This document provides detailed technical specifications for implementing the Vi
   - Security and rate limiting
 
 **RAG Pipeline Components:**
-* **Document Store:** Azure Blob Storage in vimarsh-db-rg for persistent content
+* **Document Store:** Azure Blob Storage in vimarsh-persistent-rg for persistent content
 * **Vector Database:** Azure Cosmos DB (`vimarsh-db`) with serverless pricing
 * **Embedding Model:** Hugging Face `sentence-transformers` library
   - Primary: `all-MiniLM-L6-v2` or `paraphrase-MiniLM-L6-v2`
@@ -1152,7 +1152,7 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-03-01' = {
 ```bash
 # Deploy infrastructure using Azure CLI
 az deployment group create \
-  --resource-group vimarsh-rg \
+  --resource-group vimarsh-compute-rg \
   --template-file infrastructure/main.bicep \
   --parameters appName=vimarsh environment=prod
 ```

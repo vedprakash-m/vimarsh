@@ -8,7 +8,28 @@
 export const isProduction = process.env.NODE_ENV === 'production';
 export const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Custom domain configuration for vimarsh.vedprakash.net
+// Define both valid production domains
+const VALID_PRODUCTION_DOMAINS = [
+  'vimarsh.vedprakash.net',
+  'white-forest-05c196d0f.2.azurestaticapps.net'
+];
+
+// Enhanced production domain detection
+export const isValidProductionDomain = (domain: string): boolean => {
+  return VALID_PRODUCTION_DOMAINS.some(validDomain => domain.includes(validDomain));
+};
+
+// Detect current runtime domain for multi-domain support
+export const getCurrentRuntimeDomain = (): string => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // Fallback for SSR/build time - return placeholder, will be resolved at runtime
+  return 'runtime-domain-placeholder';
+};
+
+// Multi-domain configuration supporting both valid production domains
 export const DOMAIN_CONFIG = {
   production: {
     domain: 'https://vimarsh.vedprakash.net',
@@ -22,34 +43,111 @@ export const DOMAIN_CONFIG = {
   }
 };
 
-// Get current domain configuration
+// Get current domain configuration with multi-domain production support
 export const getCurrentDomainConfig = () => {
-  return isProduction ? DOMAIN_CONFIG.production : DOMAIN_CONFIG.development;
+  if (isDevelopment) {
+    return DOMAIN_CONFIG.development;
+  }
+  
+  // Production environment - support both valid domains
+  if (typeof window !== 'undefined') {
+    const runtimeDomain = window.location.origin;
+    
+    // Check if current domain is a valid production domain
+    if (isValidProductionDomain(runtimeDomain)) {
+      console.info('✅ Valid production domain detected:', runtimeDomain);
+      
+      // Return dynamic configuration for current domain
+      return {
+        domain: runtimeDomain,
+        redirectUri: `${runtimeDomain}/auth/callback`,
+        postLogoutRedirectUri: runtimeDomain,
+      };
+    }
+    
+    // Fallback for unknown domains
+    console.warn('⚠️ Unknown domain detected, using runtime configuration:', runtimeDomain);
+    return {
+      domain: runtimeDomain,
+      redirectUri: `${runtimeDomain}/auth/callback`,
+      postLogoutRedirectUri: runtimeDomain,
+    };
+  }
+  
+  // Build-time fallback to custom domain
+  return DOMAIN_CONFIG.production;
 };
 
-// Entra ID Configuration for Vedprakash Domain
+// Update environment detection for multi-domain support
+export const isValidProduction = (): boolean => {
+  if (!isProduction) return false;
+  
+  if (typeof window !== 'undefined') {
+    return isValidProductionDomain(window.location.origin);
+  }
+  
+  return true; // Assume valid during build
+};
+
+// Entra ID Configuration for Vedprakash Domain - Multi-Domain Support
 export const ENTRA_ID_CONFIG = {
-  tenantId: 'vedid.onmicrosoft.com',
-  authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/vedid.onmicrosoft.com',
-  clientId: process.env.REACT_APP_CLIENT_ID || 'your-vimarsh-app-client-id',
-  scopes: ['openid', 'profile', 'email'],
+  tenantId: 'common', // Allow both personal and work accounts
+  authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/common',
+  clientId: process.env.REACT_APP_CLIENT_ID || 'e4bd74b8-9a82-40c6-8d52-3e231733095e', // Vimarsh app registration
+  scopes: ['openid', 'profile', 'email', 'api://3cdae009-79cd-42cc-a0e0-2b1e9e464c2d/.default'],
 };
 
 // Environment-aware configuration
+export const getAuthConfig = () => {
+  const domainConfig = getCurrentDomainConfig();
+  return {
+    ...ENTRA_ID_CONFIG,
+    ...domainConfig,
+    enableDebugLogging: isDevelopment,
+    usePlaceholder: isDevelopment && !process.env.REACT_APP_CLIENT_ID,
+  };
+};
+
+// For backward compatibility - but this will use static config
 export const AUTH_CONFIG = {
   ...ENTRA_ID_CONFIG,
-  ...getCurrentDomainConfig(),
   enableDebugLogging: isDevelopment,
   usePlaceholder: isDevelopment && !process.env.REACT_APP_CLIENT_ID,
 };
 
 // API Configuration
 export const API_CONFIG = {
-  baseUrl: isProduction 
+  baseUrl: process.env.REACT_APP_API_BASE_URL || (isProduction 
     ? 'https://vimarsh-backend-app.azurewebsites.net/api'
-    : process.env.REACT_APP_API_BASE_URL || 'http://localhost:7071/api',
+    : 'http://localhost:7071/api'),
   scopes: ENTRA_ID_CONFIG.scopes,
   timeout: 30000,
+};
+
+// Get API base URL with proper multi-domain production detection
+export const getApiBaseUrl = (): string => {
+  // Always prefer environment variable
+  if (process.env.REACT_APP_API_BASE_URL) {
+    console.log('🔗 Using API URL from environment variable:', process.env.REACT_APP_API_BASE_URL);
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  
+  // Check if we're on any valid production domain
+  if (typeof window !== 'undefined') {
+    const currentDomain = window.location.origin;
+    if (isValidProductionDomain(currentDomain)) {
+      console.log('🔗 Production domain detected, using production API:', currentDomain);
+      return 'https://vimarsh-backend-app.azurewebsites.net/api';
+    }
+  }
+  
+  // Fallback based on environment
+  const apiUrl = isProduction 
+    ? 'https://vimarsh-backend-app.azurewebsites.net/api'
+    : 'http://localhost:7071/api';
+  
+  console.log('🔗 Using fallback API URL:', apiUrl, '(isProduction:', isProduction, ')');
+  return apiUrl;
 };
 
 // Feature Flags

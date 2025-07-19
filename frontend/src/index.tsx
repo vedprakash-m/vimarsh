@@ -7,8 +7,6 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Remove React.StrictMode to prevent MSAL double-mounting issues
+// StrictMode causes components to mount twice, corrupting MSAL cache
+root.render(<App />);

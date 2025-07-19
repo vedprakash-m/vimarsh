@@ -16,9 +16,9 @@ from enum import Enum
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
-# Import centralized configuration
+# Import unified configuration
 try:
-    from backend.core.config import get_config
+    from backend.config.unified_config import get_unified_config
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False
@@ -121,24 +121,33 @@ class EnhancedLLMService:
         Initialize enhanced LLM service with safety configuration.
         
         Args:
-            api_key: Google AI API key (if None, reads from configuration)
+            api_key: Google AI API key (if None, reads from unified configuration)
             safety_config: Spiritual safety configuration
         """
-        # Load configuration
-        if CONFIG_AVAILABLE:
-            config = get_config()
-            self.api_key = api_key or config.llm.api_key
-            self.model_name = config.llm.model
-            self.temperature = config.llm.temperature
-            self.max_tokens = config.llm.max_tokens
-            self.safety_settings_level = config.llm.safety_settings
-        else:
+        # Load configuration from unified config system
+        config_loaded = False
+        try:
+            from backend.config.unified_config import get_unified_config
+            config = get_unified_config()
+            self.api_key = api_key or config.get_value("LLM", "GEMINI_API_KEY", fallback="")
+            self.model_name = config.get_value("LLM", "MODEL", fallback="gemini-2.5-flash")
+            self.temperature = float(config.get_value("LLM", "TEMPERATURE", fallback=0.7))
+            self.max_tokens = int(config.get_value("LLM", "MAX_TOKENS", fallback=150))
+            self.safety_settings_level = config.get_value("LLM", "SAFETY_SETTINGS", fallback="BLOCK_MEDIUM_AND_ABOVE")
+            logger.info("🔧 LLM service configured using unified configuration")
+            config_loaded = True
+        except Exception as e:
+            logger.warning(f"Failed to load unified config for LLM service: {e}")
+            # Fall back to manual configuration
+        
+        if not config_loaded:
             # Fallback to environment variables
             self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_AI_API_KEY")
             self.model_name = os.getenv("LLM_MODEL", "gemini-2.5-flash")
             self.temperature = float(os.getenv("LLM_TEMPERATURE", "0.7"))
             self.max_tokens = int(os.getenv("MAX_TOKENS", "150"))  # Reduced for concise responses
             self.safety_settings_level = os.getenv("SAFETY_SETTINGS", "BLOCK_MEDIUM_AND_ABOVE")
+            logger.info("🔧 LLM service configured using environment variables (fallback)")
         
         self.is_configured = bool(self.api_key and self.api_key != "dev-mode-placeholder")
         

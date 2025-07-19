@@ -247,21 +247,39 @@ echo "🔒 Security Validation..."
 
 cd "$PROJECT_ROOT"
 
-# Check for hardcoded secrets (basic patterns)
+# Check for hardcoded secrets (comprehensive patterns)
 SECRET_PATTERNS=(
-    "password\s*=\s*[\"'][a-zA-Z0-9]{8,}[\"']"
-    "api_key\s*=\s*[\"'][a-zA-Z0-9]{20,}[\"']"
-    "secret_key\s*=\s*[\"'][a-zA-Z0-9]{16,}[\"']"
+    "password\s*[=:]\s*[\"'][a-zA-Z0-9]{8,}[\"']"
+    "api_key\s*[=:]\s*[\"'][a-zA-Z0-9]{20,}[\"']"
+    "secret_key\s*[=:]\s*[\"'][a-zA-Z0-9]{16,}[\"']"
+    "gemini_api_key\s*[=:]\s*[\"'][a-zA-Z0-9_-]{30,}[\"']"
+    "google_api_key\s*[=:]\s*[\"'][a-zA-Z0-9_-]{30,}[\"']"
+    "GEMINI_API_KEY\s*[=:]\s*[\"']?[a-zA-Z0-9_-]{30,}[\"']?"
+    "GOOGLE_API_KEY\s*[=:]\s*[\"']?[a-zA-Z0-9_-]{30,}[\"']?"
+    "AIza[0-9A-Za-z_-]{35}"  # Google API key pattern
+    "private_key\s*[=:]\s*[\"'][^\"']{50,}[\"']"
+    "client_secret\s*[=:]\s*[\"'][a-zA-Z0-9_-]{20,}[\"']"
+    "access_token\s*[=:]\s*[\"'][a-zA-Z0-9._-]{20,}[\"']"
+    "bearer\s+[a-zA-Z0-9._-]{20,}"
+    "sk-[a-zA-Z0-9]{20,}"  # OpenAI API key pattern
 )
 
 SECURITY_ISSUES=0
 for pattern in "${SECRET_PATTERNS[@]}"; do
     # Exclude test files and common non-sensitive patterns
-    if grep -r -E "$pattern" backend/ frontend/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" --exclude-dir=tests --exclude-dir=test --exclude="*test*" --exclude="*mock*" | grep -v "example\|sample\|placeholder\|dummy" &> /dev/null; then
+    if grep -r -E "$pattern" backend/ frontend/ config/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.env*" --exclude-dir=tests --exclude-dir=test --exclude="*test*" --exclude="*mock*" | grep -v "example\|sample\|placeholder\|dummy\|template\|TODO\|XXX" &> /dev/null; then
         warning "Potential hardcoded secret found (pattern: $pattern)"
+        grep -r -E "$pattern" backend/ frontend/ config/ --include="*.py" --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.env*" --exclude-dir=tests --exclude-dir=test --exclude="*test*" --exclude="*mock*" | grep -v "example\|sample\|placeholder\|dummy\|template\|TODO\|XXX" | head -3
         SECURITY_ISSUES=$((SECURITY_ISSUES + 1))
     fi
 done
+
+# Additional check for .env files that shouldn't be committed
+if find . -name ".env" -o -name ".env.local" -o -name ".env.production" | grep -v ".env.example" &> /dev/null; then
+    warning "Environment files found - ensure no secrets are committed:"
+    find . -name ".env" -o -name ".env.local" -o -name ".env.production" | grep -v ".env.example"
+    SECURITY_ISSUES=$((SECURITY_ISSUES + 1))
+fi
 
 if [[ $SECURITY_ISSUES -eq 0 ]]; then
     success "No obvious hardcoded secrets found"

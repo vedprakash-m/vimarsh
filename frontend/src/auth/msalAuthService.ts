@@ -7,10 +7,10 @@ import {
 } from '@azure/msal-browser';
 import { 
   msalConfig, 
-  loginRequest, 
+  createLoginRequest, 
   apiTokenRequest, 
   silentRequest,
-  logoutRequest,
+  createLogoutRequest,
   AUTH_ERROR_MESSAGES 
 } from './msalConfig';
 import { AuthService, AuthUser } from './authService';
@@ -46,6 +46,7 @@ export class MSALAuthService implements AuthService {
       console.info('🔐 Starting MSAL login process');
       
       // Use redirect flow for better mobile support
+      const loginRequest = createLoginRequest();
       await this.msalInstance.loginRedirect(loginRequest);
       
       // After redirect, this won't execute immediately
@@ -74,6 +75,7 @@ export class MSALAuthService implements AuthService {
         return;
       }
 
+      const logoutRequest = createLogoutRequest();
       const logoutRequestWithAccount: EndSessionRequest = {
         ...logoutRequest,
         account: this.accounts[0]
@@ -93,13 +95,35 @@ export class MSALAuthService implements AuthService {
 
   async getUser(): Promise<AuthUser | null> {
     try {
+      // Always get fresh account list from MSAL
       this.accounts = this.msalInstance.getAllAccounts();
       
+      console.log('🔍 MSALAuthService getUser debug:', {
+        accountsCount: this.accounts.length,
+        activeAccount: this.msalInstance.getActiveAccount()?.username,
+        allAccounts: this.accounts.map(acc => ({ username: acc.username, homeAccountId: acc.homeAccountId }))
+      });
+      
       if (this.accounts.length === 0) {
+        console.log('🔍 No accounts found in MSAL cache');
         return null;
       }
 
-      const vedUser = this.extractVedUser(this.accounts[0]);
+      // Get the active account or use the first available
+      let account = this.msalInstance.getActiveAccount();
+      if (!account && this.accounts.length > 0) {
+        account = this.accounts[0];
+        this.msalInstance.setActiveAccount(account);
+        console.log('🔧 Set active account to:', account.username);
+      }
+
+      if (!account) {
+        console.log('🔍 No active account available despite having accounts');
+        return null;
+      }
+
+      const vedUser = this.extractVedUser(account);
+      console.log('✅ Successfully extracted VedUser for:', vedUser.email);
       return vedUser;
 
     } catch (error) {

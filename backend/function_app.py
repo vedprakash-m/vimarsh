@@ -19,9 +19,9 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 import asyncio
 
-# Import centralized configuration
+# Import unified configuration system
 try:
-    from backend.core.config import get_config
+    from config.unified_config import get_config, is_development_mode, is_production_mode
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False
@@ -48,11 +48,13 @@ else:
 
 # Import authentication middleware
 try:
-    from auth.entra_external_id_middleware import auth_required, VedUser
+    from auth.unified_auth_service import auth_service, require_auth, require_admin, AuthenticatedUser
+    from auth.models import AuthenticatedUser
     AUTHENTICATION_ENABLED = True
-except ImportError:
+    logger.info("✅ Unified authentication service loaded successfully")
+except ImportError as e:
     AUTHENTICATION_ENABLED = False
-    logger.warning("Authentication modules not available, running without auth")
+    logger.warning(f"⚠️ Authentication modules not available, running without auth: {e}")
 
 # Initialize Azure Functions app
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -84,12 +86,15 @@ async def health_check_impl(req: func.HttpRequest) -> func.HttpResponse:
             )
         else:
             # Fallback to simple health check
+            config = get_config() if CONFIG_AVAILABLE else None
+            environment = config.environment.value if config else "unknown"
+            
             health_status = {
                 "status": "healthy",
                 "service": "vimarsh-spiritual-guidance",
                 "version": "1.0.0",
                 "timestamp": datetime.utcnow().isoformat(),
-                "environment": os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "unknown"),
+                "environment": environment,
                 "monitoring": "basic"
             }
             
@@ -203,7 +208,7 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
     Main spiritual guidance endpoint providing Lord Krishna's wisdom.
     
     Accepts user queries and returns spiritually grounded responses based on
-    sacred texts using RAG pipeline and Gemini Pro API.
+    sacred texts using RAG pipeline and Gemini Pro API with budget controls.
     
     Authentication: Optional - Can be enabled by setting ENABLE_AUTH environment variable
     
@@ -224,22 +229,40 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         }
     """
     try:
-        # Optional authentication check
+        # Optional authentication check with admin role detection
         user_context = None
+        user_id = None
+        user_email = None
+        session_id = None
+        
         if AUTHENTICATION_ENABLED and os.getenv("ENABLE_AUTH", "false").lower() == "true":
             try:
                 # Extract user from JWT token
                 auth_header = req.headers.get('Authorization', '')
                 if auth_header.startswith('Bearer '):
                     token = auth_header[7:]
-                    # Validate token and extract user (simplified for now)
-                    user_context = {"authenticated": True, "token": token}
-                    logger.info("🔐 Authenticated request received")
+                    # Use auth middleware to extract user
+                    user = auth_middleware.extract_user_from_request(req)
+                    if user:
+                        user_context = {"authenticated": True, "role": str(user.role)}
+                        user_id = user.id
+                        user_email = user.email
+                        session_id = req.headers.get('x-session-id', f"session_{user.id}")
+                        logger.info(f"🔐 Authenticated request from {user.email} (Role: {user.role})")
+                    else:
+                        logger.warning("Invalid authentication token")
                 else:
                     logger.warning("Missing authentication token")
             except Exception as auth_error:
                 logger.warning(f"Authentication failed: {auth_error}")
                 # Continue without auth for graceful degradation
+        
+        # Generate placeholder user context for development
+        if not user_context:
+            user_id = req.headers.get('x-user-id', 'dev_user_1')
+            user_email = req.headers.get('x-user-email', 'dev@example.com')
+            session_id = req.headers.get('x-session-id', f"session_{user_id}")
+            user_context = {"authenticated": False, "role": "user"}
         
         # Parse and validate request
         if not req.get_body():
@@ -263,17 +286,19 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         if language not in ['English', 'Hindi']:
             raise ValueError("Language must be 'English' or 'Hindi'")
         
-        logger.info(f"Processing spiritual guidance request: {user_query[:100]}...")
+        logger.info(f"Processing spiritual guidance request from {user_email}: {user_query[:100]}...")
         
-        # Generate response with enhanced API integration
-        response_data = await _generate_spiritual_response(
-            user_query, language, include_citations, voice_enabled, conversation_context
+        # Generate response with budget-aware LLM service
+        response_data = await _generate_spiritual_response_with_budget(
+            user_query, language, include_citations, voice_enabled, conversation_context,
+            user_id, user_email, session_id
         )
         
         # Add authentication metadata if available
         if user_context:
-            response_data["metadata"]["authenticated"] = True
-            response_data["metadata"]["user_context"] = "available"
+            response_data["metadata"]["authenticated"] = user_context["authenticated"]
+            response_data["metadata"]["user_role"] = user_context["role"]
+            response_data["metadata"]["user_id"] = user_id
         
         logger.info("Spiritual guidance response generated successfully")
         return func.HttpResponse(
@@ -282,9 +307,10 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
             status_code=200,
             headers={
                 "Content-Type": "application/json; charset=utf-8",
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, x-user-id, x-user-email, x-session-id",
+                "Access-Control-Allow-Credentials": "true"
             }
         )
         
@@ -376,12 +402,104 @@ async def supported_languages(req: func.HttpRequest) -> func.HttpResponse:
     return await supported_languages_impl(req)
 
 
+async def _generate_spiritual_response_with_budget(
+    query: str, 
+    language: str, 
+    include_citations: bool,
+    voice_enabled: bool,
+    conversation_context: List[Dict[str, str]] = None,
+    user_id: str = None,
+    user_email: str = None,
+    session_id: str = None
+) -> Dict[str, Any]:
+    """
+    Generate spiritual guidance response using budget-aware LLM service.
+    
+    Args:
+        query: User's spiritual question
+        language: Response language (English/Hindi)
+        include_citations: Whether to include source citations
+        voice_enabled: Whether to generate audio response
+        conversation_context: Previous conversation context
+        user_id: User ID for budget tracking
+        user_email: User email for budget tracking
+        session_id: Session ID for usage tracking
+    
+    Returns:
+        Structured response with guidance, citations, and metadata
+    """
+    try:
+        # Use budget-aware LLM service
+        from services.llm_service import llm_service
+        from services.llm_service import SpiritualContext
+        
+        # Get spiritual guidance with budget controls
+        if user_id and user_email:
+            spiritual_response = llm_service.generate_response_with_budget_check(
+                prompt=query,
+                user_id=user_id,
+                user_email=user_email,
+                context=SpiritualContext.GUIDANCE,
+                session_id=session_id
+            )
+        else:
+            # Fallback to regular generation for development
+            spiritual_response = llm_service.generate_response(
+                prompt=query,
+                context=SpiritualContext.GUIDANCE,
+                include_context=True,
+                user_id=user_id,
+                session_id=session_id
+            )
+        
+        # Structure the response
+        response_data = {
+            "response": spiritual_response.content,
+            "citations": [],  # Don't include separate citations since they're inline
+            "metadata": {
+                "language": language,
+                "confidence": spiritual_response.confidence,
+                "processing_time_ms": int(spiritual_response.response_time * 1000),
+                "voice_enabled": voice_enabled,
+                "service_version": "enhanced_budget_aware_v1.0",
+                "spiritual_context": spiritual_response.spiritual_context.value if spiritual_response.spiritual_context else "general",
+                "safety_passed": spiritual_response.safety_passed,
+                "safety_score": spiritual_response.safety_score,
+                "token_usage": {
+                    "input_tokens": spiritual_response.token_usage.input_tokens,
+                    "output_tokens": spiritual_response.token_usage.output_tokens,
+                    "total_tokens": spiritual_response.token_usage.total_tokens,
+                    "estimated_cost": spiritual_response.token_usage.estimated_cost
+                } if spiritual_response.token_usage else None,
+                **spiritual_response.metadata
+            }
+        }
+        
+        # Add audio URL if voice enabled (placeholder for now)
+        if voice_enabled:
+            response_data["audio_url"] = None  # TODO: Implement TTS
+        
+        logger.info("✅ Generated response using budget-aware LLM service")
+        return response_data
+        
+    except Exception as e:
+        logger.error(f"Budget-aware LLM service failed: {e}")
+        # Return fallback to original function
+        return await _generate_spiritual_response(
+            query, language, include_citations, voice_enabled, conversation_context,
+            user_id, user_email, session_id
+        )
+
+
 async def _generate_spiritual_response(
     query: str, 
     language: str, 
     include_citations: bool,
     voice_enabled: bool,
-    conversation_context: List[Dict[str, str]] = None
+    conversation_context: List[Dict[str, str]] = None,
+    user_id: str = None,
+    user_email: str = None,
+    session_id: str = None
 ) -> Dict[str, Any]:
     """
     Generate spiritual guidance response using simplified LLM service.
@@ -391,6 +509,10 @@ async def _generate_spiritual_response(
         language: Response language (English/Hindi)
         include_citations: Whether to include source citations
         voice_enabled: Whether to generate audio response
+        conversation_context: Previous conversation context
+        user_id: User ID for conversation tracking
+        user_email: User email for conversation tracking
+        session_id: Session ID for conversation tracking
     
     Returns:
         Structured response with guidance, citations, and metadata
@@ -407,7 +529,7 @@ async def _generate_spiritual_response(
         # Structure the response
         response_data = {
             "response": spiritual_response.content,
-            "citations": spiritual_response.citations if include_citations else [],
+            "citations": [],  # Don't include separate citations since they're inline
             "metadata": {
                 "language": language,
                 "confidence": spiritual_response.confidence,
@@ -417,6 +539,41 @@ async def _generate_spiritual_response(
                 **spiritual_response.metadata
             }
         }
+        
+        # Save conversation to database for audit and improvement
+        if user_id and user_email:
+            try:
+                from services.database_service import db_service, Conversation
+                
+                conversation = Conversation(
+                    id=f"conv_{user_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+                    userId=user_id,
+                    userEmail=user_email,
+                    sessionId=session_id or f"session_{user_id}",
+                    timestamp=datetime.utcnow().isoformat(),
+                    question=query,
+                    response=spiritual_response.content,
+                    citations=spiritual_response.citations,
+                    personality="krishna",  # Default personality
+                    metadata={
+                        "language": language,
+                        "confidence": spiritual_response.confidence,
+                        "model": spiritual_response.metadata.get("model", "gemini-2.5-flash"),
+                        "tokens": spiritual_response.metadata.get("total_tokens", 0),
+                        "cost": spiritual_response.metadata.get("estimated_cost", 0.0),
+                        "responseTime": spiritual_response.metadata.get("response_time", 0.0),
+                        "voiceEnabled": voice_enabled,
+                        "includeCitations": include_citations
+                    }
+                )
+                
+                # Save conversation asynchronously
+                await db_service.save_conversation(conversation)
+                logger.info(f"💾 Conversation saved for user {user_email}")
+                
+            except Exception as db_error:
+                logger.error(f"Failed to save conversation: {db_error}")
+                # Don't fail the request if database save fails
         
         # Add audio URL if voice enabled (placeholder for now)
         if voice_enabled:
@@ -447,9 +604,10 @@ async def handle_options_impl(req: func.HttpRequest) -> func.HttpResponse:
         "",
         status_code=204,
         headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id",
+            "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id",
+            "Access-Control-Allow-Credentials": "true",
             "Access-Control-Max-Age": "86400"
         }
     )
@@ -856,4 +1014,461 @@ else:
             }),
             status_code=503,
             mimetype="application/json"
+        )
+
+# Admin endpoints for cost management and user administration
+try:
+    from admin import (
+        admin_cost_dashboard,
+        admin_user_management,
+        admin_budget_management,
+        super_admin_role_management,
+        admin_system_health,
+        admin_get_user_role,
+        admin_metrics_dashboard,
+        admin_performance_report,
+        admin_real_time_metrics,
+        admin_alerts_dashboard
+    )
+    ADMIN_AVAILABLE = True
+    logger.info("✅ Admin endpoints loaded successfully")
+except ImportError as e:
+    logger.error(f"❌ Admin endpoints not available: {e}")
+    ADMIN_AVAILABLE = False
+
+# Register admin endpoints if available
+if ADMIN_AVAILABLE:
+    @app.function_name("admin_cost_dashboard")
+    @app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin cost dashboard endpoint - Requires admin authentication."""
+        try:
+            return await admin_cost_dashboard(req)
+        except Exception as e:
+            logger.error(f"Error in admin cost dashboard: {e}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            return func.HttpResponse(
+                json.dumps({"error": "Cost dashboard service unavailable", "debug": str(e)}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_user_list")
+    @app.route(route="vimarsh-admin/users", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_user_list_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin user list endpoint - Requires admin authentication."""
+        try:
+            return await admin_user_management(req)
+        except Exception as e:
+            logger.error(f"Error in admin user list: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "User list service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_user_block")
+    @app.route(route="vimarsh-admin/users/{user_id}/block", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_user_block_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin user block endpoint - Requires admin authentication."""
+        try:
+            return await admin_user_management(req)
+        except Exception as e:
+            logger.error(f"Error in admin user block: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "User block service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_user_unblock")
+    @app.route(route="vimarsh-admin/users/{user_id}/unblock", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_user_unblock_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin user unblock endpoint - Requires admin authentication."""
+        try:
+            return await admin_user_management(req)
+        except Exception as e:
+            logger.error(f"Error in admin user unblock: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "User unblock service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_budget_list")
+    @app.route(route="vimarsh-admin/budgets", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_budget_list_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin budget list endpoint - Requires admin authentication."""
+        try:
+            return await admin_budget_management(req)
+        except Exception as e:
+            logger.error(f"Error in admin budget list: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Budget list service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_budget_create")
+    @app.route(route="vimarsh-admin/budgets", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_budget_create_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin budget create endpoint - Requires admin authentication."""
+        try:
+            return await admin_budget_management(req)
+        except Exception as e:
+            logger.error(f"Error in admin budget create: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Budget create service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_budget_override")
+    @app.route(route="vimarsh-admin/budgets/{user_id}/override", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_budget_override_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin budget override endpoint - Requires admin authentication."""
+        try:
+            return await admin_budget_management(req)
+        except Exception as e:
+            logger.error(f"Error in admin budget override: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Budget override service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("super_admin_role_list")
+    @app.route(route="vimarsh-admin/roles", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def super_admin_role_list_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Super admin role list endpoint - Requires admin authentication."""
+        try:
+            return await super_admin_role_management(req)
+        except Exception as e:
+            logger.error(f"Error in super admin role list: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Role list service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("super_admin_role_create")
+    @app.route(route="vimarsh-admin/roles", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def super_admin_role_create_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Super admin role create endpoint - Requires admin authentication."""
+        try:
+            return await super_admin_role_management(req)
+        except Exception as e:
+            logger.error(f"Error in super admin role create: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Role create service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_system_health")
+    @app.route(route="vimarsh-admin/health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_system_health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin system health endpoint - Requires admin authentication."""
+        try:
+            return await admin_system_health(req)
+        except Exception as e:
+            logger.error(f"Error in admin system health: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "System health service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_get_role")
+    @app.route(route="vimarsh-admin/role", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_get_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin get user role endpoint - Requires admin authentication."""
+        try:
+            return await admin_get_user_role(req)
+        except Exception as e:
+            logger.error(f"Error in admin get role: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Role service unavailable"}),
+                status_code=503,
+                mimetype="application/json",
+                headers={
+                    "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
+                }
+            )
+
+    @app.function_name("admin_dev_token")
+    @app.route(route="vimarsh-admin/dev-token", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_dev_token_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Generate development token for specific user - Development mode only."""
+        try:
+            # Only allow in development mode
+            if os.getenv('ENVIRONMENT', 'production') != 'development':
+                return func.HttpResponse(
+                    json.dumps({"error": "Development tokens only available in development mode"}),
+                    status_code=403,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Parse request body
+            try:
+                req_body = req.get_json()
+                user_email = req_body.get('email')
+                if not user_email:
+                    return func.HttpResponse(
+                        json.dumps({"error": "Email is required"}),
+                        status_code=400,
+                        mimetype="application/json",
+                        headers={"Access-Control-Allow-Origin": "*"}
+                    )
+            except Exception:
+                return func.HttpResponse(
+                    json.dumps({"error": "Invalid JSON body"}),
+                    status_code=400,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+            
+            # Use simple dev token format: dev:email:timestamp:signature
+            import hashlib
+            import hmac
+            from datetime import datetime
+            
+            dev_secret = os.getenv('DEV_AUTH_SECRET', 'dev-secret-change-in-production')
+            timestamp = str(int(datetime.utcnow().timestamp()))
+            payload = f"{user_email}:{timestamp}"
+            signature = hmac.new(
+                dev_secret.encode(),
+                payload.encode(),
+                hashlib.sha256
+            ).hexdigest()
+            
+            dev_token = f"dev:{user_email}:{timestamp}:{signature}"
+            
+            logger.info(f"🔑 Generated development token for user: {user_email}")
+            
+            return func.HttpResponse(
+                json.dumps({
+                    "token": dev_token,
+                    "email": user_email,
+                    "expires_in": "24h"
+                }),
+                status_code=200,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+            
+        except Exception as e:
+            logger.error(f"Error generating development token: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": f"Token generation failed: {str(e)}"}),
+                status_code=500,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+    @app.function_name("admin_real_time_metrics")
+    @app.route(route="vimarsh-admin/real-time-metrics", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_real_time_metrics_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin real-time metrics endpoint - Requires admin authentication."""
+        try:
+            return await admin_real_time_metrics(req)
+        except Exception as e:
+            logger.error(f"Error in admin real-time metrics: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Real-time metrics service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    @app.function_name("admin_alerts_dashboard")
+    @app.route(route="vimarsh-admin/alerts", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    @require_admin
+    async def admin_alerts_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Admin alerts dashboard endpoint - Requires admin authentication."""
+        try:
+            return await admin_alerts_dashboard(req)
+        except Exception as e:
+            logger.error(f"Error in admin alerts dashboard: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": "Alerts dashboard service unavailable"}),
+                status_code=503,
+                mimetype="application/json"
+            )
+
+    # Simple test endpoint without complex decorators
+    @app.function_name("admin_test")
+    @app.route(route="vimarsh-admin/test", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_test_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Simple admin test endpoint."""
+        try:
+            # Check if user is authenticated
+            if AUTHENTICATION_ENABLED:
+                user = auth_service.authenticate_request(req)
+                if not user:
+                    return func.HttpResponse(
+                        json.dumps({"error": "Authentication required"}),
+                        status_code=401,
+                        mimetype="application/json",
+                        headers={
+                            "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                            "Access-Control-Allow-Credentials": "true",
+                            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                            "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
+                        }
+                    )
+                
+                # Check admin role
+                from core.user_roles import admin_role_manager
+                user_role = admin_role_manager.get_user_role(user.email)
+                is_admin = admin_role_manager.is_admin(user.email)
+                
+                return func.HttpResponse(
+                    json.dumps({
+                        "message": "Admin test successful",
+                        "user_email": user.email,
+                        "user_role": str(user_role),
+                        "is_admin": is_admin,
+                        "timestamp": datetime.utcnow().isoformat()
+                    }),
+                    mimetype="application/json",
+                    status_code=200,
+                    headers={
+                        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                        "Access-Control-Allow-Credentials": "true",
+                        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
+                    }
+                )
+            else:
+                return func.HttpResponse(
+                    json.dumps({"message": "Authentication disabled"}),
+                    mimetype="application/json",
+                    status_code=200
+                )
+        except Exception as e:
+            logger.error(f"Admin test error: {e}")
+            return func.HttpResponse(
+                json.dumps({"error": str(e)}),
+                status_code=500,
+                mimetype="application/json",
+                headers={
+                    "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
+                }
+            )
+
+else:
+    @app.function_name("admin_unavailable")
+    @app.route(route="vimarsh-admin/{*route}", methods=["GET", "POST"])
+    async def admin_unavailable(req: func.HttpRequest) -> func.HttpResponse:
+        """Fallback for when admin API is unavailable."""
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Admin API is not available in this deployment",
+                "message": "Please check system configuration and admin permissions"
+            }),
+            status_code=503,
+            mimetype="application/json"
+        )
+
+@app.route(route="user/budget", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def user_budget_status(req: func.HttpRequest) -> func.HttpResponse:
+    """User endpoint to view their own budget status and usage."""
+    try:
+        # Get user context (similar to spiritual guidance)
+        user_id = req.headers.get('x-user-id', 'dev_user_1')
+        user_email = req.headers.get('x-user-email', 'dev@example.com')
+        
+        # Optional authentication check
+        if AUTHENTICATION_ENABLED and os.getenv("ENABLE_AUTH", "false").lower() == "true":
+            try:
+                user = auth_middleware.extract_user_from_request(req)
+                if user:
+                    user_id = user.id
+                    user_email = user.email
+                    logger.info(f"🔐 Budget request from authenticated user: {user.email}")
+                else:
+                    return func.HttpResponse(
+                        json.dumps({
+                            "error": "Authentication required",
+                            "message": "Valid access token must be provided to view budget status"
+                        }),
+                        status_code=401,
+                        mimetype="application/json",
+                        headers={"Access-Control-Allow-Origin": "*"}
+                    )
+            except Exception as e:
+                logger.warning(f"Authentication failed: {e}")
+                return func.HttpResponse(
+                    json.dumps({
+                        "error": "Authentication failed",
+                        "message": str(e)
+                    }),
+                    status_code=401,
+                    mimetype="application/json",
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+        
+        # Get budget status and usage
+        if TOKEN_TRACKING_AVAILABLE:
+            from backend.core.token_tracker import token_tracker
+            from backend.core.budget_validator import budget_validator
+            
+            budget_status = budget_validator.get_user_budget_status(user_id)
+            user_stats = token_tracker.get_user_usage(user_id)
+            forecast = token_tracker.get_cost_forecast(user_id)
+            
+            response_data = {
+                "user_id": user_id,
+                "user_email": user_email,
+                "budget_status": budget_status,
+                "usage_stats": user_stats.to_dict() if user_stats else None,
+                "cost_forecast": forecast,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        else:
+            response_data = {
+                "user_id": user_id,
+                "user_email": user_email,
+                "budget_status": {"status": "tracking_not_available"},
+                "usage_stats": None,
+                "cost_forecast": None,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        
+        return func.HttpResponse(
+            json.dumps(response_data),
+            mimetype="application/json",
+            status_code=200,
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+        
+    except Exception as e:
+        logger.error(f"User budget status error: {e}")
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Failed to retrieve budget status",
+                "message": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
         )

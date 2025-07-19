@@ -2,7 +2,7 @@
 // Provides authentication state and methods throughout the app
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authConfig } from '../auth/msalConfig';
+import { getAuthConfigStatic } from '../auth/msalConfig';
 import { createAuthService, AuthUser, AuthState, AuthService } from '../auth/authService';
 
 interface AuthContextType extends AuthState {
@@ -33,6 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   // Initialize appropriate auth service based on environment
   const authService: AuthService = React.useMemo(() => {
     // Override authConfig for testing purposes if needed
+    const authConfig = getAuthConfigStatic();
     if (enableMSAL && !authConfig.usePlaceholder) {
       try {
         const { MSALAuthService } = require('../auth/msalAuthService');

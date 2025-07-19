@@ -42,6 +42,16 @@ from .health import (
     get_health_checker
 )
 
+from .user_roles import (
+    UserRole,
+    UserPermissions,
+    AdminRoleManager,
+    admin_role_manager
+)
+
+from .token_tracker import token_tracker
+from .budget_validator import budget_validator
+
 __all__ = [
     # Configuration
     "ConfigManager",
@@ -77,5 +87,15 @@ __all__ = [
     "HealthCheckResult",
     "SystemHealthSummary",
     "health_checker",
-    "get_health_checker"
+    "get_health_checker",
+    
+    # User Roles & Admin Management
+    "UserRole",
+    "UserPermissions", 
+    "AdminRoleManager",
+    "admin_role_manager",
+    
+    # Token & Budget Management
+    "token_tracker",
+    "budget_validator"
 ]

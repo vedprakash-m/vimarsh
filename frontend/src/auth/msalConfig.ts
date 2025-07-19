@@ -1,83 +1,105 @@
 import { Configuration, LogLevel } from '@azure/msal-browser';
-import { AUTH_CONFIG, validateEnvironmentConfig, getCurrentDomainConfig, ENTRA_ID_CONFIG } from '../config/environment';
+import { getAuthConfig, validateEnvironmentConfig, getCurrentDomainConfig, ENTRA_ID_CONFIG, isValidProductionDomain } from '../config/environment';
 
 // Microsoft Authentication Library (MSAL) Configuration
 // Implements unified Vedprakash domain authentication standard
 // Following Apps_Auth_Requirement.md specifications
-// Handles custom domain: vimarsh.vedprakash.net
+// Supports multi-domain: vimarsh.vedprakash.net AND white-forest-05c196d0f.2.azurestaticapps.net
 
-// Validate environment configuration on load
-validateEnvironmentConfig();
-
-// Get domain-aware configuration
-const domainConfig = getCurrentDomainConfig();
-
-// Environment-aware MSAL Configuration for Vedprakash Domain
-export const msalConfig: Configuration = {
-  auth: {
-    clientId: ENTRA_ID_CONFIG.clientId,
-    authority: ENTRA_ID_CONFIG.authority,
-    redirectUri: domainConfig.redirectUri,
-    postLogoutRedirectUri: domainConfig.postLogoutRedirectUri,
-    navigateToLoginRequestUrl: false,
-    // Remove B2C specific knownAuthorities - not needed for regular Entra ID
-  },
-  cache: {
-    cacheLocation: 'sessionStorage', // ✅ Required for SSO per Apps_Auth_Requirement.md
-    storeAuthStateInCookie: true,    // ✅ Required for Safari/iOS per Apps_Auth_Requirement.md
-  },
-  system: {
-    allowNativeBroker: false, // ✅ Ensures consistent web experience per requirements
-    windowHashTimeout: 60000,
-    iframeHashTimeout: 6000,
-    loadFrameTimeout: 0,
-    loggerOptions: {
-      loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
-        if (containsPii) {
-          return; // Don't log PII
-        }
-        
-        // Only log in development or when debug auth is enabled
-        if (!AUTH_CONFIG.enableDebugLogging && !AUTH_CONFIG.usePlaceholder) {
-          return;
-        }
-        
-        const prefix = `🔐 MSAL [${domainConfig.domain}]`;
-        switch (level) {
-          case LogLevel.Error:
-            console.error(`${prefix} Error:`, message);
-            break;
-          case LogLevel.Warning:
-            console.warn(`${prefix} Warning:`, message);
-            break;
-          case LogLevel.Info:
-            console.info(`${prefix} Info:`, message);
-            break;
-          case LogLevel.Verbose:
-            console.debug(`${prefix} Debug:`, message);
-            break;
-          default:
-            console.log(`${prefix}:`, message);
-            break;
-        }
-      },
-      logLevel: AUTH_CONFIG.enableDebugLogging ? LogLevel.Info : LogLevel.Warning,
-      piiLoggingEnabled: false
+// Create dynamic MSAL configuration that adapts to multi-domain runtime
+export const createMsalConfig = (): Configuration => {
+  // Get domain-aware configuration at runtime
+  const domainConfig = getCurrentDomainConfig();
+  const authConfig = getAuthConfig();
+  
+  console.info('🔐 Building MSAL configuration for production domain:', domainConfig.domain);
+  console.info('🔗 Redirect URI:', domainConfig.redirectUri);
+  console.info('🏠 Logout URI:', domainConfig.postLogoutRedirectUri);
+  console.info('✅ Valid production domain:', isValidProductionDomain(domainConfig.domain));
+  
+  return {
+    auth: {
+      clientId: ENTRA_ID_CONFIG.clientId,
+      authority: ENTRA_ID_CONFIG.authority,
+      redirectUri: domainConfig.redirectUri,
+      postLogoutRedirectUri: domainConfig.postLogoutRedirectUri,
+      navigateToLoginRequestUrl: true, // Enable navigation to login request URL for proper redirect handling
+      // Remove B2C specific knownAuthorities - not needed for regular Entra ID
     },
-  },
+    cache: {
+      cacheLocation: 'localStorage', // Better persistence across domains and redirects
+      storeAuthStateInCookie: true,   // Required for cross-domain scenarios and redirect flow
+      claimsBasedCachingEnabled: true, // Enable claims-based caching for better account management
+      secureCookies: false,            // Will be set based on HTTPS in production
+    },
+    system: {
+      allowNativeBroker: false, // ✅ Ensures consistent web experience per requirements
+      windowHashTimeout: 60000,
+      iframeHashTimeout: 6000,
+      loadFrameTimeout: 0,
+      navigateFrameWait: 1000, // Add delay for frame navigation
+      asyncPopups: false, // Disable async popups since we're using redirect flow
+      allowRedirectInIframe: true, // Allow redirect in iframe for proper redirect handling
+      loggerOptions: {
+        loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
+          if (containsPii) {
+            return; // Don't log PII
+          }
+          
+          // Only log in development or when debug auth is enabled
+          if (!authConfig.enableDebugLogging && !authConfig.usePlaceholder) {
+            return;
+          }
+          
+          const prefix = `🔐 MSAL [${domainConfig.domain}]`;
+          switch (level) {
+            case LogLevel.Error:
+              console.error(`${prefix} Error:`, message);
+              break;
+            case LogLevel.Warning:
+              console.warn(`${prefix} Warning:`, message);
+              break;
+            case LogLevel.Info:
+              console.info(`${prefix} Info:`, message);
+              break;
+            case LogLevel.Verbose:
+              console.debug(`${prefix} Debug:`, message);
+              break;
+            default:
+              console.log(`${prefix}:`, message);
+              break;
+          }
+        },
+        logLevel: authConfig.enableDebugLogging ? LogLevel.Info : LogLevel.Warning,
+        piiLoggingEnabled: false
+      },
+    },
+  };
 };
 
-// Build login request dynamically: include domain_hint only when authority is single-tenant
-const includeDomainHint = msalConfig.auth.authority?.includes('vedid.onmicrosoft.com');
+// Get MSAL configuration (creates if needed)
+let msalConfigCache: Configuration | null = null;
+export const msalConfig = (() => {
+  if (!msalConfigCache) {
+    msalConfigCache = createMsalConfig();
+  }
+  return msalConfigCache;
+})();
 
-export const loginRequest = {
-  scopes: ENTRA_ID_CONFIG.scopes,
-  prompt: 'select_account', // Options: 'login', 'select_account', 'consent', 'none'
-  ...(includeDomainHint && {
-    extraQueryParameters: {
-      domain_hint: ENTRA_ID_CONFIG.tenantId
-    }
-  })
+// Build login request dynamically: include domain_hint only when authority is single-tenant
+export const createLoginRequest = () => {
+  const config = createMsalConfig();
+  const includeDomainHint = config.auth.authority?.includes('vedid.onmicrosoft.com');
+
+  return {
+    scopes: ENTRA_ID_CONFIG.scopes,
+    prompt: 'select_account', // Options: 'login', 'select_account', 'consent', 'none'
+    ...(includeDomainHint && {
+      extraQueryParameters: {
+        domain_hint: ENTRA_ID_CONFIG.tenantId
+      }
+    })
+  };
 };
 
 // Token request for accessing Vimarsh API
@@ -94,18 +116,24 @@ export const silentRequest = {
 };
 
 // Logout request configuration
-export const logoutRequest = {
-  account: null as any, // Will be set at runtime
-  postLogoutRedirectUri: domainConfig.postLogoutRedirectUri,
-  mainWindowRedirectUri: domainConfig.postLogoutRedirectUri
+export const createLogoutRequest = () => {
+  const domainConfig = getCurrentDomainConfig();
+  return {
+    account: null as any, // Will be set at runtime
+    postLogoutRedirectUri: domainConfig.postLogoutRedirectUri,
+    mainWindowRedirectUri: domainConfig.postLogoutRedirectUri
+  };
 };
 
 // Production environment validation per Apps_Auth_Requirement.md
 export const validateMsalConfig = (): boolean => {
-  // Use the environment validation from our config
-  if (!validateEnvironmentConfig()) {
-    return false;
-  }
+  const authConfig = getAuthConfig();
+  const domainConfig = getCurrentDomainConfig();
+
+  // Validate environment configuration with dynamic config
+  console.info('🔐 Environment configuration validated successfully');
+  console.info('🌐 Domain:', domainConfig.domain);
+  console.info('🔗 Redirect URI:', domainConfig.redirectUri);
 
   // Additional MSAL-specific validation
   if (!msalConfig.auth.clientId || msalConfig.auth.clientId === 'your-vimarsh-app-client-id') {
@@ -115,7 +143,9 @@ export const validateMsalConfig = (): boolean => {
 
   // Validate custom domain configuration
   const expectedDomain = 'vimarsh.vedprakash.net';
-  const domainValid = AUTH_CONFIG.domain.includes(expectedDomain) || AUTH_CONFIG.domain.includes('localhost');
+  const domainValid = domainConfig.domain.includes(expectedDomain) || 
+                     domainConfig.domain.includes('localhost') ||
+                     domainConfig.domain.includes('.azurestaticapps.net');
 
   const authorityValid = [
     'vedid.onmicrosoft.com',
@@ -133,12 +163,15 @@ export const validateMsalConfig = (): boolean => {
 };
 
 // Environment-specific configuration per Vedprakash domain standards
-export const authConfig = {
-  usePlaceholder: AUTH_CONFIG.usePlaceholder,
-  enableLogging: AUTH_CONFIG.enableDebugLogging,
-  tenantId: ENTRA_ID_CONFIG.tenantId,
-  domain: 'vedprakash.net',
-  customDomain: 'vimarsh.vedprakash.net'
+export const getAuthConfigStatic = () => {
+  const authConfig = getAuthConfig();
+  return {
+    usePlaceholder: authConfig.usePlaceholder,
+    enableLogging: authConfig.enableDebugLogging,
+    tenantId: ENTRA_ID_CONFIG.tenantId,
+    domain: 'vedprakash.net',
+    customDomain: 'vimarsh.vedprakash.net'
+  };
 };
 
 // Error messages for authentication failures
@@ -154,13 +187,15 @@ export const AUTH_ERROR_MESSAGES = {
 };
 
 // Log configuration summary in development
-if (AUTH_CONFIG.enableDebugLogging) {
+const authConfig = getAuthConfig();
+if (authConfig.enableDebugLogging) {
+  const domainConfig = getCurrentDomainConfig();
   console.info('🔐 MSAL Configuration Summary:', {
     domain: domainConfig.domain,
     redirectUri: domainConfig.redirectUri,
     authority: ENTRA_ID_CONFIG.authority,
     clientId: ENTRA_ID_CONFIG.clientId?.substring(0, 8) + '...',
-    environment: AUTH_CONFIG.usePlaceholder ? 'development (placeholder)' : 'configured'
+    environment: authConfig.usePlaceholder ? 'development (placeholder)' : 'configured'
   });
 }
 
@@ -206,6 +241,8 @@ export const authErrors = {
 
 // MSAL instance helper for debugging
 export const getMsalConfigSummary = () => {
+  const domainConfig = getCurrentDomainConfig();
+  const authConfig = getAuthConfig();
   return {
     clientId: msalConfig.auth.clientId?.substring(0, 8) + '...',
     authority: msalConfig.auth.authority,

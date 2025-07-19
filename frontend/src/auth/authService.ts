@@ -1,7 +1,7 @@
 // Authentication Service - Abstraction layer for auth providers
 // Switches between placeholder auth (development) and MSAL (production)
 
-import { authConfig, spiritualRoles, type SpiritualRole } from './msalConfig';
+import { getAuthConfigStatic, spiritualRoles, type SpiritualRole } from './msalConfig';
 
 // Unified VedUser interface from Apps_Auth_Requirement.md
 export interface AuthUser {
@@ -223,6 +223,7 @@ export const createAuthService = (): AuthService => {
                            process.env.REACT_APP_CLIENT_ID !== 'placeholder-client-id' &&
                            process.env.REACT_APP_CLIENT_ID !== 'your-vimarsh-app-client-id';
   
+  const authConfig = getAuthConfigStatic();
   if (enableAuth && hasValidClientId && !authConfig.usePlaceholder) {
     console.log('🔐 Creating MSAL authentication service for production');
     // Import the actual MSALAuthService implementation
