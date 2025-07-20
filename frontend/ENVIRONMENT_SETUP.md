@@ -173,8 +173,10 @@ npm start
 ## 🔍 Verification Checklist
 
 ### Environment Configuration ✅
-- [ ] `.env.development` file created with correct values
-- [ ] `.env.production` file created with correct values  
+- [ ] `.env.development` file exists with safe development defaults
+- [ ] `.env.production` file exists as build template (no secrets)
+- [ ] `.env.local` created for personal overrides (optional)
+- [ ] Production secrets configured in Azure Key Vault
 - [ ] `REACT_APP_CLIENT_ID` configured with actual Azure App Registration ID
 - [ ] All redirect URIs point to correct domains
 

@@ -95,9 +95,9 @@ validate_config() {
         exit 1
     fi
     
-    # Check if frontend env files exist
+    # Check if frontend production template exists
     if [[ ! -f "frontend/.env.production" ]]; then
-        print_error "frontend/.env.production not found. Run setup_production.py first."
+        print_error "frontend/.env.production template not found."
         exit 1
     fi
     

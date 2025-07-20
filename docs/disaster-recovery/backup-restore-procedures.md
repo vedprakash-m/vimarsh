@@ -134,9 +134,12 @@ BACKUP_TIMESTAMP="20240115-103000"
 
 #### Manual Configuration Restore
 ```bash
-# Restore environment files
-cp backups/configuration/latest/config/environments/.env.production config/environments/
+# Restore configuration files (simplified single-environment)
+cp backups/configuration/latest/.env.development .env.development
+cp backups/configuration/latest/frontend/.env.development frontend/.env.development
+cp backups/configuration/latest/backend/local.settings.json backend/local.settings.json
 
+# Note: Production secrets are in Azure Key Vault (no file restore needed)
 # Restore infrastructure parameters
 cp backups/configuration/latest/infrastructure/parameters/prod.parameters.json infrastructure/parameters/
 
@@ -336,12 +339,17 @@ date -u +%Y-%m-%dT%H:%M:%SZ
 
 #### Resolution
 ```bash
-# Compare backup with current configuration
-diff -r config/environments/ backups/configuration/latest/config/environments/
+# Compare backup with current configuration (simplified single-environment)
+diff .env.development backups/configuration/latest/.env.development
+diff frontend/.env.development backups/configuration/latest/frontend/.env.development
+diff backend/local.settings.json backups/configuration/latest/backend/local.settings.json
 
-# Manually restore missing configurations
-cp backups/configuration/latest/config/environments/.env.production config/environments/
+# Manually restore missing configurations (simplified single-environment)
+cp backups/configuration/latest/.env.development .env.development
+cp backups/configuration/latest/frontend/.env.development frontend/.env.development
+cp backups/configuration/latest/backend/local.settings.json backend/local.settings.json
 
+# Note: Production secrets are in Azure Key Vault (no file restore needed)
 # Validate configuration
 ./scripts/config-manager.sh validate --environment prod
 ```

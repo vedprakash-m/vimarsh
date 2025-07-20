@@ -85,6 +85,11 @@ jobs:
 
     - name: 🎯 Pipeline Decision Logic
       id: decision
+      env:
+        BACKEND_CHANGED: ${{ steps.changes.outputs.backend }}
+        FRONTEND_CHANGED: ${{ steps.changes.outputs.frontend }}
+        INFRASTRUCTURE_CHANGED: ${{ steps.changes.outputs.infrastructure }}
+        FORCE_FULL_PIPELINE: ${{ github.event.inputs.force_full_pipeline }}
       run: |
         # Determine what stages should run
         SHOULD_TEST="false"
@@ -92,13 +97,13 @@ jobs:
         SHOULD_DEPLOY="false"
         
         # Force full pipeline for main branch pushes and manual triggers
-        if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event.inputs.force_full_pipeline }}" == "true" ]]; then
+        if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" || "$FORCE_FULL_PIPELINE" == "true" ]]; then
           SHOULD_TEST="true"
           SHOULD_BUILD="true"
           SHOULD_DEPLOY="true"
         else
           # For other branches, run based on changes
-          if [[ "${{ steps.changes.outputs.backend }}" == "true" || "${{ steps.changes.outputs.frontend }}" == "true" || "${{ steps.changes.outputs.infrastructure }}" == "true" ]]; then
+          if [[ "$BACKEND_CHANGED" == "true" || "$FRONTEND_CHANGED" == "true" || "$INFRASTRUCTURE_CHANGED" == "true" ]]; then
             SHOULD_TEST="true"
             SHOULD_BUILD="true"
           fi
