@@ -1605,31 +1605,6 @@
     "type": "usage_tracking"
   },
   {
-    "id": "stats_test-user-123",
-    "userId": "test-user-123",
-    "userEmail": "user@test.com",
-    "totalRequests": 2,
-    "totalTokens": 2100,
-    "totalCostUsd": 0.002545,
-    "currentMonthTokens": 2100,
-    "currentMonthCostUsd": 0.002545,
-    "lastRequest": "2025-07-10T20:59:03.842851",
-    "avgTokensPerRequest": 1050.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 2
-    },
-    "qualityBreakdown": {
-      "high": 1,
-      "medium": 1
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T20:59:03.851041"
-  },
-  {
     "id": "usage_consistency-test-user_20250710_205903",
     "userId": "consistency-test-user",
     "userEmail": "consistency@test.com",
@@ -1644,30 +1619,6 @@
     "responseQuality": "high",
     "personality": "krishna",
     "type": "usage_tracking"
-  },
-  {
-    "id": "stats_consistency-test-user",
-    "userId": "consistency-test-user",
-    "userEmail": "consistency@test.com",
-    "totalRequests": 1,
-    "totalTokens": 1800,
-    "totalCostUsd": 0.0006299999999999999,
-    "currentMonthTokens": 1800,
-    "currentMonthCostUsd": 0.0006299999999999999,
-    "lastRequest": "2025-07-10T20:59:03.858078",
-    "avgTokensPerRequest": 1800.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 1
-    },
-    "qualityBreakdown": {
-      "high": 1
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T20:59:03.858698"
   },
   {
     "id": "usage_tracker_user_20250710_205923",
@@ -1724,5 +1675,102 @@
     "responseQuality": "high",
     "personality": "krishna",
     "type": "usage_tracking"
+  },
+  {
+    "id": "usage_test-user-123_20250720_005545",
+    "userId": "test-user-123",
+    "userEmail": "user@test.com",
+    "sessionId": "session_1",
+    "timestamp": "2025-07-20T00:55:45.037574",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 800,
+    "outputTokens": 500,
+    "totalTokens": 1300,
+    "costUsd": 0.00041999999999999996,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_test-user-123_20250720_005545",
+    "userId": "test-user-123",
+    "userEmail": "user@test.com",
+    "sessionId": "session_2",
+    "timestamp": "2025-07-20T00:55:45.037619",
+    "model": "gemini-1.5-pro",
+    "inputTokens": 500,
+    "outputTokens": 300,
+    "totalTokens": 800,
+    "costUsd": 0.002125,
+    "requestType": "rag_query",
+    "responseQuality": "medium",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_test-user-123",
+    "userId": "test-user-123",
+    "userEmail": "user@test.com",
+    "totalRequests": 2,
+    "totalTokens": 2100,
+    "totalCostUsd": 0.002545,
+    "currentMonthTokens": 2100,
+    "currentMonthCostUsd": 0.002545,
+    "lastRequest": "2025-07-20T00:55:45.037619",
+    "avgTokensPerRequest": 1050.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 2
+    },
+    "qualityBreakdown": {
+      "high": 1,
+      "medium": 1
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-07-20T00:55:45.044556"
+  },
+  {
+    "id": "usage_consistency-test-user_20250720_005545",
+    "userId": "consistency-test-user",
+    "userEmail": "consistency@test.com",
+    "sessionId": "consistency-session",
+    "timestamp": "2025-07-20T00:55:45.052102",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 1000,
+    "outputTokens": 800,
+    "totalTokens": 1800,
+    "costUsd": 0.0006299999999999999,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_consistency-test-user",
+    "userId": "consistency-test-user",
+    "userEmail": "consistency@test.com",
+    "totalRequests": 1,
+    "totalTokens": 1800,
+    "totalCostUsd": 0.0006299999999999999,
+    "currentMonthTokens": 1800,
+    "currentMonthCostUsd": 0.0006299999999999999,
+    "lastRequest": "2025-07-20T00:55:45.052102",
+    "avgTokensPerRequest": 1800.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 1
+    },
+    "qualityBreakdown": {
+      "high": 1
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-07-20T00:55:45.052555"
   }
 ]

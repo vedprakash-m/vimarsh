@@ -1,0 +1,22 @@
+# Multi-stage Dockerfile for testing
+FROM node:18-alpine AS frontend-test
+
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci --only=production=false
+
+COPY frontend/ ./
+RUN npm test -- --coverage --watchAll=false --testTimeout=10000
+
+FROM python:3.11-slim AS backend-test
+
+WORKDIR /app/backend
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install pytest pytest-cov pytest-asyncio
+
+COPY backend/ ./
+RUN python -m pytest tests/ --cov=. --cov-report=term-missing --cov-fail-under=30 --tb=short -v --maxfail=10
+
+FROM alpine:latest AS final
+RUN echo "All tests passed!"

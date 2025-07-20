@@ -382,5 +382,29 @@
     "committed_at": null,
     "error_message": "'TransactionContext' object has no attribute 'add_operation'",
     "operation_count": 0
+  },
+  {
+    "transaction_id": "7c4566cd-3951-4eaf-8493-ec8aef3a679b",
+    "state": "committed",
+    "created_at": "2025-07-20T00:55:45.039446",
+    "committed_at": "2025-07-20T00:55:45.043286",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "2a8dd447-6890-46d5-9ef6-06ac7de1922f",
+    "state": "committed",
+    "created_at": "2025-07-20T00:55:45.044592",
+    "committed_at": "2025-07-20T00:55:45.048320",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "bf61de89-3cb1-49d5-a60d-16c28a6c85f8",
+    "state": "committed",
+    "created_at": "2025-07-20T00:55:45.052584",
+    "committed_at": "2025-07-20T00:55:45.056098",
+    "error_message": null,
+    "operation_count": 2
   }
 ]

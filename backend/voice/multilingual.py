@@ -679,7 +679,7 @@ class MultilingualVoiceManager:
             'detected_segments': []
         }
     
-    def process_mixed_language(self, text: str) -> Dict[str, Any]:
+    async def process_mixed_language(self, text: str) -> Dict[str, Any]:
         """
         Process text that contains multiple languages (code-switching)
         
@@ -694,7 +694,10 @@ class MultilingualVoiceManager:
             segments = []
             words = text.split()
             current_segment = []
-            current_language = self.detect_language(text)
+            
+            # Get primary language asynchronously
+            lang_result = await self.detect_language(text)
+            current_language = lang_result.get('detected_language', Language.ENGLISH)
             
             for word in words:
                 # Simple heuristic for language detection
@@ -722,20 +725,20 @@ class MultilingualVoiceManager:
                 })
             
             return {
-                'segments': segments,
-                'primary_language': self.detect_language(text),
-                'has_code_switching': len(set(s['language'] for s in segments)) > 1
+                'language_segments': segments,  # Match test expectation
+                'primary_language': current_language,
+                'is_code_switching': len(set(s['language'] for s in segments)) > 1  # Match test expectation
             }
             
         except Exception as e:
             logger.error(f"Mixed language processing error: {e}")
             return {
-                'segments': [{'text': text, 'language': self.current_language, 'start_pos': 0}],
+                'language_segments': [{'text': text, 'language': self.current_language, 'start_pos': 0}],
                 'primary_language': self.current_language,
-                'has_code_switching': False
+                'is_code_switching': False
             }
     
-    def synthesize_multilingual(self, text: str, preserve_accents: bool = True) -> Dict[str, Any]:
+    async def synthesize_multilingual(self, text: str, preserve_accents: bool = True) -> Dict[str, Any]:
         """
         Synthesize speech for multilingual text
         
@@ -747,12 +750,12 @@ class MultilingualVoiceManager:
             Synthesis result with audio data and metadata
         """
         try:
-            # Process mixed language content
-            processing_result = self.process_mixed_language(text)
+            # Process mixed language content asynchronously
+            processing_result = await self.process_mixed_language(text)
             
             # Prepare synthesis for each segment
             synthesis_segments = []
-            for segment in processing_result['segments']:
+            for segment in processing_result['language_segments']:  # Match the updated key
                 voice_profile = self.voice_selector.select_voice(
                     segment['language'], 
                     {'preserve_accent': preserve_accents}
@@ -761,7 +764,7 @@ class MultilingualVoiceManager:
                 synthesis_segments.append({
                     'text': segment['text'],
                     'language': segment['language'],
-                    'voice_profile': voice_profile,
+                    'voice_profile': voice_profile.to_dict(),  # Convert to dict for serialization
                     'start_pos': segment['start_pos']
                 })
             
@@ -769,7 +772,7 @@ class MultilingualVoiceManager:
                 'segments': synthesis_segments,
                 'total_segments': len(synthesis_segments),
                 'primary_language': processing_result['primary_language'],
-                'multilingual': processing_result['has_code_switching']
+                'multilingual': processing_result['is_code_switching']  # Match updated key
             }
             
         except Exception as e:

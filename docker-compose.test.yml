@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  frontend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: frontend-test
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    environment:
+      - CI=true
+      - NODE_ENV=test
+    
+  backend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: backend-test
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - PYTHONPATH=/app/backend
+      - ENVIRONMENT=test

@@ -1,8 +1,8 @@
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
-// allows you to do things like:
-// expect(element).toHaveTextContent(/react/i)
-// learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+
+// Import test utilities
+import { setupWebApiMocks } from './__tests__/utils/webApiMocks';
 
 // Suppress act() warnings for tests - React 18 compatibility
 const originalError = console.error;
@@ -18,6 +18,9 @@ beforeAll(() => {
     }
     originalError.call(console, ...args);
   };
+  
+  // Setup comprehensive Web API mocks
+  setupWebApiMocks();
 });
 
 afterAll(() => {
@@ -84,7 +87,9 @@ jest.mock('@azure/msal-browser', () => ({
     logout: jest.fn().mockResolvedValue(undefined),
     getAllAccounts: jest.fn().mockReturnValue([]),
     getAccountByUsername: jest.fn().mockReturnValue(null),
-    acquireTokenSilent: jest.fn().mockResolvedValue({ accessToken: 'mock-token' })
+    acquireTokenSilent: jest.fn().mockResolvedValue({ accessToken: 'mock-token' }),
+    addEventCallback: jest.fn(),
+    removeEventCallback: jest.fn()
   })),
   LogLevel: {
     Error: 0,
@@ -102,4 +107,27 @@ jest.mock('@azure/msal-browser', () => ({
     POPUP: 'popup',
     REDIRECT: 'redirect'
   }
+}));
+
+// Mock MSAL React context
+jest.mock('@azure/msal-react', () => ({
+  useMsal: jest.fn(() => ({
+    instance: {
+      initialize: jest.fn().mockResolvedValue(undefined),
+      loginPopup: jest.fn().mockResolvedValue({ account: { username: 'test@test.com' } }),
+      logout: jest.fn().mockResolvedValue(undefined),
+      getAllAccounts: jest.fn().mockReturnValue([]),
+      getAccountByUsername: jest.fn().mockReturnValue(null),
+      acquireTokenSilent: jest.fn().mockResolvedValue({ accessToken: 'mock-token' }),
+      addEventCallback: jest.fn(),
+      removeEventCallback: jest.fn()
+    },
+    accounts: [],
+    inProgress: 'None'
+  })),
+  useAccount: jest.fn(() => null),
+  useIsAuthenticated: jest.fn(() => false),
+  MsalProvider: ({ children }: { children: React.ReactNode }) => children,
+  AuthenticatedTemplate: ({ children }: { children: React.ReactNode }) => null,
+  UnauthenticatedTemplate: ({ children }: { children: React.ReactNode }) => children
 }));
