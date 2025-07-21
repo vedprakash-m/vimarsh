@@ -11,6 +11,18 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import ConversationHistory from './ConversationHistory';
 
+// Mock MSAL React
+jest.mock('@azure/msal-react', () => ({
+  useMsal: () => ({
+    accounts: [{ name: 'Test User', username: 'test@example.com' }],
+    instance: {
+      getActiveAccount: () => ({ name: 'Test User', username: 'test@example.com' })
+    }
+  }),
+  useIsAuthenticated: () => true,
+  MsalProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+}));
+
 // Mock the conversation history utility
 jest.mock('../utils/conversationHistory', () => ({
   conversationHistory: {
