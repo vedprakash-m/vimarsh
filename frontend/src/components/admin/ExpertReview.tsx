@@ -69,7 +69,7 @@ import {
   Science as ScienceIcon,
   History as HistoryIcon,
   MenuBook as PhilosophyIcon,
-  Temple as SpiritualIcon
+  Church as SpiritualIcon
 } from '@mui/icons-material';
 
 // Types
