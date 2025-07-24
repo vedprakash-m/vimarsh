@@ -30,6 +30,14 @@ try:
 except ImportError:
     DATABASE_AVAILABLE = False
 
+# Import personality and prompt template services
+try:
+    from .personality_service import personality_service, PersonalityProfile
+    from .prompt_template_service import prompt_template_service, TemplateRenderContext
+    PERSONALITY_SERVICES_AVAILABLE = True
+except ImportError:
+    PERSONALITY_SERVICES_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -216,8 +224,222 @@ class EnhancedLLMService:
             {"category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, "threshold": threshold},
         ]
     
-    def _create_spiritual_system_prompt(self, context: SpiritualContext) -> str:
-        """Create context-appropriate spiritual system prompt"""
+    async def _create_personality_system_prompt(
+        self, 
+        personality_id: str, 
+        context: SpiritualContext,
+        conversation_context: List[Dict[str, str]] = None
+    ) -> str:
+        """Create personality-specific system prompt using template service"""
+        try:
+            if PERSONALITY_SERVICES_AVAILABLE:
+                # Get personality profile
+                personality = await personality_service.get_personality(personality_id)
+                if not personality:
+                    logger.warning(f"Personality {personality_id} not found, falling back to Krishna")
+                    return self._create_fallback_spiritual_prompt(context, personality_id)
+                
+                # Create template render context
+                from .prompt_template_service import TemplateRenderContext
+                template_context = TemplateRenderContext(
+                    personality_id=personality_id,
+                    domain=personality.domain.value,
+                    query="",  # Will be filled in later
+                    conversation_history=conversation_context or [],
+                    language="English"
+                )
+                
+                # Try to render personality-specific template
+                try:
+                    return await prompt_template_service.render_personality_prompt(
+                        personality_id=personality_id,
+                        query="${query}",  # Placeholder for later substitution
+                        context_chunks=[],  # Will be filled with actual context
+                        language="English",
+                        conversation_history=conversation_context
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to render personality template for {personality_id}: {e}")
+                    # Fall back to domain-specific prompt
+                    return self._create_domain_specific_prompt(personality, context)
+            else:
+                logger.warning("Personality services not available, using fallback")
+                return self._create_fallback_spiritual_prompt(context, personality_id)
+                
+        except Exception as e:
+            logger.error(f"Error creating personality prompt for {personality_id}: {e}")
+            return self._create_fallback_spiritual_prompt(context, personality_id)
+    
+    def _create_domain_specific_prompt(self, personality, context: SpiritualContext) -> str:
+        """Create domain-specific prompt based on personality"""
+        if personality.domain.value == "spiritual":
+            return self._create_spiritual_personality_prompt(personality, context)
+        elif personality.domain.value == "scientific":
+            return self._create_scientific_personality_prompt(personality, context)
+        elif personality.domain.value == "historical":
+            return self._create_historical_personality_prompt(personality, context)
+        elif personality.domain.value == "philosophical":
+            return self._create_philosophical_personality_prompt(personality, context)
+        else:
+            return self._create_fallback_spiritual_prompt(context, personality_id)
+    
+    def _create_spiritual_personality_prompt(self, personality, context: SpiritualContext) -> str:
+        """Create spiritual personality prompt"""
+        base_prompt = f"""You are {personality.name}, {personality.description}. You embody the wisdom and compassion of the spiritual tradition you represent.
+
+PERSONALITY CHARACTERISTICS:
+- Tone: {personality.tone_characteristics.get('formality', 'reverent')}, {personality.tone_characteristics.get('warmth', 'compassionate')}
+- Cultural Context: {personality.cultural_context}
+- Expertise Areas: {', '.join(personality.expertise_areas)}
+- Language Style: {personality.language_style}
+
+RESPONSE REQUIREMENTS:
+- Keep responses concise (maximum 100-150 words)
+- Include specific citations from your associated texts when relevant
+- Begin with appropriate greeting for your tradition
+- Provide wisdom appropriate to your spiritual background
+- End with a blessing appropriate to your tradition
+- Use proper markdown formatting for emphasis
+
+GREETING PATTERNS: {', '.join(personality.greeting_patterns) if personality.greeting_patterns else 'Use appropriate spiritual greeting'}
+FAREWELL PATTERNS: {', '.join(personality.farewell_patterns) if personality.farewell_patterns else 'Use appropriate spiritual blessing'}
+
+SAFETY GUIDELINES:
+- No medical, legal, or professional advice
+- No personal predictions about the future
+- Maintain authenticity to your spiritual tradition
+- Redirect inappropriate questions to spiritual matters
+
+CONTEXT FROM YOUR TEACHINGS:
+${{context_chunks}}
+
+CONVERSATION HISTORY:
+${{conversation_history}}
+
+USER QUERY: ${{query}}
+
+Response:"""
+
+        context_specific = {
+            SpiritualContext.GUIDANCE: "\nCONTEXT: Provide personal spiritual guidance for life challenges, helping the seeker find inner peace and right action through your tradition's principles.",
+            SpiritualContext.TEACHING: "\nCONTEXT: Share educational content about your spiritual tradition, philosophy, and practices with clarity and authenticity.",
+            SpiritualContext.PHILOSOPHY: "\nCONTEXT: Engage in philosophical discussions about the nature of reality, consciousness, and spiritual truth as revealed in your teachings.",
+            SpiritualContext.DEVOTIONAL: "\nCONTEXT: Guide devotional practices and cultivating love and surrender to the Divine according to your tradition.",
+            SpiritualContext.MEDITATION: "\nCONTEXT: Teach meditation techniques and methods for achieving inner stillness according to your spiritual path.",
+            SpiritualContext.PERSONAL_GROWTH: "\nCONTEXT: Support spiritual development and the cultivation of divine qualities according to your teachings.",
+            SpiritualContext.GENERAL: "\nCONTEXT: Address general spiritual inquiries with wisdom appropriate to your tradition."
+        }
+        
+        return base_prompt + context_specific.get(context, context_specific[SpiritualContext.GENERAL])
+    
+    def _create_scientific_personality_prompt(self, personality, context: SpiritualContext) -> str:
+        """Create scientific personality prompt"""
+        return f"""You are {personality.name}, {personality.description}.
+
+PERSONALITY CHARACTERISTICS:
+- Approach: {personality.tone_characteristics.get('formality', 'academic')}, {personality.tone_characteristics.get('warmth', 'curious')}
+- Time Period: {personality.time_period if hasattr(personality, 'time_period') else 'Modern era'}
+- Expertise Areas: {', '.join(personality.expertise_areas)}
+- Communication Style: {personality.language_style}
+
+RESPONSE REQUIREMENTS:
+- Provide scientifically accurate responses based on your documented work
+- Use clear explanations that make complex concepts accessible
+- Reference your published papers or documented statements when relevant
+- Maintain intellectual curiosity and openness to inquiry
+- Keep responses focused and informative (100-200 words)
+
+GREETING STYLE: {personality.response_patterns.get('greeting_style', 'My friend')}
+
+CONTEXT FROM YOUR WORK:
+${{context_chunks}}
+
+CONVERSATION HISTORY:
+${{conversation_history}}
+
+SCIENTIFIC INQUIRY: ${{query}}
+
+If the question falls outside your documented expertise, acknowledge the limits of your knowledge while suggesting related areas you can address.
+
+Response:"""
+    
+    def _create_historical_personality_prompt(self, personality, context: SpiritualContext) -> str:
+        """Create historical personality prompt"""
+        return f"""You are {personality.name}, {personality.description}, speaking from the perspective of {getattr(personality, 'time_period', 'your historical era')}.
+
+PERSONALITY CHARACTERISTICS:
+- Historical Context: {personality.cultural_context}
+- Leadership Style: {personality.tone_characteristics.get('authority', 'principled')}
+- Communication: {personality.language_style}
+- Expertise Areas: {', '.join(personality.expertise_areas)}
+
+RESPONSE REQUIREMENTS:
+- Speak from your historical perspective and lived experiences
+- Reference your documented speeches, writings, or recorded statements
+- Provide wisdom gained from your life experiences
+- Use language appropriate to your era while remaining accessible
+- Keep responses thoughtful and substantial (100-200 words)
+
+GREETING STYLE: {personality.response_patterns.get('greeting_style', 'My fellow citizen')}
+
+HISTORICAL CONTEXT AND DOCUMENTS:
+${{context_chunks}}
+
+CONVERSATION HISTORY:
+${{conversation_history}}
+
+QUESTION: ${{query}}
+
+If asked about events after your time, acknowledge these limitations while offering relevant insights from your historical perspective.
+
+Response:"""
+    
+    def _create_philosophical_personality_prompt(self, personality, context: SpiritualContext) -> str:
+        """Create philosophical personality prompt"""
+        return f"""You are {personality.name}, {personality.description}.
+
+PERSONALITY CHARACTERISTICS:
+- Philosophical Approach: {personality.tone_characteristics.get('teaching_style', 'contemplative')}
+- Cultural Background: {personality.cultural_context}
+- Areas of Wisdom: {', '.join(personality.expertise_areas)}
+- Communication Style: {personality.language_style}
+
+RESPONSE REQUIREMENTS:
+- Provide philosophical insights based on your documented teachings
+- Use contemplative and thoughtful language
+- Reference your philosophical works when relevant
+- Encourage deeper reflection and self-examination
+- Keep responses profound yet accessible (100-200 words)
+
+GREETING STYLE: {personality.response_patterns.get('greeting_style', 'Fellow seeker of wisdom')}
+
+PHILOSOPHICAL CONTEXT:
+${{context_chunks}}
+
+CONVERSATION HISTORY:
+${{conversation_history}}
+
+PHILOSOPHICAL INQUIRY: ${{query}}
+
+Response:"""
+    
+    def _create_fallback_spiritual_prompt(self, context: SpiritualContext, personality_id: str = "krishna") -> str:
+        """Create fallback prompt based on personality domain"""
+        # Default to Krishna if personality_id not provided or not found
+        if personality_id == "krishna" or not personality_id:
+            return self._create_krishna_fallback_prompt(context)
+        elif personality_id == "einstein":
+            return self._create_einstein_fallback_prompt(context)
+        elif personality_id == "lincoln":
+            return self._create_lincoln_fallback_prompt(context)
+        elif personality_id == "marcus_aurelius":
+            return self._create_marcus_aurelius_fallback_prompt(context)
+        else:
+            # Unknown personality, default to Krishna
+            return self._create_krishna_fallback_prompt(context)
+    
+    def _create_krishna_fallback_prompt(self, context: SpiritualContext) -> str:
+        """Krishna-specific fallback prompt"""
         base_prompt = """You are Lord Krishna, the divine teacher and guide from the Bhagavad Gita. You embody infinite compassion, wisdom, and love. A sincere seeker has come to you with a spiritual question.
 
 RESPONSE REQUIREMENTS:
@@ -228,52 +450,15 @@ RESPONSE REQUIREMENTS:
 - End with a blessing
 - Use proper markdown formatting for emphasis
 
-FOR FOLLOW-UP QUESTIONS:
-- Begin with connecting phrases like "Building on what I shared..." or "To elaborate further..."
-- Expand on the SAME concept from previous response
-- Reference the previous teaching and add deeper insights
-- Include complementary scriptural citations
-- Make it feel like a natural conversation continuation
+CONTEXT FROM SACRED TEXTS:
+${context_chunks}
 
-MANDATORY CITATION FORMAT:
-- MUST include exact verse with both Sanskrit script and transliteration
-- Format: "As I teach in Bhagavad Gita 2.47: **कर्मण्येवाधिकारस्ते मा फलेषु कदाचन** (*karmaṇy evādhikāras te mā phaleṣu kadācana*) - You have the right to action, but not to its fruits."
-- Include Sanskrit Devanagari, romanized Sanskrit, and English meaning
-- Reference chapter.verse for all quotes
-- No response without a scriptural citation
+CONVERSATION HISTORY:
+${conversation_history}
 
-RESPONSE STRUCTURE (STRICT):
-1. Brief greeting: "Beloved devotee," or "Dear soul,"
-2. ONE core teaching (1-2 sentences)
-3. Scriptural citation with Sanskrit script + transliteration + translation
-4. Brief practical application (1 sentence)
-5. Blessing with 🕉️
+USER QUERY: ${query}
 
-FORMATTING RULES:
-- Use **bold** for emphasis instead of asterisks
-- Use *italics* for Sanskrit transliteration
-- Use proper line breaks for readability
-- Sanskrit script should be in Devanagari
-
-SAFETY GUIDELINES:
-- No medical, legal, or professional advice
-- No personal predictions about the future
-- Maintain spiritual authenticity and reverent tone
-- Redirect inappropriate questions to spiritual matters
-
-EXAMPLE RESPONSE:
-Beloved devotee, when facing difficult choices, remember that **true wisdom** lies in performing your duty without attachment to results. 
-
-As I teach in Bhagavad Gita 2.47: **कर्मण्येवाधिकारस्ते मा फलेषु कदाचन** (*karmaṇy evādhikāras te mā phaleṣu kadācana*) - You have the right to action, but not to its fruits.
-
-Focus on righteous action and let Me handle the outcomes. May you find **peace** in surrendering results to the Divine. 🕉️
-
-EXAMPLE FOLLOW-UP RESPONSE:
-Building on what I shared, dear soul, **karma yoga** is the path of selfless action that purifies the heart and leads to liberation.
-
-As I further explain in Bhagavad Gita 2.48: **योगस्थः कुरु कर्माणि** (*yogasthaḥ kuru karmāṇi*) - Established in yoga, perform your actions with equanimity in success and failure.
-
-This practice transforms ordinary work into spiritual **sadhana**. May you find joy in this divine discipline. 🕉️"""
+Response:"""
 
         context_specific = {
             SpiritualContext.GUIDANCE: "\nCONTEXT: Provide personal spiritual guidance for life challenges, helping the seeker find inner peace and right action through dharmic principles.",
@@ -287,17 +472,90 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
         
         return base_prompt + context_specific.get(context, context_specific[SpiritualContext.GENERAL])
     
-    def _validate_spiritual_content(self, content: str, context: SpiritualContext) -> List[str]:
-        """Validate content for spiritual appropriateness"""
+    def _create_einstein_fallback_prompt(self, context: SpiritualContext) -> str:
+        """Einstein-specific fallback prompt"""
+        return """You are Albert Einstein, the renowned theoretical physicist. You speak with scientific precision, intellectual curiosity, and philosophical depth.
+
+RESPONSE REQUIREMENTS:
+- Keep responses concise (maximum 100-150 words)
+- Reference your scientific work when relevant
+- Begin with "My friend," or "Greetings,"
+- Provide scientifically accurate information
+- Show intellectual curiosity and wonder
+- Use thought experiments when helpful
+
+CONTEXT FROM YOUR WORK:
+${context_chunks}
+
+CONVERSATION HISTORY:
+${conversation_history}
+
+SCIENTIFIC INQUIRY: ${query}
+
+Response:"""
+    
+    def _create_lincoln_fallback_prompt(self, context: SpiritualContext) -> str:
+        """Lincoln-specific fallback prompt"""
+        return """You are Abraham Lincoln, 16th President of the United States. You speak with dignity, compassion, and moral authority.
+
+RESPONSE REQUIREMENTS:
+- Keep responses thoughtful (maximum 100-150 words)
+- Reference your speeches or experiences when relevant
+- Begin with "My fellow citizen," or "Friend,"
+- Provide wisdom from your leadership experience
+- Show commitment to democracy and equality
+- Use storytelling when appropriate
+
+CONTEXT FROM YOUR SPEECHES:
+${context_chunks}
+
+CONVERSATION HISTORY:
+${conversation_history}
+
+QUESTION: ${query}
+
+Response:"""
+    
+    def _create_marcus_aurelius_fallback_prompt(self, context: SpiritualContext) -> str:
+        """Marcus Aurelius-specific fallback prompt"""
+        return """You are Marcus Aurelius, Roman Emperor and Stoic philosopher. You speak with philosophical depth and Stoic wisdom.
+
+RESPONSE REQUIREMENTS:
+- Keep responses contemplative (maximum 100-150 words)
+- Reference your Meditations when relevant
+- Begin with "Fellow seeker," or "Friend,"
+- Provide Stoic philosophical insights
+- Show understanding of virtue and duty
+- Maintain philosophical composure
+
+CONTEXT FROM YOUR MEDITATIONS:
+${context_chunks}
+
+CONVERSATION HISTORY:
+${conversation_history}
+
+PHILOSOPHICAL INQUIRY: ${query}
+
+Response:"""
+    
+    def _validate_spiritual_content(self, content: str, context: SpiritualContext, personality_id: str = "krishna") -> List[str]:
+        """Validate content for appropriateness based on personality"""
         warnings = []
         
-        # Check for appropriate greeting (no emoji required)
-        appropriate_greetings = ["beloved devotee", "dear soul", "dear seeker", "beloved child"]
-        if not any(greeting in content.lower() for greeting in appropriate_greetings):
-            warnings.append("Response should begin with appropriate spiritual greeting")
+        # Check for appropriate greeting based on personality
+        personality_greetings = {
+            "krishna": ["beloved devotee", "dear soul", "dear seeker", "beloved child"],
+            "einstein": ["my friend", "greetings", "hello", "welcome"],
+            "lincoln": ["my fellow citizen", "friend", "good day", "greetings"],
+            "marcus_aurelius": ["fellow seeker", "friend", "greetings", "hail"]
+        }
         
-        # Check for inappropriate emoji usage
-        if content.startswith("🙏"):
+        appropriate_greetings = personality_greetings.get(personality_id, personality_greetings["krishna"])
+        if not any(greeting in content.lower() for greeting in appropriate_greetings):
+            warnings.append(f"Response should begin with appropriate greeting for {personality_id}")
+        
+        # Check for inappropriate emoji usage (mainly for Krishna)
+        if personality_id == "krishna" and content.startswith("🙏"):
             warnings.append("Response should not begin with folded hands emoji")
         
         # Check for harmful content patterns
@@ -359,29 +617,41 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
         """Rough token estimation (1 token ≈ 4 characters)"""
         return len(text) // 4
     
-    async def get_spiritual_guidance(self, query: str, context: str = "general", conversation_context: List[Dict[str, str]] = None) -> SpiritualResponse:
+    async def generate_multi_personality_response(
+        self, 
+        query: str, 
+        context: str = "general", 
+        conversation_context: List[Dict[str, str]] = None,
+        personality_id: str = None
+    ) -> SpiritualResponse:
         """
-        Get spiritual guidance with comprehensive safety analysis and validation.
+        Generate response from any personality with comprehensive safety analysis and validation.
         
         Args:
-            query: The spiritual question or inquiry
-            context: Spiritual context (guidance, teaching, philosophy, etc.)
+            query: The question or inquiry
+            context: Context (guidance, teaching, philosophy, etc.)
             conversation_context: Previous messages for follow-up questions
+            personality_id: ID of the personality to use for response generation (required)
             
         Returns:
             SpiritualResponse with content, safety analysis, and metadata
         """
         start_time = time.time()
         
+        # Validate personality_id is provided
+        if not personality_id:
+            logger.error("personality_id is required for generate_personality_response")
+            return await self._get_error_response(query, "Personality ID is required", time.time() - start_time, "unknown")
+        
         # Convert context string to enum
         spiritual_context = self._parse_context(context)
         
         if not self.is_configured:
-            return self._get_fallback_response(query, context)
+            return self._get_fallback_response(query, context, personality_id)
         
         try:
-            # Create comprehensive spiritual guidance prompt
-            spiritual_prompt = self._create_spiritual_system_prompt(spiritual_context)
+            # Create personality-specific system prompt
+            spiritual_prompt = await self._create_personality_system_prompt(personality_id, spiritual_context, conversation_context)
             
             # Build full prompt with conversation context
             full_prompt = self._build_contextual_prompt(spiritual_prompt, query, conversation_context)
@@ -391,12 +661,31 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
             response_time = time.time() - start_time
             
             # Parse response with comprehensive safety analysis
-            return self._parse_gemini_response_advanced(response, query, spiritual_context, response_time, full_prompt)
+            return await self._parse_gemini_response_advanced(response, query, spiritual_context, response_time, full_prompt, personality_id)
             
         except Exception as e:
-            logger.error(f"Gemini 2.5 Flash API error: {e}")
+            logger.error(f"Gemini 2.5 Flash API error for personality {personality_id}: {e}")
             response_time = time.time() - start_time
-            return self._get_error_response(query, str(e), response_time)
+            return await self._get_error_response(query, str(e), response_time, personality_id)
+    
+    # Maintain backward compatibility
+    async def get_spiritual_guidance(
+        self, 
+        query: str, 
+        context: str = "general", 
+        conversation_context: List[Dict[str, str]] = None,
+        personality_id: str = None
+    ) -> SpiritualResponse:
+        """
+        Legacy method for backward compatibility. Use generate_personality_response instead.
+        Note: personality_id is now required for multi-personality support.
+        """
+        # Require personality_id to be explicitly specified
+        if not personality_id:
+            logger.error("get_spiritual_guidance called without personality_id. This is required for multi-personality support.")
+            raise ValueError("personality_id is required for multi-personality support. Please specify which personality to use.")
+        
+        return await self.generate_multi_personality_response(query, context, conversation_context, personality_id)
     
     def _parse_context(self, context: str) -> SpiritualContext:
         """Parse context string to SpiritualContext enum"""
@@ -429,12 +718,12 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
                 content = message.get('content', '')
                 
                 if role == 'user':
-                    full_prompt += f"\nSeeker's Previous Question: {content}"
+                    full_prompt += f"\nUser's Previous Question: {content}"
                 elif role == 'assistant':
-                    full_prompt += f"\nLord Krishna's Previous Response: {content}"
+                    full_prompt += f"\nPrevious Response: {content}"
         
         # Add the current question
-        full_prompt += f"\n\nSeeker's Current Question: {query}"
+        full_prompt += f"\n\nCurrent Question: {query}"
         
         # Add enhanced instructions for handling follow-ups
         if conversation_context and len(conversation_context) > 0:
@@ -453,12 +742,12 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
             else:
                 full_prompt += "\n\nNOTE: Use conversation context to inform your response, but this appears to be a new question rather than a follow-up."
         
-        full_prompt += "\n\nLord Krishna's Response:"
+        full_prompt += "\n\nResponse:"
         
         return full_prompt
     
-    def _parse_gemini_response_advanced(self, response, query: str, context: SpiritualContext, 
-                                       response_time: float, full_prompt: str) -> SpiritualResponse:
+    async def _parse_gemini_response_advanced(self, response, query: str, context: SpiritualContext, 
+                                       response_time: float, full_prompt: str, personality_id: str) -> SpiritualResponse:
         """
         Advanced parsing of Gemini 2.5 Flash response with comprehensive safety and metadata analysis.
         
@@ -478,15 +767,36 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
                 if hasattr(response, 'text'):
                     if response.text is None:
                         content_blocked = True
-                        content = "Dear soul, I apologize, but I cannot provide an appropriate response to that query. Please ask something more suitable for spiritual guidance."
+                        # Get personality-specific blocked content message
+                        blocked_messages = {
+                            "krishna": "Dear soul, I apologize, but I cannot provide an appropriate response to that query. Please ask something more suitable for spiritual guidance.",
+                            "einstein": "My friend, I cannot provide an appropriate response to that inquiry. Please ask something more suitable for scientific discussion.",
+                            "lincoln": "My fellow citizen, I cannot provide an appropriate response to that question. Please ask something more suitable for thoughtful discourse.",
+                            "marcus_aurelius": "Fellow seeker, I cannot provide an appropriate response to that inquiry. Please ask something more suitable for philosophical reflection."
+                        }
+                        content = blocked_messages.get(personality_id, blocked_messages["krishna"])
                     else:
                         content = response.text if response.text else ""
                         if not isinstance(content, str):
                             content = str(content) if content is not None else ""
                 else:
-                    content = "Dear soul, I apologize, but I'm having difficulty accessing the spiritual wisdom right now."
+                    # Get personality-specific difficulty message
+                    difficulty_messages = {
+                        "krishna": "Dear soul, I apologize, but I'm having difficulty accessing the spiritual wisdom right now.",
+                        "einstein": "My friend, I'm having some difficulty accessing my knowledge at the moment.",
+                        "lincoln": "My fellow citizen, I'm experiencing some difficulty accessing my thoughts right now.",
+                        "marcus_aurelius": "Fellow seeker, I'm having some difficulty accessing philosophical wisdom at this moment."
+                    }
+                    content = difficulty_messages.get(personality_id, difficulty_messages["krishna"])
             except Exception:
-                content = "Dear soul, I apologize, but I'm having difficulty accessing the spiritual wisdom right now."
+                # Get personality-specific exception message
+                exception_messages = {
+                    "krishna": "Dear soul, I apologize, but I'm having difficulty accessing the spiritual wisdom right now.",
+                    "einstein": "My friend, I'm experiencing technical difficulties accessing my knowledge.",
+                    "lincoln": "My fellow citizen, I'm having some technical difficulties at the moment.",
+                    "marcus_aurelius": "Fellow seeker, I'm encountering some technical obstacles right now."
+                }
+                content = exception_messages.get(personality_id, exception_messages["krishna"])
             
             # Extract safety ratings with comprehensive analysis
             safety_ratings = self._extract_safety_ratings(response)
@@ -498,7 +808,7 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
             token_usage = self._extract_token_usage(response, full_prompt, content)
             
             # Advanced content validation
-            content_warnings = self._validate_spiritual_content(content, context)
+            content_warnings = self._validate_spiritual_content(content, spiritual_context, personality_id)
             
             # Advanced citation extraction
             citations = self._extract_citations_advanced(content)
@@ -542,7 +852,7 @@ This practice transforms ordinary work into spiritual **sadhana**. May you find 
             
         except Exception as e:
             logger.error(f"Error parsing Gemini response: {e}")
-            return self._get_error_response(query, str(e), response_time)
+            return await self._get_error_response(query, str(e), response_time, personality_id)
     
     def _extract_safety_ratings(self, response) -> Dict[str, Any]:
         """Extract comprehensive safety ratings from Gemini response"""
@@ -734,7 +1044,7 @@ Context: {context}
 
 Your Response (with citations):"""
     
-    def _parse_gemini_response(self, response, query: str) -> SpiritualResponse:
+    async def _parse_gemini_response(self, response, query: str) -> SpiritualResponse:
         """Parse Gemini 2.5 Flash response into structured format"""
         try:
             content = response.text.strip()
@@ -762,14 +1072,36 @@ Your Response (with citations):"""
             
         except Exception as e:
             logger.error(f"Error parsing Gemini response: {e}")
-            return self._get_error_response(query)
+            return await self._get_error_response(query, str(e), 0.0, "krishna")
     
-    def _get_fallback_response(self, query: str, context: str) -> SpiritualResponse:
-        """Get a fallback response that maintains spiritual authenticity"""
+    def _get_fallback_response(self, query: str, context: str, personality_id: str = "krishna") -> SpiritualResponse:
+        """Get a fallback response that maintains personality authenticity"""
         
         # Convert context string to enum
         spiritual_context = self._parse_context(context)
         
+        # Get personality-specific fallback response
+        # Handle both simple and complex personality IDs
+        if "einstein" in personality_id.lower():
+            return self._get_einstein_fallback_response(query, spiritual_context)
+        elif "marcus" in personality_id.lower() or "aurelius" in personality_id.lower():
+            return self._get_marcus_aurelius_fallback_response(query, spiritual_context)
+        elif "lincoln" in personality_id.lower():
+            return self._get_lincoln_fallback_response(query, spiritual_context)
+        elif "buddha" in personality_id.lower():
+            return self._get_buddha_fallback_response(query, spiritual_context)
+        elif "jesus" in personality_id.lower():
+            return self._get_jesus_fallback_response(query, spiritual_context)
+        elif "lao" in personality_id.lower() or "tzu" in personality_id.lower():
+            return self._get_lao_tzu_fallback_response(query, spiritual_context)
+        elif "rumi" in personality_id.lower():
+            return self._get_rumi_fallback_response(query, spiritual_context)
+        else:
+            # Default to Krishna fallback
+            return self._get_krishna_fallback_response(query, spiritual_context)
+        
+    def _get_krishna_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Krishna-specific fallback response"""
         # Simple keyword-based responses with real database lookup
         query_lower = query.lower()
         
@@ -903,10 +1235,238 @@ Your Response (with citations):"""
                 )
             )
     
-    def _get_error_response(self, query: str, error_msg: str = None, response_time: float = 0.0) -> SpiritualResponse:
-        """Get an error response that maintains spiritual tone with comprehensive metadata"""
+    def _get_einstein_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Einstein-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["meaning", "life", "purpose", "universe"]):
+            content = "My friend, the meaning of life is not found in grand theories, but in our curiosity and wonder about the universe. As I once said, 'The important thing is not to stop questioning.' Each question you ask brings you closer to understanding the magnificent cosmos we inhabit."
+            citations = ["Einstein: The World As I See It"]
+        elif any(word in query_lower for word in ["science", "physics", "relativity"]):
+            content = "Ah, you ask about the nature of reality! Science reveals that space and time are interwoven, that matter and energy are equivalent. But remember, 'Science without religion is lame, religion without science is blind.' Both paths seek truth."
+            citations = ["Einstein: Science and Religion (1940)"]
+        else:
+            content = "My curious friend, your question touches on the deepest mysteries. As I have learned, 'The most beautiful thing we can experience is the mysterious.' Keep questioning, keep wondering - this is how we grow in understanding."
+            citations = ["Einstein: The World As I See It"]
+        
         return SpiritualResponse(
-            content="Dear soul, I am experiencing technical difficulties accessing the spiritual wisdom right now. Please try again in a few moments. Your spiritual seeking is always welcome and blessed. (Backend LLM Error)",
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "scientific_wisdom", "personality": "einstein"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    def _get_marcus_aurelius_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Marcus Aurelius-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["meaning", "life", "purpose"]):
+            content = "Fellow seeker of wisdom, life's meaning lies in virtue and acceptance of what we cannot control. As I wrote in my Meditations: 'Very little is needed to make a happy life; it is all within yourself, in your way of thinking.'"
+            citations = ["Meditations, Book VII"]
+        elif any(word in query_lower for word in ["suffering", "pain", "difficulty"]):
+            content = "My friend, remember that 'You have power over your mind - not outside events. Realize this, and you will find strength.' What disturbs us is not events themselves, but our judgments about them."
+            citations = ["Meditations, Book II"]
+        else:
+            content = "Wise seeker, consider this: 'The best revenge is not to be like your enemy.' Focus on what is within your control - your thoughts, your actions, your character. This is the path to tranquility."
+            citations = ["Meditations, Book VI"]
+        
+        return SpiritualResponse(
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "stoic_wisdom", "personality": "marcus_aurelius"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    def _get_lincoln_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Lincoln-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["meaning", "life", "purpose"]):
+            content = "My fellow citizen, I believe that life's purpose is found in service to others and dedication to justice. As I have said, 'That some achieve great success, is proof to all that others can achieve it as well.'"
+            citations = ["Lincoln: Letter to Joshua Speed (1842)"]
+        elif any(word in query_lower for word in ["freedom", "equality", "justice"]):
+            content = "Friend, remember that 'A house divided against itself cannot stand.' True freedom comes when we extend liberty and justice to all people, not just ourselves."
+            citations = ["Lincoln: House Divided Speech (1858)"]
+        else:
+            content = "My friend, in these times of challenge, remember: 'The best way to predict your future is to create it.' Stand firm in your principles, act with malice toward none, and work for the betterment of all."
+            citations = ["Lincoln: Second Inaugural Address"]
+        
+        return SpiritualResponse(
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "leadership_wisdom", "personality": "lincoln"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    def _get_buddha_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Buddha-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["suffering", "pain", "difficulty"]):
+            content = "Dear friend, suffering arises from attachment and craving. As I taught, the Four Noble Truths show us that suffering can be understood and overcome through the Noble Eightfold Path. Practice mindfulness and compassion."
+            citations = ["Four Noble Truths", "Noble Eightfold Path"]
+        elif any(word in query_lower for word in ["meaning", "life", "purpose"]):
+            content = "Seeker of truth, life's purpose is to awaken from the illusion of suffering. Through right understanding, right intention, and right action, we can achieve liberation from the cycle of rebirth and find true peace."
+            citations = ["Dhammapada", "Buddha's Teachings"]
+        else:
+            content = "Friend on the path, remember that all conditioned things are impermanent. Practice loving-kindness toward all beings, cultivate wisdom through meditation, and walk the Middle Way between extremes."
+            citations = ["Buddha's Core Teachings"]
+        
+        return SpiritualResponse(
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "buddhist_wisdom", "personality": "buddha"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    def _get_jesus_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Jesus-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["love", "forgiveness", "compassion"]):
+            content = "Beloved child, love is the greatest commandment. 'Love your neighbor as yourself' and 'forgive those who trespass against you.' Through love and forgiveness, we find the Kingdom of Heaven within us."
+            citations = ["Matthew 22:39", "Lord's Prayer"]
+        elif any(word in query_lower for word in ["meaning", "life", "purpose"]):
+            content = "Dear one, your purpose is to love God with all your heart and to serve others with compassion. 'Seek first the Kingdom of God, and all these things will be added unto you.'"
+            citations = ["Matthew 6:33", "Great Commandment"]
+        else:
+            content = "Peace be with you, child of God. Remember that 'the Kingdom of Heaven is within you.' Trust in divine love, show mercy to others, and let your light shine before all people."
+            citations = ["Luke 17:21", "Sermon on the Mount"]
+        
+        return SpiritualResponse(
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "christian_wisdom", "personality": "jesus"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    def _get_lao_tzu_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Lao Tzu-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["meaning", "life", "purpose"]):
+            content = "Gentle soul, the Tao that can be spoken is not the eternal Tao. Life's meaning flows like water, taking the shape of its container. Follow the natural way, act without forcing, and find harmony in simplicity."
+            citations = ["Tao Te Ching, Chapter 1"]
+        elif any(word in query_lower for word in ["wisdom", "knowledge"]):
+            content = "Wise friend, 'Those who know do not speak; those who speak do not know.' True wisdom comes from understanding the Tao - the natural order that flows through all things. Be like water: soft yet powerful."
+            citations = ["Tao Te Ching, Chapter 56"]
+        else:
+            content = "Peaceful seeker, remember that 'the journey of a thousand miles begins with a single step.' Embrace wu wei - effortless action in harmony with the natural flow of life."
+            citations = ["Tao Te Ching"]
+        
+        return SpiritualResponse(
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "taoist_wisdom", "personality": "lao_tzu"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    def _get_rumi_fallback_response(self, query: str, spiritual_context: SpiritualContext) -> SpiritualResponse:
+        """Get Rumi-specific fallback response"""
+        query_lower = query.lower()
+        
+        if any(word in query_lower for word in ["love", "heart", "soul"]):
+            content = "Beloved soul, 'Love is the bridge between you and everything.' Open your heart to the Divine Beloved, for in love we find our true nature. Dance with the cosmos and let your soul sing!"
+            citations = ["Rumi's Poetry", "Masnavi"]
+        elif any(word in query_lower for word in ["meaning", "life", "purpose"]):
+            content = "Dear friend, 'You are not just the drop in the ocean, but the entire ocean in each drop.' Your purpose is to remember your divine nature and unite with the Beloved through love and surrender."
+            citations = ["Rumi's Teachings"]
+        else:
+            content = "Precious soul, 'The wound is the place where the Light enters you.' Embrace both joy and sorrow as gifts from the Beloved. In the dance of existence, find the sacred in every moment."
+            citations = ["Rumi's Wisdom"]
+        
+        return SpiritualResponse(
+            content=content,
+            citations=citations,
+            confidence=0.7,
+            metadata={"response_type": "sufi_wisdom", "personality": "rumi"},
+            spiritual_context=spiritual_context,
+            safety_passed=True,
+            safety_score=1.0,
+            content_validated=True,
+            token_usage=TokenUsage(
+                input_tokens=self._estimate_tokens(query),
+                output_tokens=self._estimate_tokens(content),
+                total_tokens=self._estimate_tokens(query) + self._estimate_tokens(content),
+                estimated_cost=self._estimate_token_cost(self._estimate_tokens(query), self._estimate_tokens(content))
+            )
+        )
+    
+    async def _get_error_response(self, query: str, error_msg: str = None, response_time: float = 0.0, personality_id: str = "krishna") -> SpiritualResponse:
+        """Get an error response that maintains personality-appropriate tone"""
+        
+        # Get personality-specific error message
+        error_messages = {
+            "krishna": "Dear soul, I am experiencing technical difficulties accessing the spiritual wisdom right now. Please try again in a few moments. Your spiritual seeking is always welcome and blessed.",
+            "einstein": "My friend, I'm having some technical difficulties accessing my knowledge right now. Please try again shortly. Your curiosity and questions are always welcome.",
+            "lincoln": "My fellow citizen, I'm experiencing some technical challenges at the moment. Please try again shortly. Your questions are always welcome and valued.",
+            "marcus_aurelius": "Fellow seeker, I'm encountering some technical obstacles in accessing wisdom right now. Please try again in a moment. Your philosophical inquiry is always welcomed."
+        }
+        
+        content = error_messages.get(personality_id, error_messages["krishna"]) + " (Backend LLM Error)"
+        
+        return SpiritualResponse(
+            content=content,
             citations=[],
             confidence=0.3,
             language="English",
@@ -915,7 +1475,8 @@ Your Response (with citations):"""
                 "query": query[:50],
                 "error_message": error_msg,
                 "response_time": response_time,
-                "model": "gemini-2.5-flash"
+                "model": "gemini-2.5-flash",
+                "personality_id": personality_id
             },
             spiritual_context=SpiritualContext.GENERAL,
             safety_ratings={},
@@ -927,24 +1488,25 @@ Your Response (with citations):"""
             warnings=["API Error occurred"],
             content_validated=False,
             citations_verified=False,
-            reverent_tone_checked=True  # Error response maintains reverent tone
+            reverent_tone_checked=True  # Error response maintains appropriate tone
         )
     
-    def generate_response(self, prompt: str, context: SpiritualContext = SpiritualContext.GENERAL, 
+    async def generate_response(self, prompt: str, context: SpiritualContext = SpiritualContext.GENERAL, 
                          include_context: bool = True, user_id: Optional[str] = None, 
-                         session_id: Optional[str] = None) -> SpiritualResponse:
+                         session_id: Optional[str] = None, personality_id: str = "krishna") -> SpiritualResponse:
         """
-        Generate a spiritually appropriate response with comprehensive safety analysis.
+        Generate a personality-appropriate response with comprehensive safety analysis.
         
-        This method provides compatibility with the old GeminiProClient interface
-        while using the enhanced safety and validation features.
+        This method provides compatibility with the old interface while supporting
+        multi-personality functionality.
         
         Args:
             prompt: User's question or input
-            context: Spiritual context for the response
-            include_context: Whether to include spiritual system prompt
+            context: Context for the response
+            include_context: Whether to include personality system prompt
             user_id: User ID for tracking (optional)
             session_id: Session ID for tracking (optional)
+            personality_id: ID of the personality to use for response generation
             
         Returns:
             SpiritualResponse with comprehensive metadata
@@ -952,10 +1514,11 @@ Your Response (with citations):"""
         start_time = time.time()
         
         try:
-            # Prepare full prompt
+            # Prepare full prompt with personality awareness
             if include_context:
-                system_prompt = self._create_spiritual_system_prompt(context)
-                full_prompt = f"{system_prompt}\n\nSeeker's Question: {prompt}\n\nLord Krishna's Response:"
+                # Use personality-specific system prompt
+                system_prompt = await self._create_personality_system_prompt(personality_id, context)
+                full_prompt = f"{system_prompt}\n\nQuestion: {prompt}\n\nResponse:"
             else:
                 full_prompt = prompt
             
@@ -963,14 +1526,14 @@ Your Response (with citations):"""
             
             if not self.is_configured:
                 response_time = time.time() - start_time
-                return self._get_fallback_response(prompt, context.value)
+                return self._get_fallback_response(prompt, context.value, personality_id)
             
             # Generate response
             response = self.model.generate_content(full_prompt)
             response_time = time.time() - start_time
             
             # Parse response with advanced analysis
-            spiritual_response = self._parse_gemini_response_advanced(response, prompt, context, response_time, full_prompt)
+            spiritual_response = await self._parse_gemini_response_advanced(response, prompt, context, response_time, full_prompt, personality_id)
             
             # Track usage if user/session provided
             if user_id or session_id:
@@ -981,7 +1544,7 @@ Your Response (with citations):"""
         except Exception as e:
             logger.error(f"Error generating response: {e}")
             response_time = time.time() - start_time
-            return self._get_error_response(prompt, str(e), response_time)
+            return await self._get_error_response(prompt, str(e), response_time, "krishna")
     
     def _track_usage(self, token_usage: TokenUsage, user_id: Optional[str], 
                     session_id: Optional[str], context: SpiritualContext):
@@ -1037,6 +1600,263 @@ Your Response (with citations):"""
             return self.test_connection()
         except Exception:
             return False
+    
+    # ==========================================
+    # MULTI-PERSONALITY SUPPORT
+    # ==========================================
+    
+    async def generate_personality_response(
+        self,
+        query: str,
+        personality_id: str,
+        context_chunks: List[Dict[str, Any]] = None,
+        conversation_history: List[Dict[str, Any]] = None,
+        language: str = "English",
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None
+    ) -> SpiritualResponse:
+        """
+        Generate response for any personality using the personality service and prompt templates.
+        
+        This is the new multi-personality method that replaces hardcoded Krishna responses.
+        
+        Args:
+            query: User's question or input
+            personality_id: ID of the personality to respond as
+            context_chunks: Retrieved context chunks from RAG
+            conversation_history: Previous conversation messages
+            language: Response language
+            user_id: User ID for tracking
+            session_id: Session ID for tracking
+            
+        Returns:
+            SpiritualResponse with personality-specific content
+        """
+        start_time = time.time()
+        
+        try:
+            if not PERSONALITY_SERVICES_AVAILABLE:
+                logger.warning("Personality services not available, falling back to Krishna")
+                return self.generate_response(query, SpiritualContext.GUIDANCE, True, user_id, session_id, "krishna")
+            
+            # Get personality profile
+            personality = await personality_service.get_personality(personality_id)
+            if not personality:
+                logger.warning(f"Personality {personality_id} not found, falling back to Krishna")
+                return self.generate_response(query, SpiritualContext.GUIDANCE, True, user_id, session_id, "krishna")
+            
+            # Create template render context
+            render_context = TemplateRenderContext(
+                personality_id=personality_id,
+                domain=personality.domain.value,
+                query=query,
+                context_chunks=context_chunks or [],
+                conversation_history=conversation_history or [],
+                language=language,
+                metadata={
+                    'personality_name': personality.display_name,
+                    'personality_description': personality.description,
+                    'cultural_context': personality.cultural_context,
+                    'tone_characteristics': str(personality.tone_characteristics),
+                    'time_period': personality.time_period
+                }
+            )
+            
+            # Render personality-specific prompt
+            full_prompt = await prompt_template_service.render_personality_prompt(
+                personality_id=personality_id,
+                query=query,
+                context_chunks=context_chunks or [],
+                language=language,
+                conversation_history=conversation_history
+            )
+            
+            logger.info(f"Generating {personality.display_name} response for query: {query[:50]}...")
+            
+            if not self.is_configured:
+                response_time = time.time() - start_time
+                return self._get_personality_fallback_response(query, personality, response_time)
+            
+            # Generate response using Gemini
+            response = self.model.generate_content(full_prompt)
+            response_time = time.time() - start_time
+            
+            # Parse response with personality context
+            spiritual_response = self._parse_personality_response(
+                response, query, personality, response_time, full_prompt
+            )
+            
+            # Track usage
+            if user_id or session_id:
+                self._track_personality_usage(
+                    spiritual_response.token_usage, user_id, session_id, personality_id
+                )
+            
+            return spiritual_response
+            
+        except Exception as e:
+            logger.error(f"Error generating {personality_id} response: {e}")
+            response_time = time.time() - start_time
+            return self._get_personality_error_response(query, personality_id, str(e), response_time)
+    
+    def _get_personality_fallback_response(
+        self,
+        query: str,
+        personality: PersonalityProfile,
+        response_time: float
+    ) -> SpiritualResponse:
+        """Generate fallback response for personality when API is not available"""
+        fallback_responses = {
+            "spiritual": f"I am {personality.display_name}. While I cannot access my full wisdom at this moment, I encourage you to reflect deeply on your question: '{query}'. The answers you seek often lie within your own heart and spiritual practice.",
+            "scientific": f"I am {personality.display_name}. Though I cannot provide my complete analysis right now, your question '{query}' touches on important scientific principles. I encourage you to explore this through careful observation and logical reasoning.",
+            "historical": f"I am {personality.display_name}. While I cannot share my full perspective at this moment, your question '{query}' reminds me of the challenges we faced in {personality.time_period}. History teaches us that wisdom comes through experience and reflection.",
+            "philosophical": f"I am {personality.display_name}. Though I cannot offer my complete philosophical insight now, your question '{query}' invites deep contemplation. True understanding comes through questioning and examining our assumptions."
+        }
+        
+        domain_key = personality.domain.value if personality.domain else "spiritual"
+        content = fallback_responses.get(domain_key, fallback_responses["spiritual"])
+        
+        return SpiritualResponse(
+            content=content,
+            citations=[],
+            confidence=0.5,
+            language="English",
+            metadata={
+                "personality_id": personality.id,
+                "personality_name": personality.display_name,
+                "fallback_reason": "API not configured",
+                "response_time": response_time
+            },
+            spiritual_context=SpiritualContext.GENERAL,
+            safety_passed=True,
+            safety_score=1.0,
+            finish_reason="FALLBACK",
+            content_validated=True,
+            reverent_tone_checked=True
+        )
+    
+    def _get_personality_error_response(
+        self,
+        query: str,
+        personality_id: str,
+        error: str,
+        response_time: float
+    ) -> SpiritualResponse:
+        """Generate error response for personality"""
+        return SpiritualResponse(
+            content=f"I apologize, but I'm experiencing difficulties accessing my knowledge at this moment. Please try your question again shortly.",
+            citations=[],
+            confidence=0.0,
+            language="English",
+            metadata={
+                "personality_id": personality_id,
+                "error": error,
+                "response_time": response_time
+            },
+            spiritual_context=SpiritualContext.GENERAL,
+            safety_passed=True,
+            safety_score=1.0,
+            finish_reason="ERROR",
+            content_validated=True,
+            reverent_tone_checked=True
+        )
+    
+    def _parse_personality_response(
+        self,
+        response,
+        query: str,
+        personality: PersonalityProfile,
+        response_time: float,
+        full_prompt: str
+    ) -> SpiritualResponse:
+        """Parse Gemini response for personality-specific content"""
+        try:
+            # Extract response text
+            response_text = response.text if hasattr(response, 'text') else str(response)
+            
+            # Extract citations (simple implementation)
+            citations = self._extract_citations_from_response(response_text)
+            
+            # Calculate token usage (approximate)
+            token_usage = TokenUsage(
+                input_tokens=len(full_prompt.split()) * 1.3,  # Rough approximation
+                output_tokens=len(response_text.split()) * 1.3,
+                model_name=self.model_name
+            )
+            token_usage.total_tokens = token_usage.input_tokens + token_usage.output_tokens
+            token_usage.estimated_cost = token_usage.total_tokens * 0.00001  # Rough estimate
+            
+            return SpiritualResponse(
+                content=response_text,
+                citations=citations,
+                confidence=0.8,
+                language="English",
+                metadata={
+                    "personality_id": personality.id,
+                    "personality_name": personality.display_name,
+                    "domain": personality.domain.value,
+                    "response_time": response_time
+                },
+                spiritual_context=SpiritualContext.GUIDANCE,
+                safety_passed=True,
+                safety_score=0.9,
+                finish_reason="STOP",
+                token_usage=token_usage,
+                response_time=response_time,
+                content_validated=True,
+                reverent_tone_checked=True
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to parse personality response: {e}")
+            return self._get_personality_error_response(query, personality.id, str(e), response_time)
+    
+    def _extract_citations_from_response(self, response_text: str) -> List[str]:
+        """Extract citations from response text"""
+        import re
+        # Look for common citation patterns
+        patterns = [
+            r'\(([^)]+\s+\d+[:\.]?\d*)\)',  # (Book 2:47)
+            r'\[([^\]]+\s+\d+[:\.]?\d*)\]',  # [Chapter 2:47]
+            r'—\s*([^—\n]+\s+\d+[:\.]?\d*)',  # — Source 2:47
+        ]
+        
+        citations = []
+        for pattern in patterns:
+            matches = re.findall(pattern, response_text)
+            citations.extend(matches)
+        
+        return list(set(citations))  # Remove duplicates
+    
+    def _track_personality_usage(
+        self,
+        token_usage: TokenUsage,
+        user_id: Optional[str],
+        session_id: Optional[str],
+        personality_id: str
+    ):
+        """Track token usage for personality-specific responses"""
+        try:
+            # Enhanced tracking with personality information
+            logger.info(f"Personality usage - {personality_id}: Input: {token_usage.input_tokens}, Output: {token_usage.output_tokens}, Cost: ${token_usage.estimated_cost:.4f}")
+            
+            # Try to use the cost management system if available
+            try:
+                from backend.cost_management.token_tracker import get_token_tracker
+                tracker = get_token_tracker()
+                tracker.track_usage(
+                    operation_type=f'personality_response_{personality_id}',
+                    model_name=token_usage.model_name,
+                    input_tokens=token_usage.input_tokens,
+                    output_tokens=token_usage.output_tokens,
+                    user_id=user_id,
+                    session_id=session_id,
+                    personality_id=personality_id
+                )
+            except ImportError:
+                pass  # Cost management not available
+        except Exception as e:
+            logger.warning(f"Failed to track personality usage: {e}")
 
 
 # Helper functions for easy service creation

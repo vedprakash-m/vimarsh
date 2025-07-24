@@ -31,6 +31,7 @@ class ConfigSection(Enum):
     SECURITY = "security"
     ADMIN = "admin"
     COST = "cost"
+    PERSONALITY = "personality"
 
 
 @dataclass
@@ -144,6 +145,30 @@ class UnifiedConfig:
                 required=True, 
                 data_type=str, 
                 allowed_values=["true", "false"]
+            ),
+            
+            # Personality Configuration
+            "DEFAULT_PERSONALITY": ConfigValidationRule(
+                required=True,
+                data_type=str,
+                allowed_values=["krishna", "einstein", "lincoln", "marcus_aurelius", "buddha"]
+            ),
+            "PERSONALITY_CACHE_SIZE": ConfigValidationRule(
+                required=True,
+                data_type=int,
+                min_value=10,
+                max_value=1000
+            ),
+            "ENABLE_PERSONALITY_SWITCHING": ConfigValidationRule(
+                required=True,
+                data_type=str,
+                allowed_values=["true", "false"]
+            ),
+            "PERSONALITY_RESPONSE_TIMEOUT": ConfigValidationRule(
+                required=True,
+                data_type=int,
+                min_value=5,
+                max_value=60
             ),
             
             # Admin Features

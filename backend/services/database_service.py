@@ -109,6 +109,7 @@ class PersonalityConfig:
     associatedBooks: List[str]  # List of book/source IDs
     vectorNamespace: str  # For vector DB partitioning
     isActive: bool = True
+    domain: str = "spiritual"  # personality domain
     type: str = "personality_config"
     createdAt: str = None
     
@@ -501,16 +502,77 @@ class DatabaseService:
             return None
     
     async def get_all_personalities(self) -> List[PersonalityConfig]:
-        """Get all active personalities"""
+        """Get all personalities (not just active ones)"""
         try:
             if self.is_cosmos_enabled:
-                query = "SELECT * FROM c WHERE c.type = 'personality_config' AND c.isActive = true"
+                query = "SELECT * FROM c WHERE c.type = 'personality_config'"
                 return await self._query_cosmos(self.conversations_container, query, PersonalityConfig)
             else:
                 return self._get_all_personalities_local()
         except Exception as e:
             logger.error(f"Failed to get all personalities: {e}")
             return []
+    
+    async def get_active_personalities(self) -> List[PersonalityConfig]:
+        """Get only active personalities"""
+        try:
+            if self.is_cosmos_enabled:
+                query = "SELECT * FROM c WHERE c.type = 'personality_config' AND c.isActive = true"
+                return await self._query_cosmos(self.conversations_container, query, PersonalityConfig)
+            else:
+                personalities = self._get_all_personalities_local()
+                return [p for p in personalities if p.isActive]
+        except Exception as e:
+            logger.error(f"Failed to get active personalities: {e}")
+            return []
+    
+    async def search_personalities(self, search_query: str = None, domain: str = None, limit: int = 50) -> List[PersonalityConfig]:
+        """Search personalities with optional filters"""
+        try:
+            if self.is_cosmos_enabled:
+                query_parts = ["SELECT * FROM c WHERE c.type = 'personality_config'"]
+                
+                if search_query:
+                    query_parts.append(f"AND (CONTAINS(c.personalityName, '{search_query}') OR CONTAINS(c.description, '{search_query}'))")
+                
+                if domain:
+                    query_parts.append(f"AND c.domain = '{domain}'")
+                
+                query_parts.append(f"ORDER BY c.personalityName OFFSET 0 LIMIT {limit}")
+                query = " ".join(query_parts)
+                
+                return await self._query_cosmos(self.conversations_container, query, PersonalityConfig)
+            else:
+                personalities = self._get_all_personalities_local()
+                
+                # Apply search filter
+                if search_query:
+                    search_lower = search_query.lower()
+                    personalities = [
+                        p for p in personalities
+                        if search_lower in p.personalityName.lower() or search_lower in p.description.lower()
+                    ]
+                
+                return personalities[:limit]
+        except Exception as e:
+            logger.error(f"Failed to search personalities: {e}")
+            return []
+    
+    async def delete_personality_config(self, personality_name: str) -> bool:
+        """Delete personality configuration"""
+        try:
+            if self.is_cosmos_enabled:
+                # In Cosmos DB, we'll mark as deleted rather than hard delete
+                config = await self.get_personality_config(personality_name)
+                if config:
+                    config.isActive = False
+                    return await self.save_personality_config(config)
+                return True
+            else:
+                return self._delete_personality_config_local(personality_name)
+        except Exception as e:
+            logger.error(f"Failed to delete personality config: {e}")
+            return False
     
     async def save_enhanced_spiritual_text(self, text: EnhancedSpiritualText) -> bool:
         """Save enhanced spiritual text with personality association"""
@@ -760,14 +822,34 @@ class DatabaseService:
             return None
     
     def _get_all_personalities_local(self) -> List[PersonalityConfig]:
-        """Get all personalities from local storage"""
+        """Get all personalities from local storage (not just active)"""
         try:
             data = self._load_from_local_file(self.conversations_path)
             return [PersonalityConfig(**item) for item in data 
-                   if item.get('type') == 'personality_config' and item.get('isActive') == True]
+                   if item.get('type') == 'personality_config']
         except Exception as e:
             logger.error(f"Failed to get all personalities locally: {e}")
             return []
+    
+    def _delete_personality_config_local(self, personality_name: str) -> bool:
+        """Delete personality config from local storage"""
+        try:
+            data = self._load_from_local_file(self.conversations_path)
+            
+            # Filter out the personality to delete
+            filtered_data = [
+                item for item in data 
+                if not (item.get('personalityName') == personality_name and item.get('type') == 'personality_config')
+            ]
+            
+            # Save filtered data back
+            self._save_to_local_file(self.conversations_path, filtered_data)
+            
+            logger.info(f"🗑️ Deleted personality config locally: {personality_name}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete personality config locally: {e}")
+            return False
     
     def _save_enhanced_text_local(self, text: EnhancedSpiritualText) -> bool:
         """Save enhanced text to local spiritual-texts.json"""

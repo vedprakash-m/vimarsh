@@ -46,6 +46,50 @@ else:
     structured_logger = None
     health_checker = None
 
+# Import personality management endpoints
+try:
+    from admin.personality_endpoints import (
+        create_personality, get_personality, update_personality, delete_personality,
+        search_personalities, get_personalities_by_domain, validate_personality,
+        associate_knowledge_base, discover_personalities, get_active_personalities
+    )
+    PERSONALITY_ENDPOINTS_AVAILABLE = True
+except ImportError:
+    PERSONALITY_ENDPOINTS_AVAILABLE = False
+
+# Import content management endpoints
+try:
+    from admin.content_endpoints import (
+        get_content, create_content, update_content, delete_content,
+        associate_content_personalities, validate_content_quality,
+        approve_content, reject_content
+    )
+    CONTENT_ENDPOINTS_AVAILABLE = True
+except ImportError:
+    CONTENT_ENDPOINTS_AVAILABLE = False
+
+# Import expert review endpoints
+try:
+    from admin.expert_review_endpoints import (
+        get_review_items, get_experts, get_review_queues,
+        assign_review, submit_feedback, get_review_analytics,
+        submit_for_review
+    )
+    EXPERT_REVIEW_ENDPOINTS_AVAILABLE = True
+except ImportError:
+    EXPERT_REVIEW_ENDPOINTS_AVAILABLE = False
+
+# Import performance monitoring endpoints
+try:
+    from admin.performance_endpoints import (
+        get_cache_metrics, get_performance_metrics, get_performance_report,
+        get_performance_alerts, resolve_alert, get_optimization_recommendations,
+        warm_cache, invalidate_cache, optimize_cache
+    )
+    PERFORMANCE_ENDPOINTS_AVAILABLE = True
+except ImportError:
+    PERFORMANCE_ENDPOINTS_AVAILABLE = False
+
 # Import authentication middleware
 try:
     from auth.unified_auth_service import auth_service, require_auth, require_admin, AuthenticatedUser
@@ -217,7 +261,8 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
             "query": "User's spiritual question",
             "language": "English" | "Hindi" (optional, default: "English"),
             "include_citations": boolean (optional, default: true),
-            "voice_enabled": boolean (optional, default: false)
+            "voice_enabled": boolean (optional, default: false),
+            "personality_id": "krishna" | "einstein" | "lincoln" | "marcus_aurelius" (optional, default: "krishna")
         }
     
     Returns:
@@ -277,7 +322,8 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         language = query_data.get('language', 'English')
         include_citations = query_data.get('include_citations', True)
         voice_enabled = query_data.get('voice_enabled', False)
-        conversation_context = query_data.get('conversation_context', [])  # New parameter
+        conversation_context = query_data.get('conversation_context', [])
+        personality_id = query_data.get('personality_id', 'krishna')  # Default to Krishna for backward compatibility
         
         # Validate required parameters
         if not user_query:
@@ -291,7 +337,7 @@ async def spiritual_guidance_impl(req: func.HttpRequest) -> func.HttpResponse:
         # Generate response with budget-aware LLM service
         response_data = await _generate_spiritual_response_with_budget(
             user_query, language, include_citations, voice_enabled, conversation_context,
-            user_id, user_email, session_id
+            user_id, user_email, session_id, personality_id
         )
         
         # Add authentication metadata if available
@@ -402,6 +448,103 @@ async def supported_languages(req: func.HttpRequest) -> func.HttpResponse:
     return await supported_languages_impl(req)
 
 
+async def get_active_personalities_impl(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Get active personalities for user selection.
+    
+    Query Parameters:
+        - domain: Filter by domain (spiritual, scientific, historical, philosophical)
+        - q: Search query
+        - active_only: Only return active personalities (default: true)
+    
+    Returns:
+        {
+            "personalities": [
+                {
+                    "id": "krishna",
+                    "name": "Krishna",
+                    "display_name": "Lord Krishna",
+                    "domain": "spiritual",
+                    "description": "Divine teacher and guide...",
+                    "expertise_areas": ["dharma", "karma", ...],
+                    "quality_score": 95.0,
+                    "usage_count": 1000,
+                    "is_active": true
+                }
+            ]
+        }
+    """
+    try:
+        # Parse query parameters
+        domain = req.params.get('domain')
+        search_query = req.params.get('q')
+        active_only = req.params.get('active_only', 'true').lower() == 'true'
+        
+        # Import personality service
+        from services.personality_service import personality_service, PersonalitySearchFilter
+        
+        # Create search filter
+        filters = PersonalitySearchFilter(
+            domain=None if not domain or domain == 'all' else personality_service.PersonalityDomain(domain),
+            is_active=active_only,
+            search_query=search_query
+        )
+        
+        # Search personalities
+        personalities = await personality_service.search_personalities(filters, limit=50)
+        
+        # Convert to API format
+        personality_data = []
+        for personality in personalities:
+            personality_data.append({
+                "id": personality.id,
+                "name": personality.name,
+                "display_name": personality.display_name,
+                "domain": personality.domain.value,
+                "time_period": personality.time_period,
+                "description": personality.description,
+                "expertise_areas": personality.expertise_areas,
+                "cultural_context": personality.cultural_context,
+                "quality_score": personality.quality_score,
+                "usage_count": personality.usage_count,
+                "is_active": personality.is_active,
+                "tags": personality.tags
+            })
+        
+        return func.HttpResponse(
+            json.dumps({
+                "personalities": personality_data,
+                "total": len(personality_data)
+            }),
+            mimetype="application/json",
+            status_code=200,
+            headers={
+                "Content-Type": "application/json; charset=utf-8",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to get active personalities: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Failed to load personalities",
+                "message": str(e),
+                "personalities": []
+            }),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="personalities/active", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
+    """Azure Functions wrapper for getting active personalities."""
+    return await get_active_personalities_impl(req)
+
+
 async def _generate_spiritual_response_with_budget(
     query: str, 
     language: str, 
@@ -410,7 +553,8 @@ async def _generate_spiritual_response_with_budget(
     conversation_context: List[Dict[str, str]] = None,
     user_id: str = None,
     user_email: str = None,
-    session_id: str = None
+    session_id: str = None,
+    personality_id: str = "krishna"
 ) -> Dict[str, Any]:
     """
     Generate spiritual guidance response using budget-aware LLM service.
@@ -424,6 +568,7 @@ async def _generate_spiritual_response_with_budget(
         user_id: User ID for budget tracking
         user_email: User email for budget tracking
         session_id: Session ID for usage tracking
+        personality_id: ID of the personality to use for response generation
     
     Returns:
         Structured response with guidance, citations, and metadata
@@ -433,24 +578,13 @@ async def _generate_spiritual_response_with_budget(
         from services.llm_service import llm_service
         from services.llm_service import SpiritualContext
         
-        # Get spiritual guidance with budget controls
-        if user_id and user_email:
-            spiritual_response = llm_service.generate_response_with_budget_check(
-                prompt=query,
-                user_id=user_id,
-                user_email=user_email,
-                context=SpiritualContext.GUIDANCE,
-                session_id=session_id
-            )
-        else:
-            # Fallback to regular generation for development
-            spiritual_response = llm_service.generate_response(
-                prompt=query,
-                context=SpiritualContext.GUIDANCE,
-                include_context=True,
-                user_id=user_id,
-                session_id=session_id
-            )
+        # Get spiritual guidance with personality support
+        spiritual_response = await llm_service.get_spiritual_guidance(
+            query=query,
+            context="guidance",
+            conversation_context=conversation_context,
+            personality_id=personality_id
+        )
         
         # Structure the response
         response_data = {
@@ -487,7 +621,7 @@ async def _generate_spiritual_response_with_budget(
         # Return fallback to original function
         return await _generate_spiritual_response(
             query, language, include_citations, voice_enabled, conversation_context,
-            user_id, user_email, session_id
+            user_id, user_email, session_id, personality_id
         )
 
 
@@ -499,7 +633,8 @@ async def _generate_spiritual_response(
     conversation_context: List[Dict[str, str]] = None,
     user_id: str = None,
     user_email: str = None,
-    session_id: str = None
+    session_id: str = None,
+    personality_id: str = "krishna"
 ) -> Dict[str, Any]:
     """
     Generate spiritual guidance response using simplified LLM service.
@@ -513,6 +648,7 @@ async def _generate_spiritual_response(
         user_id: User ID for conversation tracking
         user_email: User email for conversation tracking
         session_id: Session ID for conversation tracking
+        personality_id: ID of the personality to use for response generation
     
     Returns:
         Structured response with guidance, citations, and metadata
@@ -523,7 +659,7 @@ async def _generate_spiritual_response(
         
         # Get spiritual guidance with conversation context
         spiritual_response = await llm_service.get_spiritual_guidance(
-            query, context="general", conversation_context=conversation_context
+            query, context="general", conversation_context=conversation_context, personality_id=personality_id
         )
         
         # Structure the response
@@ -1471,4 +1607,329 @@ async def user_budget_status(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500,
             mimetype="application/json",
             headers={"Access-Control-Allow-Origin": "*"}
+        )
+
+# Personality Management Endpoints
+if PERSONALITY_ENDPOINTS_AVAILABLE:
+    @app.function_name("admin_create_personality")
+    @app.route(route="admin/personalities", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_create_personality_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Create new personality endpoint."""
+        return await create_personality(req)
+
+    @app.function_name("admin_get_personality")
+    @app.route(route="admin/personalities/{personality_id}", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_personality_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get personality by ID endpoint."""
+        return await get_personality(req)
+
+    @app.function_name("admin_update_personality")
+    @app.route(route="admin/personalities/{personality_id}", methods=["PUT"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_update_personality_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Update personality endpoint."""
+        return await update_personality(req)
+
+    @app.function_name("admin_delete_personality")
+    @app.route(route="admin/personalities/{personality_id}", methods=["DELETE"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_delete_personality_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Delete personality endpoint."""
+        return await delete_personality(req)
+
+    @app.function_name("admin_search_personalities")
+    @app.route(route="admin/personalities", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_search_personalities_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Search personalities endpoint."""
+        return await search_personalities(req)
+
+    @app.function_name("admin_personalities_by_domain")
+    @app.route(route="admin/personalities/domain/{domain}", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_personalities_by_domain_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get personalities by domain endpoint."""
+        return await get_personalities_by_domain(req)
+
+    @app.function_name("discover_personalities")
+    @app.route(route="personalities/discover", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def discover_personalities_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Discover personalities endpoint."""
+        return await discover_personalities(req)
+
+    @app.function_name("get_active_personalities")
+    @app.route(route="personalities/active", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def get_active_personalities_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get active personalities endpoint."""
+        return await get_active_personalities(req)
+
+    @app.function_name("generate_personality_response")
+    @app.route(route="personalities/{personality_id}/chat", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def generate_personality_response_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Generate personality response endpoint."""
+        try:
+            from services.llm_service import EnhancedLLMService
+            
+            # Get personality ID from route
+            personality_id = req.route_params.get('personality_id')
+            if not personality_id:
+                return func.HttpResponse(
+                    json.dumps({"error": "Personality ID is required"}),
+                    status_code=400,
+                    headers={"Content-Type": "application/json"}
+                )
+            
+            # Parse request body
+            try:
+                body = req.get_json()
+            except ValueError:
+                return func.HttpResponse(
+                    json.dumps({"error": "Invalid JSON in request body"}),
+                    status_code=400,
+                    headers={"Content-Type": "application/json"}
+                )
+            
+            if not body or 'query' not in body:
+                return func.HttpResponse(
+                    json.dumps({"error": "Query is required"}),
+                    status_code=400,
+                    headers={"Content-Type": "application/json"}
+                )
+            
+            # Generate response
+            llm_service = EnhancedLLMService()
+            response = await llm_service.generate_personality_response(
+                query=body['query'],
+                personality_id=personality_id,
+                context_chunks=body.get('context_chunks', []),
+                conversation_history=body.get('conversation_history', []),
+                language=body.get('language', 'English'),
+                user_id=body.get('user_id'),
+                session_id=body.get('session_id')
+            )
+            
+            return func.HttpResponse(
+                json.dumps({
+                    "success": True,
+                    "response": {
+                        "content": response.content,
+                        "citations": response.citations,
+                        "confidence": response.confidence,
+                        "language": response.language,
+                        "metadata": response.metadata,
+                        "safety_passed": response.safety_passed
+                    }
+                }),
+                status_code=200,
+                headers={"Content-Type": "application/json"}
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to generate personality response: {str(e)}")
+            return func.HttpResponse(
+                json.dumps({"error": "Failed to generate response"}),
+                status_code=500,
+                headers={"Content-Type": "application/json"}
+            )
+else:
+    @app.function_name("personality_endpoints_unavailable")
+    @app.route(route="admin/personalities/{*route}", methods=["GET", "POST", "PUT", "DELETE"])
+    @app.route(route="personalities/{*route}", methods=["GET", "POST"])
+    async def personality_endpoints_unavailable(req: func.HttpRequest) -> func.HttpResponse:
+        """Fallback for when personality endpoints are unavailable."""
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Personality management not available",
+                "message": "Personality management functionality is currently unavailable"
+            }),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
+        )
+
+# Content Management Endpoints
+if CONTENT_ENDPOINTS_AVAILABLE:
+    @app.function_name("admin_get_content")
+    @app.route(route="admin/content", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get content with filtering and search capabilities."""
+        return await get_content(req)
+
+    @app.function_name("admin_create_content")
+    @app.route(route="admin/content", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_create_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Create new content item."""
+        return await create_content(req)
+
+    @app.function_name("admin_update_content")
+    @app.route(route="admin/content/{content_id}", methods=["PUT"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_update_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Update existing content item."""
+        return await update_content(req)
+
+    @app.function_name("admin_delete_content")
+    @app.route(route="admin/content/{content_id}", methods=["DELETE"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_delete_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Delete content item."""
+        return await delete_content(req)
+
+    @app.function_name("admin_associate_content")
+    @app.route(route="admin/content/{content_id}/associate", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_associate_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Associate content with personalities."""
+        return await associate_content_personalities(req)
+
+    @app.function_name("admin_validate_content")
+    @app.route(route="admin/content/{content_id}/validate", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_validate_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Validate content quality."""
+        return await validate_content_quality(req)
+
+    @app.function_name("admin_approve_content")
+    @app.route(route="admin/content/{content_id}/approve", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_approve_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Approve content item."""
+        return await approve_content(req)
+
+    @app.function_name("admin_reject_content")
+    @app.route(route="admin/content/{content_id}/reject", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_reject_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Reject content item."""
+        return await reject_content(req)
+
+else:
+    @app.function_name("content_endpoints_unavailable")
+    @app.route(route="admin/content/{*route}", methods=["GET", "POST", "PUT", "DELETE"])
+    async def content_endpoints_unavailable(req: func.HttpRequest) -> func.HttpResponse:
+        """Fallback for when content endpoints are unavailable."""
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Content management not available",
+                "message": "Content management functionality is currently unavailable"
+            }),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
+        )
+
+# Expert Review Endpoints
+if EXPERT_REVIEW_ENDPOINTS_AVAILABLE:
+    @app.function_name("admin_get_review_items")
+    @app.route(route="admin/expert-review/items", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_review_items_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get review items with filtering capabilities."""
+        return await get_review_items(req)
+
+    @app.function_name("admin_get_experts")
+    @app.route(route="admin/expert-review/experts", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_experts_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get expert profiles."""
+        return await get_experts(req)
+
+    @app.function_name("admin_get_review_queues")
+    @app.route(route="admin/expert-review/queues", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_review_queues_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get review queue status for all domains."""
+        return await get_review_queues(req)
+
+    @app.function_name("admin_assign_review")
+    @app.route(route="admin/expert-review/assign", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_assign_review_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Assign a review to an expert."""
+        return await assign_review(req)
+
+    @app.function_name("admin_submit_feedback")
+    @app.route(route="admin/expert-review/feedback", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_submit_feedback_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Submit expert feedback for a review."""
+        return await submit_feedback(req)
+
+    @app.function_name("admin_get_review_analytics")
+    @app.route(route="admin/expert-review/analytics", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_review_analytics_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get comprehensive review analytics."""
+        return await get_review_analytics(req)
+
+    @app.function_name("admin_submit_for_review")
+    @app.route(route="admin/expert-review/submit", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_submit_for_review_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Submit content for expert review."""
+        return await submit_for_review(req)
+
+else:
+    @app.function_name("expert_review_endpoints_unavailable")
+    @app.route(route="admin/expert-review/{*route}", methods=["GET", "POST", "PUT", "DELETE"])
+    async def expert_review_endpoints_unavailable(req: func.HttpRequest) -> func.HttpResponse:
+        """Fallback for when expert review endpoints are unavailable."""
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Expert review not available",
+                "message": "Expert review functionality is currently unavailable"
+            }),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
+        )
+
+# Performance Monitoring Endpoints
+if PERFORMANCE_ENDPOINTS_AVAILABLE:
+    @app.function_name("admin_get_cache_metrics")
+    @app.route(route="admin/performance/cache-metrics", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_cache_metrics_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get cache performance metrics."""
+        return await get_cache_metrics(req)
+
+    @app.function_name("admin_get_performance_metrics")
+    @app.route(route="admin/performance/metrics", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_performance_metrics_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get performance metrics."""
+        return await get_performance_metrics(req)
+
+    @app.function_name("admin_get_performance_report")
+    @app.route(route="admin/performance/report", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_performance_report_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get comprehensive performance report."""
+        return await get_performance_report(req)
+
+    @app.function_name("admin_get_performance_alerts")
+    @app.route(route="admin/performance/alerts", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_performance_alerts_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get active performance alerts."""
+        return await get_performance_alerts(req)
+
+    @app.function_name("admin_resolve_alert")
+    @app.route(route="admin/performance/alerts/resolve", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_resolve_alert_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Resolve a performance alert."""
+        return await resolve_alert(req)
+
+    @app.function_name("admin_get_optimization_recommendations")
+    @app.route(route="admin/performance/recommendations", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_get_optimization_recommendations_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Get performance optimization recommendations."""
+        return await get_optimization_recommendations(req)
+
+    @app.function_name("admin_warm_cache")
+    @app.route(route="admin/performance/cache/warm", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_warm_cache_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Warm cache for specific personality."""
+        return await warm_cache(req)
+
+    @app.function_name("admin_invalidate_cache")
+    @app.route(route="admin/performance/cache/invalidate", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_invalidate_cache_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Invalidate cache entries."""
+        return await invalidate_cache(req)
+
+    @app.function_name("admin_optimize_cache")
+    @app.route(route="admin/performance/cache/optimize", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+    async def admin_optimize_cache_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+        """Optimize cache performance and cleanup."""
+        return await optimize_cache(req)
+
+else:
+    @app.function_name("performance_endpoints_unavailable")
+    @app.route(route="admin/performance/{*route}", methods=["GET", "POST", "PUT", "DELETE"])
+    async def performance_endpoints_unavailable(req: func.HttpRequest) -> func.HttpResponse:
+        """Fallback for when performance endpoints are unavailable."""
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Performance monitoring not available",
+                "message": "Performance monitoring functionality is currently unavailable"
+            }),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
         )

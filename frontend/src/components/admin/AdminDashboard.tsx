@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { DollarSign, Users, Activity, Shield, Settings, ChevronDown, ChevronUp } from 'lucide-react';
+import { DollarSign, Users, Activity, Shield, Settings, ChevronDown, ChevronUp, Brain, FileText, UserCheck, Zap, TestTube } from 'lucide-react';
 import { useAdmin } from '../../contexts/AdminContext';
 import CostDashboard from './CostDashboard';
 import UserManagement from './UserManagement';
 import AdminHealth from './AdminHealth';
+import PersonalityManager from './PersonalityManager';
+import ContentManager from './ContentManager';
+import ExpertReview from './ExpertReview';
+import PerformanceDashboard from './PerformanceDashboard';
+import TestingDashboard from './TestingDashboard';
 
-type AdminTab = 'cost' | 'users' | 'health' | 'settings';
+type AdminTab = 'cost' | 'users' | 'health' | 'personalities' | 'content' | 'expert-review' | 'performance' | 'testing' | 'settings';
 
 export default function AdminDashboard() {
   const { user } = useAdmin();
@@ -20,6 +25,11 @@ export default function AdminDashboard() {
     { id: 'cost' as AdminTab, label: 'Cost Dashboard', icon: DollarSign },
     { id: 'users' as AdminTab, label: 'User Management', icon: Users },
     { id: 'health' as AdminTab, label: 'System Health', icon: Activity },
+    { id: 'personalities' as AdminTab, label: 'Personalities', icon: Brain },
+    { id: 'content' as AdminTab, label: 'Content', icon: FileText },
+    { id: 'expert-review' as AdminTab, label: 'Expert Review', icon: UserCheck },
+    { id: 'performance' as AdminTab, label: 'Performance', icon: Zap },
+    { id: 'testing' as AdminTab, label: 'Testing', icon: TestTube },
     { id: 'settings' as AdminTab, label: 'Settings', icon: Settings },
   ];
 
@@ -31,6 +41,16 @@ export default function AdminDashboard() {
         return <UserManagement />;
       case 'health':
         return <AdminHealth />;
+      case 'personalities':
+        return <PersonalityManager />;
+      case 'content':
+        return <ContentManager />;
+      case 'expert-review':
+        return <ExpertReview />;
+      case 'performance':
+        return <PerformanceDashboard />;
+      case 'testing':
+        return <TestingDashboard />;
       case 'settings':
         return (
           <div className="vimarsh-admin-dashboard">

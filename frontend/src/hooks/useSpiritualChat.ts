@@ -46,6 +46,7 @@ interface SpiritualChatConfig {
   maxRetries?: number;
   timeout?: number;
   sessionId?: string; // Allow loading a specific session
+  personalityId?: string; // Personality to use for responses
 }
 
 const DEFAULT_CONFIG: SpiritualChatConfig = {
@@ -228,7 +229,8 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
           language: finalConfig.language === 'hi' ? 'Hindi' : 'English',
           user_id: `user-${Date.now()}`,
           include_citations: true,
-          voice_enabled: false
+          voice_enabled: false,
+          personality_id: finalConfig.personalityId || 'krishna'
         }),
         signal: abortControllerRef.current.signal
       });

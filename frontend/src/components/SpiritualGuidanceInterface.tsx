@@ -6,7 +6,24 @@ import ConversationArchive from './ConversationArchive';
 import SessionManager from './SessionManager';
 import PWAManager from './PWAManager';
 import PrivacySettings from './PrivacySettings';
+import PersonalitySelector from './PersonalitySelector';
 import { useSpiritualChat } from '../hooks/useSpiritualChat';
+
+// Personality type definition
+interface Personality {
+  id: string;
+  name: string;
+  display_name: string;
+  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'political';
+  time_period: string;
+  description: string;
+  expertise_areas: string[];
+  cultural_context: string;
+  quality_score: number;
+  usage_count: number;
+  is_active: boolean;
+  tags: string[];
+}
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useLanguage, getLanguageCode } from '../contexts/LanguageContext';
 import { usePWA } from '../utils/pwa';
@@ -29,7 +46,11 @@ const SpiritualGuidanceInterface: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [showPrivacySettings, setShowPrivacySettings] = useState(false);
+  const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [selectedPersonality, setSelectedPersonality] = useState<any>(null);
+  const [personalityLoading, setPersonalityLoading] = useState(false);
+  const [personalitySwitchNotification, setPersonalitySwitchNotification] = useState<string | null>(null);
   
   // A/B Testing integration
   const { interfaceConfig, responseConfig, trackGuidanceInteraction, trackGuidanceConversion } = useSpiritualGuidanceTest();
@@ -41,7 +62,9 @@ const SpiritualGuidanceInterface: React.FC = () => {
     sessionId,
     newConversation,
     loadSession
-  } = useSpiritualChat();
+  } = useSpiritualChat({
+    personalityId: selectedPersonality?.id || 'krishna'
+  });
 
   const languageCode = getLanguageCode(currentLanguage);
 
@@ -49,6 +72,36 @@ const SpiritualGuidanceInterface: React.FC = () => {
   React.useEffect(() => {
     setCurrentSessionId(sessionId);
   }, [sessionId]);
+
+  // Load saved personality on mount
+  React.useEffect(() => {
+    try {
+      const savedPersonality = localStorage.getItem('vimarsh_selected_personality');
+      if (savedPersonality) {
+        const personality = JSON.parse(savedPersonality);
+        setSelectedPersonality(personality);
+      } else {
+        // Set default Krishna personality
+        setSelectedPersonality({
+          id: 'krishna',
+          name: 'Krishna',
+          display_name: 'Lord Krishna',
+          domain: 'spiritual',
+          description: 'Divine teacher and guide from the Bhagavad Gita'
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load saved personality:', error);
+      // Set default Krishna personality on error
+      setSelectedPersonality({
+        id: 'krishna',
+        name: 'Krishna',
+        display_name: 'Lord Krishna',
+        domain: 'spiritual',
+        description: 'Divine teacher and guide from the Bhagavad Gita'
+      });
+    }
+  }, []);
 
   const handleNewConversation = () => {
     const newSessionId = newConversation();
@@ -155,23 +208,135 @@ const SpiritualGuidanceInterface: React.FC = () => {
 
   const handleSpeakResponse = (text: string) => {
     if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = languageCode === 'hi' ? 'hi-IN' : 'en-US';
-      utterance.rate = 0.8;
-      utterance.pitch = 1.0;
-      utterance.volume = 0.9;
+      // Apply personality-specific pronunciation corrections
+      const processedText = applyPersonalityPronunciation(text);
       
-      // Find appropriate voice
+      const utterance = new SpeechSynthesisUtterance(processedText);
+      
+      // Get personality-specific voice settings
+      const voiceSettings = selectedPersonality?.voice_settings || {
+        language: 'en-US',
+        speaking_rate: 0.8,
+        pitch: -1.0,
+        volume: 0.9,
+        voice_characteristics: {
+          gender: 'male',
+          age: 'middle',
+          tone: 'reverent'
+        }
+      };
+      
+      // Configure voice parameters based on personality
+      utterance.lang = languageCode === 'hi' ? 'hi-IN' : voiceSettings.language;
+      utterance.rate = voiceSettings.speaking_rate;
+      utterance.pitch = 1.0 + (voiceSettings.pitch / 10); // Convert to 0-2 range
+      utterance.volume = voiceSettings.volume;
+      
+      // Find appropriate voice based on personality characteristics
       const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(voice => 
-        voice.lang.startsWith(languageCode)
-      );
+      const targetLang = languageCode === 'hi' ? 'hi' : voiceSettings.language.split('-')[0];
+      
+      let preferredVoice = null;
+      
+      if (voiceSettings.voice_name) {
+        // Try to find the specific voice name
+        preferredVoice = voices.find(voice => voice.name.includes(voiceSettings.voice_name!));
+      }
+      
+      if (!preferredVoice && voiceSettings.voice_characteristics) {
+        // Fallback to gender and characteristics-based selection
+        const genderPreference = voiceSettings.voice_characteristics.gender;
+        
+        preferredVoice = voices.find(voice => {
+          const voiceName = voice.name.toLowerCase();
+          const langMatch = voice.lang.startsWith(targetLang);
+          const genderMatch = genderPreference === 'female' ? 
+            voiceName.includes('female') || voiceName.includes('woman') :
+            voiceName.includes('male') || voiceName.includes('man') || !voiceName.includes('female');
+          
+          return langMatch && genderMatch;
+        });
+      }
+      
+      // Final fallback to any voice in the target language
+      if (!preferredVoice) {
+        preferredVoice = voices.find(voice => voice.lang.startsWith(targetLang));
+      }
       
       if (preferredVoice) {
         utterance.voice = preferredVoice;
       }
       
       speechSynthesis.speak(utterance);
+    }
+  };
+
+  const applyPersonalityPronunciation = (text: string): string => {
+    if (!selectedPersonality?.pronunciation_guide) return text;
+    
+    let processedText = text;
+    const pronunciationGuide = selectedPersonality.pronunciation_guide;
+    
+    // Apply pronunciation corrections for specialized terms
+    Object.entries(pronunciationGuide).forEach(([term, guide]) => {
+      const regex = new RegExp(`\\b${term}\\b`, 'gi');
+      // For TTS, we can use phonetic representations
+      processedText = processedText.replace(regex, guide.phonetic);
+    });
+    
+    return processedText;
+  };
+
+  const handlePersonalitySelect = async (personality: any) => {
+    setPersonalityLoading(true);
+    
+    try {
+      // Update selected personality
+      setSelectedPersonality(personality);
+      setShowPersonalitySelector(false);
+      
+      // Start a new conversation when switching personalities
+      handleNewConversation();
+      
+      // Store selected personality in localStorage for persistence
+      localStorage.setItem('vimarsh_selected_personality', JSON.stringify(personality));
+      
+      // Show switch notification
+      setPersonalitySwitchNotification(`Now conversing with ${personality.display_name}`);
+      setTimeout(() => setPersonalitySwitchNotification(null), 3000);
+      
+    } catch (error) {
+      console.error('Failed to select personality:', error);
+    } finally {
+      setPersonalityLoading(false);
+    }
+  };
+
+  const handleTogglePersonalitySelector = () => {
+    setShowPersonalitySelector(!showPersonalitySelector);
+  };
+
+  // Get personality-specific placeholder text
+  const getPersonalityPlaceholder = () => {
+    if (!selectedPersonality) {
+      return currentLanguage === 'Hindi'
+        ? 'अपना प्रश्न यहाँ लिखें... (Enter दबाएं)'
+        : 'Ask your spiritual question here... (Press Enter to send)';
+    }
+
+    switch (selectedPersonality.domain) {
+      case 'spiritual':
+        return currentLanguage === 'Hindi'
+          ? `${selectedPersonality.display_name} से आध्यात्मिक प्रश्न पूछें...`
+          : `Ask ${selectedPersonality.display_name} about spiritual matters...`;
+      case 'scientific':
+        return `Ask ${selectedPersonality.display_name} about science and the universe...`;
+      case 'historical':
+        return `Ask ${selectedPersonality.display_name} about leadership and history...`;
+      case 'philosophical':
+        return `Ask ${selectedPersonality.display_name} about philosophy and wisdom...`;
+      default:
+        return `Ask ${selectedPersonality.display_name} a question...`;
     }
   };
 
@@ -206,9 +371,16 @@ const SpiritualGuidanceInterface: React.FC = () => {
             <header className="header flex items-center justify-between mb-6 bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-4">
                 <span className="text-2xl sacred-icon" aria-hidden="true">🕉️</span>
-                <h1 className="heading-3 mb-0">
-                  {t('spiritualGuidance')}
-                </h1>
+                <div>
+                  <h1 className="heading-3 mb-0">
+                    {selectedPersonality ? `${selectedPersonality.display_name}` : t('spiritualGuidance')}
+                  </h1>
+                  {selectedPersonality && (
+                    <p className="text-sm text-neutral-600 mt-1">
+                      {selectedPersonality.domain} • {selectedPersonality.description.substring(0, 50)}...
+                    </p>
+                  )}
+                </div>
               </div>
               
               <div className="flex items-center gap-3" role="toolbar" aria-label={t('conversationControls')}>
@@ -253,6 +425,24 @@ const SpiritualGuidanceInterface: React.FC = () => {
                   <span aria-hidden="true">🔒</span>
                   <span className="sr-only">Privacy Settings</span>
                 </button>
+
+                <button
+                  onClick={() => setShowPersonalitySelector(true)}
+                  className={`btn btn-secondary btn-icon ${selectedPersonality ? 'bg-saffron-light' : ''}`}
+                  title={selectedPersonality ? `Current: ${selectedPersonality.display_name}` : "Choose Personality"}
+                  aria-label={selectedPersonality ? `Current personality: ${selectedPersonality.display_name}. Click to change.` : "Choose conversation personality"}
+                  type="button"
+                  disabled={personalityLoading}
+                >
+                  {personalityLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-saffron-primary"></div>
+                  ) : (
+                    <span aria-hidden="true">🧠</span>
+                  )}
+                  <span className="sr-only">
+                    {personalityLoading ? 'Loading personality...' : 'Choose Personality'}
+                  </span>
+                </button>
               </div>
             </header>
 
@@ -260,12 +450,28 @@ const SpiritualGuidanceInterface: React.FC = () => {
             <section className="welcome-section card card-sacred text-center mb-6" aria-labelledby="welcome-heading">
               <h2 id="welcome-heading" className="sr-only">{t('welcomeHeading')}</h2>
               <p className="body-text text-neutral-600">
-                {currentLanguage === 'Hindi' 
-                  ? 'धर्म के बारे में प्रश्न पूछें, पवित्र ग्रंथों से ज्ञान प्राप्त करें, या अपनी आध्यात्मिक साधना के लिए मार्गदर्शन पाएं।'
-                  : 'Ask questions about dharma, seek wisdom from sacred texts, or find guidance for your spiritual practice.'
-                }
+                {selectedPersonality ? (
+                  currentLanguage === 'Hindi' 
+                    ? `${selectedPersonality.display_name} से बात करें और उनके ज्ञान से सीखें।`
+                    : `Converse with ${selectedPersonality.display_name} and learn from their wisdom.`
+                ) : (
+                  currentLanguage === 'Hindi' 
+                    ? 'धर्म के बारे में प्रश्न पूछें, पवित्र ग्रंथों से ज्ञान प्राप्त करें, या अपनी आध्यात्मिक साधना के लिए मार्गदर्शन पाएं।'
+                    : 'Ask questions about dharma, seek wisdom from sacred texts, or find guidance for your spiritual practice.'
+                )}
               </p>
-            </section>            {/* Chat Messages Area */}
+            </section>
+
+            {/* Personality Switch Notification */}
+            {personalitySwitchNotification && (
+              <div className="personality-switch-notification bg-saffron-light border border-saffron-primary rounded-lg p-3 mb-4 text-center">
+                <p className="text-sm text-saffron-dark font-medium">
+                  {personalitySwitchNotification}
+                </p>
+              </div>
+            )}
+
+            {/* Chat Messages Area */}
             <section 
               className="chat-area flex-1 overflow-y-auto space-y-4 px-4 py-2" 
               aria-live="polite"
@@ -288,7 +494,7 @@ const SpiritualGuidanceInterface: React.FC = () => {
                     }`}
                     data-sender={message.sender}
                     role="article"
-                    aria-label={`${message.sender === 'user' ? t('yourMessage') : t('lordKrishnaMessage')} ${index + 1}`}
+                    aria-label={`${message.sender === 'user' ? t('yourMessage') : (selectedPersonality?.display_name || 'AI')} message ${index + 1}`}
                   >
                     {message.sender === 'user' ? (
                       <div className="bg-saffron-primary text-white rounded-lg p-4 max-w-3xl">
@@ -299,8 +505,8 @@ const SpiritualGuidanceInterface: React.FC = () => {
                         </div>
                       </div>
                     ) : (
-                      <div role="article" aria-label={t('lordKrishnaResponse')}>
-                        <div className="sr-only">{t('lordKrishnaMessage')}:</div>
+                      <div role="article" aria-label={`${selectedPersonality?.display_name || 'AI'} response`}>
+                        <div className="sr-only">{selectedPersonality?.display_name || 'AI'} message:</div>
                         <ResponseDisplay
                           response={{
                             ...message,
@@ -323,7 +529,7 @@ const SpiritualGuidanceInterface: React.FC = () => {
                         className="loading-spinner animate-spin rounded-full h-4 w-4 border-b-2 border-saffron-primary"
                         aria-hidden="true"
                       ></div>
-                      <span>{t('lordKrishnaIsTyping')}</span>
+                      <span>{selectedPersonality?.display_name || 'AI'} is thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -340,11 +546,7 @@ const SpiritualGuidanceInterface: React.FC = () => {
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={
-                      currentLanguage === 'Hindi'
-                        ? 'अपना प्रश्न यहाँ लिखें... (Enter दबाएं)'
-                        : 'Ask your spiritual question here... (Press Enter to send)'
-                    }
+                    placeholder={getPersonalityPlaceholder()}
                     className="w-full p-3 border border-neutral-300 rounded-lg resize-none focus:ring-2 focus:ring-saffron-primary focus:border-transparent min-w-0"
                     rows={3}
                     disabled={isLoading}
@@ -357,6 +559,24 @@ const SpiritualGuidanceInterface: React.FC = () => {
                       onVoiceInput={handleVoiceInput}
                       language={languageCode}
                       disabled={isLoading}
+                      personality={selectedPersonality ? {
+                        id: selectedPersonality.id,
+                        name: selectedPersonality.display_name || selectedPersonality.name,
+                        domain: selectedPersonality.domain || 'spiritual',
+                        voice_settings: selectedPersonality.voice_settings || {
+                          language: 'en-US',
+                          speaking_rate: 0.8,
+                          pitch: -1.0,
+                          volume: 0.9,
+                          voice_characteristics: {
+                            gender: 'male',
+                            age: 'middle',
+                            tone: 'reverent'
+                          }
+                        },
+                        pronunciation_guide: selectedPersonality.pronunciation_guide || {}
+                      } : undefined}
+                      onPersonalityChange={handlePersonalitySelect}
                     />
                   </div>
                   
@@ -415,6 +635,16 @@ const SpiritualGuidanceInterface: React.FC = () => {
         isOpen={showPrivacySettings}
         onClose={handleTogglePrivacySettings}
       />
+
+      {/* Personality Selector Modal */}
+      {showPersonalitySelector && (
+        <PersonalitySelector
+          selectedPersonalityId={selectedPersonality?.id}
+          onPersonalitySelect={handlePersonalitySelect}
+          onClose={() => setShowPersonalitySelector(false)}
+          showAsDialog={true}
+        />
+      )}
     </>
   );
 };

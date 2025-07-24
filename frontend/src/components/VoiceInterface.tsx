@@ -1,11 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+interface Personality {
+  id: string;
+  name: string;
+  domain: 'spiritual' | 'historical' | 'scientific' | 'philosophical';
+  voice_settings: {
+    language: string;
+    voice_name?: string;
+    speaking_rate: number;
+    pitch: number;
+    volume: number;
+    voice_characteristics: {
+      gender: 'male' | 'female';
+      age: 'young' | 'middle' | 'elderly';
+      accent?: string;
+      tone: 'reverent' | 'authoritative' | 'contemplative' | 'scholarly';
+    };
+  };
+  pronunciation_guide: {
+    [term: string]: {
+      phonetic: string;
+      audio_url?: string;
+      language: string;
+    };
+  };
+}
+
 interface VoiceInterfaceProps {
   onVoiceInput: (text: string) => void;
   onSpeechStart?: () => void;
   onSpeechEnd?: () => void;
   language?: 'en' | 'hi';
   disabled?: boolean;
+  personality?: Personality;
+  onPersonalityChange?: (personalityId: string) => void;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -44,12 +72,119 @@ declare global {
   }
 }
 
+// Personality-specific voice configurations
+const PERSONALITY_VOICES: Record<string, Personality> = {
+  krishna: {
+    id: 'krishna',
+    name: 'Lord Krishna',
+    domain: 'spiritual',
+    voice_settings: {
+      language: 'en-US',
+      voice_name: 'Google US English Male',
+      speaking_rate: 0.75, // Slower, contemplative pace
+      pitch: -1.5, // Lower, more reverent tone
+      volume: 0.9,
+      voice_characteristics: {
+        gender: 'male',
+        age: 'middle',
+        tone: 'reverent'
+      }
+    },
+    pronunciation_guide: {
+      'dharma': { phonetic: 'DHAR-ma', language: 'sanskrit' },
+      'karma': { phonetic: 'KAR-ma', language: 'sanskrit' },
+      'yoga': { phonetic: 'YO-ga', language: 'sanskrit' },
+      'moksha': { phonetic: 'MOHK-sha', language: 'sanskrit' },
+      'samsara': { phonetic: 'sam-SAH-ra', language: 'sanskrit' },
+      'bhakti': { phonetic: 'BHAK-ti', language: 'sanskrit' },
+      'Arjuna': { phonetic: 'ar-JU-na', language: 'sanskrit' },
+      'Kurukshetra': { phonetic: 'ku-ruk-SHET-ra', language: 'sanskrit' }
+    }
+  },
+  einstein: {
+    id: 'einstein',
+    name: 'Albert Einstein',
+    domain: 'scientific',
+    voice_settings: {
+      language: 'en-US',
+      voice_name: 'Google US English Male',
+      speaking_rate: 0.85, // Thoughtful pace
+      pitch: 0.0, // Natural pitch
+      volume: 0.9,
+      voice_characteristics: {
+        gender: 'male',
+        age: 'elderly',
+        accent: 'slight_german',
+        tone: 'scholarly'
+      }
+    },
+    pronunciation_guide: {
+      'relativity': { phonetic: 'rel-uh-TIV-i-tee', language: 'english' },
+      'spacetime': { phonetic: 'SPACE-time', language: 'english' },
+      'quantum': { phonetic: 'KWAN-tum', language: 'english' },
+      'photon': { phonetic: 'FOH-ton', language: 'english' },
+      'Lorentz': { phonetic: 'LOR-ents', language: 'german' },
+      'Minkowski': { phonetic: 'min-KOV-skee', language: 'german' }
+    }
+  },
+  lincoln: {
+    id: 'lincoln',
+    name: 'Abraham Lincoln',
+    domain: 'historical',
+    voice_settings: {
+      language: 'en-US',
+      voice_name: 'Google US English Male',
+      speaking_rate: 0.8, // Deliberate, presidential pace
+      pitch: -0.5, // Slightly lower, authoritative
+      volume: 0.95,
+      voice_characteristics: {
+        gender: 'male',
+        age: 'middle',
+        accent: 'midwest_american',
+        tone: 'authoritative'
+      }
+    },
+    pronunciation_guide: {
+      'Gettysburg': { phonetic: 'GET-eez-burg', language: 'english' },
+      'emancipation': { phonetic: 'ih-man-si-PAY-shun', language: 'english' },
+      'proclamation': { phonetic: 'prok-luh-MAY-shun', language: 'english' },
+      'secession': { phonetic: 'si-SESH-un', language: 'english' }
+    }
+  },
+  marcus_aurelius: {
+    id: 'marcus_aurelius',
+    name: 'Marcus Aurelius',
+    domain: 'philosophical',
+    voice_settings: {
+      language: 'en-US',
+      voice_name: 'Google US English Male',
+      speaking_rate: 0.7, // Very contemplative
+      pitch: -1.0, // Lower, philosophical tone
+      volume: 0.85,
+      voice_characteristics: {
+        gender: 'male',
+        age: 'middle',
+        tone: 'contemplative'
+      }
+    },
+    pronunciation_guide: {
+      'stoicism': { phonetic: 'STOH-i-sizm', language: 'english' },
+      'virtue': { phonetic: 'VUR-choo', language: 'english' },
+      'logos': { phonetic: 'LOH-gos', language: 'greek' },
+      'ataraxia': { phonetic: 'at-uh-RAK-see-uh', language: 'greek' },
+      'Meditations': { phonetic: 'med-i-TAY-shuns', language: 'english' }
+    }
+  }
+};
+
 const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
   onVoiceInput,
   onSpeechStart,
   onSpeechEnd,
   language = 'en',
-  disabled = false
+  disabled = false,
+  personality,
+  onPersonalityChange
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -159,23 +294,56 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
     // Stop any ongoing speech
     stopSpeaking();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Apply pronunciation corrections for specialized terms
+    const processedText = applyPronunciationGuide(text);
+
+    const utterance = new SpeechSynthesisUtterance(processedText);
     
-    // Configure voice parameters for spiritual content
-    utterance.rate = 0.8; // Slower, more contemplative pace
-    utterance.pitch = 1.0; // Natural pitch
-    utterance.volume = 0.9; // Clear but not overwhelming
+    // Get personality-specific voice settings
+    const currentPersonality = personality || PERSONALITY_VOICES.krishna; // Default to Krishna
+    const voiceSettings = currentPersonality.voice_settings;
     
-    // Set language and voice
-    utterance.lang = language === 'hi' ? 'hi-IN' : 'en-US';
+    // Configure voice parameters based on personality
+    utterance.rate = voiceSettings.speaking_rate;
+    utterance.pitch = 1.0 + (voiceSettings.pitch / 10); // Convert to 0-2 range
+    utterance.volume = voiceSettings.volume;
     
-    // Find appropriate voice
+    // Set language based on personality and user preference
+    const personalityLang = voiceSettings.language;
+    utterance.lang = language === 'hi' ? 'hi-IN' : personalityLang;
+    
+    // Find appropriate voice based on personality characteristics
     const voices = window.speechSynthesis.getVoices();
-    const targetLang = language === 'hi' ? 'hi' : 'en';
-    const preferredVoice = voices.find(voice => 
-      voice.lang.startsWith(targetLang) && 
-      (voice.name.includes('Female') || voice.name.includes('Google'))
-    ) || voices.find(voice => voice.lang.startsWith(targetLang));
+    const targetLang = language === 'hi' ? 'hi' : personalityLang.split('-')[0];
+    
+    // Voice selection based on personality characteristics
+    let preferredVoice = null;
+    
+    if (voiceSettings.voice_name) {
+      // Try to find the specific voice name
+      preferredVoice = voices.find(voice => voice.name.includes(voiceSettings.voice_name!));
+    }
+    
+    if (!preferredVoice) {
+      // Fallback to gender and characteristics-based selection
+      const genderPreference = voiceSettings.voice_characteristics.gender;
+      const agePreference = voiceSettings.voice_characteristics.age;
+      
+      preferredVoice = voices.find(voice => {
+        const voiceName = voice.name.toLowerCase();
+        const langMatch = voice.lang.startsWith(targetLang);
+        const genderMatch = genderPreference === 'female' ? 
+          voiceName.includes('female') || voiceName.includes('woman') :
+          voiceName.includes('male') || voiceName.includes('man') || !voiceName.includes('female');
+        
+        return langMatch && genderMatch;
+      });
+    }
+    
+    // Final fallback to any voice in the target language
+    if (!preferredVoice) {
+      preferredVoice = voices.find(voice => voice.lang.startsWith(targetLang));
+    }
     
     if (preferredVoice) {
       utterance.voice = preferredVoice;
@@ -197,6 +365,23 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
+  };
+
+  const applyPronunciationGuide = (text: string): string => {
+    if (!personality) return text;
+    
+    let processedText = text;
+    const pronunciationGuide = personality.pronunciation_guide;
+    
+    // Apply pronunciation corrections for specialized terms
+    Object.entries(pronunciationGuide).forEach(([term, guide]) => {
+      const regex = new RegExp(`\\b${term}\\b`, 'gi');
+      // For TTS, we can use SSML-like phonetic representations
+      // Most browsers support basic phonetic hints through creative spelling
+      processedText = processedText.replace(regex, guide.phonetic);
+    });
+    
+    return processedText;
   };
 
   const stopSpeaking = () => {
@@ -224,8 +409,46 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
     );
   }
 
+  const getPersonalityIcon = (domain: string) => {
+    switch (domain) {
+      case 'spiritual': return '🕉️';
+      case 'scientific': return '🔬';
+      case 'historical': return '🏛️';
+      case 'philosophical': return '🤔';
+      default: return '🎭';
+    }
+  };
+
+  const getVoiceCharacteristics = () => {
+    if (!personality) return null;
+    const chars = personality.voice_settings.voice_characteristics;
+    return `${chars.gender} • ${chars.age} • ${chars.tone}`;
+  };
+
   return (
     <div className="voice-interface">
+      {/* Personality Voice Info */}
+      {personality && (
+        <div className="mb-3 p-2 bg-neutral-50 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{getPersonalityIcon(personality.domain)}</span>
+              <div>
+                <div className="text-sm font-medium text-neutral-800">
+                  {personality.name} Voice
+                </div>
+                <div className="text-xs text-neutral-600">
+                  {getVoiceCharacteristics()}
+                </div>
+              </div>
+            </div>
+            <div className="text-xs text-neutral-500">
+              Rate: {personality.voice_settings.speaking_rate}x
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Voice Input Controls */}
       <div className="flex items-center gap-3">
         <button
@@ -267,11 +490,32 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
           {isSpeaking && (
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-peacock-blue rounded-full animate-pulse"></div>
-              <span className="text-sm text-neutral-600">Speaking...</span>
+              <span className="text-sm text-neutral-600">
+                Speaking as {personality?.name || 'Default'}...
+              </span>
             </div>
           )}
         </div>
       </div>
+
+      {/* Pronunciation Guide */}
+      {personality && Object.keys(personality.pronunciation_guide).length > 0 && (
+        <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
+          <div className="font-medium text-blue-800 mb-1">Pronunciation Guide:</div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(personality.pronunciation_guide).slice(0, 4).map(([term, guide]) => (
+              <span key={term} className="bg-blue-100 px-2 py-1 rounded text-blue-700">
+                {term} → {guide.phonetic}
+              </span>
+            ))}
+            {Object.keys(personality.pronunciation_guide).length > 4 && (
+              <span className="text-blue-600">
+                +{Object.keys(personality.pronunciation_guide).length - 4} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Error Display */}
       {error && (
@@ -292,21 +536,36 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({
         {language === 'hi' ? (
           "🎙️ अपना प्रश्न बोलें • 🔊 उत्तर सुनें"
         ) : (
-          "🎙️ Speak your question • 🔊 Listen to wisdom"
+          `🎙️ Speak your question • 🔊 Listen to ${personality?.name || 'wisdom'}`
         )}
       </div>
     </div>
   );
 };
 
-// Hook for easier voice integration
+// Hook for easier voice integration with personality support
 export const useVoiceInterface = () => {
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [currentPersonality, setCurrentPersonality] = useState<Personality | null>(null);
   const voiceRef = useRef<{ speak: (text: string) => void } | null>(null);
 
-  const speakText = (text: string) => {
+  const speakText = (text: string, personalityId?: string) => {
     if (isVoiceEnabled && voiceRef.current) {
+      // Switch personality if specified
+      if (personalityId && personalityId !== currentPersonality?.id) {
+        const personality = PERSONALITY_VOICES[personalityId];
+        if (personality) {
+          setCurrentPersonality(personality);
+        }
+      }
       voiceRef.current.speak(text);
+    }
+  };
+
+  const switchPersonality = (personalityId: string) => {
+    const personality = PERSONALITY_VOICES[personalityId];
+    if (personality) {
+      setCurrentPersonality(personality);
     }
   };
 
@@ -314,11 +573,18 @@ export const useVoiceInterface = () => {
     setIsVoiceEnabled(!isVoiceEnabled);
   };
 
+  const getAvailablePersonalities = () => {
+    return Object.values(PERSONALITY_VOICES);
+  };
+
   return {
     isVoiceEnabled,
     toggleVoice,
     speakText,
-    voiceRef
+    voiceRef,
+    currentPersonality,
+    switchPersonality,
+    getAvailablePersonalities
   };
 };
 

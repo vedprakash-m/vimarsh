@@ -1,8 +1,9 @@
 """
-Spiritual Text Processor for Vimarsh AI Agent
+Multi-Domain Text Processor for Vimarsh AI Agent
 
-Comprehensive text processing capabilities for spiritual content including
-Sanskrit text handling, verse-aware chunking, and cultural preservation.
+Comprehensive text processing capabilities for multiple domains including
+spiritual, scientific, historical, and philosophical content with domain-specific
+handling, Sanskrit text support, verse-aware chunking, and cultural preservation.
 """
 
 import re
@@ -11,6 +12,14 @@ from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 from dataclasses import dataclass
 import unicodedata
+
+# Import the multi-domain processors
+from .domain_processors import (
+    MultiDomainProcessor, 
+    ProcessedChunk, 
+    ProcessingResult,
+    DomainProcessorFactory
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +36,96 @@ class TextMetadata:
     chapter_reference: Optional[str] = None
     contains_sanskrit: bool = False
     sanskrit_terms_count: int = 0
+
+
+class EnhancedTextProcessor:
+    """
+    Enhanced text processor that combines spiritual text processing with multi-domain support.
+    
+    This class extends the original spiritual text processor to handle multiple domains
+    while maintaining backward compatibility for spiritual content processing.
+    """
+    
+    def __init__(self):
+        """Initialize the enhanced text processor with multi-domain support."""
+        # Initialize the multi-domain processor
+        self.multi_domain_processor = MultiDomainProcessor()
+        
+        # Initialize the spiritual processor for backward compatibility
+        self.spiritual_processor = SpiritualTextProcessor()
+    
+    def process_text_with_domain(self, text: str, source: str = "", domain: str = None, 
+                                metadata: Dict[str, Any] = None) -> ProcessingResult:
+        """
+        Process text using domain-specific processors.
+        
+        Args:
+            text: Input text to process
+            source: Source identifier for the text
+            domain: Target domain (spiritual, scientific, historical, philosophical)
+            metadata: Additional metadata for processing
+            
+        Returns:
+            ProcessingResult with domain-specific chunks and metadata
+        """
+        return self.multi_domain_processor.process_text(text, source, domain, metadata)
+    
+    def detect_domain(self, text: str) -> str:
+        """
+        Detect the most appropriate domain for the given text.
+        
+        Args:
+            text: Input text to analyze
+            
+        Returns:
+            Detected domain string
+        """
+        return self.multi_domain_processor.detect_domain(text)
+    
+    def get_available_domains(self) -> List[str]:
+        """Get list of available processing domains."""
+        return self.multi_domain_processor.get_available_domains()
+    
+    def chunk_text_by_domain(self, text: str, domain: str, chunk_size: int = 1000, 
+                           overlap: int = 100) -> List[ProcessedChunk]:
+        """
+        Chunk text using domain-specific strategies.
+        
+        Args:
+            text: Input text to chunk
+            domain: Processing domain
+            chunk_size: Target chunk size
+            overlap: Overlap between chunks
+            
+        Returns:
+            List of processed chunks with domain-specific metadata
+        """
+        processor = self.multi_domain_processor.get_processor(domain)
+        result = processor.process_text(text, "unknown", {"chunk_size": chunk_size, "overlap": overlap})
+        return result.chunks
+    
+    def validate_content_for_domain(self, text: str, domain: str) -> Dict[str, Any]:
+        """
+        Validate if content is appropriate for the specified domain.
+        
+        Args:
+            text: Text to validate
+            domain: Target domain
+            
+        Returns:
+            Validation results with quality metrics
+        """
+        processor = self.multi_domain_processor.get_processor(domain)
+        result = processor.process_text(text, "validation", {})
+        
+        return {
+            'is_valid': result.quality_metrics.get('avg_quality', 0) > 50,
+            'quality_score': result.quality_metrics.get('avg_quality', 0),
+            'key_terms_found': len(result.chunks[0].key_terms) if result.chunks else 0,
+            'domain_confidence': result.quality_metrics.get('avg_quality', 0) / 100,
+            'warnings': result.warnings,
+            'errors': result.errors
+        }
 
 
 class SpiritualTextProcessor:
@@ -513,3 +612,46 @@ class ProcessedText:
     def __init__(self, text: str, preserved_terms: List[str]):
         self.text = text
         self.preserved_terms = preserved_terms
+
+
+# Factory function for creating the appropriate processor
+def create_text_processor(domain: str = None) -> EnhancedTextProcessor:
+    """
+    Create a text processor instance.
+    
+    Args:
+        domain: Optional domain hint for optimization
+        
+    Returns:
+        EnhancedTextProcessor instance with multi-domain support
+    """
+    return EnhancedTextProcessor()
+
+
+# Convenience functions for backward compatibility
+def process_spiritual_text(text: str, preserve_structure: bool = True) -> str:
+    """Process spiritual text using the enhanced processor."""
+    processor = create_text_processor()
+    return processor.spiritual_processor.process_text(text, preserve_structure)
+
+
+def chunk_spiritual_text(text: str, chunk_size: int = 512, overlap: int = 50) -> List[Dict[str, Any]]:
+    """Chunk spiritual text using verse-aware chunking."""
+    processor = create_text_processor()
+    return processor.spiritual_processor.chunk_text(text, chunk_size, overlap)
+
+
+def process_multi_domain_text(text: str, source: str = "", domain: str = None) -> ProcessingResult:
+    """
+    Process text using multi-domain capabilities.
+    
+    Args:
+        text: Input text
+        source: Source identifier
+        domain: Target domain (auto-detected if None)
+        
+    Returns:
+        ProcessingResult with domain-specific processing
+    """
+    processor = create_text_processor()
+    return processor.process_text_with_domain(text, source, domain)
