@@ -92,7 +92,7 @@ except ImportError:
 
 # Import authentication middleware
 try:
-    from auth.unified_auth_service import auth_service, require_auth, require_admin, AuthenticatedUser
+    from auth.unified_auth_service import auth_service, require_auth, require_admin
     from auth.models import AuthenticatedUser
     AUTHENTICATION_ENABLED = True
     logger.info("✅ Unified authentication service loaded successfully")

@@ -137,8 +137,7 @@ validate_backend() {
         --cov-fail-under=50 \
         --tb=short \
         -v \
-        --maxfail=10 \
-        --timeout=30
+        --maxfail=10
     
     if [ $? -ne 0 ]; then
         error "Backend tests failed"

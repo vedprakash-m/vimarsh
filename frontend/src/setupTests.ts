@@ -1,6 +1,9 @@
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 import '@testing-library/jest-dom';
 
+// Import test utilities
+import { setupWebApiMocks } from './test-utils/webApiMocks';
+
 // Suppress act() warnings for tests - React 18 compatibility
 const originalError = console.error;
 beforeAll(() => {
@@ -15,6 +18,9 @@ beforeAll(() => {
     }
     originalError.call(console, ...args);
   };
+  
+  // Setup comprehensive Web API mocks
+  setupWebApiMocks();
 });
 
 afterAll(() => {
@@ -72,44 +78,6 @@ if (typeof TextEncoder === 'undefined') {
 if (typeof TextDecoder === 'undefined') {
   global.TextDecoder = require('util').TextDecoder;
 }
-
-// Mock Web Speech API
-(global as any).SpeechRecognition = class MockSpeechRecognition {
-  continuous = false;
-  interimResults = false;
-  lang = 'en-US';
-  
-  addEventListener = jest.fn();
-  removeEventListener = jest.fn();
-  start = jest.fn();
-  stop = jest.fn();
-  abort = jest.fn();
-};
-
-(global as any).webkitSpeechRecognition = (global as any).SpeechRecognition;
-
-// Mock SpeechSynthesis API
-(global as any).speechSynthesis = {
-  speak: jest.fn(),
-  cancel: jest.fn(),
-  pause: jest.fn(),
-  resume: jest.fn(),
-  getVoices: jest.fn(() => []),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn()
-};
-
-(global as any).SpeechSynthesisUtterance = class MockSpeechSynthesisUtterance {
-  text = '';
-  lang = 'en-US';
-  voice = null;
-  volume = 1;
-  rate = 1;
-  pitch = 1;
-  
-  addEventListener = jest.fn();
-  removeEventListener = jest.fn();
-};
 
 // Mock MSAL dependencies
 jest.mock('@azure/msal-browser', () => ({

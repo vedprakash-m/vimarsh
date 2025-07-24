@@ -46,20 +46,10 @@ module.exports = {
     '<rootDir>/src/**/*.(test|spec).{js,jsx,ts,tsx}'
   ],
   
-  // Ignore patterns - temporarily skip failing tests for CI/CD
+  // Ignore patterns
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
-    '<rootDir>/build/',
-    // Temporarily disabled for CI/CD - fix these tests later
-    '<rootDir>/src/components/VoiceInterface.test.tsx',
-    '<rootDir>/src/components/ABTestComponents.test.tsx', 
-    '<rootDir>/src/contexts/ABTestingContext.test.tsx',
-    '<rootDir>/src/hooks/useABTest.test.ts',
-    '<rootDir>/src/components/NativeDeviceIntegration.test.tsx',
-    '<rootDir>/src/components/ResponseDisplay.test.tsx',
-    '<rootDir>/src/components/ConversationHistory.test.tsx',
-    '<rootDir>/src/hooks/useNativeDevice.test.ts',
-    '<rootDir>/src/components/SpiritualGuidanceInterface.test.tsx'
+    '<rootDir>/build/'
   ],
   
   // Coverage collection
