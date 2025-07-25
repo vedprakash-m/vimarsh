@@ -22,7 +22,7 @@ import {
   FormControl,
   InputLabel,
   Chip,
-  Grid,
+  Grid2 as Grid,
   Dialog,
   DialogTitle,
   DialogContent,
