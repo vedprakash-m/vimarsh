@@ -9,10 +9,18 @@ This module provides core audio processing functionality including:
 """
 
 import logging
-from typing import Dict, List, Optional, Any, Tuple, Union
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
-import numpy as np
+
+# Optional numpy import - gracefully handle missing numpy
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+    np = None  # Will cause AttributeError if used, alerting developer
+
 from datetime import datetime
 import io
 import wave

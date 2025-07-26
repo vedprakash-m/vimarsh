@@ -15,7 +15,15 @@ import asyncio
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
-import numpy as np
+
+# Optional numpy import - gracefully handle missing numpy
+try:
+    import numpy as np
+    HAS_NUMPY = True
+except ImportError:
+    HAS_NUMPY = False
+    np = None  # Will cause AttributeError if used, alerting developer
+
 from sentence_transformers import SentenceTransformer
 import json
 import os
