@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-07-26T10:08:19.045508",
+  "level": "basic",
+  "tests": [
+    {
+      "test": "environment_variables",
+      "status": "skipped",
+      "message": "Azure credentials not required in CI environment. Missing: ['AZURE_SUBSCRIPTION_ID', 'AZURE_TENANT_ID']",
+      "details": {},
+      "timestamp": "2025-07-26T10:08:19.046280"
+    },
+    {
+      "test": "project_structure",
+      "status": "passed",
+      "message": "All critical project files present",
+      "details": {},
+      "timestamp": "2025-07-26T10:08:19.046901"
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 1
+  }
+}

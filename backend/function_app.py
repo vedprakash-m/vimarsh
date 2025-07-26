@@ -30,6 +30,7 @@ class PersonalityDomain(Enum):
     SCIENTIFIC = "scientific"
     HISTORICAL = "historical"
     PHILOSOPHICAL = "philosophical"
+    LITERARY = "literary"
 
 @dataclass
 class PersonalitySafetyConfig:
@@ -236,6 +237,91 @@ PERSONALITY_SAFETY_CONFIGS = {
         ],
         required_tone_indicators=["virtue", "wisdom", "duty", "reason", "justice", "courage", "temperance"],
         reverent_language_required=False
+    ),
+    "chanakya": PersonalitySafetyConfig(
+        personality_id="chanakya",
+        domain=PersonalityDomain.HISTORICAL,
+        safety_level=SafetyLevel.MODERATE,
+        max_response_length=200,
+        require_citations=True,
+        block_medical_advice=True,
+        block_legal_advice=False,
+        block_financial_advice=False,
+        block_personal_predictions=True,
+        require_appropriate_tone=True,
+        allowed_greetings=["respected seeker", "dear student", "wise inquirer", "fellow strategist", "student of statecraft"],
+        blocked_patterns=[
+            r"medical advice", r"medical treatment",
+            r"future prediction personal", r"will happen to you",
+            r"guaranteed success", r"instant victory",
+            r"modern political parties", r"current elections"
+        ],
+        required_tone_indicators=["strategy", "wisdom", "statecraft", "policy", "governance", "prosperity", "security"],
+        reverent_language_required=False
+    ),
+    "confucius": PersonalitySafetyConfig(
+        personality_id="confucius",
+        domain=PersonalityDomain.HISTORICAL,
+        safety_level=SafetyLevel.MODERATE,
+        max_response_length=180,
+        require_citations=True,
+        block_medical_advice=True,
+        block_legal_advice=True,
+        block_financial_advice=True,
+        block_personal_predictions=True,
+        require_appropriate_tone=True,
+        allowed_greetings=["honorable student", "dear friend", "seeker of wisdom", "student of virtue", "fellow learner"],
+        blocked_patterns=[
+            r"medical advice", r"medical treatment",
+            r"legal advice", r"lawsuit",
+            r"financial advice", r"investment",
+            r"future prediction", r"will happen",
+            r"guaranteed wisdom", r"instant virtue"
+        ],
+        required_tone_indicators=["virtue", "wisdom", "learning", "respect", "harmony", "righteousness", "education"],
+        reverent_language_required=False
+    ),
+    "newton": PersonalitySafetyConfig(
+        personality_id="newton",
+        domain=PersonalityDomain.SCIENTIFIC,
+        safety_level=SafetyLevel.MODERATE,
+        max_response_length=200,
+        require_citations=True,
+        block_medical_advice=True,
+        block_legal_advice=True,
+        block_financial_advice=True,
+        block_personal_predictions=False,
+        require_appropriate_tone=True,
+        allowed_greetings=["good sir", "fellow natural philosopher", "curious mind", "student of nature", "seeker of truth"],
+        blocked_patterns=[
+            r"medical diagnosis", r"medical treatment",
+            r"legal advice", r"lawsuit",
+            r"financial investment", r"money advice",
+            r"pseudoscience", r"unscientific claims", r"alchemy promises"
+        ],
+        required_tone_indicators=["observation", "mathematics", "natural philosophy", "reason", "investigation", "truth"],
+        reverent_language_required=False
+    ),
+    "tesla": PersonalitySafetyConfig(
+        personality_id="tesla",
+        domain=PersonalityDomain.SCIENTIFIC,
+        safety_level=SafetyLevel.MODERATE,
+        max_response_length=200,
+        require_citations=True,
+        block_medical_advice=True,
+        block_legal_advice=True,
+        block_financial_advice=True,
+        block_personal_predictions=False,
+        require_appropriate_tone=True,
+        allowed_greetings=["fellow inventor", "curious mind", "student of electricity", "seeker of innovation", "future builder"],
+        blocked_patterns=[
+            r"medical treatment", r"medical cure",
+            r"legal advice", r"patent advice",
+            r"financial investment", r"money making",
+            r"impossible claims", r"perpetual motion", r"free energy scam"
+        ],
+        required_tone_indicators=["innovation", "electricity", "invention", "engineering", "future", "technology"],
+        reverent_language_required=False
     )
 }
 
@@ -430,6 +516,30 @@ PERSONALITIES = {
         "domain": "philosophical",
         "description": "Ancient Chinese sage and founder of Taoism",
         "safety_config": PERSONALITY_SAFETY_CONFIGS["lao_tzu"]
+    },
+    "chanakya": {
+        "name": "Chanakya",
+        "domain": "historical",
+        "description": "Ancient Indian strategist, economist, and political advisor",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["chanakya"]
+    },
+    "confucius": {
+        "name": "Confucius",
+        "domain": "historical",
+        "description": "Chinese philosopher and educator emphasizing ethics and social harmony",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["confucius"]
+    },
+    "newton": {
+        "name": "Isaac Newton",
+        "domain": "scientific",
+        "description": "English mathematician and physicist, father of classical mechanics",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["newton"]
+    },
+    "tesla": {
+        "name": "Nikola Tesla",
+        "domain": "scientific",
+        "description": "Serbian-American inventor and electrical engineer, pioneer of modern technology",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["tesla"]
     }
 }
 

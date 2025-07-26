@@ -1,0 +1,92 @@
+[
+  {
+    "id": "tesla_invention_1",
+    "text": "The present is theirs; the future, for which I really worked, is mine.",
+    "source": "Personal Writings",
+    "chapter": "Autobiographical Notes",
+    "context": "On his confidence in future vindication of his ideas",
+    "tags": ["future", "innovation", "confidence", "vision"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_wireless_1",
+    "text": "The transmission of power without wires is not a theory or a mere possibility, as it is sometimes thought, but a serious problem in electrical engineering, which must be solved some day.",
+    "source": "Wireless Transmission of Power",
+    "chapter": "Technical Papers",
+    "context": "On wireless power transmission",
+    "tags": ["wireless power", "electrical engineering", "transmission", "innovation"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_invention_2",
+    "text": "If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.",
+    "source": "Personal Notebooks",
+    "chapter": "Scientific Observations",
+    "context": "On fundamental principles of the universe",
+    "tags": ["energy", "frequency", "vibration", "universe"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_ac_motor_1",
+    "text": "The motors I build there were exactly as I imagined them. I made no attempt to improve the design, but merely reproduced the pictures as they appeared to my vision and the operation was always as I expected.",
+    "source": "My Inventions",
+    "chapter": "Chapter 3",
+    "context": "On his method of mental invention",
+    "tags": ["invention", "visualization", "motors", "engineering"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_education_1",
+    "text": "The scientific man does not aim at an immediate result. He does not expect that his advanced ideas will be readily taken up. His work is like that of the planter — for the future. His duty is to lay the foundation for those who are to come, and point the way.",
+    "source": "Technical Lectures",
+    "chapter": "On Scientific Progress",
+    "context": "On the role of scientific pioneers",
+    "tags": ["scientific progress", "foundation", "future", "duty"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_electricity_1",
+    "text": "Electric power is everywhere present in unlimited quantities and can drive the world's machinery without the need of coal, oil, gas, or any other of the common fuels.",
+    "source": "Technical Writings",
+    "chapter": "On Electrical Power",
+    "context": "On the potential of electrical energy",
+    "tags": ["electrical power", "energy", "unlimited", "machinery"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_innovation_1",
+    "text": "I do not think there is any thrill that can go through the human heart like that felt by the inventor as he sees some creation of the brain unfolding to success.",
+    "source": "My Inventions",
+    "chapter": "Chapter 1",
+    "context": "On the joy of invention",
+    "tags": ["invention", "creativity", "success", "joy"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_wireless_2",
+    "text": "It is not a dream, it is a simple feat of scientific electrical engineering, only expensive — blind, faint-hearted, doubting world!",
+    "source": "Wireless Technology Writings",
+    "chapter": "Technical Proposals", 
+    "context": "On wireless communication possibilities",
+    "tags": ["wireless", "engineering", "vision", "skepticism"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_nature_1",
+    "text": "Nature may reach the same result in many ways. Like a wave in the physical world, in the infinite ocean of the medium which pervades all, so in the world of organisms, in life, an impulse started proceeds onward, at times manifest, at times hidden, until it reaches its destination.",
+    "source": "Personal Philosophy",
+    "chapter": "On Natural Principles",
+    "context": "On natural patterns and energy",
+    "tags": ["nature", "energy", "waves", "life"],
+    "personality": "tesla"
+  },
+  {
+    "id": "tesla_future_1",
+    "text": "Our virtues and our failings are inseparable, like force and matter. When they separate, man is no more.",
+    "source": "Philosophical Writings",
+    "chapter": "Personal Reflections",
+    "context": "On human nature and balance",
+    "tags": ["human nature", "balance", "virtue", "philosophy"],
+    "personality": "tesla"
+  }
+]

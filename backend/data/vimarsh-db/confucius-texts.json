@@ -1,0 +1,92 @@
+[
+  {
+    "id": "confucius_analects_1",
+    "text": "Is it not a pleasure, having learned something, to try it out at due intervals?",
+    "source": "The Analects",
+    "chapter": "Book 1, Chapter 1",
+    "context": "On the joy of learning and practice",
+    "tags": ["learning", "education", "practice", "joy"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_2",
+    "text": "To go beyond is as wrong as to fall short.",
+    "source": "The Analects", 
+    "chapter": "Book 11, Chapter 16",
+    "context": "On moderation and balance",
+    "tags": ["moderation", "balance", "wisdom", "virtue"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_3",
+    "text": "The gentleman understands what is moral. The small man understands what is profitable.",
+    "source": "The Analects",
+    "chapter": "Book 4, Chapter 16",
+    "context": "On moral character versus material gain",
+    "tags": ["morality", "character", "virtue", "profit"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_4",
+    "text": "If you would govern a state of a thousand chariots, you must pay strict attention to business, be true to your word, be economical in expenditure, and love the people.",
+    "source": "The Analects",
+    "chapter": "Book 1, Chapter 5", 
+    "context": "On principles of good governance",
+    "tags": ["governance", "leadership", "economy", "people"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_5",
+    "text": "When we see men of worth, we should think of equaling them; when we see men of a contrary character, we should turn inwards and examine ourselves.",
+    "source": "The Analects",
+    "chapter": "Book 4, Chapter 17",
+    "context": "On self-improvement and moral development",
+    "tags": ["self-improvement", "moral development", "reflection", "virtue"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_6",
+    "text": "At fifteen, I set my heart on learning. At thirty, I established myself. At forty, I had no more doubts. At fifty, I understood the mandate of Heaven. At sixty, my ear was attuned. At seventy, I could follow my heart's desire without transgressing what was right.",
+    "source": "The Analects",
+    "chapter": "Book 2, Chapter 4",
+    "context": "On the stages of life and wisdom",
+    "tags": ["life stages", "wisdom", "learning", "righteousness"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_7",
+    "text": "The gentleman is distressed by his lack of ability, not by the fact that men do not recognize his ability.",
+    "source": "The Analects",
+    "chapter": "Book 15, Chapter 19",
+    "context": "On humility and self-improvement",
+    "tags": ["humility", "self-improvement", "character", "recognition"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_8",
+    "text": "If language is not correct, then what is said is not what is meant; if what is said is not what is meant, then what ought to be done remains undone.",
+    "source": "The Analects",
+    "chapter": "Book 13, Chapter 3",
+    "context": "On the importance of precise communication",
+    "tags": ["communication", "language", "precision", "action"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_9",
+    "text": "The gentleman calls attention to the good points in others; he does not call attention to their defects. The small man does the opposite of this.",
+    "source": "The Analects",
+    "chapter": "Book 12, Chapter 16",
+    "context": "On noble character and treatment of others",
+    "tags": ["nobility", "character", "kindness", "virtue"],
+    "personality": "confucius"
+  },
+  {
+    "id": "confucius_analects_10",
+    "text": "Learning without thinking is useless. Thinking without learning is dangerous.",
+    "source": "The Analects",
+    "chapter": "Book 2, Chapter 15",
+    "context": "On the balance of learning and reflection",
+    "tags": ["learning", "thinking", "balance", "wisdom"],
+    "personality": "confucius"
+  }
+]

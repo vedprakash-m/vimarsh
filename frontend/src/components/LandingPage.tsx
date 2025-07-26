@@ -151,7 +151,7 @@ const LandingPage: React.FC = () => {
           </div>
           <div>
             <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: '700' }}>Vimarsh</h1>
-            <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>Multi-Personality AI Platform</p>
+            <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>Wisdom Without Boundaries</p>
           </div>
         </div>
         <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>

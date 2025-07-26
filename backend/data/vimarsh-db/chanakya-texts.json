@@ -1,0 +1,92 @@
+[
+  {
+    "id": "chanakya_arthashastra_1",
+    "text": "The root of wealth is economic activity and lack of it brings material distress. In the absence of fruitful economic activity, both current prosperity and future growth are in danger of destruction.",
+    "source": "Arthashastra",
+    "chapter": "Book 1, Chapter 1",
+    "context": "On the importance of economic activity",
+    "tags": ["economics", "prosperity", "governance", "wealth"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_arthashastra_2", 
+    "text": "A king who is situated anywhere immediately on the circumference of the conqueror's territory is termed an enemy. The king who is likewise situated close to the enemy, but separated from the conqueror only by the enemy, is termed a friend.",
+    "source": "Arthashastra",
+    "chapter": "Book 6, Chapter 2",
+    "context": "On diplomatic relations and alliances",
+    "tags": ["diplomacy", "strategy", "alliances", "foreign policy"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_niti_1",
+    "text": "Before you start some work, always ask yourself three questions - Why am I doing it, What the results might be and Will I be successful. Only when you think deeply and find satisfactory answers to these questions, go ahead.",
+    "source": "Chanakya Niti",
+    "chapter": "Chapter 1",
+    "context": "On planning and decision making",
+    "tags": ["planning", "decision making", "wisdom", "strategy"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_niti_2",
+    "text": "A person should not be too honest. Straight trees are cut first and honest people are screwed first.",
+    "source": "Chanakya Niti", 
+    "chapter": "Chapter 2",
+    "context": "On practical wisdom in dealing with others",
+    "tags": ["pragmatism", "worldly wisdom", "caution", "strategy"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_arthashastra_3",
+    "text": "The king shall never cause his subjects to live in distress. The king's happiness lies in his subjects' happiness; his benefit in theirs. He shall not consider as good only that which pleases him but treat as beneficial to him whatever pleases his subjects.",
+    "source": "Arthashastra",
+    "chapter": "Book 1, Chapter 19",
+    "context": "On the duties of a ruler",
+    "tags": ["leadership", "governance", "public welfare", "duty"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_niti_3",
+    "text": "Education is the best friend. An educated person is respected everywhere. Education beats the beauty and the youth.",
+    "source": "Chanakya Niti",
+    "chapter": "Chapter 5",
+    "context": "On the value of education",
+    "tags": ["education", "knowledge", "wisdom", "respect"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_arthashastra_4",
+    "text": "There is no better way to maintain discipline among soldiers than by meting out punishment to those who violate the rules.",
+    "source": "Arthashastra",
+    "chapter": "Book 10, Chapter 3",
+    "context": "On military discipline and organization",
+    "tags": ["discipline", "military", "punishment", "order"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_niti_4",
+    "text": "Once you start a working on something, don't be afraid of failure and don't abandon it. People who work sincerely are the happiest.",
+    "source": "Chanakya Niti",
+    "chapter": "Chapter 6",
+    "context": "On perseverance and hard work",
+    "tags": ["perseverance", "hard work", "dedication", "success"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_arthashastra_5",
+    "text": "The treasury is based upon mining, the army upon the treasury, conquest upon the army, and sovereignty and the sciences upon conquest.",
+    "source": "Arthashastra",
+    "chapter": "Book 2, Chapter 12",
+    "context": "On the foundations of state power",
+    "tags": ["economy", "military", "sovereignty", "power"],
+    "personality": "chanakya"
+  },
+  {
+    "id": "chanakya_niti_5",
+    "text": "The world's biggest power is the youth and beauty of a woman.",
+    "source": "Chanakya Niti",
+    "chapter": "Chapter 8",
+    "context": "On the influence of beauty and youth",
+    "tags": ["influence", "power", "beauty", "worldly wisdom"],
+    "personality": "chanakya"
+  }
+]

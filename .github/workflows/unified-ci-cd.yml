@@ -179,6 +179,25 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-asyncio
 
+    - name: 🔍 Validate Configuration Files
+      run: |
+        cd backend
+        # Validate pyproject.toml syntax
+        python -c "
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli as tomllib
+            except ImportError:
+                print('⚠️ TOML validation skipped - no TOML library available')
+                exit(0)
+        
+        with open('pyproject.toml', 'rb') as f:
+            tomllib.load(f)
+        print('✅ pyproject.toml syntax validation passed')
+        "
+
     - name: 🔍 Validate Dependencies
       run: |
         cd backend
@@ -277,6 +296,9 @@ jobs:
         cd ../frontend && npm ci
 
     - name: 🧪 Run E2E Validation
+      env:
+        CI: true
+        GITHUB_ACTIONS: true
       run: |
         python scripts/enhanced_e2e_validator.py --level comprehensive
 

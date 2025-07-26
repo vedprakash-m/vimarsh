@@ -1,0 +1,92 @@
+[
+  {
+    "id": "newton_principia_1",
+    "text": "Every body continues in its state of rest, or of uniform motion in a straight line, unless it is compelled to change that state by forces impressed upon it.",
+    "source": "Principia Mathematica",
+    "chapter": "Book 1, Axioms or Laws of Motion, Law I",
+    "context": "First Law of Motion",
+    "tags": ["physics", "motion", "forces", "natural philosophy"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_principia_2",
+    "text": "The change of motion is proportional to the motive force impressed; and is made in the direction of the right line in which that force is impressed.",
+    "source": "Principia Mathematica",
+    "chapter": "Book 1, Axioms or Laws of Motion, Law II",
+    "context": "Second Law of Motion",
+    "tags": ["physics", "motion", "force", "acceleration"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_principia_3", 
+    "text": "To every action there is always opposed an equal reaction; or, the mutual actions of two bodies upon each other are always equal, and directed to contrary parts.",
+    "source": "Principia Mathematica",
+    "chapter": "Book 1, Axioms or Laws of Motion, Law III",
+    "context": "Third Law of Motion",
+    "tags": ["physics", "action", "reaction", "force"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_principia_4",
+    "text": "I have not yet been able to discover the cause of these properties of gravity from phenomena, and I feign no hypotheses. For whatever is not deduced from the phenomena must be called a hypothesis; and hypotheses, whether metaphysical or physical, have no place in experimental philosophy.",
+    "source": "Principia Mathematica",
+    "chapter": "General Scholium",
+    "context": "On the scientific method and avoiding speculation",
+    "tags": ["scientific method", "hypothesis", "phenomena", "experimental philosophy"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_opticks_1",
+    "text": "If I have seen further it is by standing on the shoulders of giants.",
+    "source": "Letter to Robert Hooke",
+    "chapter": "Personal Correspondence",
+    "context": "On building upon previous knowledge",
+    "tags": ["humility", "knowledge", "collaboration", "progress"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_opticks_2",
+    "text": "Nature is pleased with simplicity. And nature is no dummy.",
+    "source": "Principia Mathematica",
+    "chapter": "General Scholium",
+    "context": "On the elegance of natural laws",
+    "tags": ["simplicity", "nature", "natural laws", "elegance"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_method_1",
+    "text": "Truth is ever to be found in simplicity, and not in the multiplicity and confusion of things.",
+    "source": "Manuscript Notes",
+    "chapter": "Personal Writings",
+    "context": "On seeking truth through simplicity",
+    "tags": ["truth", "simplicity", "clarity", "understanding"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_principia_5",
+    "text": "Absolute space, in its own nature, without regard to anything external, remains always similar and immovable.",
+    "source": "Principia Mathematica",
+    "chapter": "Definitions, Scholium",
+    "context": "On the nature of space and time",
+    "tags": ["space", "time", "absolute", "physics"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_method_2",
+    "text": "To explain all nature is too difficult a task for any one man or even for any one age. 'Tis much better to do a little with certainty, and leave the rest for others that come after you.",
+    "source": "Manuscript Notes",
+    "chapter": "Personal Writings", 
+    "context": "On the gradual progress of scientific understanding",
+    "tags": ["scientific progress", "humility", "certainty", "knowledge"],
+    "personality": "newton"
+  },
+  {
+    "id": "newton_principia_6",
+    "text": "The center of the system of the world is immovable. This is acknowledged by all, while some contend that the earth, others that the sun, is fixed in that center.",
+    "source": "Principia Mathematica", 
+    "chapter": "Book 3, The System of the World",
+    "context": "On astronomical observations and theories",
+    "tags": ["astronomy", "solar system", "observation", "theory"],
+    "personality": "newton"
+  }
+]

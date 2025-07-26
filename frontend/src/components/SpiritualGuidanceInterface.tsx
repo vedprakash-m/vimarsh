@@ -8,22 +8,8 @@ import PWAManager from './PWAManager';
 import PrivacySettings from './PrivacySettings';
 import PersonalitySelector from './PersonalitySelector';
 import { useSpiritualChat } from '../hooks/useSpiritualChat';
+import { usePersonality, DEFAULT_KRISHNA_PERSONALITY } from '../contexts/PersonalityContext';
 
-// Personality type definition
-interface Personality {
-  id: string;
-  name: string;
-  display_name: string;
-  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'political';
-  time_period: string;
-  description: string;
-  expertise_areas: string[];
-  cultural_context: string;
-  quality_score: number;
-  usage_count: number;
-  is_active: boolean;
-  tags: string[];
-}
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useLanguage, getLanguageCode } from '../contexts/LanguageContext';
 import { usePWA } from '../utils/pwa';
@@ -42,15 +28,22 @@ const SpiritualGuidanceInterface: React.FC = () => {
   const { accounts } = useMsal();
   const user = accounts[0] || null;
   const { currentLanguage, t } = useLanguage();
+  const { 
+    selectedPersonality, 
+    setSelectedPersonality, 
+    availablePersonalities, 
+    personalityLoading,
+    setPersonalityLoading,
+    personalitySwitchNotification,
+    setPersonalitySwitchNotification
+  } = usePersonality();
+  
   const [inputMessage, setInputMessage] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
   const [showPrivacySettings, setShowPrivacySettings] = useState(false);
   const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [selectedPersonality, setSelectedPersonality] = useState<any>(null);
-  const [personalityLoading, setPersonalityLoading] = useState(false);
-  const [personalitySwitchNotification, setPersonalitySwitchNotification] = useState<string | null>(null);
   
   // A/B Testing integration
   const { interfaceConfig, responseConfig, trackGuidanceInteraction, trackGuidanceConversion } = useSpiritualGuidanceTest();
@@ -82,24 +75,12 @@ const SpiritualGuidanceInterface: React.FC = () => {
         setSelectedPersonality(personality);
       } else {
         // Set default Krishna personality
-        setSelectedPersonality({
-          id: 'krishna',
-          name: 'Krishna',
-          display_name: 'Lord Krishna',
-          domain: 'spiritual',
-          description: 'Divine teacher and guide from the Bhagavad Gita'
-        });
+        setSelectedPersonality(DEFAULT_KRISHNA_PERSONALITY);
       }
     } catch (error) {
       console.error('Failed to load saved personality:', error);
       // Set default Krishna personality on error
-      setSelectedPersonality({
-        id: 'krishna',
-        name: 'Krishna',
-        display_name: 'Lord Krishna',
-        domain: 'spiritual',
-        description: 'Divine teacher and guide from the Bhagavad Gita'
-      });
+      setSelectedPersonality(DEFAULT_KRISHNA_PERSONALITY);
     }
   }, []);
 
@@ -563,16 +544,16 @@ const SpiritualGuidanceInterface: React.FC = () => {
                       personality={selectedPersonality ? {
                         id: selectedPersonality.id,
                         name: selectedPersonality.display_name || selectedPersonality.name,
-                        domain: selectedPersonality.domain || 'spiritual',
+                        domain: selectedPersonality.domain === 'literary' ? 'philosophical' : selectedPersonality.domain as 'spiritual' | 'historical' | 'scientific' | 'philosophical',
                         voice_settings: selectedPersonality.voice_settings || {
                           language: 'en-US',
                           speaking_rate: 0.8,
                           pitch: -1.0,
                           volume: 0.9,
                           voice_characteristics: {
-                            gender: 'male',
-                            age: 'middle',
-                            tone: 'reverent'
+                            gender: 'male' as const,
+                            age: 'middle' as const,
+                            tone: 'reverent' as const
                           }
                         },
                         pronunciation_guide: selectedPersonality.pronunciation_guide || {}
@@ -640,6 +621,7 @@ const SpiritualGuidanceInterface: React.FC = () => {
       {/* Personality Selector Modal */}
       {showPersonalitySelector && (
         <PersonalitySelector
+          availablePersonalities={availablePersonalities}
           selectedPersonalityId={selectedPersonality?.id}
           onPersonalitySelect={handlePersonalitySelect}
           onClose={() => setShowPersonalitySelector(false)}

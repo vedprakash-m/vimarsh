@@ -12,7 +12,7 @@ export interface Personality {
   id: string;
   name: string;
   display_name: string;
-  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'political';
+  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary';
   time_period: string;
   description: string;
   expertise_areas: string[];
@@ -165,7 +165,24 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       
       if (data.personalities && Array.isArray(data.personalities)) {
         console.log('✅ PersonalityContext: Successfully loaded', data.personalities.length, 'personalities');
-        setAvailablePersonalities(data.personalities);
+        
+        // Map API response to frontend interface
+        const mappedPersonalities: Personality[] = data.personalities.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          display_name: p.name, // Use name as display_name since API doesn't have display_name
+          domain: p.domain as 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary',
+          time_period: 'Ancient/Historical', // Default since API doesn't provide this
+          description: p.description,
+          expertise_areas: [], // Default since API doesn't provide this
+          cultural_context: 'Historical', // Default since API doesn't provide this
+          quality_score: 95.0, // Default since API doesn't provide this
+          usage_count: 0, // Default since API doesn't provide this
+          is_active: true, // Default since API doesn't provide this
+          tags: [p.domain] // Use domain as default tag
+        }));
+        
+        setAvailablePersonalities(mappedPersonalities);
       } else {
         console.warn('⚠️ PersonalityContext: Failed to load personalities from API - unexpected response format:', data);
         // Set default personalities if API fails
@@ -193,14 +210,14 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
         console.log('📦 PersonalityContext: Loaded saved personality from localStorage:', personality.name);
         setSelectedPersonalityState(personality);
       } else {
-        console.log('🔷 PersonalityContext: No saved personality found, setting default Krishna');
-        // Set default Krishna personality
-        setSelectedPersonalityState(DEFAULT_KRISHNA_PERSONALITY);
+        console.log('🔷 PersonalityContext: No saved personality found, leaving null for user selection');
+        // Don't set a default personality - let user choose
+        setSelectedPersonalityState(null);
       }
     } catch (error) {
       console.error('❌ PersonalityContext: Failed to load saved personality:', error);
-      // Set default Krishna personality on error
-      setSelectedPersonalityState(DEFAULT_KRISHNA_PERSONALITY);
+      // Don't set a default personality on error - let user choose
+      setSelectedPersonalityState(null);
     }
 
     // Load available personalities
@@ -237,5 +254,5 @@ export const usePersonality = (): PersonalityContextType => {
   return context;
 };
 
-export { PersonalityContext };
+export { PersonalityContext, DEFAULT_KRISHNA_PERSONALITY };
 export type { PersonalityContextType };

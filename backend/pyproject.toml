@@ -45,9 +45,6 @@ addopts = [
 # Async test support
 asyncio_mode = "auto"
 
-# Test discovery patterns
-norecursedirs = ["venv", "__pycache__", ".git", "htmlcov"]
-
 # Warning filters
 filterwarnings = [
     "ignore::DeprecationWarning",
