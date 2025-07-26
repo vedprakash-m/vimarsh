@@ -178,6 +178,96 @@ async def init_krishna_texts():
         else:
             logger.error(f"❌ Failed to initialize Krishna text: {text.title}")
 
+async def init_buddha_texts():
+    """Initialize Buddha's spiritual texts from core Buddhist teachings"""
+    texts = [
+        EnhancedSpiritualText(
+            id="dhammapada_1_1_2",
+            title="Mind as the Forerunner",
+            content="All mental phenomena have mind as their forerunner; they have mind as their chief; they are mind-made. If one speaks or acts with a serene mind, happiness follows, as surely as one's shadow.",
+            source="Dhammapada 1.2",
+            chapter="Chapter 1: The Twin Verses",
+            verse="Dhammapada 1.2",
+            personality="buddha",
+            category="fundamental",
+            vectorNamespace="buddha"
+        ),
+        EnhancedSpiritualText(
+            id="four_noble_truths",
+            title="The Four Noble Truths",
+            content="Life contains suffering (dukkha). Suffering arises from attachment and craving (tanha). Suffering can cease when attachment ceases (nirodha). The Eightfold Path leads to the cessation of suffering.",
+            source="Dhammacakkappavattana Sutta",
+            chapter="Core Teaching",
+            verse="First Sermon",
+            personality="buddha",
+            category="fundamental",
+            vectorNamespace="buddha"
+        ),
+        EnhancedSpiritualText(
+            id="loving_kindness_meditation",
+            title="Loving-Kindness for All Beings",
+            content="May all beings be happy and secure. May all beings be healthy and strong. May all beings live with ease. Just as a mother protects her only child, so should we cultivate boundless love for all living beings.",
+            source="Metta Sutta",
+            chapter="Sutta Nipata",
+            verse="Loving-Kindness Discourse",
+            personality="buddha",
+            category="meditation",
+            vectorNamespace="buddha"
+        )
+    ]
+    
+    for text in texts:
+        success = await db_service.save_enhanced_spiritual_text(text)
+        if success:
+            logger.info(f"✅ Initialized Buddha text: {text.title}")
+        else:
+            logger.error(f"❌ Failed to initialize Buddha text: {text.title}")
+
+async def init_jesus_texts():
+    """Initialize Jesus's spiritual texts from the Gospels"""
+    texts = [
+        EnhancedSpiritualText(
+            id="beatitudes_blessed_peacemakers",
+            title="Blessed Are the Peacemakers",
+            content="Blessed are the peacemakers, for they will be called children of God. Blessed are those who are persecuted because of righteousness, for theirs is the kingdom of heaven.",
+            source="Matthew 5:9-10",
+            chapter="Sermon on the Mount",
+            verse="Matthew 5:9-10",
+            personality="jesus",
+            category="moral teaching",
+            vectorNamespace="jesus"
+        ),
+        EnhancedSpiritualText(
+            id="greatest_commandment",
+            title="The Greatest Commandment",
+            content="'Love the Lord your God with all your heart and with all your soul and with all your mind.' This is the first and greatest commandment. And the second is like it: 'Love your neighbor as yourself.' All the Law and the Prophets hang on these two commandments.",
+            source="Matthew 22:37-40",
+            chapter="Gospel Teaching",
+            verse="Matthew 22:37-40",
+            personality="jesus",
+            category="fundamental",
+            vectorNamespace="jesus"
+        ),
+        EnhancedSpiritualText(
+            id="forgiveness_seventy_seven",
+            title="Forgive Seventy-Seven Times",
+            content="Then Peter came to Jesus and asked, 'Lord, how many times shall I forgive my brother or sister who sins against me? Up to seven times?' Jesus answered, 'I tell you, not seven times, but seventy-seven times.'",
+            source="Matthew 18:21-22",
+            chapter="Gospel Teaching",
+            verse="Matthew 18:21-22",
+            personality="jesus",
+            category="moral teaching",
+            vectorNamespace="jesus"
+        )
+    ]
+    
+    for text in texts:
+        success = await db_service.save_enhanced_spiritual_text(text)
+        if success:
+            logger.info(f"✅ Initialized Jesus text: {text.title}")
+        else:
+            logger.error(f"❌ Failed to initialize Jesus text: {text.title}")
+
 async def init_sample_data():
     """Initialize sample conversation and usage data"""
     # Sample user stats
@@ -242,6 +332,12 @@ async def main():
         
         # Initialize Krishna's texts
         await init_krishna_texts()
+        
+        # Initialize Buddha's texts
+        await init_buddha_texts()
+        
+        # Initialize Jesus's texts
+        await init_jesus_texts()
         
         # Initialize sample data
         await init_sample_data()

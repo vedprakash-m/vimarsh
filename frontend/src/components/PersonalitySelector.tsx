@@ -24,7 +24,6 @@ import {
   FormControl,
   InputLabel,
   Chip,
-  Grid,
   Avatar,
   IconButton,
   Tooltip,
@@ -363,8 +362,8 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
         </Box>
 
         {/* Search and Filters */}
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginBottom: '16px' }}>
+          <div style={{ flex: '1 1 300px', minWidth: '200px' }}>
             <TextField
               fullWidth
               size="small"
@@ -379,8 +378,8 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                 )
               }}
             />
-          </Grid>
-          <Grid item xs={12} md={3}>
+          </div>
+          <div style={{ flex: '1 1 200px', minWidth: '150px' }}>
             <FormControl fullWidth size="small">
               <InputLabel>Domain</InputLabel>
               <Select
@@ -398,8 +397,8 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
 
         {/* Tabs */}
         <Tabs
@@ -432,13 +431,18 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
 
         {/* Personalities Grid */}
         {!loading && (
-          <Grid container spacing={3}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+            gap: '24px',
+            padding: '16px 0'
+          }}>
             {getFilteredPersonalities().map((personality) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={personality.id}>
+              <div key={personality.id}>
                 <PersonalityCard personality={personality} />
-              </Grid>
+              </div>
             ))}
-          </Grid>
+          </div>
         )}
 
         {/* Empty State */}

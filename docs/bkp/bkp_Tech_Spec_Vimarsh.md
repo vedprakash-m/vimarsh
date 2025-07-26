@@ -1,12 +1,10 @@
-# Technical Specification Document: Vimarsh Multi-Personality Platform
+# Technical Specification Document: Vimarsh AI Agent
 
 ---
 
 ## 1. Overview
 
-This document provides comprehensive technical specifications for implementing the Vimarsh AI-powered multi-personality conversational platform as defined in the Product Requirements Document (PRD). Vimarsh leverages Retrieval-Augmented Generation (RAG) with Google Gemini 2.5 Flash to enable authentic conversations with **8 distinct personalities** across **4 major domains** (spiritual, scientific, historical, philosophical), each grounded in their authentic works and teachings through personality-specific knowledge bases.
-
-**Architecture Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures while maintaining the same cost-optimized, scalable infrastructure.
+This document provides detailed technical specifications for implementing the Vimarsh AI-powered conversational agent as defined in the Product Requirements Document (PRD). Vimarsh leverages Retrieval-Augmented Generation (RAG) to provide contextually grounded spiritual guidance from foundational Indian texts through the perspective of Lord Krishna.
 
 ---
 
@@ -63,7 +61,7 @@ This document provides comprehensive technical specifications for implementing t
 
 ## 3. System Architecture
 
-### 3.1. High-Level Multi-Personality Architecture
+### 3.1. High-Level Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -71,62 +69,33 @@ This document provides comprehensive technical specifications for implementing t
 │   (Web App)     │◄──►│   (API Server)  │◄──►│   Services      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 │                      │                      │                 │
-├─ React/TypeScript   ├─ Azure Functions    ├─ Google Gemini  │
-├─ PersonalitySelector├─ Multi-Domain RAG   │   2.5 Flash      │
-├─ Voice Interface    ├─ Personality Service├─ Google Cloud   │
-├─ Admin Dashboard    ├─ LLM Service        │   STT/TTS APIs   │
-└─ Domain Filtering   └─ Auth & Security    └─ Azure Services │
+├─ React/Vue.js       ├─ FastAPI/Flask      ├─ LLM APIs       │
+├─ Web Speech API     ├─ RAG Pipeline       ├─ Google Cloud   │
+├─ Audio/Text UI      ├─ Vector Database    │   STT/TTS APIs   │
+├─ Voice Processing   ├─ Authentication     ├─ Translation    │
+└─ Language Toggle    └─ Error Handling     └─ Cloud Storage  │
                                                               │
 ┌─────────────────────────────────────────────────────────────┐
-│                Multi-Personality Data Layer                 │
+│                Voice Processing Flow                        │
 ├─────────────────────────────────────────────────────────────┤
-│ Spiritual Domain: Krishna, Buddha, Jesus, Rumi             │
-│ Scientific Domain: Einstein                                 │
-│ Historical Domain: Lincoln                                  │
-│ Philosophical Domain: Marcus Aurelius, Lao Tzu             │
-│                                                             │
-│ Each personality has:                                       │
-│ - Dedicated knowledge base with domain-specific content    │
-│ - Personality profile with tone and response patterns      │
-│ - Vector embeddings in personality-specific namespaces     │
-│ - Citation metadata linked to authentic source material    │
+│ User Voice Input → Web Speech API → Backend Processing     │
+│ ↓                                                           │
+│ Text Query → RAG Retrieval → LLM Processing               │
+│ ↓                                                           │
+│ Text Response → Google Cloud TTS → Audio Output           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2. Multi-Domain Processing Architecture
+### 3.2. Detailed Component Architecture
 
-**Domain-Specific Processing Pipeline:**
-```
-User Query → Domain Detection → Personality Selection → Knowledge Retrieval → Response Generation
-
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Domain          │    │ Personality     │    │ Knowledge       │
-│ Classification  │───►│ Profile         │───►│ Base Retrieval  │
-│                 │    │ Loading         │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-│                      │                      │                 │
-├─ Spiritual          ├─ Tone Guidelines    ├─ Vector Search   │
-├─ Scientific         ├─ Response Patterns  ├─ Citation Lookup │
-├─ Historical         ├─ Cultural Context   ├─ Domain Filtering│
-└─ Philosophical      └─ Expertise Areas    └─ Relevance Score │
-```
-
-### 3.3. Detailed Component Architecture
-
-**Frontend (Multi-Personality Interface):**
-- **Technology Stack:** React 18 with TypeScript for type safety across personality interactions
-- **Core Components:**
-  - `PersonalitySelector`: Browse and select from 8 personalities across 4 domains
-  - `CleanSpiritualInterface`: Main conversation interface with personality context
-  - `AdminDashboard`: Comprehensive personality and content management
-  - `VoiceInterface`: Personality-specific voice characteristics and TTS settings
-- **Input Handling:**
-  - Text input with personality context awareness
-  - Voice input using Web Speech API with domain-specific vocabulary optimization
-  - Personality selection with domain filtering and search capabilities
-- **Output Rendering:**
-  - Personality-specific response formatting and styling
-  - Domain-appropriate citation display (e.g., verse numbers for spiritual, paper citations for scientific)
+**Frontend (User Interface):**
+* **Technology Stack:** React.js or Vue.js for responsive web application
+* **Input Handling:**
+  - Text input via standard form controls
+  - Voice input using Web Speech API (browser native) or JavaScript libraries (`annyang`, `react-speech-recognition`)
+  - Language selection dropdown (English/Hindi for MVP)
+* **Output Rendering:**
+  - Text display with formatted responses and citations
   - Audio playback for TTS-generated responses
   - Responsive design for mobile and desktop
 
@@ -281,131 +250,43 @@ def generate_chunk_id(filename: str, index: int) -> str:
 
 ---
 
-## 5. Multi-Personality RAG Implementation
+## 4. RAG Implementation
 
-### 5.1. Domain-Aware Retrieval Mechanism
+### 4.1. Retrieval Mechanism
 
-**Multi-Domain Embedding Strategy:**
-- **Primary Model:** `sentence-transformers/all-MiniLM-L6-v2` (384 dimensions) for cross-domain compatibility
-- **Domain-Specific Optimization:** 
-  - Sanskrit term embeddings for spiritual domain
-  - Scientific terminology embeddings for Einstein
-  - Historical context embeddings for Lincoln
-  - Philosophical concept embeddings for Marcus Aurelius/Lao Tzu
-- **Personality Namespacing:** Each personality has isolated vector space for authentic response generation
+**Embedding Generation:**
+* **Model:** `sentence-transformers/all-MiniLM-L6-v2`
+* **Embedding Dimension:** 384
+* **Query Processing:** User queries embedded using same model
 
-**Personality-Aware Similarity Search:**
+**Similarity Search:**
 ```python
-# Multi-Personality Vector Search Implementation
+# Azure Cosmos DB Vector Search implementation
 from azure.cosmos import CosmosClient
 import numpy as np
-from typing import List, Dict, Optional
-from enum import Enum
 
-class PersonalityDomain(Enum):
-    SPIRITUAL = "spiritual"
-    SCIENTIFIC = "scientific"
-    HISTORICAL = "historical"  
-    PHILOSOPHICAL = "philosophical"
-
-class MultiPersonalityVectorSearch:
-    def __init__(self, connection_string: str, database_name: str):
+class CosmosVectorSearch:
+    def __init__(self, connection_string, database_name, container_name):
         self.client = CosmosClient.from_connection_string(connection_string)
         self.database = self.client.get_database_client(database_name)
-        self.personality_containers = {
-            "krishna": self.database.get_container_client("spiritual-texts"),
-            "einstein": self.database.get_container_client("scientific-texts"),
-            "lincoln": self.database.get_container_client("historical-texts"),
-            "marcus_aurelius": self.database.get_container_client("philosophical-texts"),
-            "buddha": self.database.get_container_client("spiritual-texts"),
-            "jesus": self.database.get_container_client("spiritual-texts"),
-            "rumi": self.database.get_container_client("spiritual-texts"),
-            "lao_tzu": self.database.get_container_client("philosophical-texts")
-        }
+        self.container = self.database.get_container_client(container_name)
     
-    async def retrieve_personality_context(
-        self, 
-        user_query: str, 
-        personality_id: str,
-        k: int = 10,
-        similarity_threshold: float = 0.7
-    ) -> List[Dict]:
-        """Retrieve context specific to selected personality"""
+    def retrieve_context(self, user_query, k=10):
+        # Embed user query
+        query_embedding = embedding_model.encode([user_query])[0].tolist()
         
-        # Get personality-specific container
-        container = self.personality_containers.get(personality_id)
-        if not container:
-            raise ValueError(f"Unknown personality: {personality_id}")
-        
-        # Embed user query with domain-specific preprocessing
-        query_embedding = await self._get_domain_optimized_embedding(
-            user_query, personality_id
-        )
-        
-        # Personality-specific vector search query
+        # Perform vector similarity search using Cosmos DB
         query = """
-        SELECT TOP @k c.text, c.citation, c.source, c.personality_id,
-               c.domain, c.cultural_context, c.time_period,
+        SELECT TOP @k c.text, c.citation, c.source, 
                VectorDistance(c.embedding, @query_vector) AS similarity
         FROM c 
-        WHERE c.personality_id = @personality_id
-        AND VectorDistance(c.embedding, @query_vector) > @threshold
+        WHERE VectorDistance(c.embedding, @query_vector) > @threshold
         ORDER BY VectorDistance(c.embedding, @query_vector)
         """
         
         parameters = [
             {"name": "@k", "value": k},
-            {"name": "@personality_id", "value": personality_id},
             {"name": "@query_vector", "value": query_embedding},
-            {"name": "@threshold", "value": similarity_threshold}
-        ]
-        
-        results = list(container.query_items(query, parameters=parameters))
-        return self._format_personality_context(results, personality_id)
-        
-    async def _get_domain_optimized_embedding(
-        self, 
-        query: str, 
-        personality_id: str
-    ) -> List[float]:
-        """Generate embedding with domain-specific optimization"""
-        
-        # Apply personality-specific query preprocessing
-        processed_query = await self._preprocess_query_for_personality(
-            query, personality_id
-        )
-        
-        # Generate embedding using the base model
-        embedding = self.embedding_model.encode([processed_query])[0].tolist()
-        return embedding
-        
-    async def _preprocess_query_for_personality(
-        self, 
-        query: str, 
-        personality_id: str
-    ) -> str:
-        """Apply personality-specific query preprocessing"""
-        
-        domain_processors = {
-            "krishna": self._preprocess_spiritual_query,
-            "buddha": self._preprocess_spiritual_query,
-            "jesus": self._preprocess_spiritual_query,
-            "rumi": self._preprocess_spiritual_query,
-            "einstein": self._preprocess_scientific_query,
-            "lincoln": self._preprocess_historical_query,
-            "marcus_aurelius": self._preprocess_philosophical_query,
-            "lao_tzu": self._preprocess_philosophical_query
-        }
-        
-        processor = domain_processors.get(personality_id, lambda x: x)
-        return processor(query)
-```
-
-**Domain-Specific Retrieval Parameters:**
-- **Spiritual Domain**: k=8, threshold=0.6 (broader context for wisdom)
-- **Scientific Domain**: k=12, threshold=0.75 (precise technical context)
-- **Historical Domain**: k=10, threshold=0.7 (balanced context with chronology)
-- **Philosophical Domain**: k=10, threshold=0.65 (conceptual depth priority)
             {"name": "@threshold", "value": 0.7}
         ]
         

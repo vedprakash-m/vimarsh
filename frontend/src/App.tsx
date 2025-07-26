@@ -7,7 +7,6 @@ import './styles/spiritual-design-system.css';
 // Lazy load main components for better bundle splitting
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const CleanSpiritualInterface = lazy(() => import('./components/CleanSpiritualInterface'));
-const AdminRouter = lazy(() => import('./components/AdminRouter'));
 
 // Keep lightweight components as regular imports
 import AuthCallback from './components/AuthCallback';
@@ -15,7 +14,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 // Context Providers
 import { LanguageProvider } from './contexts/LanguageContext';
-import { AdminProvider } from './contexts/AdminContext';
 import { AuthProvider } from './auth/AuthProvider';
 
 // MSAL Configuration
@@ -85,7 +83,6 @@ function App() {
       <MsalProvider instance={msalInstance}>
         <AuthProvider>
           <LanguageProvider>
-            <AdminProvider>
               <Router>
                 <Suspense fallback={<SpiritualLoadingSpinner />}>
                   <Routes>
@@ -105,22 +102,11 @@ function App() {
                     } 
                   />
                   
-                  {/* Admin Routes - Protected and Lazy Loaded */}
-                  <Route 
-                    path="/admin/*" 
-                    element={
-                      <ProtectedRoute requireAdmin={true}>
-                        <AdminRouter />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
                   {/* Fallback Route - Redirect to Landing */}
                   <Route path="*" element={<LandingPage />} />
                 </Routes>
               </Suspense>
             </Router>
-          </AdminProvider>
         </LanguageProvider>
       </AuthProvider>
     </MsalProvider>

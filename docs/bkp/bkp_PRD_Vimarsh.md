@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD): Vimarsh Multi-Personality Platform
+# Product Requirements Document (PRD): Vimarsh
 
 > **Document Relationship:** This PRD defines the strategic business requirements, market positioning, and high-level technical approach for Vimarsh. For detailed user experience specifications, interface design, and interaction patterns, refer to `User_Experience.md`. For technical implementation details, refer to `Tech_Spec_Vimarsh.md`.
 
@@ -6,135 +6,61 @@
 
 ## 1. Executive Summary
 
-**Vimarsh** is a revolutionary AI-powered multi-personality conversational platform that enables authentic dialogues with history's greatest minds, thinkers, and spiritual leaders through their own curated knowledge bases. Leveraging **Retrieval-Augmented Generation (RAG)** with Google Gemini 2.5 Flash, the platform transforms how users access and interact with profound wisdom across **multiple domains: spiritual, scientific, historical, and philosophical**.
-
-**Sanskrit**: *विमर्श (Vimarsh)* - "conversation," "dialogue," or "thoughtful discourse"
-
-**Current Achievement**: Lord Krishna spiritual guidance system (Live at https://vimarsh.vedprakash.net)  
-**Vision**: Multi-personality platform featuring conversations with Einstein, Lincoln, Marcus Aurelius, Buddha, Rumi, Jesus Christ, and Lao Tzu
-
-The platform democratizes access to timeless wisdom by allowing users to engage in authentic conversations with personalities like **Lord Krishna** (spiritual guidance), **Albert Einstein** (scientific inquiry), **Abraham Lincoln** (leadership and governance), **Marcus Aurelius** (Stoic philosophy), **Buddha** (Buddhist teachings), **Rumi** (mystical poetry), **Jesus Christ** (Christian wisdom), and **Lao Tzu** (Taoist philosophy). Each personality maintains their authentic voice, expertise, and cultural context, grounded in their actual works and teachings.
-
-The core principle remains ensuring the **highest possible standard for authentic, respectful, and textually faithful responses** across all personality domains, doing full justice to each historical figure's legacy and wisdom. Users can interact through text or voice interfaces in multiple languages, with each personality offering domain-specific expertise while maintaining their characteristic tone and perspective.
+**Vimarsh** is an AI-powered conversational agent designed to provide accessible, context-rich insights and guidance drawn from foundational Indian spiritual texts. Leveraging **Retrieval-Augmented Generation (RAG)**, it enables users to explore philosophical concepts, ethical dilemmas, and life lessons through the **profound and divine perspective of Lord Krishna**. By grounding responses strictly in texts like the Bhagavad Gita, Mahabharata, and Srimad Bhagavatam, Vimarsh aims to democratize access to timeless wisdom. Users can interact with the agent through text or voice, and receive responses in multiple languages including Hindi, with more languages to be added later. The core principle is to ensure the **highest possible standard for divine, respectful, and textually faithful responses**, doing full justice to the opportunity to engage with Lord Krishna's wisdom. We plan to extend the wisdom by adding more texts and revered personalities for conversation in future iterations.
 
 ---
 
 ## 2. Problem Statement
 
-Many individuals today seek guidance and wisdom for complex life decisions, ethical understanding, and deeper meaning. While history offers profound insights through great minds across multiple domains, these resources are often:
+Many individuals today seek guidance for complex life decisions, ethical understanding, and deeper meaning. While the rich traditions of Indian spiritual texts offer profound wisdom, they are often:
 
-* **Inaccessible:** Historical texts, scientific papers, philosophical works, and spiritual scriptures are voluminous, written in archaic language, and require deep scholarly effort to comprehend.
-* **Fragmented & Disjointed:** Insights from specific personalities (like Einstein, Lincoln, or Marcus Aurelius) are scattered across multiple, lengthy works, making comprehensive understanding challenging.
-* **Domain-Specific Barriers:** Users must navigate different academic disciplines, cultural contexts, and historical periods to access wisdom from various domains.
-* **Overwhelming Volume:** Users are unsure where to begin or how to extract relevant insights for specific modern dilemmas from thousands of pages across multiple personalities.
-* **Lacking Personalization:** Generic interpretations don't resonate with individual questions or specific life situations that could benefit from domain-specific expertise.
-* **Language and Cultural Barriers:** Wisdom is primarily available in original languages or academic translations, limiting access for diverse global audiences.
-* **Engagement Barrier:** Traditional text-only interfaces lack the immediacy and naturalness of human conversation with historical figures.
-* **Authentication Challenges:** Users struggle to distinguish authentic wisdom from modern interpretations or popularized versions.
+* **Inaccessible:** Voluminous, written in archaic language, and require deep scholarly effort to comprehend.
+* **Fragmented & Disjointed:** Insights related to a specific figure (like Lord Krishna) are scattered across multiple, lengthy texts, making comprehensive understanding challenging.
+* **Overwhelming:** Users are unsure where to begin or how to extract relevant wisdom for specific modern dilemmas from thousands of verses.
+* **Lacking Personalization:** Generic interpretations don't resonate with individual questions or specific life situations.
+* **Language Barrier:** The wisdom is primarily available in English translations, limiting access for non-English speakers.
+* **Engagement Barrier:** Text-only interfaces can sometimes lack the immediacy and naturalness of human conversation.
 
-This results in missed opportunities for:
-- **Personal Growth**: Learning from history's greatest minds across multiple domains
-- **Cross-Domain Insights**: Combining spiritual, scientific, historical, and philosophical perspectives
-- **Authentic Guidance**: Receiving advice grounded in the actual thoughts and writings of revered personalities
-- **Cultural Connection**: Accessing wisdom from diverse traditions and time periods
-
-The consequence is reliance on less grounded advice, superficial interpretations, or complete disengagement from humanity's rich intellectual and spiritual heritage across all domains of knowledge.
+This results in a missed opportunity for personal growth, ethical clarity, and cultural connection, leading to reliance on less grounded advice or disengagement from a rich spiritual heritage.
 
 ---
 
-## 3. Solution Overview: Vimarsh Multi-Personality Platform
+## 3. Solution Overview: Vimarsh AI Agent
 
-**Vimarsh** is a comprehensive AI-powered conversational platform that serves as a bridge between users and history's greatest minds across multiple domains. Users can engage in authentic conversations with **8 distinct personalities** spanning **4 major domains**, each grounded in their authentic works and teachings.
+**Vimarsh** will be a user-friendly AI agent, accessible via a web interface, acting as a knowledgeable guide to the wisdom contained within its curated corpus.
 
 > **Note:** Detailed technical specifications, system architecture, and implementation details are documented separately in `Tech_Spec_Vimarsh.md`.
 
-### Core Personality Roster:
+### Key User Interactions (MVP Focus):
 
-**🕉️ Spiritual Domain:**
-- **Lord Krishna** - Divine guidance from Bhagavad Gita, Mahabharata, and Srimad Bhagavatam
-- **Buddha** - Buddhist teachings on suffering, enlightenment, and the Middle Path
-- **Jesus Christ** - Christian wisdom on love, compassion, and spiritual transformation
-- **Rumi** - Mystical poetry and Sufi spiritual insights
-
-**🔬 Scientific Domain:**
-- **Albert Einstein** - Scientific inquiry, relativity theory, and philosophy of science
-
-**🏛️ Historical Domain:**  
-- **Abraham Lincoln** - Leadership, governance, civil rights, and national unity
-
-**💭 Philosophical Domain:**
-- **Marcus Aurelius** - Stoic philosophy, virtue ethics, and practical wisdom
-- **Lao Tzu** - Taoist principles, natural harmony, and effortless action
-
-### Key User Interactions (Multi-Personality Experience):
-
-* **Personality Selection:** Users can browse and select from multiple personalities based on their interests, questions, or life situations (e.g., spiritual guidance with Krishna, scientific inquiry with Einstein, leadership advice with Lincoln).
-* **Domain-Specific Conversations:** Each personality provides expertise in their domain while maintaining their authentic voice, cultural context, and historical perspective.
-* **Cross-Domain Insights:** Users can explore how different personalities might approach similar questions, gaining multi-perspective understanding.
-* **Text or Voice Input:** Users can interact with any personality through typing or speaking, with personality-specific voice characteristics in responses.
-* **Authentic Responses:** All answers are grounded directly in the personality's actual works, teachings, or documented statements, with explicit citations (e.g., "Meditations 2.11" for Marcus Aurelius, "Letter to Max Born, 1926" for Einstein).
-* **Multilingual Support:** Users can receive responses in **English or Hindi** with personality-appropriate language patterns and cultural sensitivity.
-* **Seamless Personality Switching:** Users can switch between personalities within conversations or start fresh conversations with different personalities.
-* **Contextual Understanding:** Each personality maintains awareness of their historical context, limitations, and areas of expertise.
+* **Pose Questions:** Users will ask open-ended questions about life, ethics, dilemmas, or philosophical concepts (e.g., "What is the nature of duty?", "How to deal with attachment?", "What is true happiness?").
+* **Text or Voice Input:** Users can either type their questions or speak them using a microphone.
+* **Receive Lord Krishna's Perspective:** All answers in the MVP will automatically be framed from **Lord Krishna's divine perspective**, drawing directly from His teachings and actions as described in the source texts. There will be no manual "character selection" in MVP; this is implicitly the core function.
+* **Multilingual Responses:** Users can select to receive answers in **English or Hindi** (with more languages planned for future iterations).
+* **Contextualized Answers:** Get concise, relevant answers **grounded directly in passages from the RAG corpus**, with explicit citations to the original text (e.g., Bhagavad Gita Chapter:Verse, Mahabharata Book:Section, Srimad Bhagavatam Canto:Chapter:Verse).
+* **Explore Further:** Users can ask follow-up questions to delve deeper into the initial response or related concepts.
 
 > **Note:** Detailed interface specifications and user interaction flows are documented in `User_Experience.md`.
 
 ### Key Differentiators:
 
-* **Multi-Domain Expertise:** Unlike single-domain systems, Vimarsh offers access to wisdom across spiritual, scientific, historical, and philosophical domains through authentic personalities.
-* **Strict Textual Grounding (RAG-First):** All responses are rigorously linked to source material from each personality's authentic works, minimizing hallucinations and ensuring **absolute fidelity to original teachings**.
-* **Authentic Voice Preservation:** Each personality maintains their characteristic tone, vocabulary, and thinking patterns, completely avoiding anachronisms or cultural inconsistencies.
-* **Domain-Specific Safety:** Personality-appropriate content filtering ensures responses maintain dignity and authenticity for each historical figure.
-* **Personality-Aware Context:** The system understands each personality's historical period, cultural background, and areas of expertise, providing contextually appropriate responses.
-* **Cross-Personality Learning:** Users can explore how different great minds might approach similar questions, fostering comprehensive understanding.
-* **Cultural Authenticity:** Maintains reverence for spiritual figures while presenting historical and scientific personalities with appropriate scholarly respect.
-* **Enhanced Engagement:** Multi-modal interaction (text/voice) with personality-specific characteristics creates immersive conversational experiences.
+* **Strict Textual Grounding (RAG-First):** Responses are rigorously linked to source material, explicitly minimizing hallucinations and ensuring **absolute fidelity to the original wisdom**.
+* **Divine Tone & Decorum:** An unwavering commitment to ensuring all responses from Lord Krishna maintain the **highest standards of reverence, wisdom, and dignity**, completely devoid of colloquialisms, slang, profanity, or any language that would diminish the divine persona.
+* **Focused Perspective (MVP):** By concentrating on Lord Krishna's perspective, the agent can achieve higher fidelity and depth within that specific worldview.
+* **Manageable Scope for MVP:** Limits the initial corpus to key texts, simplifying data ingestion and RAG development.
+* **Accessibility:** Translates complex ancient concepts into understandable, actionable insights for a modern audience, with initial support for English and Hindi.
+* **Enhanced Engagement:** Offers both text and voice interaction for user preference and accessibility.
 
 ---
 
 ## 4. Target Audience & User Personas
 
-Vimarsh serves a diverse global audience seeking authentic wisdom and insights from history's greatest minds across multiple domains.
+Vimarsh is designed for a broad yet discerning audience seeking authentic spiritual and ethical guidance.
 
-### Primary Audiences:
-
-* **Cross-Domain Learners (Core):** Individuals with curiosity spanning multiple fields - spiritual seekers interested in scientific perspectives, scientists seeking philosophical frameworks, leaders looking for historical wisdom, or philosophers exploring spiritual insights. They value authentic sources and cross-pollination of ideas.
-
-* **Spiritual Seekers & Practitioners:** People exploring spirituality across traditions - those seeking Krishna's divine guidance, Buddha's enlightenment teachings, Christ's love-centered wisdom, or Rumi's mystical poetry. They demand authenticity, reverence, and proper cultural context.
-
-* **Students & Scholars (Secondary):** Those studying philosophy, history, religion, or science who need quick access to authentic thoughts from primary sources. They require accurate citations, historical context, and scholarly rigor across disciplines.
-
-* **Professionals & Leaders:** Business leaders, politicians, educators, and decision-makers seeking wisdom from historical leaders like Lincoln for governance insights, Marcus Aurelius for ethical leadership, or Einstein for innovative thinking frameworks.
-
-* **Cultural Explorers:** Individuals interested in understanding different philosophical and spiritual traditions through authentic voices rather than modern interpretations. They value cultural sensitivity and authentic representation.
-
-* **Lifelong Learners:** People committed to continuous learning who appreciate having access to humanity's greatest teachers in one platform, allowing them to explore connections between different domains of knowledge.
-
-### Domain-Specific Personas:
-
-**🕉️ Spiritual Domain Users:**
-- Seeking divine guidance for life decisions
-- Exploring meditation and contemplative practices  
-- Understanding ancient wisdom in modern contexts
-- Comparing insights across spiritual traditions
-
-**🔬 Scientific Domain Users:**
-- Exploring philosophy of science and ethics
-- Understanding scientific methodology and thinking
-- Seeking inspiration for innovation and discovery
-- Learning about the intersection of science and spirituality
-
-**🏛️ Historical Domain Users:**
-- Learning leadership lessons from historical figures
-- Understanding governance and social change
-- Exploring historical decision-making processes
-- Applying historical wisdom to contemporary challenges
-
-**💭 Philosophical Domain Users:**
-- Exploring virtue ethics and practical wisdom
-- Understanding different philosophical approaches to life
-- Seeking frameworks for ethical decision-making
-- Comparing Eastern and Western philosophical traditions
+* **Spiritual Seekers (Core):** Individuals actively exploring spirituality, seeking deeper meaning, and personal growth, often frustrated by the inaccessibility of ancient texts. They are motivated by self-improvement and a desire for authentic wisdom.
+* **Students & Scholars (Secondary):** Those studying Indian philosophy, history, or literature who need a quick reference or a tool to understand the practical application of concepts. They seek accuracy and direct textual grounding.
+* **Culturally Connected Individuals:** People with an affinity for Indian heritage who wish to reconnect with or better understand the wisdom embedded in their traditions, but may not have the time for deep study. They value respectful and authentic representation.
+* **Decision-Makers & Leaders:** Professionals or individuals facing ethical dilemmas in their personal or professional lives, looking for guidance inspired by timeless principles.
 
 > **Note:** Detailed user personas, journey mapping, and interface-specific user experience specifications are documented in `User_Experience.md`.
 
@@ -142,214 +68,80 @@ Vimarsh serves a diverse global audience seeking authentic wisdom and insights f
 
 ## 5. Competitive Analysis
 
-The multi-personality conversational AI market is emerging and fragmented. Vimarsh's competitive advantage lies in its **authentic multi-domain personality system, strict textual grounding, and comprehensive historical figure representation**.
+The digital spiritual guidance market is fragmented. Vimarsh's competitive advantage lies in its **strict textual grounding, divine persona fidelity, and multi-modal, multilingual accessibility**.
 
-### Direct Competitors:
+* **Existing AI Chatbots (e.g., ChatGPT, Gemini):**
+    * *Strengths:* Broad knowledge, conversational.
+    * *Weaknesses:* Prone to hallucination, no specific textual grounding, generic persona, can provide culturally insensitive or inappropriate responses for religious/spiritual queries, lacks citations.
+* **Digital Scripture Platforms (e.g., sacred-texts.com, Gita apps):**
+    * *Strengths:* Authentic text, searchable.
+    * *Weaknesses:* No conversational interface, requires user to interpret raw text, lacks personalized guidance, no multi-language interpretation.
+* **Spiritual/Meditation Apps (e.g., Calm, Headspace, Art of Living app):**
+    * *Strengths:* Guided meditations, structured courses, community.
+    * *Weaknesses:* Less focused on direct textual wisdom, not interactive for specific dilemmas, generic content, may lack deep philosophical grounding.
+* **Online Gurus/Spiritual Teachers:**
+    * *Strengths:* Personalized human interaction.
+    * *Weaknesses:* Costly, limited accessibility, potential for personal bias, not always grounded in specific texts.
 
-* **Character.AI:**
-    * *Strengths:* Multiple AI personalities, conversational interface, large user base.
-    * *Weaknesses:* Fictional characters focus, no scholarly grounding, prone to hallucination, lacks authentic historical accuracy, limited voice features.
-
-* **Replika & Similar AI Companions:**
-    * *Strengths:* Personalized conversations, emotional engagement.
-    * *Weaknesses:* Generic personalities, no historical figure focus, lacks educational value, not grounded in authentic sources.
-
-### Indirect Competitors:
-
-* **General AI Chatbots (ChatGPT, Gemini, Claude):**
-    * *Strengths:* Broad knowledge, advanced reasoning, conversational.
-    * *Weaknesses:* Generic persona, no consistent character embodiment, prone to hallucination on historical figures, lacks authentic voice preservation, no specialized textual grounding.
-
-* **Educational Platforms (Khan Academy, Coursera):**
-    * *Strengths:* Structured learning, expert content, educational focus.
-    * *Weaknesses:* No conversational interface, lacks personality-based learning, traditional lecture format, not personalized.
-
-* **Digital Library Platforms (Project Gutenberg, Archive.org):**
-    * *Strengths:* Authentic texts, comprehensive collections.
-    * *Weaknesses:* No AI interface, requires manual search and interpretation, not conversational, lacks guided learning.
-
-* **Meditation/Spiritual Apps (Calm, Headspace, Insight Timer):**
-    * *Strengths:* Spiritual focus, guided content, mobile-optimized.
-    * *Weaknesses:* Limited to spiritual domain, no personality interaction, generic content, lacks cross-domain insights.
-
-### **Vimarsh's Competitive Advantages:**
-
-#### **Unique Value Proposition:**
-* **Authentic Multi-Personality System:** First platform offering genuine conversations with historically accurate representations of great minds across domains.
-* **Cross-Domain Wisdom Access:** Users can explore spiritual (Krishna), scientific (Einstein), historical (Lincoln), and philosophical (Marcus Aurelius) perspectives in one platform.
-* **Textual Authenticity:** Every response grounded in actual works, writings, and documented statements of historical figures.
-* **Cultural & Historical Accuracy:** Maintains appropriate tone, vocabulary, and perspective for each personality's time period and cultural context.
-
-#### **Technical Differentiators:**
-* **Domain-Specific RAG:** Personality-specific knowledge bases ensure responses are contextually appropriate and historically accurate.
-* **Voice Character Embodiment:** Each personality has distinct voice characteristics and speech patterns.
-* **Enterprise-Grade Infrastructure:** Scalable, secure, cost-optimized architecture with pause-resume capabilities.
-* **Multi-Modal Interaction:** Seamless text and voice interaction with personality-specific optimizations.
-
-#### **Market Positioning:**
-* **Educational Focus:** Bridges entertainment and education, making learning from great minds accessible and engaging.
-* **Global Accessibility:** Multi-language support with cultural sensitivity across different traditions.
-* **Scholarly Rigor:** Appeals to both casual learners and serious scholars with authentic source citations.
-* **Cross-Cultural Bridge:** Connects wisdom traditions from different cultures and time periods.
-
-### **Market Opportunity:**
-The intersection of AI, education, and historical/spiritual content represents a blue ocean opportunity. While competitors focus on either generic AI chat or specific educational content, Vimarsh uniquely combines authentic personality embodiment with cross-domain wisdom access, creating a new category of "Conversational Wisdom Platforms."
+**Vimarsh's Competitive Advantages:**
+* **Authenticity:** Unwavering commitment to textual grounding and divine persona.
+* **Accessibility:** Combines voice/text input with multilingual output.
+* **Curated Wisdom:** Focuses on specific, profound source texts and revered personalities.
+* **Problem-Solving Focus:** Guides users through dilemmas using ancient wisdom.
 
 ---
-
-## 6. Go-to-Market Strategy
 
 ## 6. Go-to-Market Strategy
 
 ### 6.1. Launch Strategy & Phases:
 
-**Phase 1: Multi-Personality Platform Launch (Current Focus)**
-- **Target**: Launch with 8 personalities across 4 domains 
-- **Audience**: Cross-domain learners, spiritual seekers, students, professionals
-- **Key Features**: Personality selection, authentic conversations, voice interface, admin management
-- **Success Metrics**: 1,000+ active users, 90%+ authenticity rating, <5s response times
+* **Phase 1 (Alpha/Beta - Internal/Closed Group):** Test MVP with a small, curated group of spiritual seekers, scholars, and language experts for rigorous feedback on tone, accuracy, and usability.
+* **Phase 2 (Public Launch - MVP):** Announce the launch of Vimarsh (Lord Krishna persona, Bhagavad Gita/Mahabharata/Srimad Bhagavatam, English/Hindi text/voice) on relevant platforms.
+* **Phase 3 (Iterative Expansion):** Gradually introduce new revered personalities, expand the textual corpus, and add more languages based on user feedback and technical readiness.
 
-**Phase 2: Domain Expansion (3-6 months)**
-- **Target**: Add 12+ personalities across existing and new domains
-- **New Domains**: Literary (Shakespeare, Tolkien), Artistic (Da Vinci), Political (Gandhi, Churchill)
-- **Enhanced Features**: Multi-personality conversations, advanced expert review, mobile app
-- **Success Metrics**: 10,000+ users, 95% user retention, enterprise pilot programs
+### 6.2. Marketing Channels & User Acquisition:
 
-**Phase 3: Global Scale (6-12 months)**  
-- **Target**: 50+ personalities, 10+ languages, enterprise features
-- **Enterprise Features**: Custom personality creation, organization-specific deployments
-- **Global Expansion**: European, Asian markets with localized personalities
-- **Success Metrics**: 100,000+ users, revenue sustainability, enterprise contracts
-
-### 6.2. User Acquisition Strategy:
-
-**Educational Institutions:**
-- Partner with universities offering philosophy, religion, history, and science courses
-- Provide academic licensing for student and faculty access
-- Create curriculum integration guides for professors
-- Develop assessment tools aligned with learning objectives
-
-**Content Marketing:**
-- "Conversations with Great Minds" video series featuring personality interactions
-- Blog posts comparing perspectives (e.g., "Einstein vs. Lao Tzu on Simplicity")
-- Social media content highlighting daily wisdom from different personalities
-- Podcast partnerships exploring historical wisdom for modern challenges
-
-**Community Building:**
-- Host virtual events: "Evening with Einstein," "Wisdom Circle with Marcus Aurelius"
-- Create user forums for sharing insights and personality recommendations
-- Develop certification programs for educators and spiritual guides
-- Build ambassador program with domain experts and educators
-
-**Strategic Partnerships:**
-- Museums and cultural institutions for authentic content validation
-- Religious and spiritual organizations for community outreach
-- Educational technology companies for integration opportunities
-- Voice technology companies for enhanced audio experiences
-
-### 6.3. Monetization Strategy:
-
-**Freemium Model:**
-- **Free Tier**: Limited conversations (10/month), 2 personalities (Krishna, Einstein)
-- **Premium Individual** ($9.99/month): Unlimited conversations, all personalities, voice features
-- **Premium Family** ($19.99/month): 5 users, priority support, exclusive personalities
-- **Enterprise** ($99/month/seat): Custom personalities, analytics, SSO integration
-
-**Educational Licensing:**
-- **Academic Institution** ($500/month): Site license for students/faculty
-- **School District** ($1,000/month): K-12 access with age-appropriate content
-- **Online Course Integration** ($0.10/conversation): API access for course platforms
-
-**Content Partnerships:**
-- **Publisher Collaborations**: Revenue sharing for premium personality content
-- **Expert Review Services**: Paid validation and content creation by domain experts
-- **Custom Personality Development**: $10,000-50,000 for organization-specific personalities
-
-### 6.4. Success Metrics & KPIs:
-
-**User Engagement:**
-- Monthly Active Users (MAU) growth rate: Target 20% monthly
-- Conversation depth: Average 5+ exchanges per session
-- Personality diversity: Users engaging with 3+ different personalities
-- Session duration: Average 15+ minutes per session
-
-**Quality & Authenticity:**
-- User satisfaction score: >4.5/5.0 for authenticity
-- Expert validation score: >90% approval rate for responses
-- Citation accuracy: >95% of responses properly sourced
-- Cross-domain engagement: 60% of users explore multiple domains
-
-**Business Metrics:**
-- Customer Acquisition Cost (CAC): <$50 for premium users
-- Lifetime Value (LTV): >$200 per premium user
-- Monthly Recurring Revenue (MRR) growth: 25% monthly
-- Enterprise pipeline: 10+ qualified leads monthly
-
-**Technical Performance:**
-- Response latency: <5 seconds for 95% of queries
-- System uptime: >99.9% availability
-- Voice quality score: >4.0/5.0 user rating
-- Mobile app rating: >4.5 stars in app stores
-
-This cost management framework ensures Vimarsh remains financially sustainable while preserving the authentic quality of multi-personality conversational experiences and serving as a bridge between timeless wisdom and modern learners across all domains of human knowledge.
+* **Spiritual & Cultural Communities:** Engage with online forums, social media groups, and local centers dedicated to Indian philosophy, Yoga, meditation, and spirituality.
+* **Content Marketing:** Create blog posts, articles, and short videos showcasing Vimarsh's capabilities, using examples of profound advice. Highlight the unique RAG grounding.
+* **Social Media:** Organic reach through platforms like Instagram, YouTube, and X (formerly Twitter), showcasing snippets of Vimarsh's wisdom and demonstrating its features.
+* **Educational Outreach:** Present Vimarsh to university departments of religious studies, philosophy, and Indology.
+* **Partnerships:**
+    * **Spiritual Organizations:** Collaborate with non-profits, ashrams, or cultural foundations that promote Indian wisdom, offering them early access or co-promotional opportunities.
+    * **Educational Institutions:** Work with universities to integrate Vimarsh as a supplementary learning tool for relevant courses.
+    * **Content Creators:** Partner with popular spiritual YouTubers, podcasters, or bloggers for reviews and demonstrations.
 
 ---
 
-## 7. Future Roadmap & Vision
+## 7. Implementation Timeline & Roadmap
 
-### 7.1. Personality Expansion Roadmap:
+### 7.1. Development Phases & Milestones:
 
-**Short-term (3-6 months):**
-- **Literary Domain**: William Shakespeare, J.R.R. Tolkien, Maya Angelou
-- **Artistic Domain**: Leonardo da Vinci, Vincent van Gogh, Frida Kahlo
-- **Political Domain**: Mahatma Gandhi, Winston Churchill, Nelson Mandela
+**Phase 1: Foundation & MVP Development (Months 1-6)**
+* **Month 1-2: Setup & Data Preparation**
+  - Team onboarding and production environment setup
+  - Source text acquisition and legal verification (public domain status)
+  - Initial data ingestion and chunking pipeline development
+  - Expert panel recruitment and onboarding
+* **Month 3-4: Core RAG Development**
+  - Two-resource-group infrastructure deployment (vimarsh-db-rg + vimarsh-rg)
+  - Vector database implementation in Cosmos DB with static naming
+  - RAG retrieval system development and testing
+  - Lord Krishna persona profile creation and validation
+  - Initial prompt engineering and LLM integration
+* **Month 5-6: Production Integration & Testing**
+  - Web interface development (text input/output)
+  - Voice input/output integration (STT/TTS)
+  - Hindi translation integration
+  - Pause-resume strategy testing and validation
+  - End-to-end production testing and expert review cycles
 
-**Medium-term (6-12 months):**
-- **Business & Economics**: Adam Smith, John Maynard Keynes
-- **Psychology**: Carl Jung, Sigmund Freud, Viktor Frankl
-- **Social Reform**: Martin Luther King Jr., Mother Teresa, Frederick Douglass
-
-**Long-term Vision (1-2 years):**
-- **50+ Personalities** across 10+ domains
-- **Custom Personality Creation** for educational institutions
-- **Multi-Personality Conversations** allowing users to facilitate dialogues between different personalities
-- **Cultural Expansion** with region-specific historical figures and wisdom traditions
-
-### 7.2. Technology Evolution:
-
-**Advanced AI Features:**
-- **Emotion Recognition**: Understanding user emotional context for more empathetic responses
-- **Personality Dynamics**: Modeling how different personalities would interact with each other
-- **Contextual Memory**: Long-term conversation memory spanning multiple sessions
-- **Predictive Insights**: Suggesting relevant personalities based on user interests and questions
-
-**Platform Expansion:**
-- **Mobile Applications**: Native iOS and Android apps with offline capabilities
-- **VR/AR Integration**: Immersive conversations with 3D personality representations
-- **API Platform**: Third-party integrations for educational and enterprise applications
-- **White-label Solutions**: Custom implementations for organizations
-
-### 7.3. Global Impact Goals:
-
-**Educational Transformation:**
-- Partner with 1,000+ educational institutions globally
-- Integrate with major Learning Management Systems (LMS)
-- Create age-appropriate versions for K-12 education
-- Develop assessment and certification programs
-
-**Cultural Preservation:**
-- Digitally preserve wisdom from endangered cultures and languages
-- Create personality representations for local historical figures
-- Support indigenous knowledge systems and traditions
-- Build multilingual capabilities for 25+ languages
-
-**Social Impact:**
-- Provide free access to underserved communities
-- Create therapeutic applications for mental health support
-- Support conflict resolution through cross-cultural wisdom
-- Promote interfaith dialogue and understanding
-
-This roadmap ensures Vimarsh evolves from a multi-personality platform into a comprehensive ecosystem for accessing human wisdom, fostering cross-cultural understanding, and preserving our collective intellectual heritage for future generations.
+**Phase 2: Production Validation & Refinement (Months 7-8)**
+* **Month 7:**
+  - Production deployment with closed user group (20-30 users)
+  - Expert panel review of AI responses in live environment
+  - Cost monitoring and pause-resume strategy validation
+* **Month 8:**
+  - Expanded production testing (100-150 users)
   - User feedback collection and analysis
   - Final optimizations and quality assurance
 

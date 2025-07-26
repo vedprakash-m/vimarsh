@@ -12,7 +12,6 @@ import {
   CardContent,
   Typography,
   Button,
-  Grid,
   Alert,
   CircularProgress,
   LinearProgress,
@@ -108,9 +107,13 @@ const MultiPersonalityTestSuite: React.FC = () => {
         Multi-Personality Test Suite
       </Typography>
       
-      <Grid container spacing={3}>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        gap: '24px' 
+      }}>
         {testSuites.map((suite, index) => (
-          <Grid item xs={12} md={6} key={suite.suiteName}>
+          <div key={suite.suiteName}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -126,9 +129,9 @@ const MultiPersonalityTestSuite: React.FC = () => {
                 </Typography>
               </CardContent>
             </Card>
-          </Grid>
+          </div>
         ))}
-      </Grid>
+      </div>
     </Box>
   );
 };

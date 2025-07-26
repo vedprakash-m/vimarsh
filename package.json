@@ -1,0 +1,14 @@
+{
+  "name": "vimarsh",
+  "version": "1.0.0",
+  "description": "Vimarsh AI-powered spiritual guidance platform",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "start": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "test": "cd frontend && npm test"
+  }
+}

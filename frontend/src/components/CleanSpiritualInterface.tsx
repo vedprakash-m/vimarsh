@@ -1,40 +1,60 @@
-import React, { useState } from 'react';
-import { Send, Mic, MicOff, Shield, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Send, Mic, MicOff, MessageSquare, Users } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { useAdmin } from '../contexts/AdminContext';
-import AdminDashboard from './admin/AdminDashboard';
+import PersonalitySelector from './PersonalitySelector';
 import { getApiBaseUrl } from '../config/environment';
 import '../styles/spiritual-theme.css';
-import '../styles/admin.css';
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
+  personality?: string;
 }
 
-type AppTab = 'guidance' | 'admin';
+interface Personality {
+  id: string;
+  name: string;
+  display_name: string;
+  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'political';
+  time_period: string;
+  description: string;
+  expertise_areas: string[];
+  cultural_context: string;
+  quality_score: number;
+  usage_count: number;
+  is_active: boolean;
+  tags: string[];
+}
 
 export default function CleanSpiritualInterface() {
-  const { user } = useAdmin();
-  const [activeTab, setActiveTab] = useState<AppTab>('guidance');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
+  const [selectedPersonality, setSelectedPersonality] = useState<Personality>({
+    id: 'krishna',
+    name: 'Krishna',
+    display_name: 'Lord Krishna',
+    domain: 'spiritual',
+    time_period: 'Ancient India',
+    description: 'Divine teacher and guide from the Bhagavad Gita',
+    expertise_areas: ['dharma', 'karma', 'devotion'],
+    cultural_context: 'Hindu tradition',
+    quality_score: 95.0,
+    usage_count: 1000,
+    is_active: true,
+    tags: ['spiritual', 'hindu', 'bhagavad-gita']
+  });
 
-  // Debug logging for admin user
-  React.useEffect(() => {
-    console.log('🎨 CleanSpiritualInterface - user state:', user);
-    if (user) {
-      console.log('🔍 Admin check details:', {
-        isAdmin: user.isAdmin,
-        role: user.role,
-        email: user.email
-      });
-    }
-  }, [user]);
+  const handlePersonalitySelect = (personality: Personality) => {
+    setSelectedPersonality(personality);
+    setShowPersonalitySelector(false);
+    // Clear messages when switching personality to provide fresh context
+    setMessages([]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +91,8 @@ export default function CleanSpiritualInterface() {
           language: 'English',
           include_citations: true,
           voice_enabled: false,
-          conversation_context: recentMessages
+          conversation_context: recentMessages,
+          personality_id: selectedPersonality.id
         })
       });
 
@@ -128,25 +149,22 @@ export default function CleanSpiritualInterface() {
           </div>
         </div>
         
-        {/* Tab Navigation */}
-        <div className="tab-navigation">
-          <button
-            className={`tab-btn ${activeTab === 'guidance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('guidance')}
+        {/* Personality Selector Toggle */}
+        <div className="personality-header">
+          <div className="current-personality">
+            <span className="personality-name">{selectedPersonality.display_name}</span>
+            <span className="personality-domain">{selectedPersonality.domain}</span>
+          </div>
+          <button 
+            className="personality-toggle-btn"
+            onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
+            title="Change Personality"
           >
-            <MessageSquare size={18} />
-            <span>Guidance</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+            </svg>
           </button>
-          
-          {user?.isAdmin && (
-            <button
-              className={`tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('admin')}
-            >
-              <Shield size={18} />
-              <span>Admin</span>
-            </button>
-          )}
         </div>
         
         <button
@@ -157,13 +175,25 @@ export default function CleanSpiritualInterface() {
         </button>
       </header>
 
-      {/* Content based on active tab */}
-      {activeTab === 'admin' && user?.isAdmin ? (
-        <AdminDashboard />
-      ) : (
-        <>
-          {/* Welcome Section */}
-          {messages.length === 0 && (
+      {/* Personality Selector Modal */}
+      {showPersonalitySelector && (
+        <div className="personality-selector-overlay">
+          <div className="personality-selector-modal">
+            <PersonalitySelector onPersonalitySelect={handlePersonalitySelect} />
+            <button 
+              className="close-personality-selector"
+              onClick={() => setShowPersonalitySelector(false)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <>
+        {/* Welcome Section */}
+        {messages.length === 0 && (
             <div className="welcome">
               <div className="welcome-icon">🏵️</div>
               <h2>Welcome to Your Spiritual Journey</h2>
@@ -239,8 +269,7 @@ export default function CleanSpiritualInterface() {
           <Send size={16} />
         </button>
       </form>
-        </>
-      )}
+      </>
     </div>
   );
 }

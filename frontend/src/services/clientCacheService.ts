@@ -125,11 +125,11 @@ class ClientCacheService {
   clearPersonality(personalityId: string): void {
     const keysToDelete: string[] = [];
     
-    for (const [key, entry] of this.cache.entries()) {
+    Array.from(this.cache.entries()).forEach(([key, entry]) => {
       if (entry.personalityId === personalityId) {
         keysToDelete.push(key);
       }
-    }
+    });
     
     keysToDelete.forEach(key => this.cache.delete(key));
     this.updateMetrics();
@@ -148,7 +148,7 @@ class ClientCacheService {
   getPersonalityStats(): Record<string, { entries: number; size: number }> {
     const stats: Record<string, { entries: number; size: number }> = {};
     
-    for (const [key, entry] of this.cache.entries()) {
+    Array.from(this.cache.entries()).forEach(([key, entry]) => {
       if (entry.personalityId) {
         if (!stats[entry.personalityId]) {
           stats[entry.personalityId] = { entries: 0, size: 0 };
@@ -156,7 +156,7 @@ class ClientCacheService {
         stats[entry.personalityId].entries++;
         stats[entry.personalityId].size += this.estimateSize(entry.data);
       }
-    }
+    });
     
     return stats;
   }
@@ -328,13 +328,13 @@ class ClientCacheService {
     const keysToDelete: string[] = [];
     
     // Remove expired entries
-    for (const [key, entry] of this.cache.entries()) {
+    Array.from(this.cache.entries()).forEach(([key, entry]) => {
       if (now - entry.timestamp > entry.ttl) {
         keysToDelete.push(key);
         memoryFreed += this.estimateSize(entry.data);
         cleaned++;
       }
-    }
+    });
     
     keysToDelete.forEach(key => this.cache.delete(key));
     

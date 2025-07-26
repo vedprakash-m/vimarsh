@@ -281,7 +281,8 @@ const SpiritualGuidanceInterface: React.FC = () => {
     Object.entries(pronunciationGuide).forEach(([term, guide]) => {
       const regex = new RegExp(`\\b${term}\\b`, 'gi');
       // For TTS, we can use phonetic representations
-      processedText = processedText.replace(regex, guide.phonetic);
+      const guideObj = guide as { phonetic: string };
+      processedText = processedText.replace(regex, guideObj.phonetic);
     });
     
     return processedText;

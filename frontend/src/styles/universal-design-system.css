@@ -1,0 +1,325 @@
+/* =============================================================================
+   VIMARSH UNIVERSAL DESIGN SYSTEM - MULTI-DOMAIN WISDOM PLATFORM
+   ============================================================================= */
+
+/* Universal Color Palette - Representing All Domains */
+:root {
+  /* Primary Brand Colors */
+  --wisdom-primary: #2563EB;      /* Deep Blue - Universal wisdom */
+  --wisdom-secondary: #F59E0B;    /* Golden - Enlightenment */
+  --wisdom-accent: #7C3AED;       /* Purple - Philosophy */
+  
+  /* Domain-Specific Colors */
+  --spiritual-saffron: #FF9933;   /* Spiritual - Sacred traditions */
+  --scientific-cyan: #06B6D4;     /* Scientific - Discovery */
+  --historical-emerald: #059669;  /* Historical - Legacy */
+  --philosophical-violet: #8B5CF6; /* Philosophical - Contemplation */
+  
+  /* Neutral Foundation */
+  --wisdom-white: #FEFEFE;
+  --wisdom-gray-50: #F9FAFB;
+  --wisdom-gray-100: #F3F4F6;
+  --wisdom-gray-200: #E5E7EB;
+  --wisdom-gray-300: #D1D5DB;
+  --wisdom-gray-400: #9CA3AF;
+  --wisdom-gray-500: #6B7280;
+  --wisdom-gray-600: #4B5563;
+  --wisdom-gray-700: #374151;
+  --wisdom-gray-800: #1F2937;
+  --wisdom-gray-900: #111827;
+  
+  /* Typography Scale */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Crimson Text', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Spacing Scale (8px base) */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;  /* 6px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--wisdom-primary), var(--wisdom-secondary));
+  --gradient-wisdom: linear-gradient(135deg, var(--wisdom-primary), var(--wisdom-accent));
+  --gradient-domains: linear-gradient(90deg, 
+    var(--spiritual-saffron) 0%, 
+    var(--scientific-cyan) 25%, 
+    var(--historical-emerald) 50%, 
+    var(--philosophical-violet) 75%);
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  color: var(--wisdom-gray-800);
+  background: var(--wisdom-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography System */
+.text-display-xl {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.text-display-lg {
+  font-family: var(--font-display);
+  font-size: 3.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.text-display-md {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.text-heading-xl {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.text-heading-lg {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.text-heading-md {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.text-heading-sm {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.375;
+}
+
+.text-body-lg {
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
+.text-body-md {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.text-body-sm {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+}
+
+/* Color Utilities */
+.text-primary { color: var(--wisdom-primary); }
+.text-secondary { color: var(--wisdom-secondary); }
+.text-accent { color: var(--wisdom-accent); }
+.text-spiritual { color: var(--spiritual-saffron); }
+.text-scientific { color: var(--scientific-cyan); }
+.text-historical { color: var(--historical-emerald); }
+.text-philosophical { color: var(--philosophical-violet); }
+
+/* Background Utilities */
+.bg-primary { background-color: var(--wisdom-primary); }
+.bg-secondary { background-color: var(--wisdom-secondary); }
+.bg-accent { background-color: var(--wisdom-accent); }
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-wisdom { background: var(--gradient-wisdom); }
+.bg-gradient-domains { background: var(--gradient-domains); }
+
+/* Component Base Classes */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--gradient-wisdom);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: var(--wisdom-white);
+  color: var(--wisdom-primary);
+  border: 2px solid var(--wisdom-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--wisdom-primary);
+  color: white;
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: 1.125rem;
+  border-radius: var(--radius-xl);
+}
+
+/* Card Component */
+.card {
+  background: var(--wisdom-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Domain-specific card variants */
+.card-spiritual {
+  border-left: 4px solid var(--spiritual-saffron);
+}
+
+.card-scientific {
+  border-left: 4px solid var(--scientific-cyan);
+}
+
+.card-historical {
+  border-left: 4px solid var(--historical-emerald);
+}
+
+.card-philosophical {
+  border-left: 4px solid var(--philosophical-violet);
+}
+
+/* Layout Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.container-lg {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.section {
+  padding: var(--space-20) 0;
+}
+
+.section-lg {
+  padding: var(--space-24) 0;
+}
+
+/* Grid System */
+.grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 768px) {
+  .grid-cols-2 { grid-template-columns: 1fr; }
+  .grid-cols-3 { grid-template-columns: 1fr; }
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .grid-cols-4 { grid-template-columns: 1fr; }
+}
+
+/* Flex Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.text-center { text-align: center; }
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .text-display-xl { font-size: 3.5rem; }
+  .text-display-lg { font-size: 3rem; }
+  .text-display-md { font-size: 2.5rem; }
+  .text-heading-xl { font-size: 2rem; }
+  .text-heading-lg { font-size: 1.75rem; }
+}
+
+@media (max-width: 480px) {
+  .text-display-xl { font-size: 2.5rem; }
+  .text-display-lg { font-size: 2.25rem; }
+  .text-display-md { font-size: 2rem; }
+  .text-heading-xl { font-size: 1.75rem; }
+  .text-heading-lg { font-size: 1.5rem; }
+}
