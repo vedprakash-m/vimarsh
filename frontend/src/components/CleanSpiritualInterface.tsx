@@ -142,6 +142,23 @@ export default function CleanSpiritualInterface() {
     }
   };
 
+  // Generate domain-appropriate placeholder text
+  const getPlaceholderText = () => {
+    if (!selectedPersonality) {
+      return "Please choose a guide first...";
+    }
+    
+    const domainPlaceholders = {
+      spiritual: "Ask your spiritual question...",
+      scientific: "Ask your scientific question...",
+      historical: "Ask your historical question...", 
+      philosophical: "Ask your philosophical question...",
+      literary: "Ask your literary question..."
+    };
+    
+    return domainPlaceholders[selectedPersonality.domain as keyof typeof domainPlaceholders] || "Ask your question...";
+  };
+
   // Dynamic quick prompts based on selected personality domain
   const getQuickPrompts = () => {
     if (!selectedPersonality) {
@@ -596,7 +613,7 @@ export default function CleanSpiritualInterface() {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={selectedPersonality ? "Ask your spiritual question..." : "Please choose a spiritual guide first..."}
+            placeholder={getPlaceholderText()}
             disabled={!selectedPersonality}
             style={{
               flex: '1',
