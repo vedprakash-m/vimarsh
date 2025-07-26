@@ -28,3 +28,6 @@ structlog==23.2.0
 
 # Text Processing (lightweight)
 beautifulsoup4==4.12.2
+
+# Voice Interface (for tests)
+numpy==1.24.3
