@@ -39,7 +39,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
   // Domain styling that matches landing page aesthetics
   const getDomainStyle = (domain: string) => {
     const styles = {
-      spiritual: { icon: '🕉️', color: '#7c3aed', label: 'Spiritual Guidance' },
+      spiritual: { icon: '🕉️', color: '#7c3aed', label: 'Spiritual' },
       scientific: { icon: '🔬', color: '#2563eb', label: 'Scientific' },
       historical: { icon: '📜', color: '#dc2626', label: 'Historical' },
       philosophical: { icon: '🤔', color: '#ea580c', label: 'Philosophical' },
