@@ -6,6 +6,20 @@ python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 
+# Exclude disabled test directories and files
+norecursedirs = [
+    "voice_interface_disabled",
+    "*_disabled",
+    "*.disabled"
+]
+
+# Ignore patterns to exclude disabled tests
+collect_ignore = [
+    "tests/voice_interface_disabled",
+    "tests/*_disabled",
+    "tests/*.disabled"
+]
+
 # Markers for test categorization
 markers = [
     "unit: Unit tests for individual components",
