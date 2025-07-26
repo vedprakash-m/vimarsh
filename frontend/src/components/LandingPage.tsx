@@ -246,8 +246,8 @@ const LandingPage: React.FC = () => {
         {/* Stats */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '2rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '1.5rem',
           marginTop: '4rem',
           padding: '2rem',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -381,16 +381,84 @@ const LandingPage: React.FC = () => {
                   border: `1px solid ${selectedPersonality.color}40`
                 }}>
                   {selectedPersonality.id === 'krishna' && 
-                    "In the midst of chaos, remember that you are not the body, nor the mind, but the eternal soul. As I taught Arjuna, perform your duty without attachment to results, and you shall find the peace that surpasses all understanding."
+                    <>
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        "In the midst of chaos, remember that you are not the body, nor the mind, but the eternal soul. As I taught Arjuna, perform your duty without attachment to results, and you shall find the peace that surpasses all understanding."
+                      </div>
+                      <div style={{
+                        fontSize: '0.8rem',
+                        opacity: 0.7,
+                        fontStyle: 'italic',
+                        borderTop: `1px solid ${selectedPersonality.color}30`,
+                        paddingTop: '0.5rem'
+                      }}>
+                        Source: Bhagavad Gita 2.47, 6.29 - "You have a right to perform your prescribed duty, but not to the fruits of action"
+                      </div>
+                    </>
+                  }
+                  {selectedPersonality.id === 'buddha' && 
+                    <>
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        "Peace comes from within. Do not seek it without. The root of suffering is attachment - to outcomes, to desires, to the illusion of permanence. When you accept that all things are impermanent and release your grip on expectations, you will find the peace that surpasses understanding."
+                      </div>
+                      <div style={{
+                        fontSize: '0.8rem',
+                        opacity: 0.7,
+                        fontStyle: 'italic',
+                        borderTop: `1px solid ${selectedPersonality.color}30`,
+                        paddingTop: '0.5rem'
+                      }}>
+                        Source: Dhammapada 1.1, Four Noble Truths - "All that we are is the result of what we have thought"
+                      </div>
+                    </>
                   }
                   {selectedPersonality.id === 'einstein' && 
-                    "In times of difficulty, I find solace in the eternal laws of nature. The universe operates on principles of harmony and order. When we align our understanding with these cosmic truths, we find a peace that transcends temporary troubles."
+                    <>
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        "In times of difficulty, I find solace in the eternal laws of nature. The universe operates on principles of harmony and order. When we align our understanding with these cosmic truths, we find a peace that transcends temporary troubles."
+                      </div>
+                      <div style={{
+                        fontSize: '0.8rem',
+                        opacity: 0.7,
+                        fontStyle: 'italic',
+                        borderTop: `1px solid ${selectedPersonality.color}30`,
+                        paddingTop: '0.5rem'
+                      }}>
+                        Source: "The World As I See It" (1930) - "A human being is part of the whole called by us universe"
+                      </div>
+                    </>
                   }
                   {selectedPersonality.id === 'lincoln' && 
-                    "I have learned that in our darkest hours, we must hold fast to the better angels of our nature. A house divided cannot stand, and neither can the human spirit when it wars against itself. Seek unity within, and peace will follow."
+                    <>
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        "I have learned that in our darkest hours, we must hold fast to the better angels of our nature. A house divided cannot stand, and neither can the human spirit when it wars against itself. Seek unity within, and peace will follow."
+                      </div>
+                      <div style={{
+                        fontSize: '0.8rem',
+                        opacity: 0.7,
+                        fontStyle: 'italic',
+                        borderTop: `1px solid ${selectedPersonality.color}30`,
+                        paddingTop: '0.5rem'
+                      }}>
+                        Source: First Inaugural Address (1861), House Divided Speech (1858) - "The better angels of our nature"
+                      </div>
+                    </>
                   }
                   {selectedPersonality.id === 'aurelius' && 
-                    "Remember, you have power over your mind - not outside events. Realize this, and you will find strength. What disturbs people's minds is not events but their judgments about events. Change your perspective, and find your peace."
+                    <>
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        "Remember, you have power over your mind - not outside events. Realize this, and you will find strength. What disturbs people's minds is not events but their judgments about events. Change your perspective, and find your peace."
+                      </div>
+                      <div style={{
+                        fontSize: '0.8rem',
+                        opacity: 0.7,
+                        fontStyle: 'italic',
+                        borderTop: `1px solid ${selectedPersonality.color}30`,
+                        paddingTop: '0.5rem'
+                      }}>
+                        Source: Meditations Book 2.11, 11.18 - "You have power over your mind - not outside events"
+                      </div>
+                    </>
                   }
                 </div>
               </div>
@@ -514,8 +582,8 @@ const LandingPage: React.FC = () => {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '2rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '1.5rem'
           }}>
             <div style={{
               background: 'rgba(255, 255, 255, 0.1)',
