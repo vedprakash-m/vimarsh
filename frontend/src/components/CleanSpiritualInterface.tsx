@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Send, Mic, MicOff, MessageSquare, Users } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
+import { usePersonality, Personality } from '../contexts/PersonalityContext';
 import { getApiBaseUrl } from '../config/environment';
 import '../styles/spiritual-theme.css';
 
@@ -13,41 +14,28 @@ interface Message {
   personality?: string;
 }
 
-interface Personality {
-  id: string;
-  name: string;
-  display_name: string;
-  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'political';
-  time_period: string;
-  description: string;
-  expertise_areas: string[];
-  cultural_context: string;
-  quality_score: number;
-  usage_count: number;
-  is_active: boolean;
-  tags: string[];
-}
-
 export default function CleanSpiritualInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
-  const [selectedPersonality, setSelectedPersonality] = useState<Personality>({
-    id: 'krishna',
-    name: 'Krishna',
-    display_name: 'Lord Krishna',
-    domain: 'spiritual',
-    time_period: 'Ancient India',
-    description: 'Divine teacher and guide from the Bhagavad Gita',
-    expertise_areas: ['dharma', 'karma', 'devotion'],
-    cultural_context: 'Hindu tradition',
-    quality_score: 95.0,
-    usage_count: 1000,
-    is_active: true,
-    tags: ['spiritual', 'hindu', 'bhagavad-gita']
-  });
+  
+  // Use PersonalityContext instead of local state
+  const { 
+    selectedPersonality, 
+    setSelectedPersonality, 
+    availablePersonalities, 
+    personalityLoading,
+    loadPersonalities 
+  } = usePersonality();
+
+  // Load personalities on component mount if not already loaded
+  useEffect(() => {
+    if (availablePersonalities.length === 0 && !personalityLoading) {
+      loadPersonalities();
+    }
+  }, [availablePersonalities.length, personalityLoading, loadPersonalities]);
 
   const handlePersonalitySelect = (personality: Personality) => {
     setSelectedPersonality(personality);
@@ -58,7 +46,7 @@ export default function CleanSpiritualInterface() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || isLoading) return;
+    if (!inputText.trim() || isLoading || !selectedPersonality) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -152,13 +140,18 @@ export default function CleanSpiritualInterface() {
         {/* Personality Selector Toggle */}
         <div className="personality-header">
           <div className="current-personality">
-            <span className="personality-name">{selectedPersonality.display_name}</span>
-            <span className="personality-domain">{selectedPersonality.domain}</span>
+            <span className="personality-name">
+              {selectedPersonality?.display_name || 'Loading...'}
+            </span>
+            <span className="personality-domain">
+              {selectedPersonality?.domain || 'spiritual'}
+            </span>
           </div>
           <button 
             className="personality-toggle-btn"
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
             title="Change Personality"
+            disabled={!selectedPersonality}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="3"/>
@@ -179,10 +172,42 @@ export default function CleanSpiritualInterface() {
       {showPersonalitySelector && (
         <div className="personality-selector-overlay">
           <div className="personality-selector-modal">
-            <PersonalitySelector onPersonalitySelect={handlePersonalitySelect} />
+            {/* Temporarily simplified selector */}
+            <div style={{ padding: '20px', background: 'white', borderRadius: '8px' }}>
+              <h3>Select Personality</h3>
+              <div style={{ display: 'grid', gap: '10px', marginTop: '15px' }}>
+                {availablePersonalities.map((personality) => (
+                  <button
+                    key={personality.id}
+                    onClick={() => handlePersonalitySelect(personality)}
+                    style={{
+                      padding: '10px',
+                      border: selectedPersonality?.id === personality.id ? '2px solid #007bff' : '1px solid #ccc',
+                      background: selectedPersonality?.id === personality.id ? '#f0f8ff' : 'white',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <div style={{ fontWeight: 'bold' }}>{personality.display_name}</div>
+                    <div style={{ fontSize: '0.9em', color: '#666' }}>{personality.description}</div>
+                    <div style={{ fontSize: '0.8em', color: '#888' }}>{personality.domain}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
             <button 
               className="close-personality-selector"
               onClick={() => setShowPersonalitySelector(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer'
+              }}
             >
               ×
             </button>
