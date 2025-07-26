@@ -1,0 +1,341 @@
+/* ========================= */
+/* RATIONAL CLARITY THEME   */
+/* For Einstein (Scientific Domain) */
+/* ========================= */
+
+:root {
+  /* Scientific Domain Color Palette */
+  --scientific-blue: #0066CC;
+  --scientific-blue-light: #3399FF;
+  --scientific-blue-dark: #003D7A;
+  --research-gray: #4B5563;
+  --research-gray-light: #6B7280;
+  --precision-white: #FFFFFF;
+  --lab-silver: #F8FAFC;
+  --equation-black: #1F2937;
+  --discovery-teal: #14B8A6;
+  --nobel-gold: #F59E0B;
+  --shadow-precise: rgba(0, 102, 204, 0.1);
+  --shadow-analytical: rgba(0, 102, 204, 0.2);
+  --gradient-scientific: linear-gradient(135deg, #f8fafc 0%, #e1f5fe 50%, #f0f8ff 100%);
+}
+
+/* Scientific Theme Body */
+body.scientific-theme {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--gradient-scientific);
+  color: var(--equation-black);
+  letter-spacing: 0.02em;
+}
+
+/* Scientific Header */
+.scientific-theme .spiritual-header {
+  background: linear-gradient(135deg, var(--scientific-blue) 0%, var(--scientific-blue-dark) 100%);
+  color: var(--precision-white);
+  border-bottom: 3px solid var(--discovery-teal);
+}
+
+.scientific-theme .spiritual-header h1 {
+  color: var(--precision-white);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* Scientific Chat Interface */
+.scientific-theme .clean-spiritual-interface {
+  background: var(--precision-white);
+  border: 2px solid var(--scientific-blue-light);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px var(--shadow-precise);
+}
+
+/* Scientific Messages */
+.scientific-theme .user-message {
+  background: linear-gradient(135deg, var(--lab-silver) 0%, var(--precision-white) 100%);
+  border-left: 4px solid var(--scientific-blue);
+  color: var(--equation-black);
+}
+
+.scientific-theme .assistant-message {
+  background: linear-gradient(135deg, var(--scientific-blue-light) 0%, var(--discovery-teal) 100%);
+  color: var(--precision-white);
+  border-radius: 16px;
+}
+
+.scientific-theme .assistant-message strong {
+  color: var(--nobel-gold);
+  font-weight: 600;
+}
+
+/* Scientific Input */
+.scientific-theme .input-container {
+  border: 2px solid var(--scientific-blue-light);
+  border-radius: 12px;
+  background: var(--precision-white);
+}
+
+.scientific-theme .spiritual-input {
+  color: var(--equation-black);
+  font-family: 'Inter', monospace;
+}
+
+.scientific-theme .send-button {
+  background: linear-gradient(135deg, var(--scientific-blue) 0%, var(--discovery-teal) 100%);
+  color: var(--precision-white);
+}
+
+.scientific-theme .send-button:hover {
+  background: linear-gradient(135deg, var(--scientific-blue-dark) 0%, var(--discovery-teal) 100%);
+  transform: translateY(-1px);
+}
+
+/* Scientific Citations */
+.scientific-theme .citation {
+  background: var(--lab-silver);
+  border-left: 3px solid var(--nobel-gold);
+  color: var(--research-gray);
+  font-family: 'Inter', monospace;
+  font-size: 0.9rem;
+}
+
+/* Scientific Loading */
+.scientific-theme .loading-indicator {
+  color: var(--scientific-blue);
+}
+
+/* Scientific Personality Selector */
+.scientific-theme .personality-selector {
+  background: var(--precision-white);
+  border: 2px solid var(--scientific-blue-light);
+}
+
+.scientific-theme .personality-card.selected {
+  background: linear-gradient(135deg, var(--scientific-blue-light) 0%, var(--discovery-teal) 100%);
+  border-color: var(--nobel-gold);
+  color: var(--precision-white);
+}
+
+/* ========================= */
+/* TIMELESS AUTHORITY THEME */
+/* For Lincoln (Historical Domain) */
+/* ========================= */
+
+:root {
+  /* Historical Domain Color Palette */
+  --presidential-navy: #1E3A5F;
+  --presidential-navy-light: #2563EB;
+  --presidential-navy-dark: #1E40AF;
+  --constitutional-red: #DC2626;
+  --constitutional-red-light: #EF4444;
+  --parchment-cream: #FEF7ED;
+  --parchment-white: #FFFEF7;
+  --ink-black: #1F2937;
+  --heritage-brown: #92400E;
+  --liberty-gold: #D97706;
+  --union-blue: #1D4ED8;
+  --shadow-historic: rgba(30, 58, 95, 0.1);
+  --shadow-memorial: rgba(30, 58, 95, 0.2);
+  --gradient-historical: linear-gradient(135deg, #fef7ed 0%, #f0f4f8 50%, #e6f2ff 100%);
+}
+
+/* Historical Theme Body */
+body.historical-theme {
+  font-family: 'Crimson Text', 'Times New Roman', serif;
+  background: var(--gradient-historical);
+  color: var(--ink-black);
+  line-height: 1.7;
+}
+
+/* Historical Header */
+.historical-theme .spiritual-header {
+  background: linear-gradient(135deg, var(--presidential-navy) 0%, var(--presidential-navy-dark) 100%);
+  color: var(--parchment-white);
+  border-bottom: 3px solid var(--liberty-gold);
+  font-family: 'Crimson Text', serif;
+}
+
+.historical-theme .spiritual-header h1 {
+  color: var(--parchment-white);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  font-family: 'Crimson Text', serif;
+}
+
+/* Historical Chat Interface */
+.historical-theme .clean-spiritual-interface {
+  background: var(--parchment-white);
+  border: 2px solid var(--heritage-brown);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px var(--shadow-historic);
+}
+
+/* Historical Messages */
+.historical-theme .user-message {
+  background: linear-gradient(135deg, var(--parchment-cream) 0%, var(--parchment-white) 100%);
+  border-left: 4px solid var(--constitutional-red);
+  color: var(--ink-black);
+  font-family: 'Crimson Text', serif;
+}
+
+.historical-theme .assistant-message {
+  background: linear-gradient(135deg, var(--presidential-navy) 0%, var(--union-blue) 100%);
+  color: var(--parchment-white);
+  border-radius: 12px;
+  font-family: 'Crimson Text', serif;
+}
+
+.historical-theme .assistant-message strong {
+  color: var(--liberty-gold);
+  font-weight: 600;
+}
+
+/* Historical Input */
+.historical-theme .input-container {
+  border: 2px solid var(--heritage-brown);
+  border-radius: 8px;
+  background: var(--parchment-white);
+}
+
+.historical-theme .spiritual-input {
+  color: var(--ink-black);
+  font-family: 'Crimson Text', serif;
+}
+
+.historical-theme .send-button {
+  background: linear-gradient(135deg, var(--constitutional-red) 0%, var(--constitutional-red-light) 100%);
+  color: var(--parchment-white);
+}
+
+.historical-theme .send-button:hover {
+  background: linear-gradient(135deg, var(--constitutional-red-light) 0%, var(--liberty-gold) 100%);
+  transform: translateY(-1px);
+}
+
+/* Historical Citations */
+.historical-theme .citation {
+  background: var(--parchment-cream);
+  border-left: 3px solid var(--liberty-gold);
+  color: var(--heritage-brown);
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+}
+
+/* ========================= */
+/* CONTEMPLATIVE WISDOM THEME */
+/* For Philosophical Personalities (Marcus Aurelius, Lao Tzu, Rumi) */
+/* ========================= */
+
+:root {
+  /* Philosophical Domain Color Palette */
+  --wisdom-purple: #7C3AED;
+  --wisdom-purple-light: #A855F7;
+  --wisdom-purple-dark: #5B21B6;
+  --meditation-indigo: #4F46E5;
+  --meditation-indigo-light: #6366F1;
+  --contemplation-gray: #6B7280;
+  --parchment-beige: #F7F4E9;
+  --sage-white: #FEFCF5;
+  --thought-black: #374151;
+  --insight-amber: #F59E0B;
+  --zen-teal: #14B8A6;
+  --mystical-rose: #EC4899;
+  --shadow-contemplative: rgba(124, 58, 237, 0.1);
+  --shadow-meditative: rgba(124, 58, 237, 0.2);
+  --gradient-philosophical: linear-gradient(135deg, #fefcf5 0%, #f7f4e9 50%, #f3f4f6 100%);
+}
+
+/* Philosophical Theme Body */
+body.philosophical-theme {
+  font-family: 'Crimson Text', 'Georgia', serif;
+  background: var(--gradient-philosophical);
+  color: var(--thought-black);
+  line-height: 1.8;
+}
+
+/* Philosophical Header */
+.philosophical-theme .spiritual-header {
+  background: linear-gradient(135deg, var(--wisdom-purple) 0%, var(--meditation-indigo) 100%);
+  color: var(--sage-white);
+  border-bottom: 3px solid var(--insight-amber);
+  font-family: 'Crimson Text', serif;
+}
+
+.philosophical-theme .spiritual-header h1 {
+  color: var(--sage-white);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  font-family: 'Crimson Text', serif;
+}
+
+/* Philosophical Chat Interface */
+.philosophical-theme .clean-spiritual-interface {
+  background: var(--sage-white);
+  border: 2px solid var(--wisdom-purple-light);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow-contemplative);
+}
+
+/* Philosophical Messages */
+.philosophical-theme .user-message {
+  background: linear-gradient(135deg, var(--parchment-beige) 0%, var(--sage-white) 100%);
+  border-left: 4px solid var(--zen-teal);
+  color: var(--thought-black);
+  font-family: 'Crimson Text', serif;
+}
+
+.philosophical-theme .assistant-message {
+  background: linear-gradient(135deg, var(--wisdom-purple) 0%, var(--meditation-indigo) 100%);
+  color: var(--sage-white);
+  border-radius: 20px;
+  font-family: 'Crimson Text', serif;
+}
+
+.philosophical-theme .assistant-message strong {
+  color: var(--insight-amber);
+  font-weight: 600;
+}
+
+/* Philosophical Input */
+.philosophical-theme .input-container {
+  border: 2px solid var(--wisdom-purple-light);
+  border-radius: 16px;
+  background: var(--sage-white);
+}
+
+.philosophical-theme .spiritual-input {
+  color: var(--thought-black);
+  font-family: 'Crimson Text', serif;
+}
+
+.philosophical-theme .send-button {
+  background: linear-gradient(135deg, var(--wisdom-purple) 0%, var(--zen-teal) 100%);
+  color: var(--sage-white);
+}
+
+.philosophical-theme .send-button:hover {
+  background: linear-gradient(135deg, var(--wisdom-purple-dark) 0%, var(--mystical-rose) 100%);
+  transform: translateY(-1px);
+}
+
+/* Philosophical Citations */
+.philosophical-theme .citation {
+  background: var(--parchment-beige);
+  border-left: 3px solid var(--insight-amber);
+  color: var(--contemplation-gray);
+  font-family: 'Crimson Text', serif;
+  font-style: italic;
+}
+
+/* Theme Switching Animation */
+body {
+  transition: all 0.3s ease-in-out;
+}
+
+.spiritual-header,
+.clean-spiritual-interface,
+.user-message,
+.assistant-message,
+.input-container,
+.send-button {
+  transition: all 0.3s ease-in-out;
+}

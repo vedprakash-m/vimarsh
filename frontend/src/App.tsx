@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MsalProvider } from '@azure/msal-react';
 import { PublicClientApplication } from '@azure/msal-browser';
 import './styles/spiritual-design-system.css';
+import './styles/domain-themes.css';
 
 // Lazy load main components for better bundle splitting
 const LandingPage = lazy(() => import('./components/LandingPage'));
@@ -11,9 +12,11 @@ const CleanSpiritualInterface = lazy(() => import('./components/CleanSpiritualIn
 // Keep lightweight components as regular imports
 import AuthCallback from './components/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
+import { DomainThemeManager } from './components/DomainThemeManager';
 
 // Context Providers
 import { LanguageProvider } from './contexts/LanguageContext';
+import { PersonalityProvider } from './contexts/PersonalityContext';
 import { AuthProvider } from './auth/AuthProvider';
 
 // MSAL Configuration
@@ -82,7 +85,9 @@ function App() {
     <div className="App">
       <MsalProvider instance={msalInstance}>
         <AuthProvider>
-          <LanguageProvider>
+          <PersonalityProvider>
+            <LanguageProvider>
+              <DomainThemeManager />
               <Router>
                 <Suspense fallback={<SpiritualLoadingSpinner />}>
                   <Routes>
@@ -107,7 +112,8 @@ function App() {
                 </Routes>
               </Suspense>
             </Router>
-        </LanguageProvider>
+          </LanguageProvider>
+        </PersonalityProvider>
       </AuthProvider>
     </MsalProvider>
     </div>

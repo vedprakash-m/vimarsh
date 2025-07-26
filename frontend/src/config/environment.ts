@@ -91,10 +91,10 @@ export const isValidProduction = (): boolean => {
 
 // Entra ID Configuration for Vedprakash Domain - Multi-Domain Support
 export const ENTRA_ID_CONFIG = {
-  tenantId: 'common', // Allow both personal and work accounts
+  tenantId: process.env.REACT_APP_TENANT_ID || 'common', // Allow both personal and work/school accounts
   authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/common',
-  clientId: process.env.REACT_APP_CLIENT_ID || 'e4bd74b8-9a82-40c6-8d52-3e231733095e', // Vimarsh app registration
-  scopes: ['openid', 'profile', 'email', 'api://3cdae009-79cd-42cc-a0e0-2b1e9e464c2d/.default'],
+  clientId: process.env.REACT_APP_CLIENT_ID || 'your-vimarsh-entra-client-id', // Vimarsh app registration
+  scopes: ['openid', 'profile', 'email', 'User.Read'],
 };
 
 // Environment-aware configuration

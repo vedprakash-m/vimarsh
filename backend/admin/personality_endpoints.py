@@ -17,7 +17,7 @@ import azure.functions as func
 
 # Import services
 try:
-    from backend.services.personality_service import (
+    from services.personality_service import (
         personality_service,
         PersonalityProfile,
         PersonalityDomain,
@@ -25,8 +25,8 @@ try:
         PersonalitySearchFilter,
         PersonalityValidationResult
     )
-    from backend.auth.unified_auth_service import require_auth, get_current_user
-    from backend.core.error_handling import handle_api_error, APIError
+    from auth.unified_auth_service import require_auth, get_current_user
+    from core.error_handling import handle_api_error, APIError
     SERVICES_AVAILABLE = True
 except ImportError as e:
     logging.warning(f"Service imports failed: {e}")

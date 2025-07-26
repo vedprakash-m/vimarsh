@@ -10,10 +10,10 @@ interface ProtectedRouteProps {
 /**
  * ProtectedRoute Component
  * Ensures user is authenticated via centralized AuthProvider before accessing protected content
- * Redirects to landing page if unauthenticated
+ * Redirects to landing page if unauthenticated or unauthorized
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, account } = useAuth();
   const location = useLocation();
 
   // Show loading while authentication state is being determined
@@ -36,8 +36,43 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  // TODO: Add admin role checking when requireAdmin is true
-  // For now, just allow access if authenticated
+  // Check admin requirements
+  if (requireAdmin) {
+    const userEmail = account?.username || account?.name || '';
+    const isAdmin = userEmail.includes('admin') || userEmail.includes('vedprakash@outlook.com');
+    
+    if (!isAdmin) {
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          fontSize: '16px',
+          textAlign: 'center',
+          padding: '20px'
+        }}>
+          <h2>Access Denied</h2>
+          <p>You need administrator privileges to access this page.</p>
+          <button 
+            onClick={() => window.history.back()}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              background: '#FF6B35',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Go Back
+          </button>
+        </div>
+      );
+    }
+  }
   
   return <>{children}</>;
 };

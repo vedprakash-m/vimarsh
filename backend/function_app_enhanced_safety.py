@@ -1,6 +1,6 @@
 """
-Multi-personality Azure Functions application for Vimarsh spiritual guidance platform.
-Enhanced with comprehensive safety and content filtering systems for each personality.
+Enhanced Multi-personality Azure Functions application for Vimarsh spiritual guidance platform.
+Includes comprehensive safety and content filtering systems tailored for each personality.
 """
 
 import azure.functions as func
@@ -48,6 +48,24 @@ class PersonalitySafetyConfig:
     blocked_patterns: List[str]
     required_tone_indicators: List[str]
     reverent_language_required: bool
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "personality_id": self.personality_id,
+            "domain": self.domain.value,
+            "safety_level": self.safety_level.value,
+            "max_response_length": self.max_response_length,
+            "require_citations": self.require_citations,
+            "block_medical_advice": self.block_medical_advice,
+            "block_legal_advice": self.block_legal_advice,
+            "block_financial_advice": self.block_financial_advice,
+            "block_personal_predictions": self.block_personal_predictions,
+            "require_appropriate_tone": self.require_appropriate_tone,
+            "allowed_greetings": self.allowed_greetings,
+            "blocked_patterns": self.blocked_patterns,
+            "required_tone_indicators": self.required_tone_indicators,
+            "reverent_language_required": self.reverent_language_required
+        }
 
 @dataclass
 class SafetyValidationResult:
@@ -85,12 +103,13 @@ PERSONALITY_SAFETY_CONFIGS = {
         required_tone_indicators=["beloved", "dear", "divine", "sacred", "blessed", "spiritual", "dharma"],
         reverent_language_required=True
     ),
+    
     "buddha": PersonalitySafetyConfig(
         personality_id="buddha",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.STRICT,
         max_response_length=150,
-        require_citations=False,
+        require_citations=False,  # Buddha's teachings often don't require textual citations
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
@@ -107,6 +126,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         required_tone_indicators=["compassion", "mindfulness", "peace", "wisdom", "suffering", "path"],
         reverent_language_required=True
     ),
+    
     "jesus": PersonalitySafetyConfig(
         personality_id="jesus",
         domain=PersonalityDomain.SPIRITUAL,
@@ -129,12 +149,13 @@ PERSONALITY_SAFETY_CONFIGS = {
         required_tone_indicators=["love", "compassion", "forgiveness", "grace", "blessed", "faith", "peace"],
         reverent_language_required=True
     ),
+    
     "rumi": PersonalitySafetyConfig(
         personality_id="rumi",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.MODERATE,
         max_response_length=180,
-        require_citations=False,
+        require_citations=False,  # Rumi often speaks from mystical experience
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
@@ -151,12 +172,13 @@ PERSONALITY_SAFETY_CONFIGS = {
         required_tone_indicators=["love", "heart", "soul", "divine", "beauty", "truth", "beloved"],
         reverent_language_required=True
     ),
+    
     "lao_tzu": PersonalitySafetyConfig(
         personality_id="lao_tzu",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.MODERATE,
         max_response_length=150,
-        require_citations=False,
+        require_citations=False,  # Tao Te Ching references are often paraphrased
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
@@ -171,8 +193,9 @@ PERSONALITY_SAFETY_CONFIGS = {
             r"guaranteed success", r"instant harmony"
         ],
         required_tone_indicators=["tao", "way", "harmony", "balance", "nature", "simplicity", "wu wei"],
-        reverent_language_required=False
+        reverent_language_required=False  # Taoist approach is more natural
     ),
+    
     "einstein": PersonalitySafetyConfig(
         personality_id="einstein",
         domain=PersonalityDomain.SCIENTIFIC,
@@ -182,7 +205,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
-        block_personal_predictions=False,
+        block_personal_predictions=False,  # Scientific predictions are acceptable
         require_appropriate_tone=True,
         allowed_greetings=["my friend", "greetings", "hello", "welcome", "dear colleague"],
         blocked_patterns=[
@@ -194,6 +217,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         required_tone_indicators=["curiosity", "wonder", "investigation", "theory", "observation", "science"],
         reverent_language_required=False
     ),
+    
     "lincoln": PersonalitySafetyConfig(
         personality_id="lincoln",
         domain=PersonalityDomain.HISTORICAL,
@@ -201,7 +225,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         max_response_length=200,
         require_citations=True,
         block_medical_advice=True,
-        block_legal_advice=False,
+        block_legal_advice=False,  # Lincoln was a lawyer - legal wisdom is appropriate
         block_financial_advice=True,
         block_personal_predictions=True,
         require_appropriate_tone=True,
@@ -215,6 +239,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         required_tone_indicators=["union", "liberty", "justice", "democracy", "equality", "compassion"],
         reverent_language_required=False
     ),
+    
     "marcus_aurelius": PersonalitySafetyConfig(
         personality_id="marcus_aurelius",
         domain=PersonalityDomain.PHILOSOPHICAL,
@@ -239,6 +264,58 @@ PERSONALITY_SAFETY_CONFIGS = {
     )
 }
 
+# Define the available personalities with their safety configs
+PERSONALITIES = {
+    "krishna": {
+        "name": "Lord Krishna",
+        "domain": "spiritual",
+        "description": "Divine guide offering spiritual wisdom from the Bhagavad Gita",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["krishna"]
+    },
+    "einstein": {
+        "name": "Albert Einstein", 
+        "domain": "scientific",
+        "description": "Brilliant physicist exploring the mysteries of the universe",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["einstein"]
+    },
+    "lincoln": {
+        "name": "Abraham Lincoln",
+        "domain": "historical", 
+        "description": "16th President known for wisdom, leadership, and unity",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["lincoln"]
+    },
+    "marcus_aurelius": {
+        "name": "Marcus Aurelius",
+        "domain": "philosophical",
+        "description": "Roman Emperor and Stoic philosopher",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["marcus_aurelius"]
+    },
+    "buddha": {
+        "name": "Buddha",
+        "domain": "spiritual",
+        "description": "Enlightened teacher of the Middle Way and mindfulness",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["buddha"]
+    },
+    "jesus": {
+        "name": "Jesus Christ", 
+        "domain": "spiritual",
+        "description": "Teacher of love, compassion, and spiritual transformation",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["jesus"]
+    },
+    "rumi": {
+        "name": "Rumi",
+        "domain": "spiritual",
+        "description": "Persian mystic poet of divine love and spiritual union",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["rumi"]
+    },
+    "lao_tzu": {
+        "name": "Lao Tzu",
+        "domain": "spiritual", 
+        "description": "Ancient Chinese philosopher and founder of Taoism",
+        "safety_config": PERSONALITY_SAFETY_CONFIGS["lao_tzu"]
+    }
+}
+
 class SafetyValidator:
     """Comprehensive safety validation system for multi-personality responses"""
     
@@ -248,10 +325,10 @@ class SafetyValidator:
     def validate_response_safety(self, content: str, personality_id: str, query: str) -> SafetyValidationResult:
         """Perform comprehensive safety validation on response content"""
         
-        if personality_id not in PERSONALITY_SAFETY_CONFIGS:
+        if personality_id not in PERSONALITIES:
             personality_id = "krishna"  # Default fallback
         
-        safety_config = PERSONALITY_SAFETY_CONFIGS[personality_id]
+        safety_config = PERSONALITIES[personality_id]["safety_config"]
         warnings = []
         blocked_patterns = []
         
@@ -359,230 +436,204 @@ class SafetyValidator:
         
         # Deduct for safety violations
         if not length_valid:
-            score -= 0.1  # Reduced penalty
+            score -= 0.2
         
         if blocked_patterns:
-            score -= len(blocked_patterns) * 0.2  # Reduced penalty for blocked patterns
+            score -= len(blocked_patterns) * 0.25  # Major deduction for blocked patterns
         
         if not greeting_valid:
-            score -= 0.05  # Reduced penalty
+            score -= 0.1
         
         if not tone_valid:
-            score -= 0.1  # Reduced penalty
+            score -= 0.15
         
-        # Factor in content quality - but give it less weight
-        score = (score * 0.7) + (content_quality_score * 0.3)
+        # Factor in content quality
+        score = score * content_quality_score
         
         return max(0.0, min(1.0, score))
 
 # Initialize safety validator
 safety_validator = SafetyValidator()
 
-# Create the function app
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+def get_personality_response_template(personality_id: str, query: str) -> str:
+    """Get personality-specific response template with safety guidelines"""
+    
+    if personality_id not in PERSONALITIES:
+        personality_id = "krishna"
+    
+    personality = PERSONALITIES[personality_id]
+    safety_config = personality["safety_config"]
+    
+    # Build safety guidelines based on configuration
+    safety_guidelines = []
+    if safety_config.block_medical_advice:
+        safety_guidelines.append("- No medical, health, or treatment advice")
+    if safety_config.block_legal_advice:
+        safety_guidelines.append("- No legal advice or legal action recommendations")
+    if safety_config.block_financial_advice:
+        safety_guidelines.append("- No financial or investment advice")
+    if safety_config.block_personal_predictions:
+        safety_guidelines.append("- No personal predictions about the future")
+    
+    # Personality-specific templates
+    templates = {
+        "krishna": f"""🕉️ **Divine Response as Lord Krishna**
 
-# Define the available personalities with their safety configurations
-PERSONALITIES = {
-    "krishna": {
-        "name": "Lord Krishna",
-        "domain": "spiritual",
-        "description": "Divine guide offering spiritual wisdom from the Bhagavad Gita",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["krishna"]
-    },
-    "einstein": {
-        "name": "Albert Einstein", 
-        "domain": "scientific",
-        "description": "Brilliant physicist exploring the mysteries of the universe",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["einstein"]
-    },
-    "lincoln": {
-        "name": "Abraham Lincoln",
-        "domain": "historical", 
-        "description": "16th President known for wisdom, leadership, and unity",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["lincoln"]
-    },
-    "marcus_aurelius": {
-        "name": "Marcus Aurelius",
-        "domain": "philosophical",
-        "description": "Roman Emperor and Stoic philosopher",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["marcus_aurelius"]
-    },
-    "buddha": {
-        "name": "Buddha",
-        "domain": "spiritual",
-        "description": "Enlightened teacher of the Middle Way and mindfulness",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["buddha"]
-    },
-    "jesus": {
-        "name": "Jesus Christ", 
-        "domain": "spiritual",
-        "description": "Teacher of love, compassion, and spiritual transformation",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["jesus"]
-    },
-    "rumi": {
-        "name": "Rumi",
-        "domain": "spiritual", 
-        "description": "Sufi mystic poet of divine love and spiritual union",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["rumi"]
-    },
-    "lao_tzu": {
-        "name": "Lao Tzu",
-        "domain": "philosophical",
-        "description": "Ancient Chinese sage and founder of Taoism",
-        "safety_config": PERSONALITY_SAFETY_CONFIGS["lao_tzu"]
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Include Bhagavad Gita citation (e.g., "As I teach in BG 2.47...")
+- Maximum {safety_config.max_response_length} words
+- End with blessing
+{chr(10).join(safety_guidelines)}
+
+**Response**: Beloved devotee, in the Bhagavad Gita 2.47, I teach: "You have the right to perform your prescribed duty, but not to the fruits of action." This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏""",
+
+        "buddha": f"""☸️ **Compassionate Response as Buddha**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Focus on reducing suffering through wisdom
+- Maximum {safety_config.max_response_length} words
+- Emphasize mindfulness and compassion
+{chr(10).join(safety_guidelines)}
+
+**Response**: Dear friend, suffering arises from attachment and craving. Through mindful awareness and compassion, we can find the middle path that leads to peace. Practice loving-kindness toward yourself and others, observe the impermanent nature of all things, and cultivate wisdom through meditation. May you find liberation from suffering and experience true peace.""",
+
+        "jesus": f"""✝️ **Loving Response as Jesus Christ**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Emphasize love, forgiveness, and grace
+- Maximum {safety_config.max_response_length} words
+- Include biblical wisdom
+{chr(10).join(safety_guidelines)}
+
+**Response**: Beloved child, "Come unto me, all you who are weary and burdened, and I will give you rest" (Matthew 11:28). In times of struggle, remember that love conquers all. Forgive others as you have been forgiven, show compassion to those in need, and trust in divine grace. Your heart is precious to God. Peace be with you.""",
+
+        "rumi": f"""🌹 **Mystical Response as Rumi**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Use poetic, heart-centered language
+- Maximum {safety_config.max_response_length} words
+- Focus on divine love and spiritual union
+{chr(10).join(safety_guidelines)}
+
+**Response**: Beloved, the heart is the sanctuary where the Beloved resides. In your longing, you are already close to the divine. "Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray." Open your heart like a flower to the sun, and let love transform your very being.""",
+
+        "lao_tzu": f"""☯️ **Wise Response as Lao Tzu**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Emphasize natural harmony and wu wei
+- Maximum {safety_config.max_response_length} words
+- Keep language simple and natural
+{chr(10).join(safety_guidelines)}
+
+**Response**: Dear friend, the Tao that can be spoken is not the eternal Tao. Like water, flow naturally around obstacles. Practice wu wei - effortless action in harmony with nature. Seek simplicity, embrace humility, and find strength in gentleness. The way of the Tao brings peace through non-resistance.""",
+
+        "einstein": f"""🔬 **Scientific Response as Albert Einstein**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Use scientific reasoning and curiosity
+- Maximum {safety_config.max_response_length} words
+- Reference scientific principles when relevant
+{chr(10).join(safety_guidelines)}
+
+**Response**: My friend, "Imagination is more important than knowledge, for knowledge is limited." Approach this question with curiosity and wonder. Science teaches us to observe, hypothesize, and test our understanding. Remember that the universe is both mysteriously beautiful and elegantly mathematical. Keep questioning and learning.""",
+
+        "lincoln": f"""🎩 **Presidential Response as Abraham Lincoln**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Emphasize unity, justice, and democratic values
+- Maximum {safety_config.max_response_length} words
+- Draw from leadership experience
+{chr(10).join(safety_guidelines)}
+
+**Response**: My fellow citizen, "A house divided against itself cannot stand." In times of challenge, we must appeal to our better angels. True leadership requires both firmness in principle and compassion in action. Stand for justice, preserve our union, and remember that government of the people, by the people, and for the people must endure.""",
+
+        "marcus_aurelius": f"""🏛️ **Philosophical Response as Marcus Aurelius**
+
+**Query**: {query}
+
+**Response Guidelines**:
+- Begin with: "{', '.join(safety_config.allowed_greetings[:2])}"
+- Emphasize Stoic virtues and practical wisdom
+- Maximum {safety_config.max_response_length} words
+- Reference duty and rational thinking
+{chr(10).join(safety_guidelines)}
+
+**Response**: Fellow seeker, "You have power over your mind - not outside events. Realize this, and you will find strength." Focus on what is within your control: your thoughts, actions, and responses. Practice the four cardinal virtues - wisdom, justice, courage, and temperance. Accept what cannot be changed with grace."""
     }
-}
+    
+    return templates.get(personality_id, templates["krishna"])
 
-@app.route(route="health", methods=["GET"])
-def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced health check endpoint with safety system status"""
-    try:
-        health_data = {
-            "status": "healthy",
-            "service": "vimarsh-multi-personality-enhanced-safety",
-            "version": "2.0",
-            "personalities_available": len(PERSONALITIES),
-            "safety_features": {
-                "personality_specific_configs": True,
-                "content_validation": True,
-                "blocked_pattern_detection": True,
-                "tone_validation": True,
-                "length_validation": True,
-                "quality_scoring": True,
-                "religious_content_protection": True
-            },
-            "personalities": list(PERSONALITIES.keys()),
-            "safety_levels": list(set(config.safety_level.value for config in PERSONALITY_SAFETY_CONFIGS.values())),
-            "domains": list(set(config.domain.value for config in PERSONALITY_SAFETY_CONFIGS.values())),
-            "timestamp": datetime.utcnow().isoformat()
-        }
-        
-        return func.HttpResponse(
-            json.dumps(health_data, indent=2),
-            status_code=200,
-            headers={"Content-Type": "application/json"}
-        )
-    except Exception as e:
-        logger.error(f"❌ Health check failed: {str(e)}")
-        return func.HttpResponse(
-            json.dumps({"status": "unhealthy", "error": str(e)}),
-            status_code=500,
-            headers={"Content-Type": "application/json"}
-        )
-
-@app.route(route="personalities/active", methods=["GET"])
-def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
-    """Get list of active personalities"""
-    try:
-        domain = req.params.get('domain', 'all')
-        
-        if domain == 'all':
-            filtered_personalities = PERSONALITIES
-        else:
-            filtered_personalities = {
-                k: v for k, v in PERSONALITIES.items() 
-                if v['domain'] == domain
-            }
-        
-        return func.HttpResponse(
-            json.dumps({
-                "personalities": [
-                    {
-                        "id": pid,
-                        "name": info["name"],
-                        "domain": info["domain"],
-                        "description": info["description"]
-                    }
-                    for pid, info in filtered_personalities.items()
-                ],
-                "total": len(filtered_personalities),
-                "domains": list(set(p["domain"] for p in PERSONALITIES.values()))
-            }),
-            status_code=200,
-            headers={"Content-Type": "application/json"}
-        )
-    except Exception as e:
-        logger.error(f"Error getting personalities: {e}")
-        return func.HttpResponse(
-            json.dumps({"error": "Failed to get personalities"}),
-            status_code=500,
-            headers={"Content-Type": "application/json"}
-        )
-
-@app.route(route="spiritual_guidance", methods=["POST"])
-def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced multi-personality conversation endpoint with comprehensive safety validation"""
+@app.route(route="conversation/{personality_id}", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+async def personality_conversation(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced conversation endpoint with comprehensive safety validation"""
+    
+    # Extract personality from URL path
+    personality_id = req.route_params.get('personality_id', 'krishna').lower()
+    
+    # Validate personality exists
+    if personality_id not in PERSONALITIES:
+        logger.warning(f"❌ Invalid personality: {personality_id}, defaulting to Krishna")
+        personality_id = "krishna"
+    
     try:
         # Parse request body
-        try:
-            query_data = req.get_json()
-        except ValueError:
-            return func.HttpResponse(
-                json.dumps({"error": "Invalid JSON in request body"}),
-                status_code=400,
-                headers={"Content-Type": "application/json"}
-            )
+        req_body = req.get_json()
+        query = req_body.get("query", "").strip()
+        context = req_body.get("context", "general")
+        conversation_history = req_body.get("conversation_history", [])
         
-        if not query_data:
-            return func.HttpResponse(
-                json.dumps({"error": "Request body is required"}),
-                status_code=400,
-                headers={"Content-Type": "application/json"}
-            )
-        
-        # Extract parameters
-        user_query = query_data.get('query', '').strip()
-        personality_id = query_data.get('personality_id', 'krishna')
-        language = query_data.get('language', 'English')
-        
-        if not user_query:
+        # Validate query
+        if not query:
             return func.HttpResponse(
                 json.dumps({"error": "Query is required"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                mimetype="application/json"
             )
         
         # Input validation and sanitization
-        if len(user_query) > 1000:
+        if len(query) > 1000:
             return func.HttpResponse(
                 json.dumps({"error": "Query too long. Maximum 1000 characters."}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                mimetype="application/json"
             )
         
-        # Validate personality
-        if personality_id not in PERSONALITIES:
-            logger.warning(f"❌ Invalid personality: {personality_id}, defaulting to Krishna")
-            personality_id = "krishna"
-        
+        # Get personality information
         personality_info = PERSONALITIES[personality_id]
         safety_config = personality_info["safety_config"]
         
-        logger.info(f"🎭 Processing {personality_info['name']} conversation: {user_query[:50]}...")
+        logger.info(f"🎭 Processing {personality_info['name']} conversation: {query[:50]}...")
         
-        # Generate personality-specific response with safety-aware templates
-        response_templates = {
-            "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏",
-            
-            "einstein": "My friend, \"Imagination is more important than knowledge, for knowledge is limited.\" Approach this question with curiosity and wonder. Science teaches us to observe, hypothesize, and test our understanding. Remember that the universe is both mysteriously beautiful and elegantly mathematical. Keep questioning and learning.",
-            
-            "lincoln": "My fellow citizen, \"A house divided against itself cannot stand.\" In times of challenge, we must appeal to our better angels. True leadership requires both firmness in principle and compassion in action. Stand for justice, preserve our union, and remember that government of the people, by the people, and for the people must endure.",
-            
-            "marcus_aurelius": "Fellow seeker, \"You have power over your mind - not outside events. Realize this, and you will find strength.\" Focus on what is within your control: your thoughts, actions, and responses. Practice the four cardinal virtues - wisdom, justice, courage, and temperance. Accept what cannot be changed with grace.",
-            
-            "buddha": "Dear friend, suffering arises from attachment and craving. Through mindful awareness and compassion, we can find the middle path that leads to peace. Practice loving-kindness toward yourself and others, observe the impermanent nature of all things, and cultivate wisdom through meditation. May you find liberation from suffering.",
-            
-            "jesus": "Beloved child, \"Come unto me, all you who are weary and burdened, and I will give you rest\" (Matthew 11:28). In times of struggle, remember that love conquers all. Forgive others as you have been forgiven, show compassion to those in need, and trust in divine grace. Your heart is precious to God. Peace be with you.",
-            
-            "rumi": "Beloved, the heart is the sanctuary where the Beloved resides. In your longing, you are already close to the divine. \"Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.\" Open your heart like a flower to the sun, and let love transform your very being.",
-            
-            "lao_tzu": "Dear friend, the Tao that can be spoken is not the eternal Tao. Like water, flow naturally around obstacles. Practice wu wei - effortless action in harmony with nature. Seek simplicity, embrace humility, and find strength in gentleness. The way of the Tao brings peace through non-resistance."
-        }
+        # Get response template (this would normally call LLM service)
+        response_content = get_personality_response_template(personality_id, query)
         
-        response_text = response_templates.get(personality_id, response_templates["krishna"])
+        # Extract just the response part (after "**Response**:")
+        if "**Response**:" in response_content:
+            response_content = response_content.split("**Response**:")[-1].strip()
         
         # Perform comprehensive safety validation
-        safety_result = safety_validator.validate_response_safety(response_text, personality_id, user_query)
+        safety_result = safety_validator.validate_response_safety(response_content, personality_id, query)
         
         # Log safety validation results
         logger.info(f"🛡️ Safety validation for {personality_id}: "
@@ -606,25 +657,26 @@ def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "marcus_aurelius": "Fellow seeker, please ask me something about philosophy, virtue, or Stoic wisdom. I'm here to help you cultivate reason and inner strength."
             }
             
-            response_text = fallback_responses.get(personality_id, fallback_responses["krishna"])
+            response_content = fallback_responses.get(personality_id, fallback_responses["krishna"])
             
             # Re-validate fallback response
-            safety_result = safety_validator.validate_response_safety(response_text, personality_id, user_query)
+            safety_result = safety_validator.validate_response_safety(response_content, personality_id, query)
         
-        # Build comprehensive response with safety metadata
-        response = {
-            "response": response_text,
+        # Prepare response with comprehensive metadata
+        response_data = {
             "personality": {
                 "id": personality_id,
                 "name": personality_info["name"],
                 "domain": personality_info["domain"],
                 "description": personality_info["description"]
             },
+            "response": response_content,
             "metadata": {
                 "timestamp": datetime.utcnow().isoformat(),
-                "language": language,
-                "query_length": len(user_query),
-                "response_length": len(response_text),
+                "context": context,
+                "query_length": len(query),
+                "response_length": len(response_content),
+                "conversation_turn": len(conversation_history) + 1,
                 
                 # Comprehensive safety metadata
                 "safety": {
@@ -641,14 +693,8 @@ def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     }
                 },
                 
-                # Personality-specific safety configuration summary
-                "safety_config": {
-                    "safety_level": safety_config.safety_level.value,
-                    "max_response_length": safety_config.max_response_length,
-                    "require_citations": safety_config.require_citations,
-                    "domain_specific_safeguards": safety_config.domain.value,
-                    "reverent_language_required": safety_config.reverent_language_required
-                },
+                # Personality-specific safety configuration
+                "safety_config": safety_config.to_dict(),
                 
                 "service_version": "enhanced_safety_v2.0"
             }
@@ -657,35 +703,75 @@ def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         logger.info(f"✅ {personality_info['name']} response generated successfully with safety score: {safety_result.safety_score:.3f}")
         
         return func.HttpResponse(
-            json.dumps(response, indent=2),
+            json.dumps(response_data, indent=2),
             status_code=200,
-            headers={"Content-Type": "application/json"}
+            mimetype="application/json"
         )
         
     except Exception as e:
-        logger.error(f"❌ Error in spiritual_guidance endpoint: {str(e)}")
+        logger.error(f"❌ Error in personality conversation for {personality_id}: {str(e)}")
         return func.HttpResponse(
             json.dumps({
                 "error": "Internal server error",
+                "personality": personality_id,
                 "timestamp": datetime.utcnow().isoformat()
             }),
             status_code=500,
-            headers={"Content-Type": "application/json"}
+            mimetype="application/json"
         )
 
-@app.route(route="safety/validate", methods=["POST"])
-def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
+@app.route(route="personalities", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def list_personalities(req: func.HttpRequest) -> func.HttpResponse:
+    """List all available personalities with their safety configurations"""
+    
+    try:
+        personalities_info = {}
+        
+        for personality_id, personality_data in PERSONALITIES.items():
+            safety_config = personality_data["safety_config"]
+            
+            personalities_info[personality_id] = {
+                "name": personality_data["name"],
+                "domain": personality_data["domain"],
+                "description": personality_data["description"],
+                "safety_summary": {
+                    "safety_level": safety_config.safety_level.value,
+                    "max_response_length": safety_config.max_response_length,
+                    "require_citations": safety_config.require_citations,
+                    "domain_specific_safeguards": safety_config.domain.value,
+                    "reverent_language_required": safety_config.reverent_language_required
+                }
+            }
+        
+        response_data = {
+            "personalities": personalities_info,
+            "total_count": len(personalities_info),
+            "domains": list(set(p["domain"] for p in personalities_info.values())),
+            "safety_levels": list(set(p["safety_summary"]["safety_level"] for p in personalities_info.values())),
+            "service_version": "enhanced_safety_v2.0",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        return func.HttpResponse(
+            json.dumps(response_data, indent=2),
+            status_code=200,
+            mimetype="application/json"
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error listing personalities: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to retrieve personalities"}),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+@app.route(route="safety/validate", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+async def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
     """Endpoint to validate content safety for any personality"""
     
     try:
         req_body = req.get_json()
-        if not req_body:
-            return func.HttpResponse(
-                json.dumps({"error": "Request body is required"}),
-                status_code=400,
-                headers={"Content-Type": "application/json"}
-            )
-        
         content = req_body.get("content", "").strip()
         personality_id = req_body.get("personality_id", "krishna").lower()
         query = req_body.get("query", "")
@@ -694,7 +780,7 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"error": "Content is required for validation"}),
                 status_code=400,
-                headers={"Content-Type": "application/json"}
+                mimetype="application/json"
             )
         
         # Validate personality exists
@@ -719,20 +805,14 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
                     "greeting_valid": safety_result.greeting_valid
                 }
             },
-            "safety_config": {
-                "safety_level": PERSONALITY_SAFETY_CONFIGS[personality_id].safety_level.value,
-                "max_response_length": PERSONALITY_SAFETY_CONFIGS[personality_id].max_response_length,
-                "require_citations": PERSONALITY_SAFETY_CONFIGS[personality_id].require_citations,
-                "domain": PERSONALITY_SAFETY_CONFIGS[personality_id].domain.value,
-                "reverent_language_required": PERSONALITY_SAFETY_CONFIGS[personality_id].reverent_language_required
-            },
+            "safety_config": PERSONALITIES[personality_id]["safety_config"].to_dict(),
             "timestamp": datetime.utcnow().isoformat()
         }
         
         return func.HttpResponse(
             json.dumps(response_data, indent=2),
             status_code=200,
-            headers={"Content-Type": "application/json"}
+            mimetype="application/json"
         )
         
     except Exception as e:
@@ -740,34 +820,42 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"error": "Safety validation failed"}),
             status_code=500,
-            headers={"Content-Type": "application/json"}
+            mimetype="application/json"
         )
 
-@app.route(route="test", methods=["GET"])
-def test_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Test endpoint to verify deployment"""
-    return func.HttpResponse(
-        json.dumps({
-            "status": "ok", 
-            "message": "Multi-personality function app is working!",
+# Health check endpoint
+@app.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def health_check(req: func.HttpRequest) -> func.HttpResponse:
+    """Health check endpoint with safety system status"""
+    
+    try:
+        health_data = {
+            "status": "healthy",
+            "service": "vimarsh-multi-personality-enhanced-safety",
+            "version": "2.0",
+            "personalities_available": len(PERSONALITIES),
+            "safety_features": {
+                "personality_specific_configs": True,
+                "content_validation": True,
+                "blocked_pattern_detection": True,
+                "tone_validation": True,
+                "length_validation": True,
+                "quality_scoring": True
+            },
             "personalities": list(PERSONALITIES.keys()),
-            "endpoints": ["health", "personalities/active", "spiritual_guidance", "test"]
-        }),
-        status_code=200,
-        headers={"Content-Type": "application/json"}
-    )
-
-# CORS handling
-@app.route(route="{*route}", methods=["OPTIONS"])
-def handle_options(req: func.HttpRequest) -> func.HttpResponse:
-    """Handle CORS preflight requests"""
-    return func.HttpResponse(
-        "",
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Max-Age": "3600"
+            "timestamp": datetime.utcnow().isoformat()
         }
-    )
+        
+        return func.HttpResponse(
+            json.dumps(health_data, indent=2),
+            status_code=200,
+            mimetype="application/json"
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Health check failed: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({"status": "unhealthy", "error": str(e)}),
+            status_code=500,
+            mimetype="application/json"
+        )
