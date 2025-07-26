@@ -189,16 +189,17 @@ const LandingPage: React.FC = () => {
           fontSize: '3.5rem',
           fontWeight: '700',
           marginBottom: '1rem',
-          background: 'linear-gradient(135deg, #ffffff, #e2e8f0)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          lineHeight: '1.1'
+          color: 'white',
+          lineHeight: '1.1',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
         }}>
           Converse with History's<br />
           <span style={{
-            background: 'linear-gradient(135deg, #fbbf24, #f59e0b, #10b981, #3b82f6)',
+            background: 'linear-gradient(135deg, #fef3c7, #fbbf24, #34d399, #60a5fa)',
             WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            WebkitTextFillColor: 'transparent',
+            textShadow: 'none',
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
           }}>
             Greatest Minds
           </span>
@@ -206,10 +207,12 @@ const LandingPage: React.FC = () => {
 
         <p style={{
           fontSize: '1.25rem',
-          opacity: 0.9,
+          opacity: 1,
           maxWidth: '800px',
           margin: '0 auto 2rem',
-          lineHeight: '1.6'
+          lineHeight: '1.6',
+          color: 'rgba(255, 255, 255, 0.95)',
+          textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
         }}>
           Experience authentic conversations with Einstein about scientific discovery, seek spiritual wisdom from Lord Krishna, learn leadership from Lincoln, or explore philosophy with Marcus Aurelius. Each personality grounded in their actual works and teachings.
         </p>
@@ -236,7 +239,7 @@ const LandingPage: React.FC = () => {
           Begin Your Journey
         </button>
 
-        <p style={{ fontSize: '0.9rem', opacity: 0.7, margin: 0 }}>
+        <p style={{ fontSize: '0.9rem', opacity: 0.9, margin: 0, textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>
           Secure sign-in with Microsoft to unlock conversations
         </p>
 
@@ -252,20 +255,20 @@ const LandingPage: React.FC = () => {
           backdropFilter: 'blur(10px)'
         }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>8+</div>
-            <div style={{ opacity: 0.8, fontSize: '0.95rem' }}>Great Minds</div>
+            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>8+</div>
+            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Great Minds</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>4</div>
-            <div style={{ opacity: 0.8, fontSize: '0.95rem' }}>Domains</div>
+            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>4</div>
+            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Domains</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>1000+</div>
-            <div style={{ opacity: 0.8, fontSize: '0.95rem' }}>Authentic Texts</div>
+            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>1000+</div>
+            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Authentic Texts</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>Deep</div>
-            <div style={{ opacity: 0.8, fontSize: '0.95rem' }}>Insights</div>
+            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>Deep</div>
+            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Insights</div>
           </div>
         </div>
       </section>
@@ -281,7 +284,8 @@ const LandingPage: React.FC = () => {
             fontSize: '2.5rem',
             fontWeight: '700',
             textAlign: 'center',
-            marginBottom: '3rem'
+            marginBottom: '3rem',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
           }}>
             Experience the Conversation
           </h2>
@@ -294,7 +298,7 @@ const LandingPage: React.FC = () => {
           }}>
             {/* Personality Selector */}
             <div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: '600' }}>Choose a Personality</h3>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: '600', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Choose a Personality</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {personalities.slice(0, 4).map((personality) => (
                   <button
@@ -414,7 +418,8 @@ const LandingPage: React.FC = () => {
           fontSize: '2.5rem',
           fontWeight: '700',
           textAlign: 'center',
-          marginBottom: '3rem'
+          marginBottom: '3rem',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
         }}>
           Meet the Great Minds
         </h2>
@@ -501,7 +506,8 @@ const LandingPage: React.FC = () => {
             fontSize: '2.5rem',
             fontWeight: '700',
             textAlign: 'center',
-            marginBottom: '3rem'
+            marginBottom: '3rem',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
           }}>
             Powered by Advanced AI
           </h2>
