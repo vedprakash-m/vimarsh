@@ -161,7 +161,7 @@ export default function CleanSpiritualInterface() {
     return domainPlaceholders[selectedPersonality.domain as keyof typeof domainPlaceholders] || "Ask your question...";
   };
 
-  // Dynamic quick prompts based on selected personality domain
+  // Dynamic quick prompts based on selected personality
   const getQuickPrompts = () => {
     if (!selectedPersonality) {
       return [
@@ -172,43 +172,121 @@ export default function CleanSpiritualInterface() {
       ];
     }
 
-    switch (selectedPersonality.domain) {
-      case 'scientific':
+    // First check for specific personality-based questions
+    const personalityId = selectedPersonality.id?.toLowerCase() || selectedPersonality.name?.toLowerCase();
+    
+    switch (personalityId) {
+      case 'jesus':
+      case 'jesus christ':
         return [
-          "How does the theory of relativity change our understanding of time and space?",
-          "What is the relationship between energy and matter in the universe?",
-          "How do we approach scientific discovery and overcome preconceived notions?",
-          "What role does imagination play in scientific breakthroughs?"
+          "How can I show love and compassion to those who have hurt me?",
+          "What does it mean to carry my cross in daily life?",
+          "How do I find hope and peace during times of suffering?",
+          "How can I serve others and live according to God's will?"
         ];
-      case 'historical':
-        return [
-          "What lessons can we learn from leadership during times of crisis?",
-          "How do we build unity and preserve democracy in challenging times?",
-          "What role does character play in effective governance?",
-          "How do we balance justice with compassion in difficult decisions?"
-        ];
-      case 'philosophical':
-        return [
-          "How do we cultivate virtue and wisdom in daily life?",
-          "What is the relationship between reason and emotion in decision-making?",
-          "How do we find meaning and purpose in the face of adversity?",
-          "What does it mean to live according to nature and cosmic order?"
-        ];
-      case 'literary':
-        return [
-          "How does literature help us understand the human condition?",
-          "What is the relationship between beauty and truth in art?",
-          "How do stories shape our understanding of morality and ethics?",
-          "What role does creativity play in personal transformation?"
-        ];
-      case 'spiritual':
-      default:
+      
+      case 'krishna':
+      case 'lord krishna':
         return [
           "How can I find my dharma and live according to my true purpose?",
           "How can I maintain equanimity during life's ups and downs?",
           "What are the different paths of yoga and which one suits me?",
           "How do I overcome anger and jealousy through spiritual practice?"
         ];
+      
+      case 'buddha':
+      case 'gautama buddha':
+        return [
+          "How can I find freedom from suffering and attachment?",
+          "What is the path to mindfulness and inner peace?",
+          "How do I cultivate compassion for all living beings?",
+          "How can I understand the nature of impermanence?"
+        ];
+      
+      case 'einstein':
+      case 'albert einstein':
+        return [
+          "How does the theory of relativity change our understanding of time and space?",
+          "What is the relationship between energy and matter in the universe?",
+          "How do we approach scientific discovery and overcome preconceived notions?",
+          "What role does imagination play in scientific breakthroughs?"
+        ];
+      
+      case 'lincoln':
+      case 'abraham lincoln':
+        return [
+          "What lessons can we learn from leadership during times of crisis?",
+          "How do we build unity and preserve democracy in challenging times?",
+          "What role does character play in effective governance?",
+          "How do we balance justice with compassion in difficult decisions?"
+        ];
+      
+      case 'aurelius':
+      case 'marcus aurelius':
+        return [
+          "How do we cultivate virtue and wisdom in daily life?",
+          "What is the relationship between reason and emotion in decision-making?",
+          "How do we find meaning and purpose in the face of adversity?",
+          "What does it mean to live according to nature and cosmic order?"
+        ];
+      
+      case 'rumi':
+        return [
+          "How do I open my heart to divine love and connection?",
+          "What is the spiritual meaning behind life's joys and sorrows?",
+          "How do I find unity with the divine through mystical experience?",
+          "How can poetry and beauty lead me to spiritual truth?"
+        ];
+      
+      case 'laotzu':
+      case 'lao tzu':
+        return [
+          "How do I find balance and harmony in the natural flow of life?",
+          "What does it mean to act through wu wei (effortless action)?",
+          "How do I cultivate simplicity and humility in modern life?",
+          "What is the Way and how do I align with it?"
+        ];
+      
+      default:
+        // Fall back to domain-based questions if personality not found
+        switch (selectedPersonality.domain) {
+          case 'scientific':
+            return [
+              "How does the theory of relativity change our understanding of time and space?",
+              "What is the relationship between energy and matter in the universe?",
+              "How do we approach scientific discovery and overcome preconceived notions?",
+              "What role does imagination play in scientific breakthroughs?"
+            ];
+          case 'historical':
+            return [
+              "What lessons can we learn from leadership during times of crisis?",
+              "How do we build unity and preserve democracy in challenging times?",
+              "What role does character play in effective governance?",
+              "How do we balance justice with compassion in difficult decisions?"
+            ];
+          case 'philosophical':
+            return [
+              "How do we cultivate virtue and wisdom in daily life?",
+              "What is the relationship between reason and emotion in decision-making?",
+              "How do we find meaning and purpose in the face of adversity?",
+              "What does it mean to live according to nature and cosmic order?"
+            ];
+          case 'literary':
+            return [
+              "How does literature help us understand the human condition?",
+              "What is the relationship between beauty and truth in art?",
+              "How do stories shape our understanding of morality and ethics?",
+              "What role does creativity play in personal transformation?"
+            ];
+          case 'spiritual':
+          default:
+            return [
+              "How can I find my dharma and live according to my true purpose?",
+              "How can I maintain equanimity during life's ups and downs?",
+              "What are the different paths of yoga and which one suits me?",
+              "How do I overcome anger and jealousy through spiritual practice?"
+            ];
+        }
     }
   };
 

@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
 """
-Test All Eight Personalities on Enhanced Service
+Test All Twelve Personalities on Enhanced Service
 """
 
 import requests
 import json
 
 def test_all_personalities():
-    """Test all 8 personalities with their unique character limits"""
+    """Test all 12 personalities with standardized 500 character limits"""
     
     personalities = [
         ("krishna", "What is dharma?", 500),
-        ("buddha", "How can I find inner peace?", 400),
-        ("jesus", "How should I love others?", 400),
-        ("rumi", "What is divine love?", 400),
-        ("lao_tzu", "What is the natural way?", 350),
-        ("einstein", "What is the nature of reality?", 350),
-        ("lincoln", "How can we achieve unity?", 350),
-        ("marcus_aurelius", "How should I live virtuously?", 300)
+        ("buddha", "How can I find inner peace?", 500),
+        ("jesus", "How should I love others?", 500),
+        ("rumi", "What is divine love?", 500),
+        ("lao_tzu", "What is the natural way?", 500),
+        ("einstein", "What is the nature of reality?", 500),
+        ("lincoln", "How can we achieve unity?", 500),
+        ("marcus_aurelius", "How should I live virtuously?", 500),
+        ("tesla", "How can innovation change the world?", 500),
+        ("newton", "What are the fundamental laws of nature?", 500),
+        ("chanakya", "What makes an effective leader?", 500),
+        ("confucius", "How should we live ethically?", 500)
     ]
     
     url = "https://vimarsh-backend-app.azurewebsites.net/api/spiritual_guidance"
@@ -25,7 +29,7 @@ def test_all_personalities():
     
     results = {}
     
-    print("🧪 Testing All 8 Enhanced Personalities")
+    print("🧪 Testing All 12 Enhanced Personalities")
     print("=" * 60)
     
     for personality_id, query, expected_max in personalities:
@@ -92,10 +96,10 @@ def test_all_personalities():
     within_limits = sum(1 for r in results.values() if r.get("within_limit", False))
     safe_responses = sum(1 for r in results.values() if r.get("safety_passed", False))
     
-    print(f"✅ Total Successful: {successful}/8")
-    print(f"🤖 AI-Powered Responses: {ai_powered}/8")
-    print(f"📏 Within Character Limits: {within_limits}/8")
-    print(f"🛡️ Safety Validated: {safe_responses}/8")
+    print(f"✅ Total Successful: {successful}/12")
+    print(f"🤖 AI-Powered Responses: {ai_powered}/12")
+    print(f"📏 Within Character Limits: {within_limits}/12")
+    print(f"🛡️ Safety Validated: {safe_responses}/12")
     
     print(f"\n📋 Detailed Results:")
     for personality_id, result in results.items():
@@ -112,7 +116,7 @@ def test_all_personalities():
             print(f"❌ {personality_id.replace('_', ' ').title()}: {result['error']}")
     
     # Final Assessment
-    if successful == 8 and ai_powered == 8 and within_limits == 8:
+    if successful == 12 and ai_powered == 12 and within_limits == 12:
         print(f"\n🎉 ENHANCED SERVICE VALIDATION: COMPLETE SUCCESS!")
         print("✅ All personalities working with real AI responses")
         print("✅ All character limits properly configured")

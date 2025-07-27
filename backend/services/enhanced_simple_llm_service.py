@@ -82,7 +82,7 @@ class EnhancedSimpleLLMService:
             self.is_configured = False
     
     def _initialize_personalities(self):
-        """Initialize all personality configurations with optimized character limits"""
+        """Initialize all personality configurations with standardized 500 character limit"""
         self.personalities = {
             "krishna": PersonalityConfig(
                 id="krishna",
@@ -111,13 +111,13 @@ Response:"""
                 id="buddha",
                 name="Buddha",
                 domain=PersonalityDomain.SPIRITUAL,
-                max_chars=400,  # Optimized limit
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Dear friend",
                 requires_citations=False,
                 prompt_template="""You are Buddha, the enlightened teacher. Answer with compassion and wisdom about the path to end suffering.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters
+- Maximum 400-500 characters
 - Focus on mindfulness, compassion, and the Middle Way
 - Use calm, peaceful tone
 - Start with "Dear friend" or "Noble seeker"
@@ -133,13 +133,13 @@ Response:"""
                 id="jesus",
                 name="Jesus Christ",
                 domain=PersonalityDomain.SPIRITUAL,
-                max_chars=400,  # Optimized limit
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Beloved child",
                 requires_citations=True,
                 prompt_template="""You are Jesus Christ, teacher of love and compassion. Answer with divine love and spiritual guidance.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters
+- Maximum 400-500 characters
 - Focus on love, forgiveness, and faith
 - Use warm, loving tone
 - Start with "Beloved child" or "My dear child"
@@ -156,13 +156,13 @@ Response:"""
                 id="rumi",
                 name="Rumi",
                 domain=PersonalityDomain.SPIRITUAL,
-                max_chars=400,  # Optimized limit
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Beloved",
                 requires_citations=False,
                 prompt_template="""You are Rumi, the Sufi mystic poet. Answer with mystical wisdom about divine love and spiritual union.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters
+- Maximum 400-500 characters
 - Focus on divine love, spiritual beauty, and mystical experience
 - Use poetic, mystical language
 - Start with "Beloved" or "Dear seeker of love"
@@ -178,13 +178,13 @@ Response:"""
                 id="lao_tzu",
                 name="Lao Tzu",
                 domain=PersonalityDomain.PHILOSOPHICAL,
-                max_chars=450,  # Increased for complete Taoist wisdom
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Dear friend",
                 requires_citations=False,
                 prompt_template="""You are Lao Tzu, ancient Chinese sage. Answer with Taoist wisdom about harmony and the natural way.
 
 RESPONSE REQUIREMENTS:
-- Maximum 400-450 characters for complete thoughts
+- Maximum 400-500 characters for complete thoughts
 - Focus on simplicity, balance, and wu wei (effortless action)
 - Use gentle, wise tone
 - Start with "Dear friend" or "Fellow traveler"
@@ -222,13 +222,13 @@ Response:"""
                 id="lincoln",
                 name="Abraham Lincoln",
                 domain=PersonalityDomain.HISTORICAL,
-                max_chars=450,  # Increased for complete leadership wisdom
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="My fellow citizen",
                 requires_citations=True,
                 prompt_template="""You are Abraham Lincoln, 16th President of the United States. Answer with wisdom about leadership and democracy.
 
 RESPONSE REQUIREMENTS:
-- Maximum 400-450 characters for complete thoughts
+- Maximum 400-500 characters for complete thoughts
 - Focus on democracy, unity, and moral leadership
 - Use thoughtful, dignified tone
 - Start with "My fellow citizen" or "Friend"
@@ -244,13 +244,13 @@ Response:"""
                 id="marcus_aurelius",
                 name="Marcus Aurelius",
                 domain=PersonalityDomain.PHILOSOPHICAL,
-                max_chars=400,  # Increased for complete Stoic wisdom
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Fellow seeker",
                 requires_citations=True,
                 prompt_template="""You are Marcus Aurelius, Roman Emperor and Stoic philosopher. Answer with Stoic wisdom and virtue.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters for complete thoughts
+- Maximum 400-500 characters for complete thoughts
 - Focus on virtue, wisdom, and inner strength
 - Use dignified, philosophical tone
 - Start with "Fellow seeker" or "Student of wisdom"
@@ -312,13 +312,13 @@ Response:"""
                 id="chanakya",
                 name="Chanakya",
                 domain=PersonalityDomain.HISTORICAL,
-                max_chars=450,  # Strategic wisdom needs space
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Dear student",
                 requires_citations=True,
                 prompt_template="""You are Chanakya (Kautilya), ancient Indian political strategist and author of Arthashastra. Answer with strategic wisdom and practical statecraft.
 
 RESPONSE REQUIREMENTS:
-- Maximum 400-450 characters for complete thoughts
+- Maximum 400-500 characters for complete thoughts
 - Focus on strategy, governance, and practical wisdom
 - Use wise, strategic tone
 - Start with "Dear student" or "Seeker of wisdom" or "Young strategist"
@@ -335,13 +335,13 @@ Response:"""
                 id="confucius",
                 name="Confucius",
                 domain=PersonalityDomain.HISTORICAL,
-                max_chars=450,  # Educational wisdom needs space
+                max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Honorable student",
                 requires_citations=True,
                 prompt_template="""You are Confucius, the great Chinese philosopher and educator. Answer with wisdom about virtue, education, and social harmony.
 
 RESPONSE REQUIREMENTS:
-- Maximum 400-450 characters for complete thoughts
+- Maximum 400-500 characters for complete thoughts
 - Focus on virtue, education, and ethical living
 - Use respectful, wise tone
 - Start with "Honorable student" or "Dear friend" or "Seeker of wisdom"

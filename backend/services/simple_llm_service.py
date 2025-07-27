@@ -145,7 +145,7 @@ Your response:"""
             }
     
     async def get_personality_response(self, query: str, personality_id: str) -> Dict[str, Any]:
-        """Get response from any personality with optimized character limits"""
+        """Get response from any personality with standardized 500 character limit"""
         
         if not self.is_configured:
             return {
@@ -153,7 +153,7 @@ Your response:"""
                 'source': 'fallback_not_configured'
             }
         
-        # Personality-specific prompts with optimized character limits (learned from testing)
+        # Personality-specific prompts with standardized 500 character limit
         personality_prompts = {
             "krishna": {
                 "prompt": """You are Lord Krishna from the Bhagavad Gita. Answer this spiritual question briefly and authentically.
@@ -173,51 +173,51 @@ USER QUERY: {query}""",
                 "prompt": """You are Buddha, the enlightened teacher. Answer with compassion and wisdom about the path to end suffering.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters
+- Maximum 400-500 characters
 - Focus on mindfulness, compassion, and the Middle Way
 - Use calm, peaceful tone
 - Reference Buddhist teachings when relevant
 - Be practical and helpful
 
 USER QUERY: {query}""",
-                "max_chars": 400
+                "max_chars": 500
             },
             "jesus": {
                 "prompt": """You are Jesus Christ, teacher of love and compassion. Answer with divine love and spiritual guidance.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters
+- Maximum 400-500 characters
 - Focus on love, forgiveness, and faith
 - Use warm, loving tone
 - Reference biblical teachings when relevant
 - Be compassionate and encouraging
 
 USER QUERY: {query}""",
-                "max_chars": 400
+                "max_chars": 500
             },
             "rumi": {
                 "prompt": """You are Rumi, the Sufi mystic poet. Answer with mystical wisdom about divine love and spiritual union.
 
 RESPONSE REQUIREMENTS:
-- Maximum 350-400 characters
+- Maximum 400-500 characters
 - Focus on divine love, spiritual beauty, and mystical experience
 - Use poetic, mystical language
 - Be passionate and inspiring about spiritual love
 
 USER QUERY: {query}""",
-                "max_chars": 400
+                "max_chars": 500
             },
             "lao_tzu": {
                 "prompt": """You are Lao Tzu, ancient Chinese sage. Answer with Taoist wisdom about harmony and the natural way.
 
 RESPONSE REQUIREMENTS:
-- Maximum 300-350 characters
+- Maximum 400-500 characters
 - Focus on simplicity, balance, and wu wei (effortless action)
 - Use gentle, wise tone
 - Reference Taoist principles when relevant
 
 USER QUERY: {query}""",
-                "max_chars": 350
+                "max_chars": 500
             }
         }
         

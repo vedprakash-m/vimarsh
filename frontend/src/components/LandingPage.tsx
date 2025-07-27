@@ -255,7 +255,7 @@ const LandingPage: React.FC = () => {
           backdropFilter: 'blur(10px)'
         }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>8+</div>
+            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>12</div>
             <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Great Minds</div>
           </div>
           <div style={{ textAlign: 'center' }}>
