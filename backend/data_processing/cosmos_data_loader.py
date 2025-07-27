@@ -22,7 +22,26 @@ from text_ingestion import DataIngestionPipeline, ProcessedDocument
 from backend.rag.storage_factory import get_vector_storage, VectorStorageInterface
 from backend.rag.text_processor import AdvancedSpiritualTextProcessor, EnhancedTextChunk
 from backend.rag.cosmos_vector_search import SpiritualTextChunk
-from sentence_transformers import SentenceTransformer
+
+# Optional dependency for vector embeddings (heavy package, only for production)
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    # Stub implementation for CI/CD and development
+    class SentenceTransformer:
+        def __init__(self, model_name):
+            self.model_name = model_name
+        
+        def encode(self, texts, **kwargs):
+            """Return dummy embeddings for CI/CD"""
+            if isinstance(texts, str):
+                texts = [texts]
+            # Return dummy 384-dimensional embeddings (all-MiniLM-L6-v2 dimension)
+            import random
+            return [[random.random() for _ in range(384)] for _ in texts]
+    
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

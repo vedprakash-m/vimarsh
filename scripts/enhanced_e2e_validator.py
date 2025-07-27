@@ -219,35 +219,47 @@ class VimarshE2EValidator:
         # Test 5: Infrastructure validation
         try:
             infra_main_path = "infrastructure/main.bicep"
+            unified_resources_path = "infrastructure/unified-resources.bicep"
+            
+            bicep_content = ""
+            
+            # Read main.bicep if it exists
             if os.path.exists(infra_main_path):
                 with open(infra_main_path, 'r') as f:
-                    bicep_content = f.read()
-                
-                required_resources = [
-                    "Microsoft.Resources/resourceGroups",
-                    "Microsoft.Web/staticSites"
-                ]
-                
-                missing_resources = [resource for resource in required_resources
-                                   if resource not in bicep_content]
-                
-                if missing_resources:
-                    self.log_test_result(
-                        "infrastructure_configuration",
-                        "failed", 
-                        f"Missing infrastructure resources: {missing_resources}"
-                    )
-                else:
-                    self.log_test_result(
-                        "infrastructure_configuration",
-                        "passed",
-                        "Infrastructure configuration is valid"
-                    )
-            else:
+                    bicep_content += f.read()
+            
+            # Read unified-resources.bicep if it exists (where most resources are defined)
+            if os.path.exists(unified_resources_path):
+                with open(unified_resources_path, 'r') as f:
+                    bicep_content += "\n" + f.read()
+            
+            if not bicep_content:
                 self.log_test_result(
                     "infrastructure_configuration",
                     "failed",
-                    "Infrastructure main.bicep not found"
+                    "No infrastructure Bicep files found"
+                )
+                return
+                
+            required_resources = [
+                "Microsoft.Resources/resourceGroups",
+                "Microsoft.Web/staticSites"
+            ]
+            
+            missing_resources = [resource for resource in required_resources
+                               if resource not in bicep_content]
+            
+            if missing_resources:
+                self.log_test_result(
+                    "infrastructure_configuration",
+                    "failed", 
+                    f"Missing infrastructure resources: {missing_resources}"
+                )
+            else:
+                self.log_test_result(
+                    "infrastructure_configuration",
+                    "passed",
+                    "Infrastructure configuration is valid"
                 )
         except Exception as e:
             self.log_test_result(
