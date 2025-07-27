@@ -4,7 +4,7 @@
 
 **Date**: July 26, 2025  
 **Issue**: Azure AD Client ID exposed in commit `f94f6e8`  
-**Exposed Value**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`  
+**Exposed Value**: `e4bd74b8-****-****-****-************` (masked for security)  
 **Status**: ✅ **RESOLVED** - Comprehensive security system deployed
 
 ### Immediate Actions Taken:
@@ -50,7 +50,7 @@
 REACT_APP_CLIENT_ID=<REPLACE_WITH_AZURE_AD_CLIENT_ID>
 
 # ❌ BAD - Real credentials in code
-REACT_APP_CLIENT_ID=e4bd74b8-9a82-40c6-8d52-3e231733095e
+REACT_APP_CLIENT_ID=xxxxxxxx-****-****-****-************
 ```
 
 ### 2. Production Configuration
