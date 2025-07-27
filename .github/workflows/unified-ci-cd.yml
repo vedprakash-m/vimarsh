@@ -393,7 +393,7 @@ jobs:
         name: frontend-build
         path: ./frontend-build
 
-    - name: 🔍 Debug: List Frontend Artifact Contents
+    - name: Debug - List Frontend Artifact Contents
       run: |
         echo "📂 Contents of frontend-build directory:"
         ls -la ./frontend-build
