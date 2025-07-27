@@ -505,7 +505,8 @@ deployment/temp/
 .env.*
 !.env.example
 !.env.development
-!frontend/.env.production
+# NOTE: Production env files should NEVER be committed
+# Use deployment-time environment variable injection instead
 
 # Certificate files
 *.p12
@@ -513,6 +514,33 @@ deployment/temp/
 *.crt
 *.cer
 *.key
+*.pem
+*.pub
+
+# Sensitive configuration files
+credentials.json
+service-account*.json
+client-secrets*.json
+secrets.json
+private.json
+config.production.json
+
+# SSH keys
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+*.ppk
+
+# Azure specific secrets
+azure-credentials.json
+publish-settings.xml
+*.publishsettings
+
+# Database credentials
+database.json
+db-config.json
+connection-strings.json
 
 # Service principal files
 sp.json
