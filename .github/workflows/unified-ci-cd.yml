@@ -304,10 +304,10 @@ jobs:
 
   # ===== STAGE 5: BUILD ARTIFACTS =====
   build-backend:
-    name: 🏗️ Build Backend
+    name: 🏗️ Build Backend (TEMPORARILY SKIPPED)
     runs-on: ubuntu-latest
     needs: [setup, test-backend, test-integration]
-    if: needs.setup.outputs.should_build == 'true' && (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped')
+    if: false  # Skip backend build since backend is already deployed
     timeout-minutes: 10
 
     steps:
@@ -376,7 +376,7 @@ jobs:
 
   # ===== STAGE 6: PRODUCTION DEPLOYMENT (SINGLE ENVIRONMENT STRATEGY) =====
   deploy-production:
-    name: 🚀 Deploy to Production
+    name: 🚀 Deploy Frontend to Production (Backend Already Deployed)
     runs-on: ubuntu-latest
     needs: [setup, build-frontend]
     if: needs.setup.outputs.should_deploy == 'true' && github.ref == 'refs/heads/main'
@@ -384,35 +384,14 @@ jobs:
     timeout-minutes: 15
 
     steps:
-    - name: � Checkout Code
+    - name: 📥 Checkout Code
       uses: actions/checkout@v4
-
-    - name: 🐍 Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: 🔧 Install Azure Functions Core Tools
-      run: npm install -g azure-functions-core-tools@4 --unsafe-perm true
-
-    - name: �📥 Download Backend Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: backend-package
-        path: ./backend-package
 
     - name: 📥 Download Frontend Artifact
       uses: actions/download-artifact@v4
       with:
         name: frontend-build
         path: ./frontend-build
-
-    - name: 🚀 Deploy Backend to Azure Functions (Flex Consumption)
-      run: |
-        # Copy backend files to deployment directory
-        cp -r ./backend-package/* ./backend/ 2>/dev/null || true
-        cd backend
-        func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }} --python
 
     - name: 🌐 Deploy Frontend to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
