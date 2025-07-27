@@ -18,7 +18,7 @@ cd frontend && npm run build && swa deploy build --env production --resource-gro
 
 **Backend**:
 ```bash
-cd backend && func azure functionapp publish vimarsh-backend-app
+cd backend && func azure functionapp publish vimarsh-backend-app --python
 ```
 
 ## 🔍 Health Endpoints
