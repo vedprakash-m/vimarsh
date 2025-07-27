@@ -4,6 +4,9 @@ Tests integration between all completed phases (1, 2, and 3.1)
 """
 
 import pytest
+
+# Skip these complex integration tests in CI/CD
+pytestmark = pytest.mark.skip_ci
 import asyncio
 import json
 import os

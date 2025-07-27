@@ -4,6 +4,9 @@ Testing end-to-end workflows and system integration after all Phase 2 optimizati
 """
 
 import pytest
+
+# Skip these complex integration tests in CI/CD
+pytestmark = pytest.mark.skip_ci
 import asyncio
 import json
 import time

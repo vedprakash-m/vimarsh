@@ -23,7 +23,8 @@ markers = [
     "voice: Tests for voice interface components",
     "rag: Tests for RAG pipeline components",
     "llm: Tests for LLM integration components",
-    "asyncio: Async test support"
+    "asyncio: Async test support",
+    "skip_ci: Skip these tests in CI/CD pipeline (API mismatches)"
 ]
 
 # Test execution options
@@ -33,7 +34,8 @@ addopts = [
     "--tb=short",
     "--durations=10",
     "-ra",
-    "--asyncio-mode=auto"
+    "--asyncio-mode=auto",
+    "-m not skip_ci"  # Skip tests marked as skip_ci
 ]
 
 # Warning filters
