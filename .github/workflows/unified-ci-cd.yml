@@ -371,7 +371,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: frontend-build
-        path: frontend/dist/
+        path: frontend/build/
         retention-days: 30
 
   # ===== STAGE 6: PRODUCTION DEPLOYMENT (SINGLE ENVIRONMENT STRATEGY) =====
