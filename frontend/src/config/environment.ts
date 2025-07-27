@@ -165,7 +165,7 @@ export const APP_CONFIG = {
   description: 'AI-powered spiritual guidance from Lord Krishna',
   version: process.env.REACT_APP_VERSION || '1.0.0',
   domain: 'vimarsh.vedprakash.net',
-  supportEmail: 'support@vedprakash.net',
+  supportEmail: 'ved@vedprakash.net',
   environment: process.env.NODE_ENV || 'development',
 };
 
