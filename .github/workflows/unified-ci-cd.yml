@@ -33,7 +33,7 @@ env:
   NODE_VERSION: '18'
   COVERAGE_THRESHOLD: 10
   AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend-app-flex'
-  AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend-westus2'
+  AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
 
 jobs:
   # ===== STAGE 1: CHANGE DETECTION & SETUP =====
@@ -417,7 +417,7 @@ jobs:
       run: |
         echo "✅ Deployment completed to Azure Static Web Apps"
         echo "🌐 Expected URL: https://vimarsh.vedprakash.net"
-        echo "🚀 Resource: vimarsh-frontend-westus2" 
+        echo "🚀 Resource: vimarsh-frontend" 
         echo "📅 Deployment time: $(date)"
 
   # ===== STAGE 7: POST-DEPLOYMENT VALIDATION =====

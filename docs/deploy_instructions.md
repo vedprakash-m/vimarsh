@@ -6,14 +6,14 @@
 
 | Component | Resource | URL |
 |-----------|----------|-----|
-| Frontend | `vimarsh-frontend-westus2` (Azure Static Web App, West US 2) | `https://vimarsh.vedprakash.net` |
+| Frontend | `vimarsh-frontend` (Azure Static Web App) | `https://vimarsh.vedprakash.net` |
 | Backend | `vimarsh-backend-app-flex` (Function App, Python 3.12, Flex Consumption) | `https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net` |
 
 ## 📦 Quick Deploy Commands
 
 **Frontend**:
 ```bash
-cd frontend && npm run build && swa deploy build --env production --resource-group vimarsh-rg --app-name vimarsh-frontend-westus2
+cd frontend && npm run build && swa deploy build --env production --resource-group vimarsh-rg --app-name vimarsh-frontend
 ```
 
 **Backend**:
@@ -45,7 +45,7 @@ cd backend && func azure functionapp publish vimarsh-backend-app-flex --python
 ### vimarsh-rg (Unified Resources)
 | Resource | Type | Status | Purpose |
 |----------|------|--------|---------|
-| `vimarsh-frontend-westus2` | Static Web App | ✅ Live | React 18 frontend (West US 2) |
+| `vimarsh-frontend` | Static Web App | ✅ Live | React 18 frontend |
 | `vimarsh-backend-app-flex` | Function App | ✅ Live | Python 3.12 API (Flex Consumption) |
 | `vimarsh-db` | Cosmos DB Account | ✅ Active | Vector & document storage (serverless) |
 | `vimarsh-kv-*` | Key Vault | ✅ Active | Secrets & configuration |
