@@ -625,6 +625,10 @@ expert_review_temp/
 review_queue/
 validation_cache/
 
+# E2E validation results and test output files
+*validation_results*.json
+e2e_validation_*.json
+
 # Content moderation logs
 moderation_logs/
 content_flags/

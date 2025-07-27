@@ -43,14 +43,14 @@ Vimarsh is an AI-powered spiritual guidance system that provides personalized ad
 - **AI/ML**: Google Gemini 2.5 Flash, RAG pipeline with vector search
 - **Database**: Azure Cosmos DB with vector embeddings
 - **Authentication**: Microsoft Entra ID (configured, pending App Registration)
-- **Infrastructure**: Bicep IaC, two-resource-group pause-resume cost architecture
+- **Infrastructure**: Bicep IaC, unified resource group architecture
 - **Security**: Azure Key Vault, HTTPS everywhere
 - **CI/CD**: GitHub Actions with unified pipeline
 
 ### **Architecture Patterns**
 - **Serverless RAG Pipeline**: Vector search with citation system
 - **Domain-Driven Design**: Personality-specific knowledge domains
-- **Cost-Optimized**: Pause-resume architecture for development cost management
+- **Cost-Optimized**: Serverless architecture for cost management
 - **Single Production Environment**: Simplified deployment model
 
 ## 🎨 UI/UX Features (100% Complete)
@@ -193,7 +193,7 @@ Vimarsh is an AI-powered spiritual guidance system that provides personalized ad
 
 ### **Infrastructure as Code**
 - **Bicep Templates**: Complete Azure resource definitions
-- **Cost Management**: Two-resource-group architecture for cost optimization
+- **Cost Management**: Unified resource group architecture for simplified cost optimization
 - **Security**: Azure Key Vault integration for secrets management
 - **Monitoring**: Application Insights for production telemetry
 

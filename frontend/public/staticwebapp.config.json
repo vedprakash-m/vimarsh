@@ -9,7 +9,7 @@
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
       },
-      "rewrite": "https://vimarsh-backend-app.azurewebsites.net/api/{*}"
+      "rewrite": "https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api/{*}"
     }
   ],
   "navigationFallback": {

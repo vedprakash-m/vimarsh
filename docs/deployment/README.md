@@ -4,33 +4,33 @@ Complete guide for deploying Vimarsh AI Spiritual Guidance System to production.
 
 ## Overview
 
-Vimarsh uses a modern cloud-native architecture with a cost-optimized two-resource-group strategy:
+Vimarsh uses a modern cloud-native architecture with a unified resource group strategy:
 
 ### Architecture Components
 - **Backend:** Azure Functions (Python) - Consumption plan for cost efficiency
-- **Frontend:** Azure Static Web Apps (React) - Free tier for beta testing
+- **Frontend:** Azure Static Web Apps (React) - Free tier for optimal cost
 - **Database:** Azure Cosmos DB with vector search - Serverless mode
 - **AI:** Google Gemini Pro API - Pay-per-use model
 - **Authentication:** Microsoft Entra External ID - Free tier
 - **Monitoring:** Azure Application Insights - Basic tier
 - **Security:** Azure Key Vault - Standard tier
 
-### Two-Resource-Group Strategy (Cost Optimization)
+### Unified Resource Group Strategy (Simplified Management)
 
-**vimarsh-db-rg (Persistent Resources):**
-- Cosmos DB (`vimarsh-db`)
-- Key Vault (`vimarsh-kv`) 
-- Storage Account (`vimarshstorage`)
-
-**vimarsh-rg (Compute Resources):**
-- Function App (`vimarsh-functions`)
-- Static Web App (`vimarsh-web`)
-- Application Insights (`vimarsh-insights`)
+**vimarsh-rg (All Resources):**
+- Cosmos DB (`vimarsh-db`) - Multi-personality knowledge base
+- Key Vault (`vimarsh-kv-*`) - Secrets and configuration  
+- Storage Account (`vimarshstorage`) - Content and function storage
+- Function App (`vimarsh-backend-app`) - Backend API
+- Static Web App (`vimarsh-frontend`) - Frontend application
+- Application Insights (`vimarsh-backend-app`) - Monitoring
+- App Service Plan (`EastUSLinuxDynamicPlan`) - Consumption hosting
 
 **Benefits:**
-- **Pause/Resume:** Delete `vimarsh-rg` to stop all costs, keep data intact in `vimarsh-db-rg`
-- **Cost Control:** Pay only for storage when not actively using the application
-- **Quick Recovery:** Redeploy compute resources in minutes to resume operation
+- **Unified Management:** All resources in single resource group for simplified administration
+- **Cost Optimization:** Serverless and consumption-based pricing across all components
+- **Easy Monitoring:** Centralized resource management and cost tracking
+- **Simplified Deployment:** Single deployment target with consistent resource naming
 - **Idempotent:** Static resource names prevent duplicate resources during CI/CD
 
 ## Prerequisites
@@ -84,20 +84,24 @@ az account set --subscription "Your Subscription Name"
 export GEMINI_API_KEY="your-gemini-api-key"
 export AZURE_SUBSCRIPTION_ID="your-subscription-id"
 
-# Run deployment with two-resource-group strategy
+# Run deployment with unified resource group strategy
 ./scripts/deploy.sh dev
 ```
 
 ### 3. Deployment Output
 
-The deployment will create two resource groups:
+The deployment will create one unified resource group:
 
 ```bash
-# Persistent resources (always running - minimal cost)
-vimarsh-db-rg:
-  └── vimarsh-db (Cosmos DB)
-  └── vimarsh-kv (Key Vault)
-  └── vimarshstorage (Storage Account)
+# All resources in unified group (serverless cost optimization)
+vimarsh-rg:
+  ├── vimarsh-db (Cosmos DB - Serverless)
+  ├── vimarsh-kv-* (Key Vault - Standard)
+  ├── vimarshstorage (Storage Account - Standard LRS)
+  ├── vimarsh-backend-app (Function App - Consumption)
+  ├── vimarsh-frontend (Static Web App - Free)
+  ├── vimarsh-backend-app (Application Insights - Basic)
+  └── EastUSLinuxDynamicPlan (App Service Plan - Consumption)
 
 # Compute resources (can be paused to save cost)
 vimarsh-rg:
@@ -123,84 +127,89 @@ az consumption usage list --billing-period-name current
 
 ## Manual Deployment (Step by Step)
 
-### Phase 1: Persistent Resources Setup
+### Phase 1: Unified Resource Group Setup
 
-#### 1.1 Create Persistent Resource Group
-
-```bash
-# Create persistent resource group (Database, Key Vault, Storage)
-az group create \
-  --name vimarsh-db-rg \
-  --location eastus \
-  --tags project=vimarsh type=persistent costStrategy=pause-resume
-```
-
-#### 1.2 Deploy Persistent Resources
+#### 1.1 Create Unified Resource Group
 
 ```bash
-# Deploy using Bicep template
-az deployment group create \
-  --resource-group vimarsh-db-rg \
-  --template-file infrastructure/persistent.bicep \
-  --parameters location=eastus geminiApiKey="YOUR_API_KEY"
-```
-
-This creates:
-- **vimarsh-db:** Cosmos DB with vector search (serverless)
-- **vimarsh-kv:** Key Vault for secrets management
-- **vimarshstorage:** Storage account for Functions
-
-### Phase 2: Compute Resources Setup
-
-#### 2.1 Create Compute Resource Group
-
-```bash
-# Create compute resource group (Functions, Web App, Insights)
+# Create unified resource group (All Vimarsh resources)
 az group create \
   --name vimarsh-rg \
-  --location eastus \
-  --tags project=vimarsh type=compute costStrategy=pause-resume
+  --location "West US 2" \
+  --tags project=vimarsh costStrategy=unified environment=production
 ```
 
-#### 2.2 Deploy Compute Resources
+#### 1.2 Deploy All Resources with Unified Template
 
 ```bash
-# Get outputs from persistent deployment
-COSMOS_ENDPOINT=$(az cosmosdb show --name vimarsh-db --resource-group vimarsh-db-rg --query documentEndpoint -o tsv)
-KEY_VAULT_URI=$(az keyvault show --name vimarsh-kv --resource-group vimarsh-db-rg --query properties.vaultUri -o tsv)
-
-# Deploy compute resources
-az deployment group create \
-  --resource-group vimarsh-rg \
-  --template-file infrastructure/compute.bicep \
-  --parameters location=eastus \
-              keyVaultUri="$KEY_VAULT_URI" \
-              keyVaultName=vimarsh-kv \
-              cosmosDbEndpoint="$COSMOS_ENDPOINT" \
-              expertReviewEmail="your-email@domain.com"
+# Deploy using unified Bicep template
+az deployment sub create \
+  --location "West US 2" \
+  --template-file infrastructure/main.bicep \
+  --parameters geminiApiKey="YOUR_API_KEY" expertReviewEmail="your-email@example.com"
 ```
-az cosmosdb sql database create \
-  --account-name vimarsh-cosmos-prod \
-  --resource-group vimarsh-prod \
-  --name SpiritualGuidance
 
-# Create containers
-az cosmosdb sql container create \
-  --account-name vimarsh-cosmos-prod \
-  --resource-group vimarsh-prod \
-  --database-name SpiritualGuidance \
-  --name Documents \
-  --partition-key-path "/source" \
-  --throughput 400
+This creates all Vimarsh resources in the unified vimarsh-rg:
+- **vimarsh-db:** Cosmos DB with vector search (serverless)
+- **vimarsh-kv-*:** Key Vault for secrets management  
+- **vimarshstorage:** Storage account for Functions and content
+- **vimarsh-backend-app:** Function App for API (consumption plan)
+- **vimarsh-frontend:** Static Web App for frontend (free tier)
+- **vimarsh-backend-app:** Application Insights for monitoring
+- **EastUSLinuxDynamicPlan:** Linux consumption hosting plan
 
-az cosmosdb sql container create \
-  --account-name vimarsh-cosmos-prod \
-  --resource-group vimarsh-prod \
-  --database-name SpiritualGuidance \
-  --name Vectors \
-  --partition-key-path "/document_id" \
-  --throughput 400
+### Phase 2: Verify Deployment
+
+#### 2.1 Check Resource Creation
+
+```bash
+# Verify all resources are deployed in unified resource group
+az resource list --resource-group vimarsh-rg --output table
+
+# Check Function App status
+az functionapp show --name vimarsh-backend-app --resource-group vimarsh-rg --query state
+
+# Verify Static Web App
+az staticwebapp show --name vimarsh-frontend --resource-group vimarsh-rg --query status
 ```
+
+#### 2.2 Test API Endpoints
+
+```bash
+# Get Function App URL
+FUNCTION_URL=$(az functionapp show --name vimarsh-backend-app --resource-group vimarsh-rg --query defaultHostName -o tsv)
+
+# Test health endpoint
+curl "https://$FUNCTION_URL/api/health"
+
+# Get Static Web App URL
+STATIC_URL=$(az staticwebapp show --name vimarsh-frontend --resource-group vimarsh-rg --query defaultHostname -o tsv)
+echo "Frontend URL: https://$STATIC_URL"
+```
+
+## Production Deployment
+
+### Prerequisites for Production
+
+- Separate Azure subscription or resource group for production
+- Production-grade API keys
+- Custom domain certificates (optional)
+- Production monitoring setup
+
+### 1. Create Production Resources
+
+#### 1.1 Create Cosmos DB Account
+
+```bash
+# Create Cosmos DB account for production
+az cosmosdb create \
+  --name vimarsh-cosmos-prod \
+  --resource-group vimarsh-prod \
+  --location eastus \
+  --kind GlobalDocumentDB \
+  --capabilities EnableServerless EnableVectorSearch
+
+# Create database
 
 #### 1.3 Create Storage Account
 

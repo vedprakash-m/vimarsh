@@ -118,7 +118,7 @@ export const AUTH_CONFIG = {
 // API Configuration
 export const API_CONFIG = {
   baseUrl: process.env.REACT_APP_API_BASE_URL || (isProduction 
-    ? 'https://vimarsh-backend-app.azurewebsites.net/api'
+    ? 'https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api'
     : 'http://localhost:7071/api'),
   scopes: ENTRA_ID_CONFIG.scopes,
   timeout: 30000,
@@ -137,13 +137,13 @@ export const getApiBaseUrl = (): string => {
     const currentDomain = window.location.origin;
     if (isValidProductionDomain(currentDomain)) {
       console.log('🔗 Production domain detected, using production API:', currentDomain);
-      return 'https://vimarsh-backend-app.azurewebsites.net/api';
+      return 'https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api';
     }
   }
   
   // Fallback based on environment
   const apiUrl = isProduction 
-    ? 'https://vimarsh-backend-app.azurewebsites.net/api'
+    ? 'https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api'
     : 'http://localhost:7071/api';
   
   console.log('🔗 Using fallback API URL:', apiUrl, '(isProduction:', isProduction, ')');

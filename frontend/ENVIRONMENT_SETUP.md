@@ -63,7 +63,7 @@ REACT_APP_ENVIRONMENT=production
 REACT_APP_DEBUG_AUTH=false
 
 # API Configuration
-REACT_APP_API_BASE_URL=https://vimarsh-backend.azurewebsites.net/api
+REACT_APP_API_BASE_URL=https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api
 REACT_APP_API_SCOPES=openid,profile,email
 
 # Feature Flags for Production
@@ -134,7 +134,7 @@ REACT_APP_TENANT_ID=vedid.onmicrosoft.com
 REACT_APP_REDIRECT_URI=https://vimarsh.vedprakash.net/auth/callback
 REACT_APP_POST_LOGOUT_REDIRECT_URI=https://vimarsh.vedprakash.net
 REACT_APP_ENVIRONMENT=production
-REACT_APP_API_BASE_URL=https://vimarsh-backend.azurewebsites.net/api
+REACT_APP_API_BASE_URL=https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api
 ```
 
 ### Custom Domain Configuration

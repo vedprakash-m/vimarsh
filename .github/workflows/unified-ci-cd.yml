@@ -32,8 +32,8 @@ env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '18'
   COVERAGE_THRESHOLD: 25
-  AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend'
-  AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
+  AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend-app-flex'
+  AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend-westus2'
 
 jobs:
   # ===== STAGE 1: CHANGE DETECTION & SETUP =====
@@ -384,7 +384,18 @@ jobs:
     timeout-minutes: 15
 
     steps:
-    - name: 📥 Download Backend Artifact
+    - name: � Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 🔧 Install Azure Functions Core Tools
+      run: npm install -g azure-functions-core-tools@4 --unsafe-perm true
+
+    - name: �📥 Download Backend Artifact
       uses: actions/download-artifact@v4
       with:
         name: backend-package
@@ -396,12 +407,12 @@ jobs:
         name: frontend-build
         path: ./frontend-build
 
-    - name: 🚀 Deploy Backend to Azure Functions
-      uses: Azure/functions-action@v1
-      with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: './backend-package'
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+    - name: 🚀 Deploy Backend to Azure Functions (Flex Consumption)
+      run: |
+        # Copy backend files to deployment directory
+        cp -r ./backend-package/* ./backend/ 2>/dev/null || true
+        cd backend
+        func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }} --python
 
     - name: 🌐 Deploy Frontend to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1

@@ -73,7 +73,7 @@
 **💻 For Developers & Administrators:**
 - **Modern Architecture**: React 18 + TypeScript frontend, Python 3.12 Azure Functions backend
 - **Advanced RAG System**: Multi-domain vector search with Google Gemini 2.5 Flash
-- **Cost-Optimized Infrastructure**: Innovative pause-resume architecture reducing costs by 90%
+- **Cost-Optimized Infrastructure**: Serverless architecture with unified resource management
 - **Enterprise Security**: Microsoft Entra ID integration with role-based access control
 - **Comprehensive Admin Tools**: Full personality and content management system
 - **Production Ready**: Comprehensive CI/CD, monitoring, and quality assurance
@@ -148,7 +148,7 @@ python scripts/setup_production.py
 └── PhilosophicalTexts - Wisdom literature (Marcus Aurelius, Lao Tzu)
 
 🔧 Infrastructure Layer (Azure Cloud)
-├── Cost-Optimized Architecture - 90% cost reduction with pause-resume
+├── Unified Resource Management - Simplified cost optimization
 ├── Multi-Personality Monitoring - Individual performance tracking for all 12
 ├── Domain-Based Security - Granular access control per personality
 └── Global Distribution - CDN and multi-region deployment

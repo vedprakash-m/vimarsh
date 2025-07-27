@@ -183,7 +183,7 @@ The multi-personality conversational AI market is emerging and fragmented. Vimar
 #### **Technical Differentiators:**
 * **Domain-Specific RAG:** Personality-specific knowledge bases ensure responses are contextually appropriate and historically accurate.
 * **Voice Character Embodiment:** Each personality has distinct voice characteristics and speech patterns.
-* **Enterprise-Grade Infrastructure:** Scalable, secure, cost-optimized architecture with pause-resume capabilities.
+* **Enterprise-Grade Infrastructure:** Scalable, secure, cost-optimized serverless architecture with unified resource management.
 * **Multi-Modal Interaction:** Seamless text and voice interaction with personality-specific optimizations.
 
 #### **Market Positioning:**
@@ -360,7 +360,7 @@ This roadmap ensures Vimarsh evolves from a multi-personality platform into a co
   - Community engagement and partnerships
 * **Month 10-12:**
   - User acquisition and retention optimization
-  - Cost optimization through pause-resume cycles
+  - Cost optimization through serverless scaling and resource efficiency
   - Operational excellence and monitoring enhancement
 
 ### 7.2. Critical Dependencies:
@@ -387,30 +387,33 @@ This roadmap ensures Vimarsh evolves from a multi-personality platform into a co
 
 ### 7.4. Cost Management & Deployment Strategy
 
-**Single Environment Production Deployment:**
-* **Architecture Strategy**: Two-resource-group separation for cost optimization
-* **Monthly Active Cost**: $50-100 for full production operation
-* **Monthly Pause Cost**: $5-10 for storage-only during inactive periods
-* **Cost Reduction**: Up to 90% savings during extended inactivity
+**Unified Serverless Production Deployment:**
+* **Architecture Strategy**: Single resource group with serverless scaling for optimal cost efficiency
+* **Monthly Base Cost**: $10-30 for serverless resources (pay-per-use)
+* **Monthly Peak Cost**: $50-100 during high usage periods
+* **Cost Efficiency**: Up to 80% savings through serverless auto-scaling and consumption-based billing
 
-**Innovative Pause-Resume Strategy:**
+**Serverless Cost-Optimization Strategy:**
 ```
-Operational Mode     | Monthly Cost | Resource Status        | Data Retention
----------------------|--------------|------------------------|---------------
-Active Production    | $50-100      | Full service running   | Complete
-Paused State         | $5-10        | Compute deleted        | Complete
-Resume Operation     | $50-100      | Redeployed in <10min   | Complete
+Usage Mode           | Monthly Cost | Resource Status        | Scaling Behavior
+---------------------|--------------|------------------------|------------------
+Low Usage           | $10-30       | Auto-scale to zero     | Serverless consumption
+Active Production   | $50-100      | Auto-scale based on load | Elastic serverless
+High Traffic        | $100-200     | Maximum serverless scale | Auto-throttling
 ```
 
-**Resource Group Architecture:**
-* **vimarsh-db-rg**: Persistent resources (Cosmos DB, Key Vault, Storage) - Always active
-* **vimarsh-rg**: Compute resources (Functions, Web App, Monitoring) - Pause-resume capable
+**Unified Resource Group Architecture:**
+* **vimarsh-rg**: All resources in single group for simplified management
+  - Cosmos DB (serverless) - Always available, pay-per-request
+  - Function Apps (consumption) - Auto-scale based on demand  
+  - Static Web App (free tier) - Global CDN distribution
+  - Key Vault (standard) - Pay-per-operation security
 
-**Cost Optimization Benefits:**
-* **Operational flexibility**: Pause during low-usage periods without data loss
-* **Development efficiency**: Single production environment reduces complexity
-* **Resource efficiency**: Consumption-based pricing with serverless architecture
-* **Deployment consistency**: Static naming prevents duplicate resource creation
+**Serverless Cost Benefits:**
+* **Automatic scaling**: Resources scale to zero during inactivity
+* **Pay-per-use**: Only charged for actual resource consumption
+* **Simplified management**: Single resource group reduces operational overhead
+* **Global availability**: 99.9% uptime SLA with automatic failover
 
 > **Note:** Detailed cost analysis, infrastructure optimization strategies, and scaling projections are comprehensively documented in `Tech_Spec_Vimarsh.md` Section 17.
 
@@ -1203,7 +1206,7 @@ This enhanced framework ensures that Vimarsh maintains the highest standards of 
 * **Budget API Integration:** Real-time budget validation before expensive LLM operations
 * **Resource Scaling:** Automated scaling down of AI-related compute resources during off-peak hours
 * **Cost Attribution:** Detailed cost breakdown by user, operation type, and model usage
-* **Billing Optimization:** Intelligent use of Azure's pause-resume architecture for cost efficiency
+* **Billing Optimization:** Intelligent use of Azure's serverless architecture for automatic cost efficiency
 
 ### 13.2. Dynamic Fallback Mechanisms
 

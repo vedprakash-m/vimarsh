@@ -3,10 +3,15 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "value": "East US"
+      "value": "West US 2"
     },
     "geminiApiKey": {
-      "value": "placeholder-will-set-later"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/8c48242c-a20e-448a-ac0f-be75ac5ebad0/resourceGroups/vimarsh-rg/providers/Microsoft.KeyVault/vaults/vimarsh-kv-kflkds3zrcdzq"
+        },
+        "secretName": "GEMINI-API-KEY"
+      }
     },
     "expertReviewEmail": {
       "value": "vedprakash.m@me.com"

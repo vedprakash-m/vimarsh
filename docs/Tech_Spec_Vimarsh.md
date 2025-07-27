@@ -20,44 +20,39 @@ This document provides comprehensive technical specifications for implementing t
 * **Single Slot**: No staging slots to avoid environment duplication overhead
 * **Static Naming**: Idempotent resource names prevent duplicate creation during CI/CD
 
-### 2.2. Two-Resource-Group Architecture
+### 2.2. Unified Resource Group Architecture
 
-**vimarsh-persistent-rg (Persistent Resources):**
-* **Purpose**: Data retention and persistence through deployment cycles
+**vimarsh-rg (Unified Resource Group):**
+* **Purpose**: Simplified management of all Vimarsh resources in a single location
 * **Resources**: 
-  - Cosmos DB (`vimarsh-db`) - Spiritual texts and user data
-  - Key Vault (`vimarsh-kv`) - API keys and secrets
-  - Storage Account (`vimarshstorage`) - Content and media files
-* **Cost Behavior**: Always active, minimal storage costs (~$5-10/month)
-* **Lifecycle**: Never deleted, preserves all application state
+  - Cosmos DB (`vimarsh-db`) - Multi-personality knowledge base and user data
+  - Key Vault (`vimarsh-kv-*`) - API keys, secrets, and configuration
+  - Storage Account (`vimarshstorage`) - Content, media files, and function storage
+  - Function App (`vimarsh-backend-app-flex`) - Backend API server (Flex Consumption)
+  - Static Web App (`vimarsh-frontend`) - Frontend application  
+  - Application Insights (`vimarsh-backend-app-flex`) - Monitoring and telemetry
+  - App Service Plan (`ASP-vimarshrg-84c5`) - Flex Consumption hosting (West US 2)
+* **Cost Behavior**: Optimized with serverless and consumption-based pricing
+* **Lifecycle**: Unified management and deployment cycles
 
-**vimarsh-compute-rg (Compute Resources):**
-* **Purpose**: Application execution and user interaction
-* **Resources**:
-  - Function App (`vimarsh-functions`) - Backend API
-  - Static Web App (`vimarsh-web`) - Frontend hosting
-  - App Insights (`vimarsh-insights`) - Monitoring and telemetry
-* **Cost Behavior**: Can be completely deleted for cost savings
-* **Lifecycle**: Delete for pause, redeploy for resume
+### 2.3. Cost Optimization Strategy
 
-### 2.3. Pause-Resume Cost Strategy
+**Serverless Architecture Benefits:**
+1. **Cosmos DB Serverless**: Pay-per-request pricing model eliminates idle costs
+2. **Function App Flex Consumption Plan**: Pay only for actual execution time with improved cold start performance  
+3. **Static Web App Free Tier**: No hosting costs for frontend
+4. **Standard Storage**: Cost-optimized storage tier for infrequent access
 
-**Pause Operation (Cost Savings):**
-1. Delete entire `vimarsh-compute-rg` resource group
-2. Eliminates compute costs (~$40-90/month)
-3. Retains all data in `vimarsh-persistent-rg`
-4. Reduces costs to storage fees only
-
-**Resume Operation (Service Restoration):**
-1. Redeploy `vimarsh-compute-rg` infrastructure via Bicep
-2. Automatic reconnection to existing data
-3. Full service restoration in <10 minutes
-4. Zero data loss or configuration required
+**Resource Optimization:**
+1. **Single Resource Group**: Simplified cost tracking and management
+2. **Flex Consumption-Based Pricing**: Automatic scaling based on actual usage with enhanced performance
+3. **Regional Optimization**: Single region deployment reduces data transfer costs
+4. **Efficient Resource Sizing**: Right-sized resources for actual workload
 
 **Cost Comparison:**
-* **Active Production**: $50-100/month
-* **Paused State**: $5-10/month  
-* **Savings**: Up to 90% during inactive periods
+* **Production Operation**: $15-40/month (optimized serverless pricing)
+* **Low Usage Periods**: $5-15/month (automatic scaling down)  
+* **Unified Management**: Simplified cost allocation and monitoring
 
 ---
 
@@ -140,7 +135,7 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
   - Security and rate limiting
 
 **RAG Pipeline Components:**
-* **Document Store:** Azure Blob Storage in vimarsh-persistent-rg for persistent content
+* **Document Store:** Azure Blob Storage in vimarsh-rg for persistent content
 * **Vector Database:** Azure Cosmos DB (`vimarsh-db`) with serverless pricing
 * **Embedding Model:** Hugging Face `sentence-transformers` library
   - Primary: `all-MiniLM-L6-v2` or `paraphrase-MiniLM-L6-v2`
@@ -996,7 +991,7 @@ class ExpertReviewSystem:
 **Recommended Platform:** Microsoft Azure
 
 **Infrastructure Components:**
-* **Compute:** Azure Functions (Consumption Plan)
+* **Compute:** Azure Functions (Flex Consumption Plan)
 * **Storage:** Azure Blob Storage for texts and static assets
 * **Database:** Azure Cosmos DB with Vector Search for embeddings
 * **Networking:** Azure Static Web Apps (includes CDN)
@@ -1201,13 +1196,13 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-// Azure Functions (Consumption Plan)
+// Azure Functions (Flex Consumption Plan)
 resource hostingPlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: '${appName}-plan-${environment}'
   location: location
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
+    name: 'FC1'
+    tier: 'FlexConsumption'
   }
 }
 
@@ -1271,7 +1266,7 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-03-01' = {
 ```bash
 # Deploy infrastructure using Azure CLI
 az deployment group create \
-  --resource-group vimarsh-compute-rg \
+  --resource-group vimarsh-rg \
   --template-file infrastructure/main.bicep \
   --parameters appName=vimarsh environment=prod
 ```
@@ -1728,7 +1723,7 @@ Service Category              | Monthly Cost | Notes
 ------------------------------|--------------|----------------------------------
 Gemini Pro API                | $3.07        | 2,000 queries/month
 Google Cloud Speech Services  | $5.59        | STT + TTS for 40% of interactions
-Azure Functions (Consumption) | $8.00        | Serverless backend
+Azure Functions (Flex Consumption) | $8.00        | Serverless backend (improved performance)
 Azure Cosmos DB Vector Search | $25.00       | RAG text embeddings
 Azure Static Web Apps         | $0.00        | Frontend hosting (free tier)
 Azure Key Vault               | $3.00        | API key management
@@ -2048,7 +2043,7 @@ class AzureCostManager:
 
 **Automated Cost Actions:**
 * **Resource Scaling:** Automatic scaling down during off-peak hours
-* **Pause-Resume:** Intelligent use of two-resource-group architecture
+* **Resource Optimization:** Intelligent use of unified resource group architecture
 * **Alert Integration:** Real-time budget monitoring with automated responses
 * **Cost Attribution:** Detailed breakdown by service, user, and operation
 

@@ -1,13 +1,11 @@
-// Vimarsh Infrastructure as Code Template
-// DEPLOYMENT STRATEGY: Single environment (production), single region, single slot for cost efficiency
-// RESOURCE ORGANIZATION: This template orchestrates deployment to two resource groups:
-// - vimarsh-persistent-rg: Persistent resources (Cosmos DB, Key Vault, Storage) for data retention  
-// - vimarsh-compute-rg: Compute resources (Functions, Static Web App, App Insights) for pause-resume cost strategy
+// Vimarsh Infrastructure as Code Template - Unified Resource Group
+// DEPLOYMENT STRATEGY: Single environment (production), single region, single unified resource group for simplified management
+// RESOURCE ORGANIZATION: All resources deployed to vimarsh-rg for unified management and easier maintenance
 
 targetScope = 'subscription'
 
 @description('Location for all resources - single region deployment for cost efficiency')
-param location string = 'East US'
+param location string = 'West US 2'
 
 @description('Gemini API key for LLM integration')
 @secure()
@@ -16,73 +14,35 @@ param geminiApiKey string
 @description('Expert review email for spiritual content validation')
 param expertReviewEmail string = 'vedprakash.m@me.com'
 
-// Resource Group for Persistent Resources (Database, Secrets, Storage)
-// This resource group contains data that must persist through deployment cycles
-resource persistentResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'vimarsh-persistent-rg'
+// Unified Resource Group for All Resources
+// This resource group contains all Vimarsh resources for simplified management
+resource vimarshResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: 'vimarsh-rg'
   location: location
   tags: {
     project: 'vimarsh'
-    type: 'persistent'
-    purpose: 'data-retention'
-    costCenter: 'production'
+    costStrategy: 'unified'
+    environment: 'production'
+    purpose: 'spiritual-guidance-platform'
   }
 }
 
-// Resource Group for Compute Resources (Functions, Web App, Monitoring)
-// This resource group can be deleted/recreated for cost savings while preserving data
-resource computeResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'vimarsh-compute-rg'
-  location: location
-  tags: {
-    project: 'vimarsh'
-    type: 'compute'
-    purpose: 'pause-resume-strategy'
-    costCenter: 'production'
-  }
-}
-
-// Deploy Persistent Resources (Cosmos DB, Key Vault, Storage)
-module persistentResources 'persistent.bicep' = {
-  name: 'vimarsh-persistent-deployment'
-  scope: persistentResourceGroup
+// Deploy All Vimarsh Resources in Unified Resource Group
+module vimarshResources 'unified-resources.bicep' = {
+  name: 'vimarsh-unified-deployment'
+  scope: vimarshResourceGroup
   params: {
     location: location
     geminiApiKey: geminiApiKey
-  }
-}
-
-// Deploy Compute Resources (Functions, Static Web App, App Insights)
-module computeResources 'compute.bicep' = {
-  name: 'vimarsh-compute-deployment'
-  scope: computeResourceGroup
-  params: {
-    location: location
-    keyVaultUri: persistentResources.outputs.keyVaultUri
-    keyVaultName: persistentResources.outputs.keyVaultName
-    cosmosDbEndpoint: persistentResources.outputs.cosmosDbEndpoint
     expertReviewEmail: expertReviewEmail
   }
 }
 
-// Outputs for operational reference
-output persistentResourceGroup string = persistentResourceGroup.name
-output computeResourceGroup string = computeResourceGroup.name
-output functionAppUrl string = computeResources.outputs.functionAppUrl
-output staticWebAppUrl string = computeResources.outputs.staticWebAppUrl
-output cosmosDbName string = persistentResources.outputs.cosmosDbName
-output keyVaultName string = persistentResources.outputs.keyVaultName
-
-// Deployment Strategy Documentation
-// 
-// PAUSE-RESUME COST STRATEGY:
-// 1. To pause costs: Delete vimarsh-compute-rg resource group (keeps data in vimarsh-persistent-rg)
-// 2. To resume: Re-deploy this template (recreates compute resources, connects to existing data)
-// 3. Data persistence: All user data, configurations, and content remain in vimarsh-persistent-rg
-// 4. Cost savings: Only pay for storage costs during pause periods
-//
-// IDEMPOTENT DEPLOYMENTS:
-// - All resource names are static (e.g., vimarsh-db, vimarsh-kv, vimarsh-functions)
-// - No timestamp or random suffixes that create duplicates
-// - Safe to re-deploy multiple times without resource conflicts
-// - Consistent naming across all deployment cycles
+// Outputs for application configuration
+output resourceGroupName string = vimarshResourceGroup.name
+output storageAccountName string = vimarshResources.outputs.storageAccountName
+output cosmosDbAccountName string = vimarshResources.outputs.cosmosDbAccountName
+output keyVaultName string = vimarshResources.outputs.keyVaultName
+output functionAppName string = vimarshResources.outputs.functionAppName
+output staticWebAppName string = vimarshResources.outputs.staticWebAppName
+output applicationInsightsName string = vimarshResources.outputs.applicationInsightsName

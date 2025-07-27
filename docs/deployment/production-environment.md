@@ -6,17 +6,15 @@ This document outlines the complete production environment configuration for Vim
 
 ## Azure Resource Groups
 
-### Primary Resource Groups
-1. **vimarsh-db-rg** (Persistent Resources)
-   - Cosmos DB (vimarsh-cosmos)
-   - Key Vault (vimarsh-kv) 
-   - Storage Account (vimarshstorage)
-
-2. **vimarsh-rg** (Compute Resources)
-   - Azure Functions (vimarsh-functions)
-   - Static Web App (vimarsh-web)
-   - Application Insights (vimarsh-insights)
-   - App Service Plan (vimarsh-plan)
+### Unified Resource Group
+**vimarsh-rg** (All Resources)
+   - Cosmos DB (vimarsh-db) - Serverless vector database
+   - Key Vault (vimarsh-kv-*) - Secrets and configuration management
+   - Storage Account (vimarshstorage) - Function app and data storage
+   - Function App (vimarsh-backend-app) - Python 3.12 API on consumption plan
+   - Static Web App (vimarsh-frontend) - React frontend with global CDN
+   - Application Insights (vimarsh-backend-app) - Monitoring and logging
+   - Consumption Plan (EastUSLinuxDynamicPlan) - Serverless hosting
 
 ## Security Configuration
 
@@ -89,7 +87,7 @@ This document outlines the complete production environment configuration for Vim
 - **Monthly Budget**: $50-200 for beta testing phase
 - **Alert Thresholds**: 80% (warning), 100% (critical)
 - **Cost Controls**: Automatic scaling limits and throttling
-- **Resource Management**: Pause/resume capability
+- **Resource Management**: Automatic serverless scaling with consumption-based billing
 
 ### Resource Optimization
 - **Serverless**: Cosmos DB and Functions for pay-per-use
