@@ -21,7 +21,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__)))
 from services.personality_service import personality_service, PersonalitySearchFilter, PersonalityDomain
 from services.llm_service import EnhancedLLMService
 from services.knowledge_base_manager import knowledge_base_manager
-from data_processing.domain_processors import process_text
+from data_processing.domain_processors import process_text_with_auto_domain as process_text
 
 logger = logging.getLogger(__name__)
 
