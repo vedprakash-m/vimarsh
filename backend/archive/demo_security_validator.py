@@ -148,16 +148,16 @@ def demonstrate_data_filtering():
             {
                 "id": "user_123",
                 "email": "user@example.com",
-                "password": "supersecret123",
-                "api_key": "sk-1234567890abcdef",
+                "password": "[REDACTED]",
+                "api_key": "[REDACTED]",
                 "last_login": "2025-07-10T22:00:00Z",
                 "total_requests": 150
             },
             {
                 "id": "user_456",
                 "email": "admin@vimarsh.com",
-                "password_hash": "hashed_password_here",
-                "secret_key": "private_admin_key",
+                "password_hash": "[HASH_PLACEHOLDER]",
+                "secret_key": "[REDACTED]",
                 "permissions": ["admin", "super_admin"]
             }
         ],
@@ -165,11 +165,11 @@ def demonstrate_data_filtering():
             "database": {
                 "host": "localhost",
                 "port": 5432,
-                "connection_string": "postgresql://user:pass@localhost/db"
+                "connection_string": "[REDACTED]"
             },
             "llm": {
                 "provider": "google",
-                "api_key": "AIzaSyBxxxxxxxxxxxxxxxxxxxxxxx",
+                "api_key": "[REDACTED]",
                 "model": "gemini-2.5-flash"
             }
         },

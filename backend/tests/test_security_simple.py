@@ -139,8 +139,8 @@ def test_data_filtering():
     # Test basic filtering
     data = {
         "user_id": "123",
-        "password": "secret123",
-        "api_key": "sk-1234567890",
+        "password": "test_password_123",
+        "api_key": "test_mock_key_123",
         "safe_data": "this is safe"
     }
     

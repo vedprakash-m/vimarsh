@@ -629,6 +629,10 @@ validation_cache/
 *validation_results*.json
 e2e_validation_*.json
 
+# Demo and archive files that may contain test credentials
+backend/archive/demo_*.py
+*/demo_*.py
+
 # Content moderation logs
 moderation_logs/
 content_flags/

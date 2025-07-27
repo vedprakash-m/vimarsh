@@ -221,8 +221,8 @@ class TestDataFilter:
         data = {
             "user_id": "123",
             "user_email": "test@example.com",
-            "password": "secret123",
-            "api_key": "sk-1234567890",
+            "password": "test_password_123",
+            "api_key": "test_mock_key_123",
             "connection_string": "Server=localhost;Database=test;",
             "safe_data": "this is safe"
         }
@@ -244,7 +244,7 @@ class TestDataFilter:
                     "host": "localhost",
                     "password": "secret"
                 },
-                "api_key": "sk-123"
+                "api_key": "test_mock_key"
             },
             "users": [
                 {"id": "1", "email": "user1@test.com"},
@@ -388,7 +388,7 @@ class TestSecurityValidator:
                     "id": "123",
                     "email": "test@example.com",
                     "password": "secret",
-                    "api_key": "sk-123"
+                    "api_key": "test_mock_key"
                 }
             ],
             "system_info": {

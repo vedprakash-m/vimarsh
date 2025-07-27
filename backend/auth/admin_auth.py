@@ -40,7 +40,11 @@ class AdminAuthService:
     
     def __init__(self):
         self.admin_emails = self._get_admin_emails()
-        self.jwt_secret = os.getenv('JWT_SECRET', 'your-secret-key-here')
+        jwt_secret = os.getenv('JWT_SECRET')
+        if not jwt_secret:
+            logger.error("🚨 JWT_SECRET environment variable not set - admin auth disabled")
+            raise ValueError("JWT_SECRET must be configured for admin authentication")
+        self.jwt_secret = jwt_secret
         
     def _get_admin_emails(self) -> List[str]:
         """Get admin email addresses from environment"""
