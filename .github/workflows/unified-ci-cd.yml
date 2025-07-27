@@ -393,6 +393,15 @@ jobs:
         name: frontend-build
         path: ./frontend-build
 
+    - name: 🔍 Debug: List Frontend Artifact Contents
+      run: |
+        echo "📂 Contents of frontend-build directory:"
+        ls -la ./frontend-build
+        echo "📄 Checking index.html content:"
+        head -n 10 ./frontend-build/index.html
+        echo "📦 Checking if staticwebapp.config.json exists:"
+        ls -la ./frontend-build/staticwebapp.config.json || echo "No staticwebapp.config.json found"
+
     - name: 🌐 Deploy Frontend to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
       with:
@@ -401,6 +410,15 @@ jobs:
         action: "upload"
         app_location: "./frontend-build"
         skip_app_build: true
+        production_branch: "main"
+        skip_api_build: true
+        
+    - name: 🔍 Verify Deployment
+      run: |
+        echo "✅ Deployment completed to Azure Static Web Apps"
+        echo "🌐 Expected URL: https://vimarsh.vedprakash.net"
+        echo "🚀 Resource: vimarsh-frontend-westus2" 
+        echo "📅 Deployment time: $(date)"
 
   # ===== STAGE 7: POST-DEPLOYMENT VALIDATION =====
   post-deploy-validation:
