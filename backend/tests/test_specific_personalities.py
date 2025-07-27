@@ -29,7 +29,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from function_app import spiritual_guidance_impl
+from function_app import spiritual_guidance_endpoint
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ async def test_specific_personalities():
             mock_request = MockHttpRequest(request_data)
             
             # Call the API function
-            response = await spiritual_guidance_impl(mock_request)
+            response = await spiritual_guidance_endpoint(mock_request)
             
             # Parse response
             response_data = json.loads(response.get_body().decode('utf-8'))

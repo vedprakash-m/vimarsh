@@ -16,6 +16,7 @@ cryptography==41.0.7
 
 # AI/ML Libraries (Essential only)
 google-generativeai==0.7.2
+sentence-transformers==2.7.0
 
 # Utilities
 python-dotenv==1.0.0
@@ -28,3 +29,7 @@ structlog==23.2.0
 
 # Text Processing (lightweight)
 beautifulsoup4==4.12.2
+
+# Testing (for CI)
+pytest==7.4.3
+pytest-asyncio==0.21.1

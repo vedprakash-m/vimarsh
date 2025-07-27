@@ -16,7 +16,7 @@ import os
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
-from data_processing.domain_processors import DomainProcessorFactory, process_text
+from data_processing.domain_processors import DomainProcessorFactory, process_text_with_auto_domain as process_text
 from services.knowledge_base_manager import knowledge_base_manager
 from services.personality_service import personality_service
 

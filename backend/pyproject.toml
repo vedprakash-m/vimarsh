@@ -13,13 +13,6 @@ norecursedirs = [
     "*.disabled"
 ]
 
-# Ignore patterns to exclude disabled tests
-collect_ignore = [
-    "tests/voice_interface_disabled",
-    "tests/*_disabled",
-    "tests/*.disabled"
-]
-
 # Markers for test categorization
 markers = [
     "unit: Unit tests for individual components",
@@ -39,11 +32,9 @@ addopts = [
     "--strict-config", 
     "--tb=short",
     "--durations=10",
-    "-ra"
+    "-ra",
+    "--asyncio-mode=auto"
 ]
-
-# Async test support
-asyncio_mode = "auto"
 
 # Warning filters
 filterwarnings = [
