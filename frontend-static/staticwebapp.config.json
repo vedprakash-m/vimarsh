@@ -1,0 +1,44 @@
+{
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"],
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      },
+      "rewrite": "https://vimarsh-backend-app.azurewebsites.net/api/{*}"
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/static/*",
+      "/images/*.{png,jpg,gif}",
+      "/css/*",
+      "/js/*",
+      "/favicon.ico",
+      "/asset-manifest.json",
+      "/manifest.json",
+      "/robots.txt"
+    ]
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://vimarsh-backend-app.azurewebsites.net https://vimarsh.vedprakash.net https://*.gemini.ai https://fonts.googleapis.com https://fonts.gstatic.com https://login.microsoftonline.com https://*.login.microsoftonline.com https://graph.microsoft.com *.microsoft.com; worker-src 'self' blob:; frame-src 'self' https://login.microsoftonline.com;"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "text/javascript",
+    ".css": "text/css"
+  }
+}

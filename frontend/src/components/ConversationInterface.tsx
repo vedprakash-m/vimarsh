@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Send, Mic } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
+// Voice functionality temporarily disabled - imports kept for future implementation
+// import { Mic, MicOff } from 'lucide-react';
+// import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
 interface ConversationInterfaceProps {
   onBack: () => void;
@@ -8,6 +11,49 @@ interface ConversationInterfaceProps {
 const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ onBack }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Array<{id: string, text: string, isUser: boolean, citations?: any[]}>>([]);
+
+  /* Voice recognition functionality - temporarily disabled until fully implemented
+  const {
+    isListening,
+    isSupported,
+    transcript,
+    finalTranscript,
+    interimTranscript,
+    error,
+    startListening,
+    stopListening,
+    clearError
+  } = useVoiceRecognition(
+    { 
+      language: 'en',
+      continuous: false,
+      interimResults: true 
+    },
+    (result) => {
+      if (result.isFinal && result.transcript.trim()) {
+        setMessage(result.transcript.trim());
+      }
+    },
+    (error) => {
+      console.error('Voice recognition error:', error);
+    }
+  );
+
+  const handleVoiceToggle = () => {
+    if (!isSupported) {
+      alert('Voice recognition is not supported in your browser. Please try Chrome or Edge.');
+      return;
+    }
+
+    if (isListening) {
+      stopListening();
+    } else {
+      clearError(); // Clear any previous errors
+      startListening();
+      setMessage(''); // Clear existing message when starting voice input
+    }
+  };
+  */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,9 +187,18 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ onBack })
               placeholder="Ask your spiritual question..."
               className="message-input"
             />
-            <button type="button" className="voice-button">
-              <Mic size={20} />
+            {/* Voice functionality temporarily hidden until fully implemented */}
+            {/* 
+            <button 
+              type="button" 
+              className={`voice-button ${isListening ? 'listening' : ''} ${!isSupported ? 'disabled' : ''}`}
+              onClick={handleVoiceToggle}
+              disabled={!isSupported}
+              title={isSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice not supported'}
+            >
+              {isListening ? <MicOff size={20} /> : <Mic size={20} />}
             </button>
+            */}
             <button type="submit" className="send-button" disabled={!message.trim()}>
               <Send size={20} />
             </button>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Mic, MicOff, MessageSquare, Users } from 'lucide-react';
+import { Send, MessageSquare, Users } from 'lucide-react';
+// Voice functionality temporarily disabled - imports kept for future implementation
+// import { Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
@@ -305,6 +307,8 @@ export default function CleanSpiritualInterface() {
           >
             <Users size={18} />
           </button>
+          {/* Voice functionality temporarily hidden until fully implemented */}
+          {/* 
           <button
             onClick={() => setIsListening(!isListening)}
             style={{
@@ -321,6 +325,7 @@ export default function CleanSpiritualInterface() {
           >
             {isListening ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
+          */}
         </div>
       </header>
 

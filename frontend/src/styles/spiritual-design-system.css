@@ -469,6 +469,42 @@ body {
   transform: scale(1.05);
 }
 
+/* Voice button listening states */
+.voice-button.listening {
+  background: var(--divine-crimson);
+  animation: pulse-listening 1.5s ease-in-out infinite;
+  box-shadow: 0 0 0 4px rgba(255, 69, 0, 0.3);
+}
+
+.voice-button.disabled {
+  background: var(--peaceful-grey);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.voice-button.disabled:hover {
+  transform: none;
+  background: var(--peaceful-grey);
+}
+
+/* Input listening state */
+.message-input.listening {
+  border-color: var(--divine-crimson);
+  box-shadow: 0 0 0 2px rgba(255, 69, 0, 0.2);
+  background: rgba(255, 69, 0, 0.05);
+}
+
+@keyframes pulse-listening {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
 .send-button {
   background: var(--sacred-saffron);
   color: var(--lotus-white);

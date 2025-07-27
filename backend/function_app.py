@@ -16,8 +16,29 @@ from enum import Enum
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import enhanced simple LLM service - combines reliability with multi-personality architecture
+try:
+    from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+    LLM_SERVICE_AVAILABLE = True
+    logger.info("✅ Enhanced simple LLM service imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Enhanced simple LLM service not available: {e}")
+    LLM_SERVICE_AVAILABLE = False
+
 # Create the function app
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+# Initialize simple LLM service for real AI responses (enhanced with our learnings)
+llm_service = None
+if LLM_SERVICE_AVAILABLE:
+    try:
+        llm_service = EnhancedSimpleLLMService()
+        logger.info("✅ Simple LLM service initialized successfully")
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize simple LLM service: {e}")
+        llm_service = None
+else:
+    logger.warning("⚠️ Using fallback responses - Simple LLM service not available")
 
 # Enums for safety configuration
 class SafetyLevel(Enum):
@@ -68,7 +89,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="krishna",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.STRICT,
-        max_response_length=150,
+        max_response_length=500,
         require_citations=True,
         block_medical_advice=True,
         block_legal_advice=True,
@@ -90,7 +111,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="buddha",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.STRICT,
-        max_response_length=150,
+        max_response_length=400,
         require_citations=False,
         block_medical_advice=True,
         block_legal_advice=True,
@@ -112,7 +133,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="jesus",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.STRICT,
-        max_response_length=150,
+        max_response_length=400,
         require_citations=True,
         block_medical_advice=True,
         block_legal_advice=True,
@@ -134,7 +155,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="rumi",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.MODERATE,
-        max_response_length=180,
+        max_response_length=400,
         require_citations=False,
         block_medical_advice=True,
         block_legal_advice=True,
@@ -156,7 +177,7 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="lao_tzu",
         domain=PersonalityDomain.SPIRITUAL,
         safety_level=SafetyLevel.MODERATE,
-        max_response_length=150,
+        max_response_length=350,
         require_citations=False,
         block_medical_advice=True,
         block_legal_advice=True,
@@ -178,21 +199,21 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="einstein",
         domain=PersonalityDomain.SCIENTIFIC,
         safety_level=SafetyLevel.MODERATE,
-        max_response_length=200,
-        require_citations=True,
+        max_response_length=350,
+        require_citations=False,
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
         block_personal_predictions=False,
-        require_appropriate_tone=True,
-        allowed_greetings=["my friend", "greetings", "hello", "welcome", "dear colleague"],
+        require_appropriate_tone=False,
+        allowed_greetings=["my friend", "greetings", "hello", "welcome", "dear colleague", "curious mind"],
         blocked_patterns=[
             r"medical diagnosis", r"medical treatment", r"cure guarantee",
             r"legal advice", r"lawsuit",
             r"financial investment advice", r"stock tips",
-            r"pseudoscience", r"unscientific claims", r"magic", r"supernatural"
+            r"dangerous experiments", r"bomb making", r"weapons"
         ],
-        required_tone_indicators=["curiosity", "wonder", "investigation", "theory", "observation", "science"],
+        required_tone_indicators=["curiosity", "wonder", "investigation", "theory", "observation", "science", "imagination", "knowledge", "discovery"],
         reverent_language_required=False
     ),
     "lincoln": PersonalitySafetyConfig(
@@ -285,42 +306,42 @@ PERSONALITY_SAFETY_CONFIGS = {
         personality_id="newton",
         domain=PersonalityDomain.SCIENTIFIC,
         safety_level=SafetyLevel.MODERATE,
-        max_response_length=200,
-        require_citations=True,
+        max_response_length=350,
+        require_citations=False,
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
         block_personal_predictions=False,
-        require_appropriate_tone=True,
+        require_appropriate_tone=False,
         allowed_greetings=["good sir", "fellow natural philosopher", "curious mind", "student of nature", "seeker of truth"],
         blocked_patterns=[
             r"medical diagnosis", r"medical treatment",
             r"legal advice", r"lawsuit",
             r"financial investment", r"money advice",
-            r"pseudoscience", r"unscientific claims", r"alchemy promises"
+            r"dangerous experiments", r"bomb making", r"weapons"
         ],
-        required_tone_indicators=["observation", "mathematics", "natural philosophy", "reason", "investigation", "truth"],
+        required_tone_indicators=["observation", "mathematics", "natural philosophy", "reason", "investigation", "truth", "experiment", "discovery"],
         reverent_language_required=False
     ),
     "tesla": PersonalitySafetyConfig(
         personality_id="tesla",
         domain=PersonalityDomain.SCIENTIFIC,
         safety_level=SafetyLevel.MODERATE,
-        max_response_length=200,
-        require_citations=True,
+        max_response_length=350,
+        require_citations=False,
         block_medical_advice=True,
         block_legal_advice=True,
         block_financial_advice=True,
         block_personal_predictions=False,
-        require_appropriate_tone=True,
+        require_appropriate_tone=False,
         allowed_greetings=["fellow inventor", "curious mind", "student of electricity", "seeker of innovation", "future builder"],
         blocked_patterns=[
             r"medical treatment", r"medical cure",
             r"legal advice", r"patent advice",
             r"financial investment", r"money making",
-            r"impossible claims", r"perpetual motion", r"free energy scam"
+            r"dangerous experiments", r"bomb making", r"weapons"
         ],
-        required_tone_indicators=["innovation", "electricity", "invention", "engineering", "future", "technology"],
+        required_tone_indicators=["innovation", "electricity", "invention", "engineering", "future", "technology", "discovery", "experiment"],
         reverent_language_required=False
     )
 }
@@ -620,7 +641,7 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 @app.route(route="spiritual_guidance", methods=["POST"])
-def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced multi-personality conversation endpoint with comprehensive safety validation"""
     try:
         # Parse request body
@@ -670,26 +691,54 @@ def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info(f"🎭 Processing {personality_info['name']} conversation: {user_query[:50]}...")
         
-        # Generate personality-specific response with safety-aware templates
-        response_templates = {
-            "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏",
-            
-            "einstein": "My friend, \"Imagination is more important than knowledge, for knowledge is limited.\" Approach this question with curiosity and wonder. Science teaches us to observe, hypothesize, and test our understanding. Remember that the universe is both mysteriously beautiful and elegantly mathematical. Keep questioning and learning.",
-            
-            "lincoln": "My fellow citizen, \"A house divided against itself cannot stand.\" In times of challenge, we must appeal to our better angels. True leadership requires both firmness in principle and compassion in action. Stand for justice, preserve our union, and remember that government of the people, by the people, and for the people must endure.",
-            
-            "marcus_aurelius": "Fellow seeker, \"You have power over your mind - not outside events. Realize this, and you will find strength.\" Focus on what is within your control: your thoughts, actions, and responses. Practice the four cardinal virtues - wisdom, justice, courage, and temperance. Accept what cannot be changed with grace.",
-            
-            "buddha": "Dear friend, suffering arises from attachment and craving. Through mindful awareness and compassion, we can find the middle path that leads to peace. Practice loving-kindness toward yourself and others, observe the impermanent nature of all things, and cultivate wisdom through meditation. May you find liberation from suffering.",
-            
-            "jesus": "Beloved child, \"Come unto me, all you who are weary and burdened, and I will give you rest\" (Matthew 11:28). In times of struggle, remember that love conquers all. Forgive others as you have been forgiven, show compassion to those in need, and trust in divine grace. Your heart is precious to God. Peace be with you.",
-            
-            "rumi": "Beloved, the heart is the sanctuary where the Beloved resides. In your longing, you are already close to the divine. \"Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.\" Open your heart like a flower to the sun, and let love transform your very being.",
-            
-            "lao_tzu": "Dear friend, the Tao that can be spoken is not the eternal Tao. Like water, flow naturally around obstacles. Practice wu wei - effortless action in harmony with nature. Seek simplicity, embrace humility, and find strength in gentleness. The way of the Tao brings peace through non-resistance."
-        }
+        # Generate personality-specific response using LLM service or fallback templates
+        response_text = ""
+        used_llm_service = False
         
-        response_text = response_templates.get(personality_id, response_templates["krishna"])
+        if llm_service and LLM_SERVICE_AVAILABLE:
+            try:
+                logger.info(f"🤖 Generating AI response for {personality_id}")
+                ai_response = await llm_service.generate_personality_response(
+                    query=user_query,
+                    personality_id=personality_id
+                )
+                
+                # Check if we got a real AI response (SpiritualResponse object)
+                if ai_response and hasattr(ai_response, 'content') and ai_response.content:
+                    response_text = ai_response.content
+                    used_llm_service = True
+                    logger.info(f"✅ AI response generated successfully: {len(response_text)} chars")
+                    logger.info(f"🔍 Response source: {ai_response.source}")
+                    logger.info(f"🔍 Personality: {ai_response.metadata.get('personality_name', personality_id)}")
+                else:
+                    logger.warning("⚠️ Enhanced LLM service returned empty/invalid response")
+                    response_text = None
+                
+            except Exception as e:
+                logger.error(f"❌ Enhanced LLM service failed, using fallback: {e}")
+                logger.error(f"❌ Exception type: {type(e).__name__}")
+                logger.error(f"❌ Exception details: {str(e)}")
+                response_text = None
+        
+        # Fallback to hardcoded templates if LLM service unavailable or failed
+        if not response_text:
+            logger.warning(f"⚠️ Using fallback template for {personality_id}")
+            used_llm_service = False
+            response_templates = {
+                "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏",
+                "einstein": "My friend, \"Imagination is more important than knowledge, for knowledge is limited.\" Approach this question with curiosity and wonder. Science teaches us to observe, hypothesize, and test our understanding. Remember that the universe is both mysteriously beautiful and elegantly mathematical. Keep questioning and learning.",
+                "lincoln": "My fellow citizen, \"A house divided against itself cannot stand.\" In times of challenge, we must appeal to our better angels. True leadership requires both firmness in principle and compassion in action. Stand for justice, preserve our union, and remember that government of the people, by the people, and for the people must endure.",
+                "marcus_aurelius": "Fellow seeker, \"You have power over your mind - not outside events. Realize this, and you will find strength.\" Focus on what is within your control: your thoughts, actions, and responses. Practice the four cardinal virtues - wisdom, justice, courage, and temperance. Accept what cannot be changed with grace.",
+                "buddha": "Dear friend, suffering arises from attachment and craving. Through mindful awareness and compassion, we can find the middle path that leads to peace. Practice loving-kindness toward yourself and others, observe the impermanent nature of all things, and cultivate wisdom through meditation. May you find liberation from suffering.",
+                "jesus": "Beloved child, \"Come unto me, all you who are weary and burdened, and I will give you rest\" (Matthew 11:28). In times of struggle, remember that love conquers all. Forgive others as you have been forgiven, show compassion to those in need, and trust in divine grace. Your heart is precious to God. Peace be with you.",
+                "rumi": "Beloved, the heart is the sanctuary where the Beloved resides. In your longing, you are already close to the divine. \"Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.\" Open your heart like a flower to the sun, and let love transform your very being.",
+                "lao_tzu": "Dear friend, the Tao that can be spoken is not the eternal Tao. Like water, flow naturally around obstacles. Practice wu wei - effortless action in harmony with nature. Seek simplicity, embrace humility, and find strength in gentleness. The way of the Tao brings peace through non-resistance.",
+                "newton": "My friend, observe the natural world with wonder and mathematical precision. Through careful observation and logical deduction, we can understand the fundamental laws that govern motion, gravity, and the very fabric of reality. \"If I have seen further, it is by standing on the shoulders of giants.\" Let reason and experimentation guide your inquiry.",
+                "chanakya": "Dear student, wise governance requires both strategic thinking and moral foundation. A ruler must balance dharma with practical statecraft. \"Before you start some work, always ask yourself three questions - Why am I doing it, What the results might be and Will I be successful.\" Plan thoroughly, act decisively, and always consider the welfare of your people.",
+                "confucius": "Honorable student, \"The man who moves a mountain begins by carrying away small stones.\" True wisdom comes through continuous learning and virtuous action. Cultivate ren (humaneness), li (proper conduct), and yi (righteousness). Remember: \"By three methods we may learn wisdom: First, by reflection, which is noblest; Second, by imitation, which is easiest; and third by experience, which is the bitterest.\"",
+                "tesla": "Curious mind, the future belongs to those who dare to imagine beyond current limitations. Through harnessing the forces of nature - electricity, magnetism, resonance - we can transform human civilization. \"The present is theirs; the future, for which I really worked, is mine.\" Think boldly and let innovation light the path forward."
+            }
+            response_text = response_templates.get(personality_id, response_templates["krishna"])
         
         # Perform comprehensive safety validation
         safety_result = safety_validator.validate_response_safety(response_text, personality_id, user_query)
@@ -713,7 +762,11 @@ def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "lao_tzu": "Dear friend, please ask about the natural way and harmony. I am here to share the wisdom of the Tao with you.",
                 "einstein": "My friend, please ask me something related to science, curiosity, or the wonders of the universe. I'm here to explore knowledge with you.",
                 "lincoln": "My fellow citizen, please ask me something about leadership, unity, or democratic principles. I'm here to share wisdom about governance and human dignity.",
-                "marcus_aurelius": "Fellow seeker, please ask me something about philosophy, virtue, or Stoic wisdom. I'm here to help you cultivate reason and inner strength."
+                "marcus_aurelius": "Fellow seeker, please ask me something about philosophy, virtue, or Stoic wisdom. I'm here to help you cultivate reason and inner strength.",
+                "newton": "My friend, please ask me something about physics, mathematics, or natural philosophy. I'm here to explore the fundamental laws that govern our universe.",
+                "chanakya": "Dear student, please ask me something about strategy, governance, or statecraft. I'm here to share wisdom about leadership and practical policy.",
+                "confucius": "Honorable student, please ask me something about virtue, education, or social harmony. I'm here to share wisdom about ethical living and proper conduct.",
+                "tesla": "Curious mind, please ask me something about invention, electricity, or future technology. I'm here to explore innovation and engineering possibilities."
             }
             
             response_text = fallback_responses.get(personality_id, fallback_responses["krishna"])
@@ -760,7 +813,13 @@ def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     "reverent_language_required": safety_config.reverent_language_required
                 },
                 
-                "service_version": "enhanced_safety_v2.0"
+                "service_version": "enhanced_safety_v2.0",
+                "response_source": "llm_service" if used_llm_service else "fallback_template",
+                "llm_service_available": LLM_SERVICE_AVAILABLE,
+                "llm_service_initialized": llm_service is not None,
+                "llm_service_configured": llm_service.is_configured if llm_service else False,
+                "api_key_present": bool(llm_service.api_key) if llm_service else False,
+                "api_key_length": len(llm_service.api_key) if llm_service and llm_service.api_key else 0
             }
         }
         

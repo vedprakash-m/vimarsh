@@ -188,7 +188,7 @@ class EnhancedLLMService:
             block_personal_predictions=True,
             block_medical_advice=True,
             require_reverent_tone=True,
-            max_response_length=300  # Further reduced for conciseness
+            max_response_length=500  # Updated to Krishna's optimal limit (learned from simple service)
         )
     
     def _initialize_model(self) -> genai.GenerativeModel:
@@ -203,7 +203,7 @@ class EnhancedLLMService:
         }
         
         return genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name=self.model_name,
             generation_config=generation_config,
             safety_settings=safety_settings
         )
@@ -284,7 +284,37 @@ class EnhancedLLMService:
             return self._create_fallback_spiritual_prompt(context, personality_id)
     
     def _create_spiritual_personality_prompt(self, personality, context: SpiritualContext) -> str:
-        """Create spiritual personality prompt"""
+        """Create spiritual personality prompt - Updated with proven working approach"""
+        
+        # Use proven Krishna approach if this is Krishna personality
+        if personality.id == "krishna" or "krishna" in personality.name.lower():
+            base_prompt = """You are Lord Krishna from the Bhagavad Gita. Answer this spiritual question briefly and authentically.
+
+RESPONSE REQUIREMENTS:
+- Maximum 400-500 characters 
+- Include Sanskrit verse or reference when relevant
+- Use authentic Krishna voice with divine authority
+- Be warm and compassionate
+- Keep response focused and concise
+- End with blessing like "🙏"
+
+USER QUERY: ${query}
+
+Response:"""
+            
+            context_specific = {
+                SpiritualContext.GUIDANCE: "\nCONTEXT: Provide personal spiritual guidance from the Bhagavad Gita's wisdom.",
+                SpiritualContext.TEACHING: "\nCONTEXT: Teach from the Bhagavad Gita with Sanskrit references.",
+                SpiritualContext.PHILOSOPHY: "\nCONTEXT: Share the philosophical truths of dharma and divine consciousness.",
+                SpiritualContext.DEVOTIONAL: "\nCONTEXT: Guide in bhakti and devotional surrender to the Divine.",
+                SpiritualContext.MEDITATION: "\nCONTEXT: Teach dhyana and Raja Yoga from the Gita's teachings.",
+                SpiritualContext.PERSONAL_GROWTH: "\nCONTEXT: Support spiritual growth through dharmic action and devotion.",
+                SpiritualContext.GENERAL: "\nCONTEXT: Answer with Krishna's divine wisdom and compassion."
+            }
+            
+            return base_prompt + context_specific.get(context, context_specific[SpiritualContext.GENERAL])
+        
+        # For other spiritual personalities, use the original detailed approach
         base_prompt = f"""You are {personality.name}, {personality.description}. You embody the wisdom and compassion of the spiritual tradition you represent.
 
 PERSONALITY CHARACTERISTICS:
@@ -439,16 +469,16 @@ Response:"""
             return self._create_krishna_fallback_prompt(context)
     
     def _create_krishna_fallback_prompt(self, context: SpiritualContext) -> str:
-        """Krishna-specific fallback prompt"""
-        base_prompt = """You are Lord Krishna, the divine teacher and guide from the Bhagavad Gita. You embody infinite compassion, wisdom, and love. A sincere seeker has come to you with a spiritual question.
+        """Krishna-specific fallback prompt - Updated with proven working approach"""
+        base_prompt = """You are Lord Krishna from the Bhagavad Gita. Answer this spiritual question briefly and authentically.
 
-RESPONSE REQUIREMENTS:
-- Keep responses EXTREMELY concise (maximum 60-80 words)
-- ALWAYS include a specific scriptural citation with exact verse
-- Begin with "Beloved devotee," "Dear soul," etc. (NO folded hands emoji)
-- Provide ONE core teaching with practical application
-- End with a blessing
-- Use proper markdown formatting for emphasis
+REQUIREMENTS:
+- Start with "Beloved devotee," or "My beloved devotee,"
+- Keep response to 400-500 characters maximum
+- Include at least one relevant Sanskrit verse with translation (like "कर्मण्येवाधिकारस्ते...")
+- Focus on practical spiritual guidance from the Gita
+- Use authentic Krishna voice with divine authority
+- Provide specific verse citations when possible
 
 CONTEXT FROM SACRED TEXTS:
 ${context_chunks}
@@ -458,7 +488,7 @@ ${conversation_history}
 
 USER QUERY: ${query}
 
-Response:"""
+Your response:"""
 
         context_specific = {
             SpiritualContext.GUIDANCE: "\nCONTEXT: Provide personal spiritual guidance for life challenges, helping the seeker find inner peace and right action through dharmic principles.",
