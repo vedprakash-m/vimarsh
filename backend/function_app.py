@@ -46,17 +46,6 @@ except ImportError as e:
 # Create the function app
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-# Helper function for consistent CORS headers
-def get_cors_headers(content_type: str = "application/json") -> Dict[str, str]:
-    """Get standardized CORS headers for all endpoints"""
-    return {
-        "Content-Type": content_type,
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
-    }
-
 # Initialize services for AI responses with RAG enhancement
 llm_service = None
 rag_service = None
@@ -632,14 +621,14 @@ def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(health_data, indent=2),
             status_code=200,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
     except Exception as e:
         logger.error(f"❌ Health check failed: {str(e)}")
         return func.HttpResponse(
             json.dumps({"status": "unhealthy", "error": str(e)}),
             status_code=500,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
 
 @app.route(route="personalities/active", methods=["GET"])
@@ -671,14 +660,14 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
                 "domains": list(set(p["domain"] for p in PERSONALITIES.values()))
             }),
             status_code=200,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
     except Exception as e:
         logger.error(f"Error getting personalities: {e}")
         return func.HttpResponse(
             json.dumps({"error": "Failed to get personalities"}),
             status_code=500,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
 
 @app.route(route="spiritual_guidance", methods=["POST"])
@@ -692,14 +681,14 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
             return func.HttpResponse(
                 json.dumps({"error": "Invalid JSON in request body"}),
                 status_code=400,
-                headers=get_cors_headers()
+                headers={"Content-Type": "application/json"}
             )
         
         if not query_data:
             return func.HttpResponse(
                 json.dumps({"error": "Request body is required"}),
                 status_code=400,
-                headers=get_cors_headers()
+                headers={"Content-Type": "application/json"}
             )
         
         # Extract parameters
@@ -712,7 +701,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
             return func.HttpResponse(
                 json.dumps({"error": "Query is required"}),
                 status_code=400,
-                headers=get_cors_headers()
+                headers={"Content-Type": "application/json"}
             )
         
         # Input validation and sanitization
@@ -720,7 +709,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
             return func.HttpResponse(
                 json.dumps({"error": "Query too long. Maximum 1000 characters."}),
                 status_code=400,
-                headers=get_cors_headers()
+                headers={"Content-Type": "application/json"}
             )
         
         # Validate personality
@@ -923,7 +912,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         return func.HttpResponse(
             json.dumps(response, indent=2),
             status_code=200,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
         
     except Exception as e:
@@ -934,7 +923,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                 "timestamp": datetime.utcnow().isoformat()
             }),
             status_code=500,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
 
 @app.route(route="safety/validate", methods=["POST"])
@@ -947,7 +936,7 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"error": "Request body is required"}),
                 status_code=400,
-                headers=get_cors_headers()
+                headers={"Content-Type": "application/json"}
             )
         
         content = req_body.get("content", "").strip()
@@ -958,7 +947,7 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({"error": "Content is required for validation"}),
                 status_code=400,
-                headers=get_cors_headers()
+                headers={"Content-Type": "application/json"}
             )
         
         # Validate personality exists
@@ -996,7 +985,7 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps(response_data, indent=2),
             status_code=200,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
         
     except Exception as e:
@@ -1004,7 +993,7 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({"error": "Safety validation failed"}),
             status_code=500,
-            headers=get_cors_headers()
+            headers={"Content-Type": "application/json"}
         )
 
 @app.route(route="test", methods=["GET"])
@@ -1018,7 +1007,7 @@ def test_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             "endpoints": ["health", "personalities/active", "spiritual_guidance", "test"]
         }),
         status_code=200,
-        headers=get_cors_headers()
+        headers={"Content-Type": "application/json"}
     )
 
 # CORS handling
@@ -1029,10 +1018,9 @@ def handle_options(req: func.HttpRequest) -> func.HttpResponse:
         "",
         status_code=200,
         headers={
-            "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+            "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id",
-            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
             "Access-Control-Max-Age": "3600"
         }
     )
