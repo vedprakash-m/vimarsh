@@ -16,7 +16,7 @@ interface Personality {
 const personalities: Personality[] = [
   {
     id: 'krishna',
-    name: 'Lord Krishna',
+    name: 'Krishna',
     domain: 'Spiritual',
     description: 'Divine wisdom from the Bhagavad Gita',
     expertise: 'Dharma, duty, and spiritual enlightenment',
@@ -85,6 +85,42 @@ const personalities: Personality[] = [
     expertise: 'Taoism, balance, and natural wisdom',
     color: '#14B8A6',
     darkColor: '#0D9488'
+  },
+  {
+    id: 'chanakya',
+    name: 'Chanakya',
+    domain: 'Historical',
+    description: 'Ancient Indian strategist and advisor',
+    expertise: 'Strategy, economics, and political wisdom',
+    color: '#F97316',
+    darkColor: '#EA580C'
+  },
+  {
+    id: 'confucius',
+    name: 'Confucius',
+    domain: 'Historical',
+    description: 'Chinese philosopher and educator',
+    expertise: 'Ethics, social harmony, and education',
+    color: '#6366F1',
+    darkColor: '#4F46E5'
+  },
+  {
+    id: 'newton',
+    name: 'Isaac Newton',
+    domain: 'Scientific',
+    description: 'Father of classical mechanics',
+    expertise: 'Mathematics, physics, and natural laws',
+    color: '#8B5CF6',
+    darkColor: '#7C3AED'
+  },
+  {
+    id: 'tesla',
+    name: 'Nikola Tesla',
+    domain: 'Scientific',
+    description: 'Pioneer of modern electrical technology',
+    expertise: 'Electrical engineering, innovation, and invention',
+    color: '#0EA5E9',
+    darkColor: '#0284C7'
   }
 ];
 
@@ -214,7 +250,7 @@ const LandingPage: React.FC = () => {
           color: 'rgba(255, 255, 255, 0.95)',
           textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
         }}>
-          Experience authentic conversations with Einstein about scientific discovery, seek spiritual wisdom from Lord Krishna, learn leadership from Lincoln, or explore philosophy with Marcus Aurelius. Each personality grounded in their actual works and teachings.
+          Experience authentic conversations with Einstein about scientific discovery, seek spiritual wisdom from Krishna, learn leadership from Lincoln, or explore philosophy with Marcus Aurelius. Each personality grounded in their actual works and teachings.
         </p>
 
         <button

@@ -118,7 +118,7 @@ export const translations = {
     exportSelected: 'Export Selected',
     matchingMessages: 'matching messages',
     you: 'You',
-    lordKrishna: 'Lord Krishna',
+    lordKrishna: 'Krishna',
     moreMatches: 'more matches',
     
     // Errors and States
@@ -144,7 +144,7 @@ export const translations = {
     hideArchive: 'Hide conversation archive',
     showArchive: 'Show conversation archive',
     startConversation: 'Start your spiritual journey by asking a question',
-    lordKrishnaIsTyping: 'Lord Krishna is responding...',
+    lordKrishnaIsTyping: 'Krishna is responding...',
     sending: 'Sending...',
     
     // Accessibility
@@ -154,8 +154,8 @@ export const translations = {
     welcomeHeading: 'Welcome section',
     conversationMessages: 'Conversation messages',
     yourMessage: 'Your message',
-    lordKrishnaMessage: 'Lord Krishna\'s message',
-    lordKrishnaResponse: 'Lord Krishna\'s response',
+    lordKrishnaMessage: 'Krishna\'s message',
+    lordKrishnaResponse: 'Krishna\'s response',
     
     // Notification Settings
     notificationSettings: 'Notification Settings',

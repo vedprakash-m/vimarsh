@@ -92,7 +92,7 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
     switch (persona) {
       case 'krishna':
         return {
-          name: currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Lord Krishna',
+          name: currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Krishna',
           avatar: 'कृ',
           color: 'from-saffron-primary to-sunset-orange'
         };
@@ -104,7 +104,7 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
         };
       default:
         return {
-          name: currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Lord Krishna',
+          name: currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Krishna',
           avatar: 'कृ',
           color: 'from-saffron-primary to-sunset-orange'
         };
@@ -220,7 +220,7 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
           <div className="divine-icon-container mb-3">
             <span className="text-2xl">🎭</span>
             <span className="text-sm font-medium text-krishna-blue ml-2">
-              {currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Lord Krishna'}
+              {currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Krishna'}
             </span>
           </div>
         )}
@@ -481,7 +481,7 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
           <p className="text-xs text-neutral-300 mt-1">
             {currentLanguage === 'Hindi' 
               ? "भगवान श्रीकृष्ण की कृपा से"
-              : "By the grace of Lord Krishna"
+              : "By the grace of Krishna"
             }
           </p>
         )}

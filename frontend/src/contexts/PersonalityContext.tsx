@@ -69,7 +69,7 @@ interface PersonalityProviderProps {
 const DEFAULT_KRISHNA_PERSONALITY: Personality = {
   id: 'krishna',
   name: 'Krishna',
-  display_name: 'Lord Krishna',
+  display_name: 'Krishna',
   domain: 'spiritual',
   time_period: 'Ancient India (3000+ BCE)',
   description: 'Divine teacher and guide from the Bhagavad Gita, offering spiritual wisdom and life guidance',
@@ -121,7 +121,7 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
           {
             id: 'krishna',
             name: 'krishna',
-            display_name: 'Lord Krishna',
+            display_name: 'Krishna',
             domain: 'spiritual' as const,
             time_period: 'Ancient India (3102 BCE)',
             description: 'Divine incarnation and spiritual guide',

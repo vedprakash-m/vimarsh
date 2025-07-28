@@ -130,7 +130,7 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ onBack })
           <div className="title-content">
             <span className="krishna-symbol">🕉</span>
             <div>
-              <h1>Lord Krishna</h1>
+              <h1>Krishna</h1>
               <p>Divine Guide</p>
             </div>
           </div>

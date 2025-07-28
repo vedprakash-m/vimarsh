@@ -34,6 +34,11 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
     const matchesSearch = personality.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          personality.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesDomain && matchesSearch;
+  }).sort((a, b) => {
+    // Sort alphabetically by display_name, fallback to name
+    const nameA = (a.display_name || a.name || '').toLowerCase();
+    const nameB = (b.display_name || b.name || '').toLowerCase();
+    return nameA.localeCompare(nameB);
   });
 
   // Domain styling that matches landing page aesthetics

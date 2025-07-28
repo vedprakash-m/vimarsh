@@ -521,7 +521,7 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 # Define the available personalities with their safety configurations
 PERSONALITIES = {
     "krishna": {
-        "name": "Lord Krishna",
+        "name": "Krishna",
         "domain": "spiritual",
         "description": "Divine guide offering spiritual wisdom from the Bhagavad Gita",
         "safety_config": PERSONALITY_SAFETY_CONFIGS["krishna"]
@@ -722,13 +722,35 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         
         logger.info(f"Processing {personality_info['name']} conversation: {user_query[:50]}...")
         
-        # Generate personality-specific response using RAG-enhanced LLM service or fallback templates
+        # Generate personality-specific response using Enhanced LLM service first, then fallback to RAG
         response_text = ""
         used_llm_service = False
         used_rag_enhancement = False
         
-        # Try RAG-enhanced response first if available
-        if rag_service and RAG_SERVICE_AVAILABLE:
+        # Try Enhanced LLM service FIRST if properly configured
+        if llm_service and LLM_SERVICE_AVAILABLE and llm_service.is_configured:
+            try:
+                logger.info(f"🤖 Trying Enhanced LLM service first for {personality_id}")
+                ai_response = await llm_service.generate_personality_response(
+                    query=user_query,
+                    personality_id=personality_id
+                )
+                
+                # Check if we got a real AI response (SpiritualResponse object)
+                if ai_response and hasattr(ai_response, 'content') and ai_response.content:
+                    response_text = ai_response.content
+                    used_llm_service = True
+                    logger.info(f"✅ Enhanced LLM response generated: {len(response_text)} chars")
+                    logger.info(f"Response source: {getattr(ai_response, 'source', 'enhanced_llm')}")
+                    logger.info(f"Personality: {ai_response.metadata.get('personality_name', personality_id)}")
+                else:
+                    logger.warning("Enhanced LLM service returned empty/invalid response, trying RAG...")
+                    
+            except Exception as e:
+                logger.error(f"Enhanced LLM service failed, falling back to RAG: {e}")
+        
+        # Try RAG-enhanced response if Enhanced LLM failed or unavailable
+        if not response_text and rag_service and RAG_SERVICE_AVAILABLE:
             try:
                 logger.info(f"Generating RAG-enhanced response for {personality_id}")
                 rag_response = await rag_service.generate_enhanced_response(
@@ -773,35 +795,9 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                     logger.warning("Simple RAG service returned empty response")
                     
             except Exception as e:
-                logger.error(f"Simple RAG service failed, falling back to basic LLM: {e}")
+                logger.error(f"Simple RAG service failed: {e}")
         
-        # Fallback to basic LLM service if RAG unavailable or failed
-        if not response_text and llm_service and LLM_SERVICE_AVAILABLE:
-            try:
-                logger.info(f"Generating basic AI response for {personality_id}")
-                ai_response = await llm_service.generate_personality_response(
-                    query=user_query,
-                    personality_id=personality_id
-                )
-                
-                # Check if we got a real AI response (SpiritualResponse object)
-                if ai_response and hasattr(ai_response, 'content') and ai_response.content:
-                    response_text = ai_response.content
-                    used_llm_service = True
-                    logger.info(f"Basic AI response generated successfully: {len(response_text)} chars")
-                    logger.info(f"Response source: {getattr(ai_response, 'source', 'basic_llm')}")
-                    logger.info(f"Personality: {ai_response.metadata.get('personality_name', personality_id)}")
-                else:
-                    logger.warning("Basic LLM service returned empty/invalid response")
-                    response_text = None
-                
-            except Exception as e:
-                logger.error(f"Basic LLM service failed, using fallback: {e}")
-                logger.error(f"Exception type: {type(e).__name__}")
-                logger.error(f"Exception details: {str(e)}")
-                response_text = None
-        
-        # Fallback to hardcoded templates if LLM service unavailable or failed
+        # Fallback to hardcoded templates if all services failed
         if not response_text:
             logger.warning(f"Using fallback template for {personality_id}")
             used_llm_service = False
@@ -895,7 +891,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                 },
                 
                 "service_version": "enhanced_safety_v2.0_with_rag",
-                "response_source": "rag_enhanced" if used_rag_enhancement else ("llm_service" if used_llm_service else "fallback_template"),
+                "response_source": "llm_service" if used_llm_service and not used_rag_enhancement else ("rag_enhanced" if used_rag_enhancement else "fallback_template"),
                 "rag_service_available": RAG_SERVICE_AVAILABLE,
                 "rag_service_initialized": rag_service is not None,
                 "rag_enhancement_used": used_rag_enhancement,
