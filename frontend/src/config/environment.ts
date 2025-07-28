@@ -93,7 +93,7 @@ export const isValidProduction = (): boolean => {
 export const ENTRA_ID_CONFIG = {
   tenantId: process.env.REACT_APP_TENANT_ID || 'common', // Allow both personal and work/school accounts
   authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/common',
-  clientId: process.env.REACT_APP_CLIENT_ID || 'your-vimarsh-entra-client-id', // Vimarsh app registration
+  clientId: process.env.REACT_APP_CLIENT_ID || 'e4bd74b8-9a82-40c6-8d52-3e231733095e', // Vimarsh app registration
   scopes: ['openid', 'profile', 'email', 'User.Read'],
 };
 
@@ -175,7 +175,7 @@ export const validateEnvironmentConfig = (): boolean => {
 
   // Check required environment variables in production
   if (isProduction) {
-    if (!process.env.REACT_APP_CLIENT_ID || process.env.REACT_APP_CLIENT_ID === 'your-vimarsh-app-client-id') {
+    if (!process.env.REACT_APP_CLIENT_ID || process.env.REACT_APP_CLIENT_ID === 'your-vimarsh-entra-client-id') {
       issues.push('REACT_APP_CLIENT_ID is not properly configured for production');
     }
   }
