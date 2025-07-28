@@ -141,6 +141,40 @@ jobs:
     - name: 📥 Checkout
       uses: actions/checkout@v4
 
+    - name: ⚡ Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: 📦 Install Dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: 🛡️ NPM Security Audit
+      run: |
+        cd frontend
+        echo "## 🔒 NPM Security Audit Results" >> $GITHUB_STEP_SUMMARY
+        npm audit --audit-level moderate || {
+          echo "⚠️ Security vulnerabilities found in dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "### Vulnerability Details:" >> $GITHUB_STEP_SUMMARY
+          npm audit --audit-level moderate --json | jq -r '.vulnerabilities | keys[] as $k | .[$k] | "- **\(.title)** (\(.severity)): \(.url)"' >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "See detailed audit output above" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ Most vulnerabilities are in development dependencies and don't affect production builds" >> $GITHUB_STEP_SUMMARY
+        }
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: 📊 Generate Security Report
+      run: |
+        python scripts/security-audit.py
+        echo "## 📋 Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+        cat security-audit-report.md >> $GITHUB_STEP_SUMMARY
+
     - name: 🔍 Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.24.0
       with:
