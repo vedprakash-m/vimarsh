@@ -135,7 +135,7 @@ class VectorDatabaseService:
                             {
                                 'path': '/embedding',
                                 'dataType': 'float32',
-                                'dimensions': 384,  # all-MiniLM-L6-v2 dimension
+                                'dimensions': 768,  # Gemini text-embedding-004 dimension
                                 'distanceFunction': 'cosine'
                             }
                         ]
@@ -174,14 +174,17 @@ class VectorDatabaseService:
     def _initialize_embedding_model(self):
         """Initialize embedding model for vector generation"""
         try:
-            from sentence_transformers import SentenceTransformer
+            # Use Gemini API for embeddings instead of sentence-transformers
+            from .gemini_embedding_service import GeminiTransformer
             
-            model_name = os.getenv('EMBEDDING_MODEL', 'all-MiniLM-L6-v2')
-            self.embedding_model = SentenceTransformer(model_name)
-            logger.info(f"✅ Loaded embedding model: {model_name}")
+            # Create Gemini-based transformer for drop-in compatibility
+            self.embedding_model = GeminiTransformer('gemini-embedding')
+            logger.info("✅ Loaded Gemini embedding service (dimension: 768)")
             
         except Exception as e:
-            logger.error(f"❌ Failed to load embedding model: {e}")
+            logger.error(f"❌ Failed to load Gemini embedding service: {e}")
+            logger.warning("⚠️ Falling back to mock embedding model")
+            self.embedding_model = None
     
     async def migrate_existing_data(self) -> bool:
         """Migrate data from old vimarsh-db.spiritual-texts to new multi-personality structure"""
@@ -618,3 +621,298 @@ class VectorDatabaseService:
         union = words1.union(words2)
         
         return len(intersection) / len(union) if union else 0.0
+
+    async def add_content(self, content: str, personality_id: str, metadata: Dict[str, Any] = None) -> bool:
+        """Add new content to the vector database with proper chunking and embedding generation"""
+        try:
+            if not self.container or not self.embedding_model:
+                logger.error("❌ Database or embedding service not available")
+                return False
+            
+            # Parse personality
+            try:
+                personality = PersonalityType(personality_id.lower())
+            except ValueError:
+                logger.error(f"❌ Invalid personality: {personality_id}")
+                return False
+            
+            metadata = metadata or {}
+            
+            # Determine content type from metadata or content analysis
+            content_type = ContentType.TEACHING
+            if metadata.get('content_type'):
+                try:
+                    content_type = ContentType(metadata['content_type'])
+                except ValueError:
+                    pass
+            elif 'verse' in metadata or 'sanskrit' in metadata:
+                content_type = ContentType.VERSE
+            elif 'commentary' in content.lower():
+                content_type = ContentType.COMMENTARY
+            
+            # Generate embedding
+            try:
+                embedding = self.embedding_model.encode(content)
+                embedding_list = embedding.tolist() if hasattr(embedding, 'tolist') else list(embedding)
+            except Exception as e:
+                logger.error(f"❌ Failed to generate embedding: {e}")
+                return False
+            
+            # Create document ID
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            doc_id = f"{personality_id}_{timestamp}_{hash(content[:100]) % 1000:03d}"
+            
+            # Create vector document
+            vector_doc = VectorDocument(
+                id=doc_id,
+                content=content,
+                personality=personality,
+                content_type=content_type,
+                source=metadata.get('source', 'Added via API'),
+                title=metadata.get('title'),
+                chapter=metadata.get('chapter'),
+                verse=metadata.get('verse'),
+                sanskrit=metadata.get('sanskrit'),
+                translation=metadata.get('translation'),
+                citation=metadata.get('citation'),
+                category=metadata.get('category', 'general'),
+                language=metadata.get('language', 'English'),
+                embedding=embedding_list,
+                metadata=metadata
+            )
+            
+            # Store in database
+            success = await self.upsert_document(vector_doc)
+            
+            if success:
+                logger.info(f"✅ Added content to {personality_id}: {doc_id}")
+                # Update stats if cached
+                if self.stats:
+                    await self._update_database_stats()
+            else:
+                logger.error(f"❌ Failed to store document: {doc_id}")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to add content: {e}")
+            return False
+
+    async def get_personality_stats(self, personality_id: Optional[str] = None) -> Dict[str, Any]:
+        """Get detailed statistics for a specific personality or all personalities"""
+        try:
+            if not self.container:
+                logger.error("❌ Database not available")
+                return {}
+            
+            # Build query based on personality filter
+            if personality_id:
+                query = f"SELECT * FROM c WHERE c.personality = '{personality_id.lower()}'"
+            else:
+                query = "SELECT * FROM c"
+            
+            items = list(self.container.query_items(
+                query=query,
+                enable_cross_partition_query=True
+            ))
+            
+            if personality_id:
+                # Stats for specific personality
+                personality_docs = items
+                total_docs = len(personality_docs)
+                
+                content_types = {}
+                sources = {}
+                languages = {}
+                with_embeddings = 0
+                avg_content_length = 0
+                
+                for item in personality_docs:
+                    # Content types
+                    ct = item.get('content_type', 'unknown')
+                    content_types[ct] = content_types.get(ct, 0) + 1
+                    
+                    # Sources
+                    source = item.get('source', 'unknown')
+                    sources[source] = sources.get(source, 0) + 1
+                    
+                    # Languages
+                    lang = item.get('language', 'unknown')
+                    languages[lang] = languages.get(lang, 0) + 1
+                    
+                    # Embeddings
+                    if item.get('embedding'):
+                        with_embeddings += 1
+                    
+                    # Content length
+                    content_length = len(item.get('content', ''))
+                    avg_content_length += content_length
+                
+                avg_content_length = avg_content_length / total_docs if total_docs > 0 else 0
+                
+                return {
+                    'personality': personality_id,
+                    'total_documents': total_docs,
+                    'content_types': content_types,
+                    'sources': sources,
+                    'languages': languages,
+                    'embeddings_generated': with_embeddings,
+                    'missing_embeddings': total_docs - with_embeddings,
+                    'avg_content_length': avg_content_length,
+                    'last_updated': datetime.utcnow().isoformat()
+                }
+            else:
+                # Stats for all personalities
+                personalities = {}
+                
+                for item in items:
+                    personality = item.get('personality', 'unknown')
+                    if personality not in personalities:
+                        personalities[personality] = {
+                            'documents': 0,
+                            'content_types': {},
+                            'sources': set(),
+                            'with_embeddings': 0
+                        }
+                    
+                    personalities[personality]['documents'] += 1
+                    
+                    ct = item.get('content_type', 'unknown')
+                    personalities[personality]['content_types'][ct] = personalities[personality]['content_types'].get(ct, 0) + 1
+                    
+                    personalities[personality]['sources'].add(item.get('source', 'unknown'))
+                    
+                    if item.get('embedding'):
+                        personalities[personality]['with_embeddings'] += 1
+                
+                # Convert sets to counts
+                for p_id, stats in personalities.items():
+                    stats['unique_sources'] = len(stats['sources'])
+                    del stats['sources']  # Remove set, keep count
+                
+                return {
+                    'total_personalities': len(personalities),
+                    'personalities': personalities,
+                    'last_updated': datetime.utcnow().isoformat()
+                }
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to get personality stats: {e}")
+            return {}
+
+    async def export_database(self, personality_filter: Optional[str] = None) -> Dict[str, Any]:
+        """Export database contents for backup or migration"""
+        try:
+            if not self.container:
+                logger.error("❌ Database not available")
+                return {}
+            
+            # Build query
+            if personality_filter:
+                query = f"SELECT * FROM c WHERE c.personality = '{personality_filter.lower()}'"
+            else:
+                query = "SELECT * FROM c"
+            
+            items = list(self.container.query_items(
+                query=query,
+                enable_cross_partition_query=True
+            ))
+            
+            # Get database stats
+            stats = await self.get_database_stats()
+            
+            export_data = {
+                'export_metadata': {
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'personality_filter': personality_filter,
+                    'total_documents': len(items),
+                    'export_version': '1.0'
+                },
+                'database_stats': asdict(stats),
+                'documents': items
+            }
+            
+            logger.info(f"✅ Exported {len(items)} documents" + 
+                       (f" for personality {personality_filter}" if personality_filter else ""))
+            
+            return export_data
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to export database: {e}")
+            return {}
+
+    async def health_check(self) -> Dict[str, Any]:
+        """Comprehensive health check for the vector database service"""
+        health_status = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'overall_status': 'healthy',
+            'components': {},
+            'performance_metrics': {}
+        }
+        
+        try:
+            # Check Cosmos DB connection
+            if self.cosmos_client and self.container:
+                try:
+                    # Simple query to test connection
+                    list(self.container.query_items(
+                        query="SELECT TOP 1 c.id FROM c",
+                        enable_cross_partition_query=True
+                    ))
+                    health_status['components']['cosmos_db'] = 'healthy'
+                except Exception as e:
+                    health_status['components']['cosmos_db'] = f'unhealthy: {str(e)}'
+                    health_status['overall_status'] = 'degraded'
+            else:
+                health_status['components']['cosmos_db'] = 'unhealthy: not initialized'
+                health_status['overall_status'] = 'unhealthy'
+            
+            # Check embedding service
+            if self.embedding_model:
+                try:
+                    # Test embedding generation
+                    test_embedding = self.embedding_model.encode("test")
+                    if test_embedding is not None and len(test_embedding) > 0:
+                        health_status['components']['embedding_service'] = 'healthy'
+                    else:
+                        health_status['components']['embedding_service'] = 'unhealthy: invalid response'
+                        health_status['overall_status'] = 'degraded'
+                except Exception as e:
+                    health_status['components']['embedding_service'] = f'unhealthy: {str(e)}'
+                    health_status['overall_status'] = 'degraded'
+            else:
+                health_status['components']['embedding_service'] = 'unhealthy: not initialized'
+                health_status['overall_status'] = 'degraded'
+            
+            # Performance metrics
+            if health_status['components'].get('cosmos_db') == 'healthy':
+                try:
+                    import time
+                    start_time = time.time()
+                    
+                    # Test query performance
+                    list(self.container.query_items(
+                        query="SELECT TOP 5 c.id, c.personality FROM c",
+                        enable_cross_partition_query=True  
+                    ))
+                    
+                    query_time = (time.time() - start_time) * 1000
+                    health_status['performance_metrics']['query_time_ms'] = round(query_time, 2)
+                    
+                    # Get document count
+                    stats = await self.get_database_stats()
+                    health_status['performance_metrics']['total_documents'] = stats.total_documents
+                    health_status['performance_metrics']['total_embeddings'] = stats.total_embeddings_generated
+                    
+                except Exception as e:
+                    health_status['performance_metrics']['error'] = str(e)
+            
+            return health_status
+            
+        except Exception as e:
+            logger.error(f"❌ Health check failed: {e}")
+            return {
+                'timestamp': datetime.utcnow().isoformat(),
+                'overall_status': 'unhealthy',
+                'error': str(e)
+            }

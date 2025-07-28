@@ -24,13 +24,13 @@ except ImportError:
     HAS_NUMPY = False
     np = None  # Will cause AttributeError if used, alerting developer
 
-# Optional dependency for vector embeddings (heavy package, only for production)
+# Optional dependency for vector embeddings - using Gemini API instead of heavy packages
 try:
-    from sentence_transformers import SentenceTransformer
-    SENTENCE_TRANSFORMERS_AVAILABLE = True
+    from .gemini_embedding_service import GeminiTransformer
+    GEMINI_EMBEDDINGS_AVAILABLE = True
 except ImportError:
     # Stub implementation for CI/CD and development
-    class SentenceTransformer:
+    class GeminiTransformer:
         def __init__(self, model_name):
             self.model_name = model_name
         
@@ -38,11 +38,11 @@ except ImportError:
             """Return dummy embeddings for CI/CD"""
             if isinstance(texts, str):
                 texts = [texts]
-            # Return dummy 384-dimensional embeddings (all-MiniLM-L6-v2 dimension)
+            # Return dummy 768-dimensional embeddings (Gemini dimension)
             import random
-            return [[random.random() for _ in range(384)] for _ in texts]
+            return [[random.random() for _ in range(768)] for _ in texts]
     
-    SENTENCE_TRANSFORMERS_AVAILABLE = False
+    GEMINI_EMBEDDINGS_AVAILABLE = False
 import json
 import os
 
@@ -122,19 +122,19 @@ class KnowledgeBaseManager:
     def __init__(self, db_service: Optional[DatabaseService] = None):
         self.db_service = db_service or DatabaseService()
         
-        # Initialize embedding model (optional dependency)
-        self.embedding_model_name = "all-MiniLM-L6-v2"
+        # Initialize embedding model using Gemini API
+        self.embedding_model_name = "gemini-embedding"
         try:
-            self.embedding_model = SentenceTransformer(self.embedding_model_name)
-            self.embedding_dim = 384  # Dimension for all-MiniLM-L6-v2
-            if SENTENCE_TRANSFORMERS_AVAILABLE:
-                logger.info(f"✅ Initialized embedding model: {self.embedding_model_name}")
+            self.embedding_model = GeminiTransformer(self.embedding_model_name)
+            self.embedding_dim = 768  # Dimension for Gemini text-embedding-004
+            if GEMINI_EMBEDDINGS_AVAILABLE:
+                logger.info(f"✅ Initialized Gemini embedding model: {self.embedding_model_name}")
             else:
-                logger.warning(f"⚠️ Using stub embedding model (sentence_transformers not available)")
+                logger.warning("⚠️ Using stub embedding model (Gemini API not available)")
         except Exception as e:
             logger.error(f"❌ Failed to initialize embedding model: {e}")
             self.embedding_model = None
-            self.embedding_dim = 384
+            self.embedding_dim = 768
         
         # Domain-specific embedding strategies
         self.domain_strategies = {

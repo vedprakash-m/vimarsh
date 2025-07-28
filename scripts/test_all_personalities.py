@@ -9,6 +9,17 @@ import json
 def test_all_personalities():
     """Test all 12 personalities with standardized 500 character limits"""
     
+    # Common fallback patterns to detect
+    fallback_patterns = [
+        "Based on the sacred texts",
+        "I understand your question, but I couldn't find specific relevant passages",
+        "While I cannot access specific verses at the moment",
+        "I apologize, but I'm currently unable to access",
+        "Let me share some wisdom based on general spiritual principles",
+        "I'm experiencing some technical difficulties",
+        "Based on general spiritual wisdom"
+    ]
+    
     personalities = [
         ("krishna", "What is dharma?", 500),
         ("buddha", "How can I find inner peace?", 500),
@@ -24,7 +35,7 @@ def test_all_personalities():
         ("confucius", "How should we live ethically?", 500)
     ]
     
-    url = "https://vimarsh-backend-app.azurewebsites.net/api/spiritual_guidance"
+    url = "https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net/api/spiritual_guidance"
     headers = {"Content-Type": "application/json"}
     
     results = {}
@@ -53,6 +64,9 @@ def test_all_personalities():
                 source = result.get("metadata", {}).get("response_source", "unknown")
                 safety_passed = result.get("metadata", {}).get("safety", {}).get("safety_passed", False)
                 
+                # Check for fallback patterns
+                is_fallback = any(pattern in response_text for pattern in fallback_patterns)
+                
                 results[personality_id] = {
                     "success": True,
                     "response": response_text,
@@ -60,17 +74,20 @@ def test_all_personalities():
                     "expected_max": expected_max,
                     "within_limit": actual_length <= expected_max,
                     "source": source,
-                    "safety_passed": safety_passed
+                    "safety_passed": safety_passed,
+                    "is_fallback": is_fallback
                 }
                 
                 # Status indicators
                 length_status = "✅" if actual_length <= expected_max else "⚠️"
                 source_status = "🤖" if source == "llm_service" else "📝"
                 safety_status = "🛡️" if safety_passed else "❌"
+                fallback_status = "⚠️ FALLBACK" if is_fallback else "✅ REAL"
                 
                 print(f"{length_status} Length: {actual_length}/{expected_max} chars")
                 print(f"{source_status} Source: {source}")
                 print(f"{safety_status} Safety: {'Passed' if safety_passed else 'Failed'}")
+                print(f"🔍 Type: {fallback_status}")
                 print(f"💬 Preview: {response_text[:100]}...")
                 
             else:
@@ -95,11 +112,14 @@ def test_all_personalities():
     ai_powered = sum(1 for r in results.values() if r.get("source") == "llm_service")
     within_limits = sum(1 for r in results.values() if r.get("within_limit", False))
     safe_responses = sum(1 for r in results.values() if r.get("safety_passed", False))
+    real_responses = sum(1 for r in results.values() if not r.get("is_fallback", True))
     
     print(f"✅ Total Successful: {successful}/12")
     print(f"🤖 AI-Powered Responses: {ai_powered}/12")
     print(f"📏 Within Character Limits: {within_limits}/12")
     print(f"🛡️ Safety Validated: {safe_responses}/12")
+    print(f"🔍 Real AI Responses: {real_responses}/12")
+    print(f"⚠️ Fallback Responses: {successful - real_responses}/12")
     
     print(f"\n📋 Detailed Results:")
     for personality_id, result in results.items():

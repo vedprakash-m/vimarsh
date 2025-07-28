@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { X, Sparkles, Brain, Clock, BookOpen } from 'lucide-react';
+import { X, Sparkles, Brain } from 'lucide-react';
 import { Personality } from '../contexts/PersonalityContext';
 
 interface PersonalitySelectorProps {
@@ -308,23 +308,6 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                   }}>
                     {personality.description}
                   </p>
-                  
-                  <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '1rem',
-                    fontSize: '0.8rem',
-                    color: 'rgba(255, 255, 255, 0.7)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <Clock size={12} />
-                      <span>{personality.time_period}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <BookOpen size={12} />
-                      <span>{personality.expertise_areas?.slice(0, 2).join(', ') || 'General guidance'}</span>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Domain Badge */}

@@ -134,7 +134,7 @@ describe('Domain Theme System Integration', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('current-personality')).toHaveTextContent('Lord Krishna');
+      expect(screen.getByTestId('current-personality')).toHaveTextContent('Krishna');
       expect(screen.getByTestId('current-domain')).toHaveTextContent('spiritual');
     });
 

@@ -16,8 +16,9 @@ cryptography==41.0.7
 
 # AI/ML Libraries (Essential only)
 google-generativeai==0.7.2
-# Note: sentence-transformers, torch, numpy are optional dependencies for RAG pipeline
-# They are only needed for production vector embeddings (not required for CI/CD)
+numpy>=1.21.0  # Required for vector similarity calculations (lightweight)
+# Note: Using Gemini API for embeddings instead of sentence-transformers
+# This saves ~500MB in deployment size and improves cold start times
 
 # Utilities
 python-dotenv==1.0.0
