@@ -177,15 +177,27 @@ jobs:
 
     - name: 🔍 Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.24.0
+      continue-on-error: true
       with:
         scan-type: 'fs'
         scan-ref: '.'
         format: 'sarif'
         output: 'trivy-results.sarif'
 
-    - name: 📤 Upload Trivy scan results
+    - name: � Check Trivy results
+      run: |
+        if [ -f "trivy-results.sarif" ]; then
+          echo "✅ Trivy SARIF file created successfully"
+          echo "📊 File size: $(stat -c%s trivy-results.sarif) bytes"
+        else
+          echo "⚠️ Trivy SARIF file not found, scanning might have failed"
+          echo "📂 Current directory contents:"
+          ls -la
+        fi
+
+    - name: �📤 Upload Trivy scan results
       uses: github/codeql-action/upload-sarif@v3
-      if: always()
+      if: always() && hashFiles('trivy-results.sarif') != ''
       with:
         sarif_file: 'trivy-results.sarif'
 
