@@ -18,6 +18,12 @@ cryptography==41.0.7
 google-generativeai==0.7.2
 numpy>=1.21.0  # Required for vector similarity calculations (lightweight)
 # Note: Using Gemini API for embeddings instead of sentence-transformers
+
+# Content Sourcing Dependencies
+aiohttp==3.9.1
+beautifulsoup4==4.12.2
+PyPDF2==3.0.1
+lxml==4.9.3
 # This saves ~500MB in deployment size and improves cold start times
 
 # Utilities

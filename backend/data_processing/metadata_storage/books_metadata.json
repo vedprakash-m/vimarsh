@@ -1,0 +1,709 @@
+{
+  "buddha_anguttara_nikaya_part_i": {
+    "book_id": "buddha_anguttara_nikaya_part_i",
+    "title": "Anguttara Nikaya Part I",
+    "author_personality": "Buddha",
+    "domain": "spiritual",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 80,
+      "vectors_created": 80,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Anguttara Nikaya Part I. Project Gutenberg. Public Domain."
+  },
+  "buddha_anguttara_nikaya_part_ii": {
+    "book_id": "buddha_anguttara_nikaya_part_ii",
+    "title": "Anguttara Nikaya Part II",
+    "author_personality": "Buddha",
+    "domain": "spiritual",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 80,
+      "vectors_created": 80,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Anguttara Nikaya Part II. Project Gutenberg. Public Domain."
+  },
+  "buddha_anguttara_nikaya_part_iii": {
+    "book_id": "buddha_anguttara_nikaya_part_iii",
+    "title": "Anguttara Nikaya Part III",
+    "author_personality": "Buddha",
+    "domain": "spiritual",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 80,
+      "vectors_created": 80,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Anguttara Nikaya Part III. Project Gutenberg. Public Domain."
+  },
+  "rumi_masnavi_i_ma'navi": {
+    "book_id": "rumi_masnavi_i_ma'navi",
+    "title": "Masnavi I Ma'navi",
+    "author_personality": "Rumi",
+    "domain": "spiritual",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 16,
+      "vectors_created": 16,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Masnavi I Ma'navi. Project Gutenberg. Public Domain."
+  },
+  "einstein_on_the_electrodynamics_of_moving_bodies": {
+    "book_id": "einstein_on_the_electrodynamics_of_moving_bodies",
+    "title": "On the Electrodynamics of Moving Bodies",
+    "author_personality": "Einstein",
+    "domain": "scientific",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 60,
+      "vectors_created": 60,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "On the Electrodynamics of Moving Bodies. Project Gutenberg. Public Domain."
+  },
+  "newton_opticks": {
+    "book_id": "newton_opticks",
+    "title": "Opticks",
+    "author_personality": "Newton",
+    "domain": "scientific",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Opticks. Project Gutenberg. Public Domain."
+  },
+  "lincoln_complete_works_of_abraham_lincoln": {
+    "book_id": "lincoln_complete_works_of_abraham_lincoln",
+    "title": "Complete Works of Abraham Lincoln",
+    "author_personality": "Lincoln",
+    "domain": "historical",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 60,
+      "vectors_created": 60,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Complete Works of Abraham Lincoln. Project Gutenberg. Public Domain."
+  },
+  "confucius_the_analects": {
+    "book_id": "confucius_the_analects",
+    "title": "The Analects",
+    "author_personality": "Confucius",
+    "domain": "historical",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "The Analects. Project Gutenberg. Public Domain."
+  },
+  "marcus aurelius_meditations": {
+    "book_id": "marcus aurelius_meditations",
+    "title": "Meditations",
+    "author_personality": "Marcus Aurelius",
+    "domain": "philosophical",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 0,
+      "vectors_created": 0,
+      "processed_date": "2025-07-29T09:44:45.586439",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain"
+    },
+    "recommended_citation": "Meditations. Project Gutenberg. Public Domain."
+  },
+  "lao tzu_tao_te_ching": {
+    "book_id": "lao tzu_tao_te_ching",
+    "title": "Tao Te Ching",
+    "author_personality": "Lao Tzu",
+    "domain": "philosophical",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 0,
+      "vectors_created": 0,
+      "processed_date": "2025-07-29T09:44:45.586444",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain"
+    },
+    "recommended_citation": "Tao Te Ching. Project Gutenberg. Public Domain."
+  },
+  "einstein_relativity__the_special_and_general_theory": {
+    "book_id": "einstein_relativity__the_special_and_general_theory",
+    "title": "Relativity: The Special and General Theory",
+    "author_personality": "Einstein",
+    "domain": "scientific",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 60,
+      "vectors_created": 60,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Relativity: The Special and General Theory. Project Gutenberg. Public Domain."
+  },
+  "newton_principia_mathematica": {
+    "book_id": "newton_principia_mathematica",
+    "title": "Principia Mathematica",
+    "author_personality": "Newton",
+    "domain": "scientific",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Principia Mathematica. Project Gutenberg. Public Domain."
+  },
+  "lao tzu_tao_te_ching_alternative_translation": {
+    "book_id": "lao tzu_tao_te_ching_alternative_translation",
+    "title": "Tao Te Ching (Alternative Translation)",
+    "author_personality": "Lao Tzu",
+    "domain": "philosophical",
+    "source_metadata": {
+      "edition_translation": "Unknown Translation",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Public domain authenticated source",
+      "download_url": "",
+      "file_format": "text"
+    },
+    "processing_info": {
+      "chunks_generated": 0,
+      "vectors_created": 0,
+      "processed_date": "2025-07-29T09:44:45.586463",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain"
+    },
+    "recommended_citation": "Tao Te Ching (Alternative Translation). Project Gutenberg. Public Domain."
+  },
+  "chanakya_arthashastra": {
+    "book_id": "chanakya_arthashastra",
+    "title": "Arthashastra",
+    "author_personality": "Chanakya",
+    "domain": "Political",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Internet Archive Sanskrit eBooks",
+      "public_domain": true,
+      "authenticity_notes": "Manual download from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Arthashastra. Internet Archive Sanskrit eBooks. Public Domain."
+  },
+  "jesus_christ_king_james_bible_old_testament": {
+    "book_id": "jesus_christ_king_james_bible_old_testament",
+    "title": "King James Bible (Old Testament)",
+    "author_personality": "Jesus Christ",
+    "domain": "Historical",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "christistheway.com",
+      "public_domain": true,
+      "authenticity_notes": "Manual download from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 1847,
+      "vectors_created": 1847,
+      "processed_date": "2025-07-29T10:04:13.108408",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain"
+    },
+    "recommended_citation": "King James Bible (Old Testament). christistheway.com. Public Domain."
+  },
+  "tesla_tesla_papers_and_lectures": {
+    "book_id": "tesla_tesla_papers_and_lectures",
+    "title": "Tesla Papers and Lectures",
+    "author_personality": "Tesla",
+    "domain": "Scientific",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Smithsonian Libraries",
+      "public_domain": true,
+      "authenticity_notes": "Manual download from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Tesla Papers and Lectures. Smithsonian Libraries. Public Domain."
+  },
+  "tesla_us_patent_334823_-_commutator": {
+    "book_id": "tesla_us_patent_334823_-_commutator",
+    "title": "US Patent 334,823 - Commutator",
+    "author_personality": "Tesla",
+    "domain": "Scientific",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "USPTO via Nikola Tesla Legend",
+      "public_domain": true,
+      "authenticity_notes": "Manual download from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "US Patent 334,823 - Commutator. USPTO via Nikola Tesla Legend. Public Domain."
+  },
+  "tesla_us_patent_1061142_-_fluid_propulsion": {
+    "book_id": "tesla_us_patent_1061142_-_fluid_propulsion",
+    "title": "US Patent 1,061,142 - Fluid Propulsion",
+    "author_personality": "Tesla",
+    "domain": "Scientific",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "USPTO via mcnikolatesla.hr",
+      "public_domain": true,
+      "authenticity_notes": "Manual download from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "US Patent 1,061,142 - Fluid Propulsion. USPTO via mcnikolatesla.hr. Public Domain."
+  },
+  "einstein_relativity_the_special_and_general_theory": {
+    "book_id": "einstein_relativity_the_special_and_general_theory",
+    "title": "Relativity: The Special and General Theory",
+    "author_personality": "Einstein",
+    "domain": "Scientific Philosophy",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Project Gutenberg",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 60,
+      "vectors_created": 60,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Relativity: The Special and General Theory. Project Gutenberg. Public Domain."
+  },
+  "einstein_the_world_as_i_see_it": {
+    "book_id": "einstein_the_world_as_i_see_it",
+    "title": "The World as I See It",
+    "author_personality": "Einstein",
+    "domain": "Scientific Philosophy",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Open Library",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 60,
+      "vectors_created": 60,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "The World as I See It. Open Library. Public Domain."
+  },
+  "buddha_gotama_the_buddha_his_life_and_teachings": {
+    "book_id": "buddha_gotama_the_buddha_his_life_and_teachings",
+    "title": "Gotama the Buddha: His Life and Teachings",
+    "author_personality": "Buddha",
+    "domain": "Buddhist Philosophy",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Buddhist Digital Resource Center",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 80,
+      "vectors_created": 80,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "Gotama the Buddha: His Life and Teachings. Buddhist Digital Resource Center. Public Domain."
+  },
+  "confucius_the_doctrine_of_the_mean": {
+    "book_id": "confucius_the_doctrine_of_the_mean",
+    "title": "The Doctrine of the Mean",
+    "author_personality": "Confucius",
+    "domain": "Confucian Ethics",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Chinese Text Project",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "TXT"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "The Doctrine of the Mean. Chinese Text Project. Public Domain."
+  },
+  "confucius_the_great_learning": {
+    "book_id": "confucius_the_great_learning",
+    "title": "The Great Learning",
+    "author_personality": "Confucius",
+    "domain": "Confucian Ethics",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Chinese Text Project",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "TXT"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "The Great Learning. Chinese Text Project. Public Domain."
+  },
+  "confucius_the_analects_of_confucius": {
+    "book_id": "confucius_the_analects_of_confucius",
+    "title": "The Analects of Confucius",
+    "author_personality": "Confucius",
+    "domain": "Confucian Ethics",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Chinese Text Project",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "TXT"
+    },
+    "processing_info": {
+      "chunks_generated": 10,
+      "vectors_created": 10,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "synced_with_production"
+    },
+    "recommended_citation": "The Analects of Confucius. Chinese Text Project. Public Domain."
+  },
+  "lao_tzu_tao_te_ching__the_book_of_the_way": {
+    "book_id": "lao_tzu_tao_te_ching__the_book_of_the_way",
+    "title": "Tao Te Ching - The Book of the Way",
+    "author_personality": "Lao Tzu",
+    "domain": "Taoist Philosophy",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "Sacred Texts Archive",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 23,
+      "vectors_created": 23,
+      "processed_date": "2025-07-29T10:12:58.538085",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain"
+    },
+    "recommended_citation": "Tao Te Ching - The Book of the Way. Sacred Texts Archive. Public Domain."
+  },
+  "multi-personality_great_teachers_confucius_buddha_jesus_and_muhammad": {
+    "book_id": "multi-personality_great_teachers_confucius_buddha_jesus_and_muhammad",
+    "title": "Great Teachers: Confucius, Buddha, Jesus, and Muhammad",
+    "author_personality": "Multi-Personality",
+    "domain": "Comparative Religion",
+    "source_metadata": {
+      "edition_translation": "English",
+      "repository": "The Great Courses Plus",
+      "public_domain": true,
+      "authenticity_notes": "Downloaded from authenticated source",
+      "download_url": "Manual download",
+      "file_format": "PDF"
+    },
+    "processing_info": {
+      "chunks_generated": 164,
+      "vectors_created": 164,
+      "processed_date": "2025-07-29T10:12:58.538164",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain"
+    },
+    "recommended_citation": "Great Teachers: Confucius, Buddha, Jesus, and Muhammad. The Great Courses Plus. Public Domain."
+  },
+  "spiritual_einstein's_scientific_ethics": {
+    "book_id": "spiritual_einstein's_scientific_ethics",
+    "title": "Einstein's Scientific Ethics",
+    "author_personality": "Spiritual",
+    "domain": "philosophical",
+    "source_metadata": {
+      "edition_translation": "Curated Collection",
+      "repository": "Vimarsh Production Database",
+      "public_domain": true,
+      "authenticity_notes": "Production-validated spiritual content",
+      "download_url": "",
+      "file_format": "json"
+    },
+    "processing_info": {
+      "chunks_generated": 434,
+      "vectors_created": 434,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "added_from_production"
+    },
+    "recommended_citation": "Einstein's Scientific Ethics. Vimarsh Spiritual Guidance System. Production Database."
+  },
+  "krishna_bhagavad_gita_as_it_is": {
+    "book_id": "krishna_bhagavad_gita_as_it_is",
+    "title": "Bhagavad Gita As It Is",
+    "author_personality": "Krishna",
+    "domain": "spiritual",
+    "source_metadata": {
+      "edition_translation": "Curated Collection",
+      "repository": "Vimarsh Production Database",
+      "public_domain": true,
+      "authenticity_notes": "Production-validated spiritual content",
+      "download_url": "",
+      "file_format": "json"
+    },
+    "processing_info": {
+      "chunks_generated": 108,
+      "vectors_created": 108,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "added_from_production"
+    },
+    "recommended_citation": "Bhagavad Gita As It Is. Vimarsh Spiritual Guidance System. Production Database."
+  },
+  "jesus_matthew_59_10": {
+    "book_id": "jesus_matthew_59_10",
+    "title": "Matthew 5:9-10",
+    "author_personality": "Jesus",
+    "domain": "spiritual",
+    "source_metadata": {
+      "edition_translation": "Curated Collection",
+      "repository": "Vimarsh Production Database",
+      "public_domain": true,
+      "authenticity_notes": "Production-validated spiritual content",
+      "download_url": "",
+      "file_format": "json"
+    },
+    "processing_info": {
+      "chunks_generated": 79,
+      "vectors_created": 79,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "added_from_production"
+    },
+    "recommended_citation": "Matthew 5:9-10. Vimarsh Spiritual Guidance System. Production Database."
+  },
+  "lao_tzu_tao_te_ching": {
+    "book_id": "lao_tzu_tao_te_ching",
+    "title": "Tao Te Ching",
+    "author_personality": "Lao_Tzu",
+    "domain": "philosophical",
+    "source_metadata": {
+      "edition_translation": "Curated Collection",
+      "repository": "Vimarsh Production Database",
+      "public_domain": true,
+      "authenticity_notes": "Production-validated spiritual content",
+      "download_url": "",
+      "file_format": "json"
+    },
+    "processing_info": {
+      "chunks_generated": 16,
+      "vectors_created": 16,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "added_from_production"
+    },
+    "recommended_citation": "Tao Te Ching. Vimarsh Spiritual Guidance System. Production Database."
+  },
+  "marcus_aurelius_meditations": {
+    "book_id": "marcus_aurelius_meditations",
+    "title": "Meditations",
+    "author_personality": "Marcus_Aurelius",
+    "domain": "philosophical",
+    "source_metadata": {
+      "edition_translation": "Curated Collection",
+      "repository": "Vimarsh Production Database",
+      "public_domain": true,
+      "authenticity_notes": "Production-validated spiritual content",
+      "download_url": "",
+      "file_format": "json"
+    },
+    "processing_info": {
+      "chunks_generated": 15,
+      "vectors_created": 15,
+      "processed_date": "2025-07-29T13:30:31.264039",
+      "quality_score": 0.95,
+      "copyright_status": "public_domain",
+      "sync_status": "added_from_production"
+    },
+    "recommended_citation": "Meditations. Vimarsh Spiritual Guidance System. Production Database."
+  }
+}

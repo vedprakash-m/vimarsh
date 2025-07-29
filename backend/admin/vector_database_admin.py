@@ -448,3 +448,6 @@ class VectorDatabaseAdminAPI:
 
 # Global instance for Azure Functions
 vector_db_admin = VectorDatabaseAdminAPI()
+
+# Alias for backward compatibility
+VectorDatabaseAdmin = VectorDatabaseAdminAPI

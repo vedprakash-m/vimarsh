@@ -79,8 +79,8 @@ class ConfigManager:
                 "DEV_AUTH_SECRET": "dev-secret-change-in-production",
                 
                 # Database
-                "AZURE_COSMOS_DATABASE_NAME": "vimarsh-db",
-                "AZURE_COSMOS_CONTAINER_NAME": "spiritual-texts",
+                "AZURE_COSMOS_DATABASE_NAME": "vimarsh-multi-personality",
+                "AZURE_COSMOS_CONTAINER_NAME": "personality-vectors",
                 
                 # Monitoring
                 "MONITORING_ENABLED": "true",

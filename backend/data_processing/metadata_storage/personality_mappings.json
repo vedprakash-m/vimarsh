@@ -1,0 +1,269 @@
+{
+  "krishna": {
+    "personality": "Krishna",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "krishna_000",
+        "work_title": "Bhagavad Gita As It Is",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 3026,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 3026,
+    "vector_count": 3026,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Spiritual Guidance, Divine Wisdom, Dharma",
+    "content_themes": [
+      "dharma",
+      "spiritual_wisdom",
+      "divine_teaching",
+      "bhagavad_gita"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "buddha": {
+    "personality": "Buddha",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "buddha_000",
+        "work_title": "Anguttara Nikaya",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 694,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 694,
+    "vector_count": 694,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Philosophy, Meditation, Ethics, Enlightenment",
+    "content_themes": [
+      "suffering",
+      "enlightenment",
+      "meditation",
+      "dharma",
+      "mindfulness"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "rumi": {
+    "personality": "Rumi",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "rumi_000",
+        "work_title": "Masnavi",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 361,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 361,
+    "vector_count": 361,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Poetry, Mysticism, Spirituality, Divine Love",
+    "content_themes": [
+      "love",
+      "divine",
+      "poetry",
+      "mysticism",
+      "spiritual_journey"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "einstein": {
+    "personality": "Einstein",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "einstein_000",
+        "work_title": "Relativity Papers",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 617,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 617,
+    "vector_count": 617,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Physics, Mathematics, Philosophy of Science",
+    "content_themes": [
+      "relativity",
+      "physics",
+      "science",
+      "thought_experiments"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "newton": {
+    "personality": "Newton",
+    "total_sources": 2,
+    "primary_sources": [
+      {
+        "source_id": "newton_000",
+        "work_title": "Principia",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 211,
+        "quality_score": 0.95
+      },
+      {
+        "source_id": "newton_001",
+        "work_title": "Opticks",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 211,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 423,
+    "vector_count": 423,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Physics, Mathematics, Natural Philosophy",
+    "content_themes": [
+      "mechanics",
+      "mathematics",
+      "natural_philosophy",
+      "scientific_method"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "lincoln": {
+    "personality": "Lincoln",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "lincoln_000",
+        "work_title": "Complete Works",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 634,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 634,
+    "vector_count": 634,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Leadership, Democracy, Moral Philosophy",
+    "content_themes": [
+      "democracy",
+      "equality",
+      "leadership",
+      "civil_rights"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "marcus_aurelius": {
+    "personality": "Marcus Aurelius",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "marcus_aurelius_000",
+        "work_title": "Meditations",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 267,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 267,
+    "vector_count": 267,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Stoic Philosophy, Leadership, Ethics",
+    "content_themes": [
+      "stoicism",
+      "virtue",
+      "duty",
+      "self_discipline"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "chanakya": {
+    "personality": "Chanakya",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "chanakya_000",
+        "work_title": "Arthashastra",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 549,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 549,
+    "vector_count": 549,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Political Science, Economics, Strategy, Governance",
+    "content_themes": [
+      "economics",
+      "strategy",
+      "governance",
+      "political_wisdom"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "jesus": {
+    "personality": "Jesus",
+    "total_sources": 1,
+    "primary_sources": [
+      {
+        "source_id": "jesus_000",
+        "work_title": "Bible KJV",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 1847,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 1847,
+    "vector_count": 1847,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Spiritual Teaching, Love, Compassion, Salvation",
+    "content_themes": [
+      "love",
+      "compassion",
+      "forgiveness",
+      "salvation",
+      "spiritual_teaching"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  },
+  "tesla": {
+    "personality": "Tesla",
+    "total_sources": 2,
+    "primary_sources": [
+      {
+        "source_id": "tesla_000",
+        "work_title": "Tesla Papers",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 9,
+        "quality_score": 0.95
+      },
+      {
+        "source_id": "tesla_001",
+        "work_title": "Patents",
+        "repository": "Vimarsh Production Database",
+        "chunk_count": 9,
+        "quality_score": 0.95
+      }
+    ],
+    "total_chunks": 18,
+    "vector_count": 18,
+    "last_updated": "2025-07-29T13:32:15.928830",
+    "domain_expertise": "Innovation, Electricity, Scientific Discovery",
+    "content_themes": [
+      "innovation",
+      "electricity",
+      "invention",
+      "scientific_discovery"
+    ],
+    "sync_status": "accurate_production_data",
+    "cosmos_db_status": "uploaded_with_real_embeddings"
+  }
+}

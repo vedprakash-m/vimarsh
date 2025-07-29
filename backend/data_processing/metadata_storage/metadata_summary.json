@@ -1,0 +1,77 @@
+{
+  "metadata_version": "6.1_PRODUCTION_ACCURATE",
+  "last_sync_date": "2025-07-29T13:32:15.928771",
+  "sync_status": "synced_with_complete_production_data",
+  "statistics": {
+    "total_books": 31,
+    "total_personalities": 12,
+    "total_chunks": 8630,
+    "total_vectors": 8630,
+    "domain_distribution": {
+      "spiritual": 4,
+      "scientific": 3,
+      "philosophical": 4
+    },
+    "active_personalities": 12
+  },
+  "personalities_list": [
+    "krishna",
+    "buddha",
+    "rumi",
+    "einstein",
+    "newton",
+    "lincoln",
+    "marcus_aurelius",
+    "chanakya",
+    "jesus",
+    "tesla",
+    "confucius",
+    "lao_tzu"
+  ],
+  "production_validation": {
+    "vector_database_chunks": 8630,
+    "embedding_model": "Gemini text-embedding-004",
+    "embedding_dimensions": 768,
+    "production_url": "https://vimarsh.vedprakash.net",
+    "cosmos_db_container": "personality-vectors",
+    "last_upload_date": "2025-07-29"
+  },
+  "data_sources": {
+    "original_personalities": 8,
+    "manual_download_additions": 3,
+    "new_intake_enhancements": 5,
+    "total_active_personalities": 12
+  },
+  "content_breakdown": {
+    "original_content": {
+      "chunks": 6216,
+      "personalities": 8
+    },
+    "manual_downloads": {
+      "chunks": 2414,
+      "personalities": [
+        "Chanakya",
+        "Jesus Christ",
+        "Tesla"
+      ]
+    },
+    "new_intake_enhancements": {
+      "chunks": 541,
+      "enhanced_personalities": [
+        "Lao Tzu",
+        "Confucius",
+        "Einstein",
+        "Muhammad",
+        "Buddha"
+      ]
+    }
+  },
+  "requested_files_status": {
+    "arthashastra_of_chanakya": "✅ UPLOADED - 549 chunks",
+    "jesus_bible_kjvold": "✅ UPLOADED - 1,847 chunks",
+    "nikolateslapape00tesl": "✅ UPLOADED - Tesla content included",
+    "tesla_103_01061142": "✅ UPLOADED - Tesla content included",
+    "tesla_usa001_us334823": "✅ UPLOADED - Tesla content included",
+    "total_requested_chunks": "2,414 chunks successfully uploaded"
+  }
+}

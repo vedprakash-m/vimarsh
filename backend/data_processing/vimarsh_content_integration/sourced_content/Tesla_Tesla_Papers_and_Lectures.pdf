@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:sioc="http://rdfs.org/sioc/ns#"
+  xmlns:sioct="http://rdfs.org/sioc/types#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <head profile="http://www.w3.org/1999/xhtml/vocab">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="MobileOptimized" content="width" />
+<meta name="HandheldFriendly" content="true" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="dcterms.type" content="Digital Book" />
+<link rel="canonical" href="https://library.si.edu/digital-library/book/nikolateslapape00tesl" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="@silibraries" />
+<meta name="twitter:url" content="https://library.si.edu/digital-library/book/nikolateslapape00tesl" />
+<meta name="twitter:title" content="Nikola Tesla papers" />
+<meta name="twitter:image" content="https://library.si.edu/sites/default/files/books/covers/nikolateslapape00teslcover.jpg" />
+<meta name="dcterms.title" content="Nikola Tesla papers" />
+<meta name="dcterms.creator" content="Tesla, Nikola,;Kerr, Page &amp; Cooper (Firm),;Bartlett and Company,;H.W. Lende, Jr. Manuscript Collection (Smithsonian Libraries)." />
+<meta name="dcterms.subject" content="Tesla, Nikola;Wireless power transmission;Intellectual property;Manuscripts (documents)" />
+<meta name="dcterms.language" content="eng" />
+<meta name="dcterms.rights" content="No Copyright - United States" />
+  <title>Nikola Tesla papers</title>
+  <style type="text/css" media="all">
+@import url("https://library.si.edu/modules/system/system.base.css?sz175g");
+@import url("https://library.si.edu/modules/system/system.menus.css?sz175g");
+@import url("https://library.si.edu/modules/system/system.messages.css?sz175g");
+@import url("https://library.si.edu/modules/system/system.theme.css?sz175g");
+</style>
+<style type="text/css" media="all">
+@import url("https://library.si.edu/sites/all/modules/panopoly/panopoly_core/css/panopoly-jquery-ui-theme.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/jquery_update/replace/ui/themes/base/minified/jquery.ui.slider.min.css?sz175g");
+</style>
+<style type="text/css" media="all">
+@import url("https://library.si.edu/sites/all/modules/sla_popup/styling/popup.css?sz175g");
+@import url("https://library.si.edu/modules/aggregator/aggregator.css?sz175g");
+@import url("https://library.si.edu/modules/comment/comment.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/dams_image/dams_image.css?sz175g");
+@import url("https://library.si.edu/modules/field/theme/field.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/google_appliance/theme/google_appliance.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/google_search_facets/google-search-facets.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/google_search_facets_image_search/google-search-facets-image-search.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/panopoly/panopoly_core/css/panopoly-dropbutton.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/radix_layouts/radix_layouts.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/sil_donate/css/sil_donate.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/sil_lostbook/css/sil_lostbook.css?sz175g");
+@import url("https://library.si.edu/modules/user/user.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/views/css/views.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/ckeditor/css/ckeditor.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/expandable_content/css/expandable_content.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/media/modules/media_wysiwyg/css/media_wysiwyg.base.css?sz175g");
+</style>
+<style type="text/css" media="all">
+@import url("https://library.si.edu/sites/all/libraries/bootstrap/css/bootstrap.min.css?sz175g");
+@import url("https://library.si.edu/sites/all/libraries/bootstrap/css/bootstrap-theme.min.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/colorbox/styles/default/colorbox_style.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/ctools/css/ctools.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/contrib/panels/css/panels.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/sil_books/sil-books.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/sil_books/tooltipster/css/tooltipster.bundle.min.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/sil_books/tooltipster/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-light.min.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/rightsstatement_org/css/rightsstatements_org.css?sz175g");
+@import url("https://library.si.edu/sites/all/modules/flexslider/assets/css/flexslider_img.css?sz175g");
+@import url("https://library.si.edu/sites/all/libraries/flexslider/flexslider.css?sz175g");
+@import url("https://library.si.edu/sites/all/libraries/superfish/css/superfish.css?sz175g");
+@import url("https://library.si.edu/sites/all/libraries/superfish/css/superfish-smallscreen.css?sz175g");
+@import url("https://library.si.edu/sites/all/libraries/superfish/style/silibraries.css?sz175g");
+</style>
+<style type="text/css" media="all">
+@import url("https://library.si.edu/sites/all/themes/bootstrap-business/bootstrap/css/bootstrap.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/style.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/local.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/collections.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/colors.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/content.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/departments.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/digital-library.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/discipline.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/exhibitions.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/flexslider2.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/galleryview.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/gardens.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/image-gallery.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/isotope.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/mail.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/masonry.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/membership.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/news-events.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/news-subscribe.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/node.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/page-changes.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/sidebar-changes.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/staff-depts.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/tools-researcher.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/users.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/homepage.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/topic-term.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/better-tabs.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/chosen-overrides.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/slick-overrides.css?sz175g");
+</style>
+<style type="text/css" media="all">
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/media_ckeditor.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/fontawesome/css/all.min.css?sz175g");
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/i18n.css?sz175g");
+</style>
+<style type="text/css" media="print">
+@import url("https://library.si.edu/sites/all/themes/bootstrap-sil/css/print.css?sz175g");
+</style>
+
+<!--[if (lt IE 9)]>
+<link type="text/css" rel="stylesheet" href="https://library.si.edu/sites/all/themes/bootstrap-sil/css/ie8.css?sz175g" media="all" />
+<![endif]-->
+  
+	<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_kfCySK-sAVmU9mu0-2IOEWRifwhHkh_9q_ovVEW41rU.js"></script>
+<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_CdQQF2iyWt49DTR6ernbvPKOr2SqEcHNLvC9F0PBfiM.js"></script>
+<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_j_8iC4h_Z-ApIJminqHkhIy06yZmbygONrW-G9ucaWY.js"></script>
+<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_-7lUSP7xA7vTifxb8xP1dlk2KUVhLazGQwmTMHfHHsg.js"></script>
+<script type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=UA-5870062-6"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments)};gtag("js", new Date());gtag("set", "developer_id.dMDhkMT", true);gtag("config", "UA-5870062-6", {"groups":"default","linker":{"domains":["www.sil.si.edu","library.si.edu"]}});gtag("config", "G-MM0P7BL6SB", {"groups":"default","linker":{"domains":["www.sil.si.edu","library.si.edu"]}});
+//--><!]]>
+</script>
+<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_uFEGIcqVG8EDVmSl3fnptjlQ4mZN4tSChu4tXseNBuo.js"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery(document).ready(function($) { 
+		$(window).scroll(function() {
+			if($(this).scrollTop() != 0) {
+				$("#toTop").fadeIn();	
+			} else {
+				$("#toTop").fadeOut();
+			}
+		});
+		
+		$("#toTop").click(function() {
+			$("body,html").animate({scrollTop:0},800);
+		});	
+		
+		});
+//--><!]]>
+</script>
+<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_4Bn1FHP0-cymhn72AeTIwKVvwp6nfSiB37Baj6OnuFw.js"></script>
+<script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_uf73SeycakNTBBILp0rYYV3fE1MP-ISUdj09JOGXzAM.js"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","setHasJsCookie":0,"ajaxPageState":{"theme":"bootstrap_sil","theme_token":"jI13XgEkhiB9NYOtj_TTjD551XvWRTLMn2efEPTxV7Q","js":{"sites\/all\/modules\/flexslider\/assets\/js\/flexslider.load.js":1,"sites\/all\/libraries\/jquery-latest\/jquery-3.7.1.min.js":1,"misc\/jquery-extend-3.4.0.js":1,"misc\/jquery-html-prefilter-3.5.0-backport.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"sites\/all\/modules\/contrib\/jquery_update\/js\/jquery_browser.js":1,"sites\/all\/libraries\/jquery-latest\/jquery-ui\/jquery-ui.js":1,"misc\/ui\/jquery.ui.position-1.13.0-backport.js":1,"misc\/ui\/jquery.ui.dialog-1.13.0-backport.js":1,"misc\/form-single-submit.js":1,"sites\/all\/modules\/contrib\/entityreference\/js\/entityreference.js":1,"sites\/all\/modules\/sil_donate\/js\/sil_donate.js":1,"sites\/all\/libraries\/bootstrap\/js\/bootstrap.min.js":1,"sites\/all\/libraries\/colorbox\/jquery.colorbox-min.js":1,"sites\/all\/modules\/contrib\/colorbox\/js\/colorbox.js":1,"sites\/all\/modules\/contrib\/colorbox\/styles\/default\/colorbox_style.js":1,"sites\/all\/modules\/contrib\/colorbox\/js\/colorbox_load.js":1,"sites\/all\/modules\/contrib\/colorbox\/js\/colorbox_inline.js":1,"sites\/all\/modules\/google_search_facets\/google_search_facets.js":1,"sites\/all\/modules\/contrib\/media_colorbox\/media_colorbox.js":1,"sites\/all\/modules\/sil_books\/tooltipster\/js\/tooltipster.bundle.min.js":1,"sites\/all\/modules\/contrib\/google_analytics\/googleanalytics.js":1,"https:\/\/www.googletagmanager.com\/gtag\/js?id=UA-5870062-6":1,"0":1,"sites\/all\/modules\/sil_books\/sil-books.js":1,"sites\/all\/libraries\/flexslider\/jquery.flexslider-min.js":1,"sites\/all\/modules\/contrib\/expandable_content\/js\/expandable_content.js":1,"1":1,"sites\/all\/libraries\/superfish\/jquery.hoverIntent.minified.js":1,"sites\/all\/libraries\/superfish\/sftouchscreen.js":1,"sites\/all\/libraries\/superfish\/sfsmallscreen.js":1,"sites\/all\/libraries\/superfish\/supposition.js":1,"sites\/all\/libraries\/superfish\/superfish.js":1,"sites\/all\/libraries\/superfish\/supersubs.js":1,"sites\/all\/modules\/superfish\/superfish.js":1,"sites\/all\/themes\/bootstrap-sil\/js\/colorbox.responsive.js":1,"sites\/all\/themes\/bootstrap-sil\/fontawesome\/js\/all.js":1,"sites\/all\/modules\/contrib\/jquery_update\/js\/jquery_position.js":1},"css":{"modules\/system\/system.base.css":1,"modules\/system\/system.menus.css":1,"modules\/system\/system.messages.css":1,"modules\/system\/system.theme.css":1,"misc\/ui\/jquery.ui.theme.css":1,"misc\/ui\/jquery.ui.slider.css":1,"sites\/all\/modules\/google_search_facetsgoogle-search-facets.css":1,"sites\/all\/modules\/sla_popup\/styling\/popup.css":1,"modules\/aggregator\/aggregator.css":1,"modules\/comment\/comment.css":1,"sites\/all\/modules\/dams_image\/dams_image.css":1,"modules\/field\/theme\/field.css":1,"sites\/all\/modules\/google_appliance\/theme\/google_appliance.css":1,"sites\/all\/modules\/google_search_facets\/google-search-facets.css":1,"sites\/all\/modules\/google_search_facets_image_search\/google-search-facets-image-search.css":1,"modules\/node\/node.css":1,"sites\/all\/modules\/panopoly\/panopoly_core\/css\/panopoly-dropbutton.css":1,"sites\/all\/modules\/contrib\/radix_layouts\/radix_layouts.css":1,"sites\/all\/modules\/sil_donate\/css\/sil_donate.css":1,"sites\/all\/modules\/sil_lostbook\/css\/sil_lostbook.css":1,"modules\/user\/user.css":1,"sites\/all\/modules\/contrib\/views\/css\/views.css":1,"sites\/all\/modules\/contrib\/ckeditor\/css\/ckeditor.css":1,"sites\/all\/modules\/contrib\/expandable_content\/css\/expandable_content.css":1,"sites\/all\/modules\/contrib\/media\/modules\/media_wysiwyg\/css\/media_wysiwyg.base.css":1,"sites\/all\/libraries\/bootstrap\/css\/bootstrap.min.css":1,"sites\/all\/libraries\/bootstrap\/css\/bootstrap-theme.min.css":1,"sites\/all\/modules\/contrib\/colorbox\/styles\/default\/colorbox_style.css":1,"sites\/all\/modules\/contrib\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/contrib\/panels\/css\/panels.css":1,"sites\/all\/modules\/sil_books\/sil-books.css":1,"sites\/all\/modules\/sil_books\/tooltipster\/css\/tooltipster.bundle.min.css":1,"sites\/all\/modules\/sil_books\/tooltipster\/css\/plugins\/tooltipster\/sideTip\/themes\/tooltipster-sideTip-light.min.css":1,"sites\/all\/modules\/rightsstatement_org\/css\/rightsstatements_org.css":1,"sites\/all\/modules\/flexslider\/assets\/css\/flexslider_img.css":1,"sites\/all\/libraries\/flexslider\/flexslider.css":1,"sites\/all\/libraries\/superfish\/css\/superfish.css":1,"sites\/all\/libraries\/superfish\/css\/superfish-smallscreen.css":1,"sites\/all\/libraries\/superfish\/style\/silibraries.css":1,"sites\/all\/themes\/bootstrap-business\/bootstrap\/css\/bootstrap.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/style.css":1,"sites\/all\/themes\/bootstrap-business\/color\/colors.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/local.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/collections.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/colors.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/content.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/departments.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/digital-library.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/discipline.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/exhibitions.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/flexslider2.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/galleryview.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/gardens.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/image-gallery.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/isotope.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/mail.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/masonry.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/membership.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/news-events.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/news-subscribe.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/node.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/page-changes.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/sidebar-changes.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/staff-depts.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/tools-researcher.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/users.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/tb-menu-changes.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/discovery-dots.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/homepage.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/topic-term.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/better-tabs.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/chosen-overrides.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/slick-overrides.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/media_ckeditor.css":1,"sites\/all\/themes\/bootstrap-sil\/fontawesome\/css\/all.min.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/i18n.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/print.css":1,"sites\/all\/themes\/bootstrap-sil\/css\/ie8.css":1}},"colorbox":{"opacity":"0.85","current":"{current} of {total}","previous":"\u00ab Prev","next":"Next \u00bb","close":"Close","maxWidth":"98%","maxHeight":"98%","fixed":true,"mobiledetect":true,"mobiledevicewidth":"480px","file_public_path":"\/sites\/default\/files","specificPagesDefaultValue":"admin*\nimagebrowser*\nimg_assist*\nimce*\nnode\/add\/*\nnode\/*\/edit\nprint\/*\nprintpdf\/*\nsystem\/ajax\nsystem\/ajax\/*"},"googleanalytics":{"account":["UA-5870062-6","G-MM0P7BL6SB"],"trackOutbound":1,"trackMailto":1,"trackDownload":1,"trackDownloadExtensions":"7z|aac|arc|arj|asf|asx|avi|bin|csv|doc|docx|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt|pptx|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls|xslx|xml|z|zip","trackColorbox":1,"trackDomainMode":2,"trackCrossDomains":["www.sil.si.edu","library.si.edu"]},"urlIsAjaxTrusted":{"\/digital-library\/book\/nikolateslapape00tesl":true},"superfish":{"1":{"id":"1","sf":{"animation":{"opacity":"show"},"speed":"fast"},"plugins":{"touchscreen":{"mode":"window_width","breakpoint":992,"breakpointUnit":"px"},"smallscreen":{"mode":"window_width","breakpoint":992,"breakpointUnit":"px","title":"Main Menu"},"supposition":true,"supersubs":true}}},"flexslider":{"optionsets":{"image_gallery_carousel":{"namespace":"flex-","selector":".slides \u003E li","easing":"swing","direction":"horizontal","reverse":false,"smoothHeight":true,"startAt":0,"animationSpeed":600,"initDelay":0,"useCSS":true,"touch":true,"video":false,"keyboard":true,"multipleKeyboard":false,"mousewheel":0,"controlsContainer":".flex-control-nav-container","sync":"","asNavFor":"","itemWidth":150,"itemMargin":4,"minItems":3,"maxItems":5,"move":4,"animation":"slide","slideshow":false,"slideshowSpeed":"7000","directionNav":true,"controlNav":false,"prevText":"Previous","nextText":"Next","pausePlay":false,"pauseText":"Pause","playText":"Play","randomize":false,"thumbCaptions":false,"thumbCaptionsBoth":false,"animationLoop":true,"pauseOnAction":true,"pauseOnHover":false,"manualControls":""}},"instances":{"related_books_carousel":"image_gallery_carousel"}}});
+//--><!]]>
+</script>
+	<!-- added by PLM 1/22/2018 touch icons -->
+	<link rel="apple-touch-icon" sizes="180x180" src="/sites/all/libraries/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" src="/sites/all/libraries/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" src="/sites/all/libraries/favicon/favicon-16x16.png">
+	<link rel="manifest" src="/sites/all/libraries/favicon/manifest.json">
+	<link rel="mask-icon" src="/sites/all/libraries/favicon/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" src="/sites/all/libraries/favicon/favicon.ico">
+
+</head>
+<body class="html not-front not-logged-in no-sidebars page-node page-node- page-node-120605 node-type-sil-book region-content i18n-en digital-library digital-library-book digital-library-book-nikolateslapape00tesl" >
+  <div id="skip-link">
+    <a href="#main-content" class="element-invisible element-focusable">Skip to main content</a>
+  </div>
+      <div id="toTop"><span class="glyphicon glyphicon-chevron-up"></span></div>
+
+
+<!-- #header -->
+<header id="header" role="banner" class="clearfix robots-noindex">
+  
+    <!-- #header-top -->
+  <div id="header-top" class="clearfix robots-noindex">
+    <div class="container">
+
+      <!-- #header-top-inside -->
+      <div id="header-top-inside" class="clearfix">
+                  <div id="logo">
+            <a href="/" title="Home" rel="home"> <img src="https://library.si.edu/sites/default/files/si-libraries-logo-sm.png" alt="Home" /> </a>
+          </div>
+        
+        <div class="row">
+          
+                      <div class="col-md-12">
+              <!-- #header-top-right -->
+              <div id="header-top-right" class="clearfix">
+                  <div class="region region-header-top-right">
+    <div id="block-google-appliance-ga-block-search-form" class="block block-google-appliance clearfix">
+
+    
+  <div class="content">
+    <form action="/digital-library/book/nikolateslapape00tesl" method="post" id="google-appliance-block-form" accept-charset="UTF-8"><div><div class="container-inline">
+      <h2 class="element-invisible">Search Google Appliance</h2>
+    <div class="form-item form-type-textfield form-item-search-keys">
+  <label class="element-invisible" for="edit-search-keys">Enter the terms you wish to search for. </label>
+ <input placeholder="Search" type="text" id="edit-search-keys" name="search_keys" value="" size="15" maxlength="128" class="form-text" />
+</div>
+<div class="form-actions form-wrapper" id="edit-actions"><input type="submit" id="edit-submit" name="op" value="Search" class="form-submit" /></div><input type="hidden" name="form_build_id" value="form-Ye6ajpbpoejes_2HO2T3H-pvSUUfoNX1KBh_vMKhimw" />
+<input type="hidden" name="form_id" value="google_appliance_block_form" />
+  
+</div>
+</div></form>  </div>
+</div>
+  </div>
+              </div>
+              <!-- EOF:#header-top-right -->
+            </div>
+          
+        </div>
+      </div>
+      <!-- EOF: #header-top-inside -->
+
+    </div>
+  </div>
+  <!-- EOF: #header-top -->
+  
+  <div id="header-full" class="robots-noindex">
+    <div class="container">
+                <div class="region region-header">
+    <div id="block-superfish-1" class="block block-superfish clearfix">
+
+    
+  <div class="content">
+    <ul  id="superfish-1" class="menu sf-menu sf-main-menu sf-horizontal sf-style-silibraries sf-total-items-7 sf-parent-items-7 sf-single-items-0"><li id="menu-3425-1" class="first sf-depth-1 sf-total-children-4 sf-parent-children-0 sf-single-children-4 menuparent"><a href="/books-online" title="Digitized books from across the Libraries" class="sf-depth-1 menuparent">Online Books</a><ul><li id="menu-34616-1" class="first sf-depth-2 sf-no-children"><a href="/digital-library/book-collections" title="Browse staff created collections of digitized books" class="sf-depth-2">Online Book Collections</a></li><li id="menu-34617-1" class="middle sf-depth-2 sf-no-children"><a href="/books-online/topic" title="Browse digitized books by general topic" class="sf-depth-2">Online Books by Topic</a></li><li id="menu-1249-1" class="middle sf-depth-2 sf-no-children"><a href="http://biodiversitylibrary.org" title="(link will take you outside the Smithsonian network)" class="sf-depth-2">Biodiversity Heritage Library</a></li><li id="menu-34618-1" class="last sf-depth-2 sf-no-children"><a href="http://siris-libraries.si.edu/ipac20/ipac.jsp?profile=liball" title="Search the Catalog" class="sf-depth-2">Library Catalog (SIRIS)</a></li></ul></li><li id="menu-647-1" class="middle sf-depth-1 sf-total-children-5 sf-parent-children-0 sf-single-children-5 menuparent"><a href="/collections" title="" class="sf-depth-1 menuparent">Digital Collections</a><ul><li id="menu-659-1" class="first sf-depth-2 sf-no-children"><a href="/image-gallery" title="" class="sf-depth-2">Image Gallery</a></li><li id="menu-657-1" class="middle sf-depth-2 sf-no-children"><a href="/art-and-artist-files" title="Search an index of the Libraries collections of vertical files on art, art organizations, and artists." class="sf-depth-2">Art &amp; Artist Files</a></li><li id="menu-34619-1" class="middle sf-depth-2 sf-no-children"><a href="/digital-library/collection/caldwell" title="Shedding Light on New York, the Edward F. Caldwell &amp; Co. collection - images of lighting and interior fixtures." class="sf-depth-2">Caldwell Lighting</a></li><li id="menu-656-1" class="middle sf-depth-2 sf-no-children"><a href="/trade-literature" title="Search our collections of trade catalogs, manuals, sales brochures and more." class="sf-depth-2">Trade Literature</a></li><li id="menu-10472-1" class="last sf-depth-2 sf-no-children"><a href="/collections" title="Full list of our digital collections, including annotated bibliographies and indexes" class="sf-depth-2">All Digital Collections</a></li></ul></li><li id="menu-6016-1" class="middle sf-depth-1 sf-total-children-4 sf-parent-children-0 sf-single-children-4 menuparent"><a href="/exhibitions" title="" class="sf-depth-1 menuparent">Exhibitions</a><ul><li id="menu-8366-1" class="first sf-depth-2 sf-no-children"><a href="/exhibitions/current" title="" class="sf-depth-2">Current Exhibitions</a></li><li id="menu-8367-1" class="middle sf-depth-2 sf-no-children"><a href="/exhibitions/online" title="" class="sf-depth-2">Online Exhibitions</a></li><li id="menu-34472-1" class="middle sf-depth-2 sf-no-children"><a href="/exhibitions/past" title="" class="sf-depth-2">Past Exhibitions</a></li><li id="menu-34473-1" class="last sf-depth-2 sf-no-children"><a href="http://www.sil.si.edu/SILPublications/Online-Exhibitions/" title="Guide to online exhibitions from Libraries and Archives all over the world." class="sf-depth-2">Index of Library &amp; Archival Exhibitions on the Web</a></li></ul></li><li id="menu-735-1" class="middle sf-depth-1 sf-total-children-6 sf-parent-children-0 sf-single-children-6 menuparent"><a href="/research" title="" class="sf-depth-1 menuparent">Research Tools</a><ul><li id="menu-2634-1" class="first sf-depth-2 sf-no-children"><a href="/research" title="Search across all SIL owned and licensed collections, as well as selected citation databases." class="sf-depth-2">Research Tools and OneSearch</a></li><li id="menu-748-1" class="middle sf-depth-2 sf-no-children"><a href="http://siris-libraries.si.edu/ipac20/ipac.jsp?profile=liball" title="" class="sf-depth-2">Library Catalog (SIRIS)</a></li><li id="menu-746-1" class="middle sf-depth-2 sf-no-children"><a href="/research/databases" title="" class="sf-depth-2">E-journals, E-books, and Databases</a></li><li id="menu-744-1" class="middle sf-depth-2 sf-no-children"><a href="http://research.si.edu/" title="Search lists of publications by Smithsonian and affiliated researchers." class="sf-depth-2">Smithsonian Research Online (SRO)</a></li><li id="menu-38018-1" class="middle sf-depth-2 sf-no-children"><a href="/research/borrowing-access-privileges" class="sf-depth-2">Borrowing and Access Privileges</a></li><li id="menu-34620-1" class="last sf-depth-2 sf-no-children"><a href="https://sinet.sharepoint.com/sites/Prism-SLA" title="Information on services and resources for SI affiliated researchers" class="sf-depth-2">Smithsonian Libraries and Archives on PRISM (SI staff)    </a></li></ul></li><li id="menu-734-1" class="middle sf-depth-1 sf-total-children-4 sf-parent-children-1 sf-single-children-3 menuparent"><a href="/get-involved" class="sf-depth-1 menuparent">Get Involved</a><ul><li id="menu-3759-1" class="first sf-depth-2 sf-no-children"><a href="/events" title="" class="sf-depth-2">Events</a></li><li id="menu-37704-1" class="middle sf-depth-2"><a href="/newsletter" class="sf-depth-2">E-news Sign Up</a></li><li id="menu-1250-1" class="middle sf-depth-2 sf-no-children"><a href="/internships-and-fellowships" class="sf-depth-2">Internships and Fellowships</a></li><li id="menu-943-1" class="last sf-depth-2 sf-no-children"><a href="/about/work-with-us" class="sf-depth-2">Work with Us</a></li></ul></li><li id="menu-732-1" class="middle sf-depth-1 sf-total-children-11 sf-parent-children-0 sf-single-children-11 menuparent"><a href="/about-us" class="sf-depth-1 menuparent">About</a><ul><li id="menu-873-1" class="first sf-depth-2 sf-no-children"><a href="/about-us" title="" class="sf-depth-2">About the Libraries</a></li><li id="menu-23994-1" class="middle sf-depth-2 sf-no-children"><a href="/libraries" title="" class="sf-depth-2">Library Locations</a></li><li id="menu-817-1" class="middle sf-depth-2 sf-no-children"><a href="/departments" class="sf-depth-2">Departments</a></li><li id="menu-752-1" class="middle sf-depth-2 sf-no-children"><a href="/staff" title="" class="sf-depth-2">Staff</a></li><li id="menu-3760-1" class="middle sf-depth-2 sf-no-children"><a href="/press" title="" class="sf-depth-2">Press Room</a></li><li id="menu-743-1" class="middle sf-depth-2 sf-no-children"><a href="/about/faq" class="sf-depth-2">FAQ</a></li><li id="menu-10481-1" class="middle sf-depth-2 sf-no-children"><a href="/contact" class="sf-depth-2">Contact Us</a></li><li id="menu-755-1" class="middle sf-depth-2 sf-no-children"><a href="/about/history" class="sf-depth-2">History of the Libraries</a></li><li id="menu-38818-1" class="middle sf-depth-2 sf-no-children"><a href="https://librariesarchives.si.edu/advisory-board/" title="" class="sf-depth-2">Advisory Board</a></li><li id="menu-651-1" class="middle sf-depth-2 sf-no-children"><a href="/projects" title="Projects we are involved with or working on behind the scenes" class="sf-depth-2">Projects</a></li><li id="menu-3635-1" class="last sf-depth-2 sf-no-children"><a href="/annual-reports" class="sf-depth-2">Annual Reports</a></li></ul></li><li id="menu-6017-1" class="last sf-depth-1 sf-total-children-5 sf-parent-children-2 sf-single-children-3 menuparent"><a href="/donate/make-a-donation" title="" class="sf-depth-1 menuparent">Support</a><ul><li id="menu-37713-1" class="first sf-depth-2 sf-no-children"><a href="/donate/make-a-donation" title="" class="sf-depth-2">Donate Now</a></li><li id="menu-738-1" class="middle sf-depth-2"><a href="/donate/adopt-a-book" class="sf-depth-2">Adopt-a-Book</a></li><li id="menu-737-1" class="middle sf-depth-2 sf-no-children"><a href="/donate/ways-to-give" class="sf-depth-2">Ways to Give</a></li><li id="menu-3665-1" class="middle sf-depth-2 sf-no-children"><a href="/donate/gifts-of-library-materials" class="sf-depth-2">Gifts of Library Materials</a></li><li id="menu-37707-1" class="last sf-depth-2"><a href="/donate/the-vault" class="sf-depth-2">The Vault</a></li></ul></li></ul>  </div>
+</div>
+  </div>
+           </div>
+  </div>
+</header>
+<!-- EOF: #header -->
+
+<!-- #banner_full -->
+	<div id="banner-full" class="clearfix">
+		  <div class="region region-banner-full">
+    <div id="block-block-72" class="block block-block clearfix">
+
+    
+  <div class="content">
+    <div style="background-color:#d0d7de;text-align:center;clear:both;font-size:85%">Please read Smithsonian Libraries and Archives' <a href="https://librariesarchives.si.edu/statement-on-harmful-content/">Statement on Harmful Content</a></div>
+  </div>
+</div>
+  </div>
+	</div>
+<!-- EOF:#banner_full -->
+
+
+
+<!-- EOF:#breadcrumbs -->
+  <header id="breadcrumb" class="clearfix">
+  
+  <div class="container">
+      <div id="breadcrumb-inside" class="clearfix">
+      <h2 class="element-invisible">You are here</h2><div class="breadcrumb" xmlns:v="http://rdf.data-vocabulary.org/#"><span class="inline odd first" typeof="v:Breadcrumb"><a href="https://library.si.edu/" rel="v:url" property="v:title">Home</a></span> <span class="delimiter">»</span> <span class="inline even" typeof="v:Breadcrumb"><a href="https://library.si.edu/books-online" rel="v:url" property="v:title">Books</a></span> <span class="delimiter">»</span> <span class="inline odd" typeof="v:Breadcrumb">Nikola Tesla papers</span> <span class="delimiter">»</span> <span class="inline even last" typeof="v:Breadcrumb">Nikola Tesla papers</span></div>      </div>
+  </div>
+</header>
+<!-- EOF:#breadcrumbs -->
+
+<!-- #page -->
+<article id="page" class="clearfix">
+
+  
+  <!-- #main-content -->
+  <div id="main-content">
+    <div class="container">
+
+      <!-- #messages-console -->
+            <!-- EOF: #messages-console -->
+
+      <div class="row">
+
+        
+        <section class="col-md-12">
+          <!-- #main -->
+          <div id="main" class="clearfix">
+            
+            <!-- EOF:#content-wrapper -->
+            <div id="content-wrapper">
+
+                                          <h1 class="page-title">Nikola Tesla papers</h1>
+                            
+              
+              <!-- #tabs -->
+                              <div class="tabs">
+                                </div>
+                            <!-- EOF: #tabs -->
+
+              <!-- #action links -->
+                            <!-- EOF: #action links -->
+
+                <div class="region region-content">
+    <div id="block-system-main" class="block block-system clearfix">
+
+    
+  <div class="content">
+    
+
+<div id="node-120605" class="node node-sil-book clearfix" about="/digital-library/book/nikolateslapape00tesl" typeof="sioc:Item foaf:Document">
+
+					<div id="book-biblio">
+			<!-- Author -->
+							<span class="field-item" rel="dc:creator"><a href="/digital-library/author/tesla-nikola">Tesla, Nikola,</a></span>; <span class="field-item" rel="dc:creator"><a href="/digital-library/author/kerr-page-cooper-firm">Kerr, Page &amp; Cooper (Firm),</a></span>; <span class="field-item" rel="dc:creator"><a href="/digital-library/author/bartlett-and-company">Bartlett and Company,</a></span>; <span class="field-item" rel="dc:creator"><a href="/digital-library/author/hw-lende-jr-manuscript-collection-smithsonian-libraries">H.W. Lende, Jr. Manuscript Collection (Smithsonian Libraries).</a></span><br>
+			
+			<!-- Publication Info -->
+			
+			<!-- Series Navigation -->
+					</div>
+
+		<!-- Book iframe -->
+				<div id="book-iframe">
+			<iframe title="Internet Archive Book Reader" src="//archive.org/stream/nikolateslapape00tesl#mode/2up" id="internet-archive-bookreader"></iframe>			<div id="book-iframe-links">
+				<div class="book-iframe-link" id="book-cc0">
+									</div>
+				<div class="book-iframe-link" id="book-full-screen">
+						<a href="http://archive.org/stream/nikolateslapape00tesl" title="View full screen" target="_blank"><span class="fa fa-expand-arrows-alt"></span></a>
+				</div>
+				<div class="book-iframe-link" id="book-download">
+					<div class="tooltip" data-tooltip-content="#tooltip-download-content">
+						<span class="fa fa-download"></span>
+					</div>
+				</div>
+				<div class="book-iframe-link" id="book-share">
+					<div class="tooltip" data-tooltip-content="#tooltip-share-content">
+						<span class="fa fa-share-alt"></span>
+					</div>
+				</div>
+				<div class="tooltip-templates" style="display:none;">
+					<span id="tooltip-cc0-content">
+						<div class="tooltip-content">
+							<strong>CC0 &mdash; Creative Commons (CC0 1.0)</strong><br>
+							This content is in the public domain (free 
+							of copyright restrictions). You can copy, 
+							modify, and distribute this work without 
+							contacting the Smithsonian. For more 
+							information, visit the Smithsonian’s 
+							<a href="https://www.si.edu/termsofuse" target="_blank">Terms of Use</a> page.
+						</div>
+					</span>
+					<span id="tooltip-share-content">
+						<!-- Sharing links -->
+						<div id="book-share-links" style="text-align:center;">
+							<strong>Sharing</strong><br>
+															<div class="links clearfix"></div>
+													</div>
+					</span>
+					<span id="tooltip-download-content">
+						<div class="tooltip-content">
+							<strong>Download</strong><br>
+							<a href="https://archive.org/download/nikolateslapape00tesl/nikolateslapape00tesl.pdf" target="_blank">PDF</a><br>
+							<a href="https://archive.org/download/nikolateslapape00tesl/nikolateslapape00tesl.epub" target="_blank">ePub</a><br>
+							<a href="https://archive.org/download/nikolateslapape00tesl/nikolateslapape00tesl.mobi" target="_blank">Kindle</a><br>
+							<a href="https://archive.org/download/nikolateslapape00tesl/nikolateslapape00tesl_jp2.zip" target="_blank">Images</a> (JPEG-2000)<br>
+							<a href="https://archive.org/download/nikolateslapape00tesl" target="_blank">All Files</a>
+						</div>
+					</span>
+				</div>
+			</div>
+		</div>
+				
+		<!-- Related Info -->
+				
+		<!-- Abstract -->
+							
+
+		<!-- Book links -->
+		<div id="book-links">
+		
+		
+			<!-- Creator -->
+							<div class="book-link">
+					<div class="fa fa-user"></div>
+					<div class="field field-label-inline clearfix">
+						<strong>Creator:</strong>
+						<span class="field-item" rel="dc:creator"><a href="/digital-library/author/tesla-nikola">Tesla, Nikola,</a></span>; <span class="field-item" rel="dc:creator"><a href="/digital-library/author/kerr-page-cooper-firm">Kerr, Page &amp; Cooper (Firm),</a></span>; <span class="field-item" rel="dc:creator"><a href="/digital-library/author/bartlett-and-company">Bartlett and Company,</a></span>; <span class="field-item" rel="dc:creator"><a href="/digital-library/author/hw-lende-jr-manuscript-collection-smithsonian-libraries">H.W. Lende, Jr. Manuscript Collection (Smithsonian Libraries).</a></span><br>
+					</div>
+				</div>
+			
+			<!-- Publication Info -->
+								
+		
+			<!-- Subjects -->
+			<div class="book-link">
+				<div class="fa fa-tags"></div>
+				<div class="field field-label-inline clearfix">
+					<strong>Subject:</strong>
+					<span class="field-item"><a href="/art-and-design" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Art and Design</a>; </span>
+<span class="field-item"><a href="/history-and-culture" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">History and Culture</a></span>; <span class="field-item" property="dc:subject"><a href="/subjects/tesla-nikola" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Tesla, Nikola</a>; </span>
+  <span class="field-item" property="dc:subject"><a href="/subjects/wireless-power-transmission" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Wireless power transmission</a>; </span>
+  <span class="field-item" property="dc:subject"><a href="/subjects/intellectual-property" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Intellectual property</a>; </span>
+  <span class="field-item" property="dc:subject"><a href="/subjects/manuscripts-documents" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Manuscripts (documents)</a></span>; <span class="field-item" property="dc:subject"><a href="/subjects/tesla-nikola" typeof="skos:Concept" property="rdfs:label skos:prefLabel" datatype="">Tesla, Nikola</a></span>				</div>
+			</div>
+
+			<!-- Subjects -->
+			<div class="book-link">
+				<div class="fa fa-tags"></div>
+				<div class="field field-label-inline clearfix">
+					<strong>Topic:</strong>
+					<span class="field-item"><a href="/term/topic/manuscripts">Manuscripts</a></span>				</div>
+			</div>
+
+			<!-- Collections -->
+						
+			<!-- Copyright info -->
+			<div class="book-link">
+				<div class="fa fa-repeat"></div>
+				<div class="field field-name-field-rights-statement field-type-field-rights-statements-org field-label-hidden">
+    <div class="field-items">
+          <div class="field-item even"><a href="https://library.si.edu/copyright">No Copyright - United States</a>
+</div>
+      </div>
+</div>
+			</div>
+
+			<!-- Additional Info PDFs -->
+			
+			<!-- Cite This -->
+			<!--googleoff: all-->
+			<div class="book-link">
+				<div class="fa fa-quote-right"></div>
+				<div class="field field-label-inline clearfix">
+					<strong>Cite This:</strong>
+					<a class="colorbox-inline" href="?width=80%&height=60%&inline=true#book-citations">View Citations</a>
+				</div>
+			</div>
+			<!--googleon: all-->
+
+			<!-- DOIs -->
+						
+			<!-- Find In -->
+			<div class="book-link">
+				<div class="fa fa-search"></div>
+				<div class="field field-label-inline clearfix">
+					<strong>Find In:</strong>
+										  <a  property="dc:identifier" href="http://siris-libraries.si.edu/ipac20/ipac.jsp?index=BIB&term=1102446" target="_blank">Catalog</a>
+ |
+											<a href="https://archive.org/details/nikolateslapape00tesl" target="_blank">Internet Archive</a> |
+										  <a  property="dc:identifier bibo:oclcnum" href="http://www.worldcat.org/title/darwin/oclc/1080523377" target="_blank">Local Library</a>
+				</div>
+			</div>
+
+			<!-- Citations popup -->
+			<!--googleoff: all-->
+			<div style="display: none;">
+				<div id="book-citations">
+					<p>
+						<strong>APA Citation</strong><br>
+						  <em>Nikola Tesla papers.</em>   Retrieved from <a href="https://library.si.edu/digital-library/book/nikolateslapape00tesl">https://library.si.edu/digital-library/book/nikolateslapape00tesl</a>					</p>
+					<p>
+						<strong>MLA Citation</strong><br>
+						 <em>Nikola Tesla papers.</em>       <a href="https://library.si.edu/digital-library/book/nikolateslapape00tesl">https://library.si.edu/digital-library/book/nikolateslapape00tesl</a>					</p>
+					<p>
+						<strong>Chicago</strong><br>
+						 <em>Nikola Tesla papers.</em>    <a href="https://library.si.edu/digital-library/book/nikolateslapape00tesl">https://library.si.edu/digital-library/book/nikolateslapape00tesl</a>					</p>
+					<table>
+						<tr>
+							<td width="1%">
+								<a href="http://www.mendeley.com/import/?url=https%3A%2F%2Flibrary.si.edu%2F%2Fdigital-library%2Fbook%2Fnikolateslapape00tesl" target="_blank"><img src="/sites/all/modules/sil_books/images/mendeley_32.png"></a>
+							</td>
+							<td width="99%">
+								<a href="http://www.mendeley.com/import/?url=https%3A%2F%2Flibrary.si.edu%2F%2Fdigital-library%2Fbook%2Fnikolateslapape00tesl" target="_blank">Add this page to your Mendeley Library</a>
+							</td>
+						</tr>
+						<tr>
+							<td width="1%">
+								<a href="https://www.zotero.org/download/" target="_blank"><img src="/sites/all/modules/sil_books/images/zotero_32.png"></a>
+							</td>
+							<td width="99%">
+								<a href="https://www.zotero.org/download/" target="_blank">Get Zotero Plugin</a>
+							</td>
+						</tr>
+					</table>
+					<span class="caption"><strong>Warning:</strong> These citations may not always be complete (especially for serials).</span>
+				</div>
+			</div>
+			<!--googleon: all-->
+		</div>
+	
+<!-- FAQ links -->
+			<div id="faq-link">
+			<a href="/digital-library/book/faq">Frequently Asked Questions</a>
+		</div>
+	</div>
+
+			<!--googleoff: all-->
+		<div class="robots-noindex">
+		<h3>More Like This</h3>
+		<div class="view view-dl-books view-id-dl_books view-display-id-block_4 view-dom-id-b20020977bdfe909d1aa893f67098a22">
+        
+  
+  
+  
+      <div class="view-content">
+      <div  id="related_books_carousel" class="flexslider optionset-image-gallery-carousel">
+  <ul class="slides"><li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/firstdraftofrepo00vonn"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/firstdraftofrepo00vonn_cover.jpg?itok=Ltfz0NNp" alt="Cover of First draft of a report on the EDVAC " title="Cover of First draft of a report on the EDVAC" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/firstdraftofrepo00vonn">First draft of a report on the EDVAC</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/journaldesmarch00"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Journaldesmarch00_cover.jpg?itok=6WSvLq7Z" alt="Cover of Journal des marches et opérations pendant la campagne du 14-8-16 au 9-9-17" title="Cover of Journal des marches et opérations pendant la campagne du 14-8-16 au 9-9-17" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/journaldesmarch00">Journal des marches et opérations pendant la...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/poetryprose00"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Poetryprose00_cover.jpg?itok=E5Udm1pn" alt="Cover of Poetry and prose" title="Cover of Poetry and prose" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/poetryprose00">Poetry and prose</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/discorsodileont00bald"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/DiscorsodiLeont00Bald_cover.jpg?itok=Xv759QOA" alt="Cover of Discorso di Leontio artefice sopra la sfera di Arato et fabbrica di quella" title="Cover of Discorso di Leontio artefice sopra la sfera di Arato et fabbrica di quella" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/discorsodileont00bald">Discorso di Leontio artefice sopra la sfera di...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/petittraitteyde00chau"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/PetittraitteYde00Chau_cover.jpg?itok=zBX6e_dE" alt="Cover of Petit traitté de la fortification moderne" title="Cover of Petit traitté de la fortification moderne" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/petittraitteyde00chau">Petit traitté de la fortification moderne</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/commonplacebook00smit"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/commonplacebook00smit.jpg?itok=0SPtlGbM" alt="Page from Commonplace book concerning science and mathematics" title="Page from -Commonplace book concerning science and mathematics" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/commonplacebook00smit">[Commonplace book concerning science and...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/aw-quilter-journal-travels-east-africa-quilter-w"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/WQuilterjournalV2QuilA_cover.jpg?itok=0wHvy6Nd" alt="Cover of A.W. Quilter journal of travels in East Africa" title="Cover of A.W. Quilter journal of travels in East Africa" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/aw-quilter-journal-travels-east-africa-quilter-w">A.W. Quilter journal of travels in East Africa</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/escadrillen124j00"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/EscadrilleN124j00_cover.jpg?itok=3wD-esk7" alt="Cover of Escadrille N. 124 journal de marche" title="Cover of Escadrille N. 124 journal de marche" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/escadrillen124j00">Escadrille N. 124 journal de marche</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/journalvoyagefr00buck"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Journalvoyagefr00Buck_cover.jpg?itok=xpZh-9is" alt="Cover of Journal of the voyage from Boston to San-Francisco" title="Cover of Journal of the voyage from Boston to San-Francisco" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/journalvoyagefr00buck">Journal of the voyage from Boston to San-Francisco</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/wquilterjournalv2quila"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/WQuilterjournalV2QuilA_cover.jpg?itok=0wHvy6Nd" alt="Cover of A.W. Quilter journal of travels in East Africa" title="Cover of A.W. Quilter journal of travels in East Africa" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/wquilterjournalv2quila">A.W. Quilter journal of travels in East Africa v...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/wquilterjournalv2quil"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/WQuilterjournalV2Quil_cover.jpg?itok=25giEt-h" alt="Cover of A.W. Quilter journal of travels in East Africa" title="Cover of A.W. Quilter journal of travels in East Africa" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/wquilterjournalv2quil">A.W. Quilter journal of travels in East Africa v...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/traittedessiege00vaub"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Traittedessiege00Vaub_cover.jpg?itok=WBrE6VEo" alt="Cover of Traitté des siéges et de l&#039;attaque des places ; Traitté de la deffense des places" title="Cover of Traitté des siéges et de l&#039;attaque des places ; Traitté de la deffense des places" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/traittedessiege00vaub">Traitté des siéges et de l&#039;attaque des...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/arithmetichaboe00boet"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/arithmetichaboe00Boet_cover.jpg?itok=QEGBJGB1" alt="Cover of Incipit Arithmeticha Boetij" title="Cover of Incipit Arithmeticha Boetij" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/arithmetichaboe00boet">Incipit Arithmeticha Boetij</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/regimen00newt"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Regimen00Newt_cover.jpg?itok=3r_LW2xX" alt="Cover of The Regimen" title="Cover of The Regimen" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/regimen00newt">The Regimen</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/letter00gali"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Letter00Gali_cover.jpg?itok=e3PRH9ak" alt="Cover of Galileo Galilei letter to Nicolas Peiresc" title="Cover of Galileo Galilei letter to Nicolas Peiresc" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/letter00gali">Galileo Galilei letter to Nicolas Peiresc</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/note00brah"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Note00Brah_cover.jpg?itok=CgmC3V-V" alt="Cover of Tycho Brahe note acknowledging receipt of money" title="Cover of Tycho Brahe note acknowledging receipt of money" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/note00brah">Tycho Brahe note acknowledging receipt of money</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/ernstmachpapers00mach"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/ErnstMachpapers00Mach_cover.jpg?itok=WMz84TO6" alt="Cover of Ernst Mach papers," title="Cover of Ernst Mach papers," /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/ernstmachpapers00mach">Ernst Mach papers</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/humphrydavypape00davy"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/HumphryDavypape00Davy_cover.jpg?itok=C0bbPZqr" alt="Cover of Humphry Davy papers and correspondence," title="Cover of Humphry Davy papers and correspondence," /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/humphrydavypape00davy">Humphry Davy papers and correspondence</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/machineetinstru00vitr"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/Machineetinstru00Vitr_cover.jpg?itok=uRGK9bs_" alt="Cover of Machine et instrumenti de piu celebratissimi autori" title="Cover of Machine et instrumenti de piu celebratissimi autori" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/machineetinstru00vitr">Machine et instrumenti de piu celebratissimi...</a></div></li>
+<li>  
+  <div class="views-field views-field-field-cover-image">        <div class="field-content"><a href="/digital-library/book/whoyouy00eins"><img typeof="foaf:Image" src="https://library.si.edu/sites/default/files/styles/book_cover_160w/public/books/covers/WhoyouY00Eins_cover.jpg?itok=zMpK4ZO0" alt="Cover of Who are you?" title="Cover of Who are you?" /></a></div>  </div><div class="flex-caption"><a href="/digital-library/book/whoyouy00eins">Who are you?</a></div></li>
+</ul></div>
+    </div>
+  
+  
+  
+  
+  
+  
+</div>		</div>
+		<!--googleon: all-->
+	  </div>
+</div>
+  </div>
+              
+            </div>
+            <!-- EOF:#content-wrapper -->
+
+          </div>
+          <!-- EOF:#main -->
+
+        </section>
+
+        
+      </div>
+
+    </div>
+  </div>
+  <!-- EOF:#main-content -->
+
+	
+	
+
+  
+</article>
+<!-- EOF:#page -->
+
+
+<footer id="subfooter" class="clearfix robots-noindex">
+  <div class="container">
+
+    <!-- #subfooter-inside -->
+    <div id="subfooter-inside" class="clearfix">
+      <div class="row">
+        <div class="col-md-12">
+          <!-- #subfooter-left -->
+          <div class="subfooter-area">
+          
+                      <div class="region region-footer">
+    <div id="block-block-33" class="block block-block clearfix">
+
+    
+  <div class="content">
+    <div id="social-footer-icons">
+	<a href="https://blog.library.si.edu/" target="_blank"><img alt="Wordpress Blog for SIL" src="/sites/all/themes/bootstrap-sil/images/social/Wordpress_32x32x32.png" /></a><a href="https://www.facebook.com/SmithsonianLibraries/" target="_blank"><img alt="Facebook for SIL" src="/sites/all/themes/bootstrap-sil/images/social/Facebook_32x32x32.png" /></a><a href="https://twitter.com/SILibraries" target="_blank"><img alt="SIL on Twitter" src="/sites/all/themes/bootstrap-sil/images/social/Twitter_32x32x32.png" /></a><a href="http://smithsonianlibraries.tumblr.com/" target="_blank"><img alt="SIL on Tumblr" src="/sites/all/themes/bootstrap-sil/images/social/Tumblr_32x32x32.png" /></a><a href="https://www.instagram.com/silibraries/" target="_blank"><img alt="SIL on Instagram" src="/sites/all/themes/bootstrap-sil/images/social/Instagram_32x32x32.png" /></a><a href="http://www.flickr.com/photos/smithsonianlibraries" target="_blank"><img alt="SIL on Flickr" src="/sites/all/themes/bootstrap-sil/images/social/Flickr_32x32x32.png" /></a><a href="https://www.youtube.com/user/SmithsonianLibraries" target="_blank"><img alt="SIL on YouTube" src="/sites/all/themes/bootstrap-sil/images/social/Youtube_32x32x32.png" /></a><a href="/newsletter-subscribe" target="_blank"><img alt="Newsletter Signup" src="/sites/all/themes/bootstrap-sil/images/social/Email_32x32x32.png" /></a>
+</div>
+  </div>
+</div>
+<div id="block-block-3" class="block block-block clearfix">
+
+    
+  <div class="content">
+    <div class="footer-block">
+    <div class="address">
+	Smithsonian Libraries and Archives, Natural History Building, 10<sup>th</sup> St. and Constitution Ave. NW, Washington DC, 20560
+    </div>
+
+    <div class="footer-main-links">
+	<a href="https://librariesarchives.si.edu">librariesarchives.si.edu</a>  | <a href="/contact">Contact Us</a> | <a href="https://www.si.edu/privacy/">Privacy</a> | <a href="https://www.si.edu/Termsofuse">Terms</a> | <a href="/copyright">Copyright</a> | <a href="https://www.si.edu/">si.edu</a>
+    </div>
+
+</div>  </div>
+</div>
+  </div>
+          
+          </div>
+          <!-- EOF: #subfooter-left -->
+        </div>
+      </div>
+    </div>
+    <!-- EOF: #subfooter-inside -->
+
+  </div>
+</footer>
+<!-- EOF:#subfooter -->
+  <script type="text/javascript" src="https://library.si.edu/sites/default/files/js/js_uTpGZRbRZm_lrt5640lI88hN-6jGIe3E3hxZcagIuss.js"></script>
+
+	<script src="/sites/all/themes/bootstrap-sil/js/webtrends.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var _tag=new WebTrends();_tag.dcsGetId();
+		_tag.dcsCustom=function(){} 
+		_tag.dcsCollect();
+	</script>
+	<noscript>
+		<div><img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="//logs1.smithsonian.museum/dcs1l9c87bdzpxr5a4j9i31nm_2s3h/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.library.si.edu"/></div>
+	</noscript>
+
+</body>
+</html>

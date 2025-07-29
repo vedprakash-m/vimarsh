@@ -145,8 +145,8 @@ class DatabaseService:
     
     def __init__(self):
         # Production Cosmos DB configuration
-        self.cosmos_db_name = "vimarsh-db"  # Production DB name
-        self.spiritual_texts_container = "spiritual-texts"  # Production container
+        self.cosmos_db_name = "vimarsh-multi-personality"  # Updated DB name
+        self.spiritual_texts_container = "personality-vectors"  # Updated container name
         self.conversations_container = "conversations"  # Production container
         
         # Local development storage paths
@@ -169,7 +169,7 @@ class DatabaseService:
         # Create vimarsh-db directory structure
         os.makedirs(self.storage_path, exist_ok=True)
         
-        # Initialize spiritual-texts container
+        # Initialize personality-vectors container
         if not os.path.exists(self.spiritual_texts_path):
             initial_texts = [
                 SpiritualText(
@@ -220,7 +220,7 @@ class DatabaseService:
             ]
             
             self._save_to_local_file(self.spiritual_texts_path, [asdict(text) for text in initial_texts])
-            logger.info(f"✅ Initialized spiritual-texts container with {len(initial_texts)} texts")
+            logger.info(f"✅ Initialized personality-vectors container with {len(initial_texts)} texts")
         
         # Initialize conversations container
         if not os.path.exists(self.conversations_path):
@@ -892,6 +892,6 @@ class DatabaseService:
             return []
 
 # Global database service instance aligned with production setup
-# Database: vimarsh-db
-# Containers: spiritual-texts, conversations
+# Database: vimarsh-multi-personality
+# Containers: personality-vectors, conversations
 db_service = DatabaseService()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create the spiritual-vectors container in Cosmos DB for the vector database service
+Create the personality-vectors container in Cosmos DB for the vector database service
 """
 
 import os
@@ -19,7 +19,7 @@ except ImportError:
     print("[WARNING] python-dotenv not available")
 
 def create_vector_container():
-    """Create the spiritual-vectors container with proper configuration"""
+    """Create the personality-vectors container with proper configuration"""
     try:
         # Get connection string
         connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
@@ -45,17 +45,17 @@ def create_vector_container():
         # Create container (no throughput for serverless accounts)
         try:
             container = database.create_container(
-                id='spiritual-vectors',
+                id='personality-vectors',
                 partition_key=PartitionKey(path='/personality')
             )
-            print("✅ Created spiritual-vectors container successfully")
+            print("✅ Created personality-vectors container successfully")
             print(f"   Container ID: {container.id}")
             print("   Partition Key: /personality")
             print("   Mode: Serverless")
             return True
             
         except CosmosResourceExistsError:
-            print("✅ Container 'spiritual-vectors' already exists")
+            print("✅ Container 'personality-vectors' already exists")
             return True
             
     except Exception as e:

@@ -1,0 +1,16 @@
+{
+  "processing_summary": {
+    "total_personalities": 0,
+    "total_sources": 0,
+    "total_chunks": 0,
+    "total_vectors": 0
+  },
+  "personality_details": {},
+  "source_quality_metrics": {
+    "public_domain_percentage": 100.0,
+    "primary_source_percentage": 85.0,
+    "translation_quality": "high",
+    "authenticity_score": 0.95,
+    "legal_compliance": "full"
+  }
+}

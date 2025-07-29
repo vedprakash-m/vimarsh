@@ -1,0 +1,27 @@
+{
+  "total_sources": 16,
+  "by_domain": {
+    "spiritual": 5,
+    "scientific": 5,
+    "historical": 3,
+    "philosophical": 3
+  },
+  "by_personality": {
+    "Buddha": 3,
+    "Jesus Christ": 1,
+    "Rumi": 1,
+    "Einstein": 2,
+    "Newton": 2,
+    "Tesla": 1,
+    "Lincoln": 1,
+    "Chanakya": 1,
+    "Confucius": 1,
+    "Marcus Aurelius": 1,
+    "Lao Tzu": 2
+  },
+  "by_priority": {
+    "Priority 1": 13,
+    "Priority 2": 3
+  },
+  "estimated_total_chunks": 14030
+}

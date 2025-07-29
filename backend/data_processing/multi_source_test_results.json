@@ -1,0 +1,95 @@
+{
+  "test_metadata": {
+    "sources_attempted": 3,
+    "sources_successful": 3,
+    "sacred_entries_created": 286,
+    "processing_stats": {
+      "downloaded": 3,
+      "processed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "source_details": [
+    {
+      "source_id": "1191143f27cf",
+      "personality": "Buddha",
+      "work_title": "Anguttara Nikaya Part I",
+      "content_length": 222673,
+      "domain": "spiritual"
+    },
+    {
+      "source_id": "8e079be5e0c5",
+      "personality": "Buddha",
+      "work_title": "Anguttara Nikaya Part II",
+      "content_length": 195565,
+      "domain": "spiritual"
+    },
+    {
+      "source_id": "057b7b843c63",
+      "personality": "Buddha",
+      "work_title": "Anguttara Nikaya Part III",
+      "content_length": 116894,
+      "domain": "spiritual"
+    }
+  ],
+  "sample_entries": [
+    {
+      "id": "sourced_1191143f27cf_0",
+      "title": "Anguttara Nikaya Part I",
+      "text": "--- Page 1 ---\nAṅguttara Nikāya\nDiscourses of the Buddha\nAn Anthology\nPart I\nSelected and translated from the Pāli \nby\nNyanaponika Thera\nand\nBhikkhu Bodhi\nBuddhist Publication Society\nKandy • Sri Lanka\nThe Wheel Publication No. 155–156\nCopyright © Kandy, Buddhist Publication Society, (1970)\nFirst edition: 1970. \nSecond edition: 1980.\nBPS Online Edition © (2010)\nDigital Transcription Source: BPS.\nFor this edition, the revised translations by Venerable Bodhi as given in the Numerical Discourses  \nof the Buddha have been used with his kind permission.\nFor free distribution. This work may be republished, reformatted, reprinted and redistributed in  \nany medium. However, any such republication and redistribution is to be made available to the  \npublic on a free and unrestricted basis and translations and other derivative works are to be  \nclearly marked as such and the Buddhist Publication Society is to be acknowledged as the  \noriginal publisher.\n\n--- Page 2 ---\nContents\nKey to Abbreviations ..................................................................................................................... 4\nIntroduction.................................................................................................................................... 5\nAṅguttara Nikāya................................................................................................................................... 6\nI. The Chapter of the Ones ............................................................................................................ 6\n1. The Mind–I......................................................................................................................... 6\n2. The Mind–II........................................................................................................................ 6\n3. Loving kindness ................................................................................................................. 7\n4.",
+      "content": "--- Page 1 ---\nAṅguttara Nikāya\nDiscourses of the Buddha\nAn Anthology\nPart I\nSelected and translated from the Pāli \nby\nNyanaponika Thera\nand\nBhikkhu Bodhi\nBuddhist Publication Society\nKandy • Sri Lanka\nThe Wheel Publication No. 155–156\nCopyright © Kandy, Buddhist Publication Society, (1970)\nFirst edition: 1970. \nSecond edition: 1980.\nBPS Online Edition © (2010)\nDigital Transcription Source: BPS.\nFor this edition, the revised translations by Venerable Bodhi as given in the Numerical Discourses  \nof the Buddha have been used with his kind permission.\nFor free distribution. This work may be republished, reformatted, reprinted and redistributed in  \nany medium. However, any such republication and redistribution is to be made available to the  \npublic on a free and unrestricted basis and translations and other derivative works are to be  \nclearly marked as such and the Buddhist Publication Society is to be acknowledged as the  \noriginal publisher.\n\n--- Page 2 ---\nContents\nKey to Abbreviations ..................................................................................................................... 4\nIntroduction.................................................................................................................................... 5\nAṅguttara Nikāya................................................................................................................................... 6\nI. The Chapter of the Ones ............................................................................................................ 6\n1. The Mind–I......................................................................................................................... 6\n2. The Mind–II........................................................................................................................ 6\n3. Loving kindness ................................................................................................................. 7\n4.",
+      "source": "Anguttara Nikaya Part I",
+      "chapter": null,
+      "verse": null,
+      "sanskrit": null,
+      "translation": null,
+      "spiritual_theme": "spiritual",
+      "dharmic_context": null,
+      "keywords": [
+        "buddha"
+      ],
+      "language": "English",
+      "content_type": "sacred_text",
+      "created_at": "2025-07-02T00:00:00Z"
+    },
+    {
+      "id": "sourced_1191143f27cf_1",
+      "title": "Anguttara Nikaya Part I",
+      "text": "Mind Is the Forerunner ..................................................................................................... 7\n5. The Highest Gain ............................................................................................................... 8\n6. One Person......................................................................................................................... 8\n7. Impossible.......................................................................................................................... 9\n8. Mindfulness Directed to the Body ................................................................................... 9\nII. The Chapter of the Twos ........................................................................................................ 11\n9. Unremitting Effort ........................................................................................................... 11\n10. Abandon Evil................................................................................................................. 11\n11. Tranquillity and Insight ................................................................................................ 12\n12. Repaying One’s Parents ................................................................................................ 13\n13. Two Kinds of Happiness .............................................................................................. 13\nIII. The Chapter of the Threes ..................................................................................................... 14\n14. The Fool and the Wise Person ...................................................................................... 14\n15. Dhamma, the Co-regent ................................................................................................ 14\n16. Cause for Shame ............................................................................................................ 15\n17.",
+      "content": "Mind Is the Forerunner ..................................................................................................... 7\n5. The Highest Gain ............................................................................................................... 8\n6. One Person......................................................................................................................... 8\n7. Impossible.......................................................................................................................... 9\n8. Mindfulness Directed to the Body ................................................................................... 9\nII. The Chapter of the Twos ........................................................................................................ 11\n9. Unremitting Effort ........................................................................................................... 11\n10. Abandon Evil................................................................................................................. 11\n11. Tranquillity and Insight ................................................................................................ 12\n12. Repaying One’s Parents ................................................................................................ 13\n13. Two Kinds of Happiness .............................................................................................. 13\nIII. The Chapter of the Threes ..................................................................................................... 14\n14. The Fool and the Wise Person ...................................................................................... 14\n15. Dhamma, the Co-regent ................................................................................................ 14\n16. Cause for Shame ............................................................................................................ 15\n17.",
+      "source": "Anguttara Nikaya Part I",
+      "chapter": null,
+      "verse": null,
+      "sanskrit": null,
+      "translation": null,
+      "spiritual_theme": "spiritual",
+      "dharmic_context": null,
+      "keywords": [
+        "buddha"
+      ],
+      "language": "English",
+      "content_type": "sacred_text",
+      "created_at": "2025-07-02T00:00:00Z"
+    },
+    {
+      "id": "sourced_1191143f27cf_2",
+      "title": "Anguttara Nikaya Part I",
+      "text": "Three Types of Patients ................................................................................................. 15\n18. Three Mentalities ........................................................................................................... 16\n19. Free of “I”-making ......................................................................................................... 17\n20. Causes of Action ............................................................................................................ 18\n21. Good Sleep...................................................................................................................... 19\n22. The Divine Messengers ................................................................................................. 20\n23. Threefold Pride .............................................................................................................. 22\n24. The Conditioned and the Unconditioned ................................................................... 23\n25. An Island of Refuge ....................................................................................................... 23\n26. The Visible Nibbāna ...................................................................................................... 24\n27. To Whom Should Gifts Be Given? ............................................................................... 24\n28. Do Monks Benefit Others? ............................................................................................ 26\n29. Three Sectarian Tenets .................................................................................................. 28\n30. To the Kālāmas ............................................................................................................... 32\n31. Lust, Hatred, and Delusion .......................................................................................... 34\n32.",
+      "content": "Three Types of Patients ................................................................................................. 15\n18. Three Mentalities ........................................................................................................... 16\n19. Free of “I”-making ......................................................................................................... 17\n20. Causes of Action ............................................................................................................ 18\n21. Good Sleep...................................................................................................................... 19\n22. The Divine Messengers ................................................................................................. 20\n23. Threefold Pride .............................................................................................................. 22\n24. The Conditioned and the Unconditioned ................................................................... 23\n25. An Island of Refuge ....................................................................................................... 23\n26. The Visible Nibbāna ...................................................................................................... 24\n27. To Whom Should Gifts Be Given? ............................................................................... 24\n28. Do Monks Benefit Others? ............................................................................................ 26\n29. Three Sectarian Tenets .................................................................................................. 28\n30. To the Kālāmas ............................................................................................................... 32\n31. Lust, Hatred, and Delusion .......................................................................................... 34\n32.",
+      "source": "Anguttara Nikaya Part I",
+      "chapter": null,
+      "verse": null,
+      "sanskrit": null,
+      "translation": null,
+      "spiritual_theme": "spiritual",
+      "dharmic_context": null,
+      "keywords": [
+        "buddha"
+      ],
+      "language": "English",
+      "content_type": "sacred_text",
+      "created_at": "2025-07-02T00:00:00Z"
+    }
+  ]
+}

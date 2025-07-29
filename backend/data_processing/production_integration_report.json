@@ -1,0 +1,14 @@
+{
+  "processed_count": 0,
+  "embeddings_generated": 2414,
+  "cosmos_inserts": 2414,
+  "errors": [],
+  "timing": {
+    "embedding_generation": 1085.0947873592377,
+    "cosmos_insertion": 67.06014204025269,
+    "total_time": 1153.2528765201569
+  },
+  "sources_processed": [
+    "manual_downloads"
+  ]
+}

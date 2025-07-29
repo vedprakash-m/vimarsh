@@ -11,6 +11,23 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    
+    # Load from root .env file
+    root_env_path = Path(__file__).parent.parent.parent / '.env'
+    if root_env_path.exists():
+        load_dotenv(root_env_path)
+        logger = logging.getLogger(__name__)
+        logger.info(f"🔧 Loaded environment variables from {root_env_path}")
+    else:
+        logger = logging.getLogger(__name__)
+        logger.warning(f"⚠️ .env file not found at {root_env_path}")
+except ImportError:
+    logger = logging.getLogger(__name__)
+    logger.warning("⚠️ python-dotenv not available - environment variables won't be loaded from .env file")
+
 logger = logging.getLogger(__name__)
 
 
@@ -224,6 +241,12 @@ class UnifiedConfig:
         
         return value
     
+    def get_value(self, section: str, key: str, fallback: Any = None) -> Any:
+        """Get configuration value (backward compatibility method)"""
+        # Map section-based access to simple key access
+        # For example: get_value("LLM", "GEMINI_API_KEY") -> get("GEMINI_API_KEY")
+        return self.get(key, fallback)
+    
     def get_bool(self, key: str, default: bool = False) -> bool:
         """Get boolean configuration value"""
         value = self.get(key, str(default))
@@ -360,6 +383,12 @@ def get_config() -> UnifiedConfig:
         get_config._instance.log_configuration_status()
     
     return get_config._instance
+
+
+# Alias for backward compatibility
+def get_unified_config() -> UnifiedConfig:
+    """Alias for get_config() - for backward compatibility"""
+    return get_config()
 
 
 # Convenience functions

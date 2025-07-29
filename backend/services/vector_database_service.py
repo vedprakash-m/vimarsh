@@ -113,7 +113,7 @@ class VectorDatabaseService:
             
             # Use dedicated database for multi-personality system
             database_name = os.getenv('AZURE_COSMOS_DATABASE_NAME', 'vimarsh-multi-personality')
-            container_name = os.getenv('AZURE_COSMOS_CONTAINER_NAME', 'spiritual-vectors')
+            container_name = os.getenv('AZURE_COSMOS_CONTAINER_NAME', 'personality-vectors')
             
             try:
                 self.database = self.cosmos_client.get_database_client(database_name)
@@ -175,11 +175,14 @@ class VectorDatabaseService:
         """Initialize embedding model for vector generation"""
         try:
             # Use Gemini API for embeddings instead of sentence-transformers
-            from .gemini_embedding_service import GeminiTransformer
+            import sys
+            import os
+            sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+            from gemini_embedding_service import GeminiTransformer
             
             # Create Gemini-based transformer for drop-in compatibility
             self.embedding_model = GeminiTransformer('gemini-embedding')
-            logger.info("✅ Loaded Gemini embedding service (dimension: 768)")
+            logger.info(f"✅ Loaded Gemini embedding service (dimension: {self.embedding_model.service.dimension})")
             
         except Exception as e:
             logger.error(f"❌ Failed to load Gemini embedding service: {e}")
@@ -187,78 +190,13 @@ class VectorDatabaseService:
             self.embedding_model = None
     
     async def migrate_existing_data(self) -> bool:
-        """Migrate data from old vimarsh-db.spiritual-texts to new multi-personality structure"""
-        try:
-            # Connect to old database
-            old_database = self.cosmos_client.get_database_client('vimarsh-db')
-            old_container = old_database.get_container_client('spiritual-texts')
-            
-            logger.info("🔄 Starting migration from old database structure...")
-            
-            # Query all existing documents
-            query = "SELECT * FROM c"
-            items = list(old_container.query_items(query=query, enable_cross_partition_query=True))
-            
-            logger.info(f"Found {len(items)} documents to migrate")
-            
-            migrated_count = 0
-            failed_count = 0
-            
-            for item in items:
-                try:
-                    # Determine personality based on content/source
-                    personality = self._determine_personality_from_content(item)
-                    content_type = self._determine_content_type(item)
-                    
-                    # Create new vector document
-                    vector_doc = VectorDocument(
-                        id=f"{personality.value}_{item.get('id', f'migrated_{migrated_count}')}",
-                        content=item.get('content', item.get('text', '')),
-                        personality=personality,
-                        content_type=content_type,
-                        source=item.get('source', 'Unknown'),
-                        title=item.get('title'),
-                        chapter=item.get('chapter'),
-                        verse=item.get('verse'),
-                        sanskrit=item.get('sanskrit'),
-                        translation=item.get('translation'),
-                        citation=item.get('citation', item.get('verse_citation')),
-                        category=item.get('category', 'general'),
-                        language=item.get('language', 'English'),
-                        embedding=item.get('embedding'),  # Preserve existing embeddings if available
-                        metadata={
-                            'migrated_from': 'vimarsh-db.spiritual-texts',
-                            'original_id': item.get('id'),
-                            'migration_date': datetime.utcnow().isoformat()
-                        }
-                    )
-                    
-                    # Generate embedding if not present
-                    if not vector_doc.embedding and self.embedding_model:
-                        embedding = self.embedding_model.encode(vector_doc.content)
-                        vector_doc.embedding = embedding.tolist()
-                    
-                    # Insert into new container
-                    await self.upsert_document(vector_doc)
-                    migrated_count += 1
-                    
-                    if migrated_count % 10 == 0:
-                        logger.info(f"Migrated {migrated_count}/{len(items)} documents...")
-                        
-                except Exception as e:
-                    logger.error(f"Failed to migrate document {item.get('id', 'unknown')}: {e}")
-                    failed_count += 1
-            
-            logger.info(f"✅ Migration completed: {migrated_count} successful, {failed_count} failed")
-            
-            # Update stats
-            await self._update_database_stats()
-            
-            return failed_count == 0
-            
-        except Exception as e:
-            logger.error(f"❌ Migration failed: {e}")
-            return False
+        """
+        DEPRECATED: Migration from old vimarsh-db.spiritual-texts to new multi-personality structure
+        This migration has been completed. Old containers have been deleted.
+        """
+        logger.warning("❌ Migration method called but is no longer needed - migration completed")
+        logger.info("✅ All data is now in vimarsh-multi-personality.personality-vectors container")
+        return True  # Return success to prevent errors in calling code
     
     def _determine_personality_from_content(self, item: Dict[str, Any]) -> PersonalityType:
         """Determine personality type from content analysis"""
@@ -341,7 +279,12 @@ class VectorDatabaseService:
                 return []
             
             # Generate query embedding
-            query_embedding = self.embedding_model.encode(query).tolist()
+            query_embedding = self.embedding_model.encode(query)
+            # Ensure it's a list (Gemini service already returns a list)
+            if hasattr(query_embedding, 'tolist'):
+                query_embedding = query_embedding.tolist()
+            elif not isinstance(query_embedding, list):
+                query_embedding = list(query_embedding)
             
             # Build search query with filters
             sql_query = "SELECT * FROM c"

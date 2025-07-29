@@ -120,7 +120,7 @@ class CostManagementService:
             return
         
         try:
-            database = self.cosmos_client.get_database_client('vimarsh-db')
+            database = self.cosmos_client.get_database_client('vimarsh-multi-personality')
             container = database.get_container_client('token_usage')
             
             record = {
@@ -152,7 +152,7 @@ class CostManagementService:
             return
         
         try:
-            database = self.cosmos_client.get_database_client('vimarsh-db')
+            database = self.cosmos_client.get_database_client('vimarsh-multi-personality')
             container = database.get_container_client('user_cost_totals')
             
             today = usage.timestamp.strftime('%Y-%m-%d')
@@ -258,7 +258,7 @@ class CostManagementService:
             return 0.0
         
         try:
-            database = self.cosmos_client.get_database_client('vimarsh-db')
+            database = self.cosmos_client.get_database_client('vimarsh-multi-personality')
             container = database.get_container_client('user_cost_totals')
             
             if period_type == 'daily':
