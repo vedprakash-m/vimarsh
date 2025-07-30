@@ -12,7 +12,7 @@ Your Vimarsh application is **completely ready** for deployment with multi-tenan
 - **UnifiedAuthService**: Multi-tenant token validation implemented
 - **User Models**: Enhanced with Microsoft identity fields (`job_title`, `company_name`, `tenant_id`)
 - **Spiritual Guidance Endpoint**: Authentication middleware added
-- **Environment Variables**: All configured with your actual client ID: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+- **Environment Variables**: All configured with your actual client ID: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
 
 ### Backend Environment Files ✅
 - `backend/.env` - Development configuration ✅

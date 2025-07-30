@@ -679,6 +679,8 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
     try:
         # NEW: Extract authenticated user
         from auth.unified_auth_service import UnifiedAuthService
+        from services.user_profile_service import user_profile_service
+        
         auth_service = UnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
@@ -695,11 +697,26 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                 }
             )
         
-        # Extract user context for analytics
-        user_id = authenticated_user.id
-        user_email = authenticated_user.email
-        user_name = authenticated_user.name
-        user_company = getattr(authenticated_user, 'company_name', None)
+        # NEW: Get or create user profile in database
+        try:
+            user_profile = await user_profile_service.get_or_create_user_profile(authenticated_user)
+            logger.info(f"🕉️ User profile loaded: {user_profile.email}")
+        except Exception as e:
+            logger.error(f"❌ Failed to load user profile: {e}")
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Profile loading failed",
+                    "message": "Unable to access your profile. Please try again."
+                }),
+                status_code=500,
+                headers={"Content-Type": "application/json"}
+            )
+        
+        # Extract user context for analytics - use profile data
+        user_id = user_profile.id  # Use internal user ID
+        user_email = user_profile.email
+        user_name = user_profile.name
+        user_company = user_profile.company_name
         # Parse request body
         try:
             query_data = req.get_json()
@@ -952,7 +969,37 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         
         logger.info(f"✅ {personality_info['name']} response generated successfully with safety score: {safety_result.safety_score:.3f}")
         
-        # NEW: Track analytics with real user data
+        # NEW: Record interaction in user profile service
+        if response_text:
+            try:
+                # Calculate response time and basic metrics
+                response_time_ms = int((datetime.now() - start_time).total_seconds() * 1000)
+                input_tokens = len(user_query.split()) * 1.3  # Rough token estimate
+                output_tokens = len(response_text.split()) * 1.3  # Rough token estimate
+                
+                # Record interaction in user profile
+                await user_profile_service.record_interaction(
+                    user_id=user_id,
+                    session_id=session_id,
+                    interaction_data={
+                        "query": user_query,
+                        "response": response_text,
+                        "personality": personality_id,
+                        "response_time_ms": response_time_ms,
+                        "input_tokens": int(input_tokens),
+                        "output_tokens": int(output_tokens),
+                        "cost_usd": 0.0,  # Will be calculated later with real pricing
+                        "themes": [personality_info["domain"]],
+                        "model": "gemini-flash" if used_llm_service else "template"
+                    }
+                )
+                
+                logger.info(f"📊 Interaction recorded for user {user_email}")
+                
+            except Exception as e:
+                logger.error(f"❌ Error recording interaction: {str(e)}")
+        
+        # Also try original analytics service if available (for backward compatibility)
         if response_text:
             try:
                 # Import your analytics service
@@ -970,7 +1017,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                     citations=getattr(ai_response, 'citations', []) if 'ai_response' in locals() else []
                 )
             except ImportError:
-                logger.warning("⚠️ Analytics service not available yet")
+                logger.info("ℹ️ Original analytics service not available - using user profile service instead")
             except Exception as e:
                 logger.error(f"❌ Error tracking analytics: {str(e)}")
         
@@ -1057,6 +1104,165 @@ def validate_content_safety(req: func.HttpRequest) -> func.HttpResponse:
         logger.error(f"❌ Error in safety validation: {str(e)}")
         return func.HttpResponse(
             json.dumps({"error": "Safety validation failed"}),
+            status_code=500,
+            headers={"Content-Type": "application/json"}
+        )
+
+
+@app.route(route="user/profile", methods=["GET"])
+async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
+    """Get authenticated user's profile and analytics"""
+    
+    try:
+        # Authenticate user
+        from auth.unified_auth_service import UnifiedAuthService
+        from services.user_profile_service import user_profile_service
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Authentication required",
+                    "message": "Please sign in to view your profile"
+                }),
+                status_code=401,
+                headers={
+                    "Content-Type": "application/json",
+                    "WWW-Authenticate": "Bearer"
+                }
+            )
+        
+        # Get user profile
+        user_profile = await user_profile_service.get_or_create_user_profile(authenticated_user)
+        
+        # Get analytics
+        analytics = await user_profile_service.get_user_analytics(user_profile.id)
+        
+        # Build response
+        profile_data = {
+            "profile": {
+                "id": user_profile.id,
+                "email": user_profile.email,
+                "name": user_profile.name,
+                "given_name": user_profile.given_name,
+                "family_name": user_profile.family_name,
+                "company_name": user_profile.company_name,
+                "preferred_language": user_profile.preferred_language,
+                "timezone": user_profile.timezone,
+                "account_status": user_profile.account_status,
+                "created_at": user_profile.created_at.isoformat() if user_profile.created_at else None,
+                "last_login": user_profile.last_login.isoformat() if user_profile.last_login else None,
+                "last_activity": user_profile.last_activity.isoformat() if user_profile.last_activity else None
+            },
+            "preferences": user_profile.user_preferences,
+            "usage_stats": user_profile.usage_stats,
+            "recent_activity": user_profile.recent_activity[-5:],  # Last 5 interactions
+            "bookmarks": {
+                "count": len(user_profile.bookmarks),
+                "recent": user_profile.bookmarks[-3:] if user_profile.bookmarks else []  # Last 3 bookmarks
+            },
+            "analytics": analytics,
+            "privacy": {
+                "data_retention_consent": user_profile.data_retention_consent,
+                "analytics_consent": user_profile.analytics_consent,
+                "last_consent_update": user_profile.last_consent_update.isoformat() if user_profile.last_consent_update else None
+            }
+        }
+        
+        return func.HttpResponse(
+            json.dumps(profile_data, indent=2),
+            status_code=200,
+            headers={"Content-Type": "application/json"}
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error getting user profile: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Profile retrieval failed",
+                "message": "Unable to load your profile"
+            }),
+            status_code=500,
+            headers={"Content-Type": "application/json"}
+        )
+
+
+@app.route(route="user/bookmark", methods=["POST"])
+async def add_user_bookmark(req: func.HttpRequest) -> func.HttpResponse:
+    """Add a bookmark to user's profile"""
+    
+    try:
+        # Authenticate user
+        from auth.unified_auth_service import UnifiedAuthService
+        from services.user_profile_service import user_profile_service
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Authentication required",
+                    "message": "Please sign in to bookmark content"
+                }),
+                status_code=401,
+                headers={
+                    "Content-Type": "application/json",
+                    "WWW-Authenticate": "Bearer"
+                }
+            )
+        
+        # Parse request body
+        try:
+            bookmark_data = req.get_json()
+        except ValueError:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid JSON in request body"}),
+                status_code=400,
+                headers={"Content-Type": "application/json"}
+            )
+        
+        if not bookmark_data:
+            return func.HttpResponse(
+                json.dumps({"error": "Request body is required"}),
+                status_code=400,
+                headers={"Content-Type": "application/json"}
+            )
+        
+        # Get user profile
+        user_profile = await user_profile_service.get_or_create_user_profile(authenticated_user)
+        
+        # Add bookmark
+        success = await user_profile_service.add_bookmark(user_profile.id, bookmark_data)
+        
+        if success:
+            return func.HttpResponse(
+                json.dumps({
+                    "success": True,
+                    "message": "Bookmark added successfully"
+                }),
+                status_code=200,
+                headers={"Content-Type": "application/json"}
+            )
+        else:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Failed to add bookmark",
+                    "message": "Unable to save bookmark"
+                }),
+                status_code=500,
+                headers={"Content-Type": "application/json"}
+            )
+        
+    except Exception as e:
+        logger.error(f"❌ Error adding bookmark: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Bookmark creation failed",
+                "message": "Unable to add bookmark"
+            }),
             status_code=500,
             headers={"Content-Type": "application/json"}
         )

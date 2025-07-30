@@ -10,7 +10,7 @@ import glob
 
 # Define the actual Client IDs to replace
 CLIENT_IDS_TO_REPLACE = [
-    '52747449-829f-4fbe-bb5e-b4c54c9b1fbe',
+    'e4bd74b8-9a82-40c6-8d52-3e231733095e',
     'e4bd74b8-9a82-40c6-8d52-3e231733095e'
 ]
 

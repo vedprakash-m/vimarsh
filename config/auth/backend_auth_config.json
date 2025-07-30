@@ -1,11 +1,12 @@
 {
-  "tenant_id": "${TENANT_ID}",
-  "client_id": "${CLIENT_ID}",
+  "tenant_id": "80feb807-105c-4fb9-ab03-c9a818e35848",
+  "client_id": "e4bd74b8-9a82-40c6-8d52-3e231733095e",
   "client_secret": "${CLIENT_SECRET}",
-  "authority": "https://login.microsoftonline.com/VedID.onmicrosoft.com",
+  "authority": "https://login.microsoftonline.com/common",
   "scope": [
     "https://graph.microsoft.com/.default"
   ],
   "redirect_uri": "https://vimarsh-functions.azurewebsites.net/.auth/login/aad/callback",
-  "logout_uri": "https://vimarsh-functions.azurewebsites.net/.auth/logout"
+  "logout_uri": "https://vimarsh.vedprakash.net",
+  "_comment": "Updated with exact tenant ID and client ID from Azure Portal screenshots"
 }

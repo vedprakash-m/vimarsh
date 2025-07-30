@@ -4,13 +4,13 @@
 
 ### Your App Details:
 - **App Name**: Vimarsh
-- **Client ID**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+- **Client ID**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
 - **Tenant**: vedid.onmicrosoft.com
 
 ### ⚠️ **IMMEDIATE ACTION REQUIRED**
 
 1. **Go to Azure Portal** → **App Registrations** → **All applications**
-2. **Find your "Vimarsh" app** (Client ID: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`)
+2. **Find your "Vimarsh" app** (Client ID: `e4bd74b8-9a82-40c6-8d52-3e231733095e`)
 3. **Click on the app** to open its configuration
 
 ### 🔄 **Change Account Types (CRITICAL)**

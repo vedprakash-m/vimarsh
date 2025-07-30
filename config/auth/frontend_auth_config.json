@@ -1,9 +1,9 @@
 {
   "auth": {
-    "clientId": "${CLIENT_ID}",
-    "authority": "https://VedID.onmicrosoft.com/",
+    "clientId": "e4bd74b8-9a82-40c6-8d52-3e231733095e",
+    "authority": "https://login.microsoftonline.com/common",
     "redirectUri": "https://localhost:3000/auth/callback",
-    "postLogoutRedirectUri": "https://localhost:3000/"
+    "postLogoutRedirectUri": "https://vimarsh.vedprakash.net"
   },
   "cache": {
     "cacheLocation": "sessionStorage",
@@ -14,5 +14,6 @@
       "loggerCallback": "(level, message, containsPii) => { if (!containsPii) { console.log(message); } }",
       "piiLoggingEnabled": false
     }
-  }
+  },
+  "_comment": "Updated with exact values from Azure Portal screenshots - configured for multitenant"
 }

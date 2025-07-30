@@ -59,10 +59,10 @@ def check_entra_id_config():
     """Check Entra ID configuration from environment"""
     print(f"\n🔐 Entra ID Configuration Check...")
     
-    # The configuration we're using
+    # The configuration we're using (Updated with Real Values)
     config = {
-        "client_id": "52747449-829f-4fbe-bb5e-b4c54c9b1fbe",
-        "tenant_id": "common",
+        "client_id": "e4bd74b8-9a82-40c6-8d52-3e231733095e",
+        "tenant_id": "80feb807-105c-4fb9-ab03-c9a818e35848",
         "authority": "https://login.microsoftonline.com/common"
     }
     

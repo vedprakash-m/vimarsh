@@ -11,7 +11,7 @@
 
 ### **Azure App Registration** ✅
 - **App Name**: Vimarsh
-- **Client ID**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+- **Client ID**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
 - **Tenant**: vedid.onmicrosoft.com
 - **Supported Account Types**: ✅ **Multitenant + Personal Microsoft Accounts**
 - **Allow Public Client Flows**: ✅ **ENABLED** (Required for React SPA)
@@ -23,7 +23,7 @@
 - **Frontend Development**: `.env.development` ✅
 - **Backend Production**: `backend/.env.production` ✅  
 - **Backend Development**: `backend/.env` ✅
-- **All files configured with**: Client ID `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+- **All files configured with**: Client ID `e4bd74b8-9a82-40c6-8d52-3e231733095e`
 - **Authority**: `https://login.microsoftonline.com/common` ✅
 
 ### **Backend Implementation** ✅

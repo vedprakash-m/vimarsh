@@ -6,7 +6,7 @@
 
 #### 1.1 Azure App Registration Update ✅ COMPLETED
 - ✅ **App Registration Created**: Vimarsh app registered in vedid.onmicrosoft.com tenant
-- ✅ **Client ID Configured**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe` added to all environment files
+- ✅ **Client ID Configured**: `e4bd74b8-9a82-40c6-8d52-3e231733095e` added to all environment files
 - ✅ **Multi-Tenant Enabled**: Azure App Registration updated to support "Accounts in any organizational directory (Multitenant) and personal Microsoft accounts"
 - ✅ **Redirect URIs Verified**: Both development and production URLs configured
 
@@ -15,22 +15,22 @@
   - Updated `REACT_APP_USE_MSAL=true`
   - Updated `REACT_APP_REQUIRE_AUTH=true`
   - Updated `REACT_APP_AUTHORITY=https://login.microsoftonline.com/common`
-  - **Added actual Client ID**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+  - **Added actual Client ID**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
   
 - ✅ **Frontend Production Configuration** (`.env.production`):
   - Updated for multi-tenant support
   - Configured production URLs
-  - **Added actual Client ID**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+  - **Added actual Client ID**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
   
 - ✅ **Backend Development Configuration** (`.env`):
   - Created with `ENABLE_AUTH=true`
   - Set `ENTRA_TENANT_ID=common`
-  - **Added actual Client ID**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+  - **Added actual Client ID**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
   
 - ✅ **Backend Production Configuration** (`.env.production`):
   - Created with production settings
   - Configured for multi-tenant authentication
-  - **Added actual Client ID**: `52747449-829f-4fbe-bb5e-b4c54c9b1fbe`
+  - **Added actual Client ID**: `e4bd74b8-9a82-40c6-8d52-3e231733095e`
 
 ### Day 3-5: Backend Authentication Integration ✅ COMPLETED
 

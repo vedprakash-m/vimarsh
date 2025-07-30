@@ -7,20 +7,20 @@
  * ⚠️  Use environment variables for production deployment
  */
 
-// Environment-specific Client ID mapping
+// Environment-specific Client ID mapping (Updated with Real Values)
 const CLIENT_ID_MAP = {
   // Production - multitenant + personal accounts (matches Azure app registration)
   production: {
-    clientId: '52747449-829f-4fbe-bb5e-b4c54c9b1fbe',
-    tenantId: 'common', // 'common' supports multitenant + personal Microsoft accounts
+    clientId: 'e4bd74b8-9a82-40c6-8d52-3e231733095e',
+    tenantId: '80feb807-105c-4fb9-ab03-c9a818e35848', // Your actual tenant ID
     environment: 'multitenant-production',
     accountType: 'multitenant-personal' // Any Microsoft Entra ID tenant + personal accounts
   },
   
   // Development - same configuration for consistency
   development: {
-    clientId: '52747449-829f-4fbe-bb5e-b4c54c9b1fbe', // Use same client ID
-    tenantId: 'common', // 'common' supports multitenant + personal Microsoft accounts
+    clientId: 'e4bd74b8-9a82-40c6-8d52-3e231733095e', // Same client ID
+    tenantId: '80feb807-105c-4fb9-ab03-c9a818e35848', // Your actual tenant ID
     environment: 'multitenant-development',
     accountType: 'multitenant-personal' // Any Microsoft Entra ID tenant + personal accounts
   }
