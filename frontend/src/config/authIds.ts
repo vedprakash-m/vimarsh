@@ -9,18 +9,20 @@
 
 // Environment-specific Client ID mapping
 const CLIENT_ID_MAP = {
-  // Production - vedid.onmicrosoft.com tenant
+  // Production - multitenant + personal accounts (matches Azure app registration)
   production: {
     clientId: '52747449-829f-4fbe-bb5e-b4c54c9b1fbe',
-    tenantId: 'vedid.onmicrosoft.com',
-    environment: 'vedid-tenant'
+    tenantId: 'common', // 'common' supports multitenant + personal Microsoft accounts
+    environment: 'multitenant-production',
+    accountType: 'multitenant-personal' // Any Microsoft Entra ID tenant + personal accounts
   },
   
-  // Development fallbacks - default directory
+  // Development - same configuration for consistency
   development: {
-    clientId: 'e4bd74b8-9a82-40c6-8d52-3e231733095e',
-    tenantId: 'common',
-    environment: 'default-directory'
+    clientId: '52747449-829f-4fbe-bb5e-b4c54c9b1fbe', // Use same client ID
+    tenantId: 'common', // 'common' supports multitenant + personal Microsoft accounts
+    environment: 'multitenant-development',
+    accountType: 'multitenant-personal' // Any Microsoft Entra ID tenant + personal accounts
   }
 };
 
@@ -68,8 +70,8 @@ export const validateClientId = (): boolean => {
   const placeholders = [
     'your-client-id',
     'your-vimarsh-app-client-id',
-    'placeholder-client-id',
-    'e4bd74b8-9a82-40c6-8d52-3e231733095e' // Old default directory ID
+    'placeholder-client-id'
+    // Removed old default directory ID since we're using vedid tenant consistently
   ];
   
   if (placeholders.includes(clientId)) {
