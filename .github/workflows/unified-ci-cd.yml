@@ -423,6 +423,12 @@ jobs:
         npm ci
 
     - name: 🏗️ Build Application
+      env:
+        REACT_APP_ENABLE_AUTH: 'true'
+        REACT_APP_CLIENT_ID: '52747449-829f-4fbe-bb5e-b4c54c9b1fbe'
+        REACT_APP_AUTHORITY: 'https://login.microsoftonline.com/common'
+        REACT_APP_TENANT_ID: 'common'
+        REACT_APP_API_BASE_URL: 'https://vimarsh-backend-app-flex.azurewebsites.net/api'
       run: |
         cd frontend
         npm run build
