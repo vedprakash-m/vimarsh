@@ -4,10 +4,9 @@ Replaces domain-specific user models with configurable, reusable components.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional
 from datetime import datetime
 from enum import Enum
-import json
 import logging
 
 # Import the existing role system to maintain compatibility
@@ -26,17 +25,29 @@ class AuthenticationMode(Enum):
 @dataclass
 class AuthenticatedUser:
     """
-    Generic, extensible user model suitable for any application domain.
-    Replaces domain-specific VedUser with configurable attributes.
+    Enhanced user model for multi-tenant Microsoft authentication.
+    Supports Vimarsh spiritual guidance application requirements.
     """
     # Core authentication fields (required)
-    id: str
-    email: str
-    name: str
+    id: str                    # Microsoft Entra ID user identifier
+    email: str                 # Primary email address
+    name: str                  # Display name
     
-    # Optional identity fields  
-    given_name: str = ""
-    family_name: str = ""
+    # Optional Microsoft identity fields  
+    given_name: Optional[str] = None       # First name from Microsoft
+    family_name: Optional[str] = None      # Last name from Microsoft
+    job_title: Optional[str] = None        # Job title from organization
+    company_name: Optional[str] = None     # Organization/company name
+    tenant_id: Optional[str] = None        # User's organization tenant
+    
+    # Authentication metadata
+    auth_provider: str = "microsoft"       # Authentication provider
+    first_login: str = ""                  # ISO timestamp of first login
+    last_login: str = ""                   # ISO timestamp of last login
+    total_sessions: int = 0                # Total number of sessions
+    
+    # Spiritual guidance application preferences
+    preferred_personalities: List[str] = field(default_factory=list)  # Preferred spiritual guides
     
     # Authorization system
     permissions: List[str] = field(default_factory=list)
@@ -51,13 +62,23 @@ class AuthenticatedUser:
     
     # System metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
-    last_login: Optional[datetime] = None
+    last_login_dt: Optional[datetime] = None  # DateTime object for internal use
     is_active: bool = True
     
     def __post_init__(self):
-        """Initialize user permissions based on role"""
+        """Initialize user permissions and timestamp fields"""
         if self.user_permissions is None:
             self.user_permissions = UserPermissions.for_role(self.role)
+        
+        # Set timestamp fields if not provided
+        if not self.first_login:
+            self.first_login = datetime.utcnow().isoformat()
+        if not self.last_login:
+            self.last_login = datetime.utcnow().isoformat()
+        
+        # Set datetime object for internal use
+        if self.last_login_dt is None:
+            self.last_login_dt = datetime.utcnow()
     
     @classmethod
     def from_token_data(cls, token_data: Dict[str, Any], 
@@ -87,13 +108,17 @@ class AuthenticatedUser:
             id=token_data.get("sub", ""),
             email=email,
             name=token_data.get("name", ""),
-            given_name=token_data.get("given_name", ""),
-            family_name=token_data.get("family_name", ""),
+            given_name=token_data.get("given_name"),
+            family_name=token_data.get("family_name"),
+            job_title=token_data.get("jobTitle"),
+            company_name=token_data.get("companyName"),
+            tenant_id=token_data.get("tid"),
+            auth_provider="microsoft",
             permissions=token_data.get("roles", []),
             role=role,
             user_permissions=user_permissions,
             profile=profile,
-            last_login=datetime.utcnow()
+            last_login_dt=datetime.utcnow()
         )
     
     @classmethod

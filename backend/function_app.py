@@ -673,8 +673,33 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route(route="spiritual_guidance", methods=["POST"])
 async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced multi-personality conversation endpoint with comprehensive safety validation"""
+    """Enhanced spiritual guidance with authenticated user tracking"""
+    start_time = datetime.now()
+    
     try:
+        # NEW: Extract authenticated user
+        from auth.unified_auth_service import UnifiedAuthService
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Authentication required",
+                    "message": "Please sign in with Microsoft to continue your spiritual journey"
+                }),
+                status_code=401,
+                headers={
+                    "Content-Type": "application/json",
+                    "WWW-Authenticate": "Bearer"
+                }
+            )
+        
+        # Extract user context for analytics
+        user_id = authenticated_user.id
+        user_email = authenticated_user.email
+        user_name = authenticated_user.name
+        user_company = getattr(authenticated_user, 'company_name', None)
         # Parse request body
         try:
             query_data = req.get_json()
@@ -692,11 +717,14 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                 headers={"Content-Type": "application/json"}
             )
         
-        # Extract parameters
+        # Extract parameters (same as before)
         user_query = query_data.get('query', '').strip()
         personality_id = query_data.get('personality_id', 'krishna')
         language = query_data.get('language', 'English')
         conversation_context = query_data.get('conversation_context', [])
+        
+        # NEW: Generate session ID with real user
+        session_id = f"session_{user_id}_{datetime.now().strftime('%Y%m%d')}"
         
         if not user_query:
             return func.HttpResponse(
@@ -864,7 +892,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
             # Re-validate fallback response
             safety_result = safety_validator.validate_response_safety(response_text, personality_id, user_query)
         
-        # Build comprehensive response with safety metadata
+        # Build comprehensive response with safety metadata and user context
         response = {
             "response": response_text,
             "personality": {
@@ -873,6 +901,12 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                 "domain": personality_info["domain"],
                 "description": personality_info["description"]
             },
+            "user_context": {
+                "name": user_name,
+                "email": user_email,
+                "session_id": session_id
+            },
+            "citations": getattr(ai_response, 'citations', []) if 'ai_response' in locals() else [],
             "metadata": {
                 "timestamp": datetime.utcnow().isoformat(),
                 "language": language,
@@ -917,6 +951,28 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         }
         
         logger.info(f"✅ {personality_info['name']} response generated successfully with safety score: {safety_result.safety_score:.3f}")
+        
+        # NEW: Track analytics with real user data
+        if response_text:
+            try:
+                # Import your analytics service
+                from services.analytics_service import analytics_service
+                
+                await analytics_service.track_query(
+                    user_id=user_id,
+                    session_id=session_id,
+                    query=user_query,
+                    personality_id=personality_id,
+                    response=response_text,
+                    response_time_ms=int((datetime.now() - start_time).total_seconds() * 1000),
+                    tokens_used=getattr(ai_response, 'token_count', None) if 'ai_response' in locals() else None,
+                    cost_usd=None,  # Calculate based on token usage
+                    citations=getattr(ai_response, 'citations', []) if 'ai_response' in locals() else []
+                )
+            except ImportError:
+                logger.warning("⚠️ Analytics service not available yet")
+            except Exception as e:
+                logger.error(f"❌ Error tracking analytics: {str(e)}")
         
         return func.HttpResponse(
             json.dumps(response, indent=2),

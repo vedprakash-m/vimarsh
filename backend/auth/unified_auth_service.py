@@ -5,19 +5,17 @@ Supports both development and production modes with extensible user model
 
 import jwt
 import os
-import hashlib
-import hmac
 import requests
 import json
 import logging
 from functools import wraps, lru_cache
-from typing import Dict, Any, Optional, Callable, Union
+from typing import Dict, Any, Optional, Callable
 from datetime import datetime, timedelta
 from azure.functions import HttpRequest, HttpResponse
 
 # Import our new generic user model
 from auth.models import AuthenticatedUser, AuthenticationMode, create_authenticated_user
-from core.user_roles import UserRole, UserPermissions, admin_role_manager
+from core.user_roles import UserRole, UserPermissions
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +90,19 @@ class UnifiedAuthService:
         except Exception as e:
             logger.error(f"❌ Authentication error: {str(e)}")
             return None
+    
+    async def extract_user_from_request(self, req: HttpRequest) -> Optional[AuthenticatedUser]:
+        """
+        Extract authenticated user from request (async version for the plan implementation).
+        This is an alias for authenticate_request to match the implementation plan naming.
+        
+        Args:
+            req: Azure Functions HTTP request
+            
+        Returns:
+            AuthenticatedUser if authenticated, None otherwise
+        """
+        return self.authenticate_request(req)
     
     def _extract_token(self, req: HttpRequest) -> Optional[str]:
         """Extract JWT token from request headers"""
@@ -193,7 +204,7 @@ class UnifiedAuthService:
         try:
             jwt.decode(token, options={"verify_signature": False})
             return True
-        except:
+        except Exception:
             return False
     
     def _decode_development_token(self, token: str) -> Dict[str, Any]:
@@ -233,16 +244,29 @@ class UnifiedAuthService:
         try:
             decoded = jwt.decode(token, options={"verify_signature": False})
             return decoded
-        except:
+        except Exception:
             # Fallback to default dev user
             return test_token_data["dev-token"]
     
     @lru_cache(maxsize=100)
     def _validate_entra_token(self, token: str, tenant_id: str, client_id: str) -> Optional[Dict[str, Any]]:
-        """Validate token against Microsoft Entra ID"""
+        """Validate token against Microsoft Entra ID with multi-tenant support"""
         try:
+            # First decode token to get actual tenant if using "common"
+            unverified = jwt.decode(token, options={"verify_signature": False})
+            actual_tenant = unverified.get("tid", tenant_id)
+            
+            # For multi-tenant, use common endpoint or specific tenant
+            if tenant_id == "common":
+                # Use common endpoint but validate against actual tenant from token
+                jwks_url = "https://login.microsoftonline.com/common/discovery/v2.0/keys"
+                expected_issuer = f"https://login.microsoftonline.com/{actual_tenant}/v2.0"
+            else:
+                # Single tenant validation
+                jwks_url = f"https://login.microsoftonline.com/{tenant_id}/discovery/v2.0/keys"
+                expected_issuer = f"https://login.microsoftonline.com/{tenant_id}/v2.0"
+            
             # Get JWKS from Microsoft
-            jwks_url = f"https://login.microsoftonline.com/{tenant_id}/discovery/v2.0/keys"
             jwks_response = requests.get(jwks_url, timeout=10)
             jwks_response.raise_for_status()
             jwks = jwks_response.json()
@@ -260,16 +284,16 @@ class UnifiedAuthService:
                 logger.error("❌ No matching key found in JWKS")
                 return None
             
-            # Validate token
+            # Validate token with multi-tenant support
             decoded_token = jwt.decode(
                 token,
                 key,
                 algorithms=["RS256"],
                 audience=client_id,
-                issuer=f"https://login.microsoftonline.com/{tenant_id}/v2.0"
+                issuer=expected_issuer
             )
             
-            logger.info(f"✅ Successfully validated Entra ID token for {decoded_token.get('email', 'unknown')}")
+            logger.info(f"✅ Successfully validated Entra ID token for {decoded_token.get('email', 'unknown')} from tenant {actual_tenant}")
             return decoded_token
             
         except jwt.ExpiredSignatureError:
