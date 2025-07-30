@@ -1,0 +1,23 @@
+{
+  "summary": {
+    "total_tests": 1,
+    "passed": 0,
+    "failed": 1,
+    "warnings": 0,
+    "success_rate": "0.0%"
+  },
+  "details": [
+    {
+      "test": "Backend Health Check",
+      "status": "FAIL",
+      "details": "Error: HTTPSConnectionPool(host='vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net', port=443): Read timed out. (read timeout=10)",
+      "timestamp": "2025-07-29T22:00:41.196953"
+    }
+  ],
+  "recommendations": [
+    "Verify backend deployment and URL configuration",
+    "Test with real Microsoft accounts from different tenants",
+    "Verify Azure App Registration is set to 'Multitenant'",
+    "Check Azure App Registration 'Allow public client flows' is enabled"
+  ]
+}

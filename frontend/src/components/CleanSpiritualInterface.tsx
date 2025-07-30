@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
 import { getApiBaseUrl } from '../config/environment';
+import { getAuthHeaders } from '../auth/authService';
 import '../styles/spiritual-theme.css';
 
 interface Message {
@@ -95,10 +96,12 @@ export default function CleanSpiritualInterface() {
 
       // Call real spiritual guidance API with conversation context
       const apiUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
       const response = await fetch(`${apiUrl}/spiritual_guidance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders
         },
         body: JSON.stringify({
           query: question,
