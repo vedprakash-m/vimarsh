@@ -968,6 +968,53 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                 response_time_ms = int((datetime.now() - start_time).total_seconds() * 1000)
                 logger.info(f"📊 Response metrics - Time: {response_time_ms}ms, User: {user_id}")
                 
+                # Collect RAG metadata if available
+                rag_metadata = {
+                    "rag_used": used_rag_enhancement,
+                    "rag_source": None,
+                    "context_chunks_count": 0,
+                    "context_chunks": [],
+                    "citations_count": 0,
+                    "citations": []
+                }
+                
+                # Extract RAG metadata from enhanced RAG service
+                if used_rag_enhancement and 'rag_response' in locals() and rag_response:
+                    context_chunks = rag_response.get('context_chunks', [])
+                    citations = rag_response.get('citations', [])
+                    rag_metadata.update({
+                        "rag_source": "enhanced_rag",
+                        "context_chunks_count": len(context_chunks),
+                        "context_chunks": [
+                            {
+                                "source": chunk.get('source', 'unknown'),
+                                "content_preview": chunk.get('content', '')[:200] + "..." if len(chunk.get('content', '')) > 200 else chunk.get('content', ''),
+                                "score": chunk.get('score', 0.0),
+                                "metadata": chunk.get('metadata', {})
+                            } for chunk in context_chunks[:5]  # Limit to first 5 chunks to avoid too much data
+                        ],
+                        "citations_count": len(citations),
+                        "citations": citations[:10]  # Limit to first 10 citations
+                    })
+                # Extract RAG metadata from simple RAG service
+                elif used_rag_enhancement and 'simple_rag_response' in locals() and simple_rag_response:
+                    context_chunks = getattr(simple_rag_response, 'context_chunks', [])
+                    citations = getattr(simple_rag_response, 'citations', [])
+                    rag_metadata.update({
+                        "rag_source": "simple_rag",
+                        "context_chunks_count": len(context_chunks),
+                        "context_chunks": [
+                            {
+                                "source": getattr(chunk, 'source', 'unknown'),
+                                "content_preview": getattr(chunk, 'content', '')[:200] + "..." if len(getattr(chunk, 'content', '')) > 200 else getattr(chunk, 'content', ''),
+                                "score": getattr(chunk, 'score', 0.0),
+                                "metadata": getattr(chunk, 'metadata', {})
+                            } for chunk in context_chunks[:5]  # Limit to first 5 chunks
+                        ],
+                        "citations_count": len(citations),
+                        "citations": citations[:10]  # Limit to first 10 citations
+                    })
+                
                 # Record interaction in user profile
                 await user_profile_service.record_interaction(
                     user_id=user_id,
@@ -983,7 +1030,8 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                         "themes": [personality_info["domain"]],
                         "safety_score": round(safety_result.safety_score, 3),
                         "is_anonymous": user_id == "anonymous-user",
-                        "model": "gemini-flash" if used_llm_service else "template"
+                        "model": "gemini-flash" if used_llm_service else "template",
+                        "rag_metadata": rag_metadata
                     }
                 )
                 
