@@ -93,7 +93,7 @@ export const isValidProduction = (): boolean => {
 export const ENTRA_ID_CONFIG = {
   tenantId: process.env.REACT_APP_TENANT_ID || 'common', // Allow both personal and work/school accounts
   authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/common',
-  clientId: process.env.REACT_APP_CLIENT_ID || 'e4bd74b8-9a82-40c6-8d52-3e231733095e', // Vimarsh app registration
+  clientId: process.env.REACT_APP_CLIENT_ID || '52747449-829f-4fbe-bb5e-b4c54c9b1fbe', // Vimarsh app registration (vedId tenant)
   scopes: ['openid', 'profile', 'email', 'User.Read'],
 };
 
