@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { conversationHistory, ConversationSession } from '../utils/conversationHistory';
 import { API_BASE_URL } from '../config/environment';
+import { getAuthHeaders } from '../auth/authService';
 
 // Debug log
 console.log('useSpiritualChat - API_BASE_URL:', API_BASE_URL);
@@ -219,10 +220,14 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
       
       const apiUrl = `${finalConfig.apiBaseUrl}/spiritual_guidance`;
       
+      // Get authentication headers
+      const authHeaders = await getAuthHeaders();
+      
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders
         },
         body: JSON.stringify({
           query: text.trim(),
@@ -294,7 +299,7 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
       setError(
         finalConfig.language === 'hi'
           ? 'सेवा में अस्थायी व्यवधान है। कृपया पुनः प्रयास करें।'
-          : 'There was an issue connecting to the spiritual guidance service. Please try again.',
+          : 'There was an issue connecting to the wisdom guidance service. Please try again.',
         'NETWORK_ERROR'
       );
     } finally {

@@ -164,7 +164,7 @@ export const FEATURE_FLAGS = {
 // Application Information
 export const APP_CONFIG = {
   name: 'Vimarsh',
-  description: 'AI-powered spiritual guidance from Lord Krishna',
+  description: 'Wisdom Without Boundaries - AI guidance from great minds across history',
   version: process.env.REACT_APP_VERSION || '1.0.0',
   domain: 'vimarsh.vedprakash.net',
   supportEmail: 'ved@vedprakash.net',

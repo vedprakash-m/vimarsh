@@ -42,7 +42,7 @@ export const translations = {
     welcomeMessage: 'Connect with the divine wisdom of ancient scriptures. Please sign in to begin your spiritual journey.',
     
     // Navigation and UI
-    spiritualGuidance: 'Spiritual Guidance',
+    spiritualGuidance: 'Wisdom Guidance',
     voiceInput: 'Voice Input',
     textInput: 'Text Input',
     send: 'Send',
@@ -149,7 +149,7 @@ export const translations = {
     
     // Accessibility
     skipToMainContent: 'Skip to main content',
-    spiritualGuidanceApp: 'Spiritual Guidance Application',
+    spiritualGuidanceApp: 'Wisdom Guidance Application',
     conversationControls: 'Conversation controls',
     welcomeHeading: 'Welcome section',
     conversationMessages: 'Conversation messages',
@@ -411,7 +411,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     
     // Update page title based on language
     document.title = currentLanguage === 'English' 
-      ? 'Vimarsh - Spiritual AI Guidance'
+      ? 'Vimarsh - Wisdom Without Boundaries'
       : 'विमर्श - आध्यात्मिक AI मार्गदर्शन';
       
     console.log(`🌍 Language changed to ${currentLanguage} (${config.code})`);

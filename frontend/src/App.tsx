@@ -45,7 +45,7 @@ const SpiritualLoadingSpinner: React.FC = () => (
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     }}></div>
-    <p style={{ marginTop: '16px', fontSize: '14px' }}>Loading spiritual guidance...</p>
+    <p style={{ marginTop: '16px', fontSize: '14px' }}>Loading wisdom guidance...</p>
     <style dangerouslySetInnerHTML={{
       __html: `
         @keyframes spin {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
+import { getAuthHeaders } from '../auth/authService';
 // Voice functionality temporarily disabled - imports kept for future implementation
 // import { Mic, MicOff } from 'lucide-react';
 // import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
@@ -73,10 +74,12 @@ const ConversationInterface: React.FC<ConversationInterfaceProps> = ({ onBack })
     
     try {
       // Call the real spiritual guidance API
+      const authHeaders = await getAuthHeaders();
       const response = await fetch('/api/spiritual_guidance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders
         },
         body: JSON.stringify({
           query: userQuery, // Use saved message

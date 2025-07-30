@@ -276,7 +276,7 @@ class DeviceIntegrationManager {
 
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: 'Vimarsh - Spiritual Guidance',
+        title: 'Vimarsh - Wisdom Without Boundaries',
         artist: 'Lord Krishna',
         album: 'Ancient Wisdom',
         artwork: [

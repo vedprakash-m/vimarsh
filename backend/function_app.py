@@ -677,46 +677,36 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
     start_time = datetime.now()
     
     try:
-        # NEW: Extract authenticated user
+        # Re-enable authentication to start collecting user data
         from auth.unified_auth_service import UnifiedAuthService
         from services.user_profile_service import user_profile_service
         
         auth_service = UnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
-        if not authenticated_user:
-            return func.HttpResponse(
-                json.dumps({
-                    "error": "Authentication required",
-                    "message": "Please sign in with Microsoft to continue your spiritual journey"
-                }),
-                status_code=401,
-                headers={
-                    "Content-Type": "application/json",
-                    "WWW-Authenticate": "Bearer"
-                }
-            )
-        
-        # NEW: Get or create user profile in database
-        try:
-            user_profile = await user_profile_service.get_or_create_user_profile(authenticated_user)
-            logger.info(f"🕉️ User profile loaded: {user_profile.email}")
-        except Exception as e:
-            logger.error(f"❌ Failed to load user profile: {e}")
-            return func.HttpResponse(
-                json.dumps({
-                    "error": "Profile loading failed",
-                    "message": "Unable to access your profile. Please try again."
-                }),
-                status_code=500,
-                headers={"Content-Type": "application/json"}
-            )
-        
-        # Extract user context for analytics - use profile data
-        user_id = user_profile.id  # Use internal user ID
-        user_email = user_profile.email
-        user_name = user_profile.name
-        user_company = user_profile.company_name
+        if authenticated_user:
+            # Real authenticated user
+            try:
+                user_profile = await user_profile_service.get_or_create_user_profile(authenticated_user)
+                user_id = user_profile.id
+                user_email = user_profile.email
+                user_name = user_profile.name
+                user_company = user_profile.company_name
+                logger.info(f"🕉️ Authenticated user: {user_email}")
+            except Exception as e:
+                logger.error(f"❌ Failed to load user profile: {e}")
+                # Fall back to anonymous user if profile service fails
+                user_id = "anonymous-user"
+                user_email = "anonymous@vimarsh.local"
+                user_name = "Anonymous User"
+                user_company = None
+        else:
+            # Anonymous user (authentication disabled or failed)
+            user_id = "anonymous-user"
+            user_email = "anonymous@vimarsh.local"
+            user_name = "Anonymous User"
+            user_company = None
+            logger.info("⚠️ Using anonymous user context")
         # Parse request body
         try:
             query_data = req.get_json()
@@ -969,13 +959,14 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         
         logger.info(f"✅ {personality_info['name']} response generated successfully with safety score: {safety_result.safety_score:.3f}")
         
-        # NEW: Record interaction in user profile service
+        # Re-enable user interaction recording
         if response_text:
             try:
+                from services.user_profile_service import user_profile_service
+                
                 # Calculate response time and basic metrics
                 response_time_ms = int((datetime.now() - start_time).total_seconds() * 1000)
-                input_tokens = len(user_query.split()) * 1.3  # Rough token estimate
-                output_tokens = len(response_text.split()) * 1.3  # Rough token estimate
+                logger.info(f"📊 Response metrics - Time: {response_time_ms}ms, User: {user_id}")
                 
                 # Record interaction in user profile
                 await user_profile_service.record_interaction(
@@ -986,10 +977,12 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                         "response": response_text,
                         "personality": personality_id,
                         "response_time_ms": response_time_ms,
-                        "input_tokens": int(input_tokens),
-                        "output_tokens": int(output_tokens),
+                        "input_tokens": 0,  # Will be updated when LLM service provides token count
+                        "output_tokens": 0,  # Will be updated when LLM service provides token count  
                         "cost_usd": 0.0,  # Will be calculated later with real pricing
                         "themes": [personality_info["domain"]],
+                        "safety_score": round(safety_result.safety_score, 3),
+                        "is_anonymous": user_id == "anonymous-user",
                         "model": "gemini-flash" if used_llm_service else "template"
                     }
                 )
