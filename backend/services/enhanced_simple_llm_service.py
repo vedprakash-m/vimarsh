@@ -9,6 +9,7 @@ architecture of the enhanced service, incorporating all our optimization learnin
 import os
 import logging
 import time
+import asyncio
 import google.generativeai as genai
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
@@ -33,6 +34,8 @@ class PersonalityConfig:
     prompt_template: str
     greeting_style: str
     requires_citations: bool = True
+    timeout_seconds: int = 30  # Default timeout
+    max_retries: int = 2       # Default retry count
 
 @dataclass
 class SpiritualResponse:
@@ -91,6 +94,8 @@ class EnhancedSimpleLLMService:
                 max_chars=500,  # Optimized from our testing
                 greeting_style="Beloved devotee",
                 requires_citations=True,
+                timeout_seconds=30,  # Standard timeout
+                max_retries=2,       # Standard retry count
                 prompt_template="""You are Lord Krishna from the Bhagavad Gita. Answer this spiritual question briefly and authentically.
 
 RESPONSE REQUIREMENTS:
@@ -114,6 +119,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Dear friend",
                 requires_citations=False,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Buddha, the enlightened teacher. Answer with compassion and wisdom about the path to end suffering.
 
 RESPONSE REQUIREMENTS:
@@ -136,6 +143,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Beloved child",
                 requires_citations=True,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Jesus Christ, teacher of love and compassion. Answer with divine love and spiritual guidance.
 
 RESPONSE REQUIREMENTS:
@@ -159,6 +168,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Beloved",
                 requires_citations=False,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Rumi, the Sufi mystic poet. Answer with mystical wisdom about divine love and spiritual union.
 
 RESPONSE REQUIREMENTS:
@@ -181,6 +192,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Dear friend",
                 requires_citations=False,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Lao Tzu, ancient Chinese sage. Answer with Taoist wisdom about harmony and the natural way.
 
 RESPONSE REQUIREMENTS:
@@ -203,6 +216,8 @@ Response:"""
                 max_chars=500,  # Increased for complete scientific wisdom
                 greeting_style="My friend",
                 requires_citations=False,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Albert Einstein, the renowned physicist. Answer with scientific curiosity and wisdom.
 
 RESPONSE REQUIREMENTS:
@@ -225,6 +240,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="My fellow citizen",
                 requires_citations=True,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Abraham Lincoln, 16th President of the United States. Answer with wisdom about leadership and democracy.
 
 RESPONSE REQUIREMENTS:
@@ -247,6 +264,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Fellow seeker",
                 requires_citations=True,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Marcus Aurelius, Roman Emperor and Stoic philosopher. Answer with Stoic wisdom and virtue.
 
 RESPONSE REQUIREMENTS:
@@ -269,6 +288,8 @@ Response:"""
                 max_chars=500,  # Increased for complete scientific responses
                 greeting_style="Curious mind",
                 requires_citations=False,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Nikola Tesla, the brilliant inventor and electrical engineer. Answer with scientific innovation and visionary insight.
 
 RESPONSE REQUIREMENTS:
@@ -289,19 +310,22 @@ Response:"""
                 id="newton",
                 name="Isaac Newton",
                 domain=PersonalityDomain.SCIENTIFIC,
-                max_chars=500,  # Scientific explanations need space
+                max_chars=450,  # Slightly reduced for faster response
                 greeting_style="My friend",
                 requires_citations=False,
+                timeout_seconds=20,  # Reduced timeout for Newton to prevent 504 errors
+                max_retries=3,       # More retries for stability
                 prompt_template="""You are Isaac Newton, the father of modern physics and mathematics. Answer with scientific precision and natural philosophy.
 
 RESPONSE REQUIREMENTS:
-- Maximum 400-500 characters for complete thoughts
+- Maximum 350-400 characters for faster, focused responses
 - Focus on physics, mathematics, and natural laws
 - Use thoughtful, precise scientific tone
 - Start with "My friend" or "Curious mind" or "Fellow natural philosopher"
 - Reference physical concepts when relevant (gravity, motion, optics, calculus)
 - Show systematic approach to understanding nature
 - Emphasize observation and mathematical description of the universe
+- BE CONCISE AND DIRECT to avoid timeout issues
 
 USER QUERY: {query}
 
@@ -315,6 +339,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Dear student",
                 requires_citations=True,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Chanakya (Kautilya), ancient Indian political strategist and author of Arthashastra. Answer with strategic wisdom and practical statecraft.
 
 RESPONSE REQUIREMENTS:
@@ -338,6 +364,8 @@ Response:"""
                 max_chars=500,  # Standardized to 500 for simplicity
                 greeting_style="Honorable student",
                 requires_citations=True,
+                timeout_seconds=30,
+                max_retries=2,
                 prompt_template="""You are Confucius, the great Chinese philosopher and educator. Answer with wisdom about virtue, education, and social harmony.
 
 RESPONSE REQUIREMENTS:
@@ -362,7 +390,7 @@ Response:"""
         user_id: Optional[str] = None,
         session_id: Optional[str] = None
     ) -> SpiritualResponse:
-        """Generate response for any personality with optimized prompts"""
+        """Generate response for any personality with timeout handling and retry logic"""
         
         if not self.is_configured:
             return SpiritualResponse(
@@ -381,58 +409,93 @@ Response:"""
         config = self.personalities[personality_id]
         prompt = config.prompt_template.format(query=query)
         
-        try:
-            start_time = time.time()
-            logger.info(f"🤖 Generating {config.name} response for: {query[:50]}...")
-            
-            # Generate response using Gemini
-            response = self.model.generate_content(prompt)
-            response_time = time.time() - start_time
-            
-            if response and response.text:
-                response_text = response.text.strip()
+        # Implement retry logic with timeout handling
+        for attempt in range(config.max_retries + 1):
+            try:
+                start_time = time.time()
+                logger.info(f"🤖 Generating {config.name} response (attempt {attempt + 1}/{config.max_retries + 1}) for: {query[:50]}...")
                 
-                # Enforce character limit
-                if len(response_text) > config.max_chars:
-                    response_text = response_text[:config.max_chars-3] + "..."
-                
-                logger.info(f"✅ Real {config.name} response generated: {len(response_text)} chars in {response_time:.2f}s")
-                
-                return SpiritualResponse(
-                    content=response_text,
-                    personality_id=personality_id,
-                    source=f"gemini_api_{personality_id}_optimized",
-                    character_count=len(response_text),
-                    max_allowed=config.max_chars,
-                    metadata={
-                        "personality_name": config.name,
-                        "domain": config.domain.value,
-                        "response_time": response_time,
-                        "model": "gemini-2.5-flash",
-                        "requires_citations": config.requires_citations,
-                        "greeting_style": config.greeting_style
-                    }
-                )
-            else:
-                logger.warning(f"⚠️ Empty response from Gemini API for {personality_id}")
-                return SpiritualResponse(
-                    content=f"{config.greeting_style}, I am unable to provide guidance at this moment. Please ask again with a specific question.",
-                    personality_id=personality_id,
-                    source="fallback_empty_response",
-                    character_count=0,
-                    max_allowed=config.max_chars
+                # Use asyncio.wait_for for timeout handling
+                response = await asyncio.wait_for(
+                    self._generate_gemini_response(prompt),
+                    timeout=config.timeout_seconds
                 )
                 
-        except Exception as e:
-            logger.error(f"❌ Gemini API call failed for {personality_id}: {e}")
-            return SpiritualResponse(
-                content=f"{config.greeting_style}, I am experiencing difficulties accessing my wisdom. Please try your question again shortly.",
-                personality_id=personality_id,
-                source="fallback_api_error",
-                character_count=0,
-                max_allowed=config.max_chars,
-                metadata={"error": str(e)}
-            )
+                response_time = time.time() - start_time
+                
+                if response and response.text:
+                    response_text = response.text.strip()
+                    
+                    # Enforce character limit
+                    if len(response_text) > config.max_chars:
+                        response_text = response_text[:config.max_chars-3] + "..."
+                    
+                    logger.info(f"✅ Real {config.name} response generated: {len(response_text)} chars in {response_time:.2f}s")
+                    
+                    return SpiritualResponse(
+                        content=response_text,
+                        personality_id=personality_id,
+                        source=f"gemini_api_{personality_id}_optimized",
+                        character_count=len(response_text),
+                        max_allowed=config.max_chars,
+                        metadata={
+                            "personality_name": config.name,
+                            "domain": config.domain.value,
+                            "response_time": response_time,
+                            "model": "gemini-2.5-flash",
+                            "requires_citations": config.requires_citations,
+                            "greeting_style": config.greeting_style,
+                            "attempt": attempt + 1,
+                            "timeout_seconds": config.timeout_seconds
+                        }
+                    )
+                else:
+                    logger.warning(f"⚠️ Empty response from Gemini API for {personality_id} (attempt {attempt + 1})")
+                    if attempt == config.max_retries:  # Last attempt
+                        return SpiritualResponse(
+                            content=f"{config.greeting_style}, I am unable to provide guidance at this moment. Please ask again with a specific question.",
+                            personality_id=personality_id,
+                            source="fallback_empty_response",
+                            character_count=0,
+                            max_allowed=config.max_chars
+                        )
+                        
+            except asyncio.TimeoutError:
+                logger.error(f"⏰ Timeout error for {personality_id} (attempt {attempt + 1}/{config.max_retries + 1}) after {config.timeout_seconds}s")
+                if attempt == config.max_retries:  # Last attempt
+                    return SpiritualResponse(
+                        content=f"{config.greeting_style}, I need more time to formulate my response. Please try asking your question again.",
+                        personality_id=personality_id,
+                        source="fallback_timeout_error",
+                        character_count=0,
+                        max_allowed=config.max_chars,
+                        metadata={"error": "timeout", "timeout_seconds": config.timeout_seconds}
+                    )
+                # Wait before retry
+                await asyncio.sleep(1 * (attempt + 1))  # Progressive backoff
+                
+            except Exception as e:
+                logger.error(f"❌ Gemini API call failed for {personality_id} (attempt {attempt + 1}): {e}")
+                if attempt == config.max_retries:  # Last attempt
+                    return SpiritualResponse(
+                        content=f"{config.greeting_style}, I am experiencing difficulties accessing my wisdom. Please try your question again shortly.",
+                        personality_id=personality_id,
+                        source="fallback_api_error",
+                        character_count=0,
+                        max_allowed=config.max_chars,
+                        metadata={"error": str(e)}
+                    )
+                # Wait before retry
+                await asyncio.sleep(1 * (attempt + 1))  # Progressive backoff
+    
+    async def _generate_gemini_response(self, prompt: str):
+        """Generate response from Gemini API with async wrapper"""
+        # Wrap the synchronous Gemini call in an async context
+        return await asyncio.get_event_loop().run_in_executor(
+            None, 
+            self.model.generate_content, 
+            prompt
+        )
     
     def get_available_personalities(self) -> List[Dict[str, Any]]:
         """Get list of available personalities with their metadata"""
@@ -443,7 +506,9 @@ Response:"""
                 "domain": config.domain.value,
                 "max_chars": config.max_chars,
                 "greeting_style": config.greeting_style,
-                "requires_citations": config.requires_citations
+                "requires_citations": config.requires_citations,
+                "timeout_seconds": config.timeout_seconds,
+                "max_retries": config.max_retries
             }
             for pid, config in self.personalities.items()
         ]

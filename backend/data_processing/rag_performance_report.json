@@ -1,0 +1,142 @@
+{
+  "health": {
+    "status": "healthy",
+    "health_data": {
+      "status": "healthy",
+      "service": "vimarsh-multi-personality-enhanced-safety",
+      "version": "2.0",
+      "personalities_available": 12,
+      "safety_features": {
+        "personality_specific_configs": true,
+        "content_validation": true,
+        "blocked_pattern_detection": true,
+        "tone_validation": true,
+        "length_validation": true,
+        "quality_scoring": true,
+        "religious_content_protection": true
+      },
+      "personalities": [
+        "krishna",
+        "einstein",
+        "lincoln",
+        "marcus_aurelius",
+        "buddha",
+        "jesus",
+        "rumi",
+        "lao_tzu",
+        "chanakya",
+        "confucius",
+        "newton",
+        "tesla"
+      ],
+      "safety_levels": [
+        "strict",
+        "moderate"
+      ],
+      "domains": [
+        "spiritual",
+        "historical",
+        "scientific",
+        "philosophical"
+      ],
+      "timestamp": "2025-07-29T22:14:09.697870"
+    },
+    "timestamp": "2025-07-29T15:14:08.794396"
+  },
+  "performance": {
+    "timestamp": "2025-07-29T15:14:08.795154",
+    "total_personalities": 12,
+    "personality_results": {
+      "krishna": {
+        "status": "success",
+        "response_time_seconds": 15.83,
+        "response_length": 230,
+        "query": "What is dharma?",
+        "response_preview": "My beloved devotee,\nDharma is that eternal principle which sustains the cosmos and all beings. It is..."
+      },
+      "einstein": {
+        "status": "success",
+        "response_time_seconds": 4.58,
+        "response_length": 309,
+        "query": "What is time?",
+        "response_preview": "Curious mind, time is a most enigmatic dimension! My theories reveal it's not absolute, but relative..."
+      },
+      "buddha": {
+        "status": "success",
+        "response_time_seconds": 5.01,
+        "response_length": 495,
+        "query": "What is suffering?",
+        "response_preview": "Dear friend, suffering, or Dukkha, is the pervasive unease and dissatisfaction inherent in existence..."
+      },
+      "chanakya": {
+        "status": "success",
+        "response_time_seconds": 4.8,
+        "response_length": 313,
+        "query": "What makes a good leader?",
+        "response_preview": "Dear student,\n\nA good leader first conquers his own senses. He is learned, understands human nature,..."
+      },
+      "lincoln": {
+        "status": "success",
+        "response_time_seconds": 3.9,
+        "response_length": 349,
+        "query": "How to preserve democracy?",
+        "response_preview": "My fellow citizen, preserving democracy requires a steadfast commitment from its people. It rests up..."
+      },
+      "marcus_aurelius": {
+        "status": "success",
+        "response_time_seconds": 8.88,
+        "response_length": 281,
+        "query": "What is virtue?",
+        "response_preview": "Student of wisdom, virtue is the soul's excellence, the only true good. It is living in harmony with..."
+      },
+      "newton": {
+        "status": "failed",
+        "error_code": 504,
+        "response_time_seconds": 240.01,
+        "query": "What are the laws of motion?"
+      },
+      "tesla": {
+        "status": "success",
+        "response_time_seconds": 31.16,
+        "response_length": 388,
+        "query": "What is electricity?",
+        "response_preview": "Curious mind, electricity is not merely a force, but the very breath of the cosmos, the unseen pulse..."
+      },
+      "jesus": {
+        "status": "success",
+        "response_time_seconds": 3.34,
+        "response_length": 127,
+        "query": "What is love?",
+        "response_preview": "Beloved child, please ask me something that aligns with love and compassion. I am here to share God'..."
+      },
+      "rumi": {
+        "status": "success",
+        "response_time_seconds": 3.73,
+        "response_length": 333,
+        "query": "What is divine love?",
+        "response_preview": "Beloved, divine love is the soul's fever for the Divine Beloved, a sacred madness that sets the hear..."
+      },
+      "lao_tzu": {
+        "status": "success",
+        "response_time_seconds": 3.59,
+        "response_length": 294,
+        "query": "What is the Tao?",
+        "response_preview": "Dear friend, The Tao is the unnamable Way, the natural flow of all existence. It is not a thing, but..."
+      },
+      "confucius": {
+        "status": "success",
+        "response_time_seconds": 3.48,
+        "response_length": 386,
+        "query": "What is wisdom?",
+        "response_preview": "Honorable student, wisdom is not merely knowing, but understanding Ren (benevolence) and applying it..."
+      }
+    },
+    "overall_metrics": {
+      "successful_queries": 11,
+      "failed_queries": 1,
+      "success_rate_percentage": 91.7,
+      "average_response_time_seconds": 8.03,
+      "total_test_duration_seconds": 328.31
+    }
+  }
+}

@@ -7,6 +7,7 @@ import azure.functions as func
 import json
 import logging
 import re
+import asyncio
 from datetime import datetime
 from typing import Dict, Any, List
 from dataclasses import dataclass
@@ -731,9 +732,14 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         if llm_service and LLM_SERVICE_AVAILABLE and llm_service.is_configured:
             try:
                 logger.info(f"🤖 Trying Enhanced LLM service first for {personality_id}")
-                ai_response = await llm_service.generate_personality_response(
-                    query=user_query,
-                    personality_id=personality_id
+                
+                # Add timeout wrapper for the entire LLM call
+                ai_response = await asyncio.wait_for(
+                    llm_service.generate_personality_response(
+                        query=user_query,
+                        personality_id=personality_id
+                    ),
+                    timeout=45  # Overall endpoint timeout (higher than individual personality timeouts)
                 )
                 
                 # Check if we got a real AI response (SpiritualResponse object)
@@ -743,9 +749,16 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
                     logger.info(f"✅ Enhanced LLM response generated: {len(response_text)} chars")
                     logger.info(f"Response source: {getattr(ai_response, 'source', 'enhanced_llm')}")
                     logger.info(f"Personality: {ai_response.metadata.get('personality_name', personality_id)}")
+                    
+                    # Log timeout and retry info
+                    if hasattr(ai_response, 'metadata'):
+                        logger.info(f"Timeout config: {ai_response.metadata.get('timeout_seconds', 'unknown')}s")
+                        logger.info(f"Attempt: {ai_response.metadata.get('attempt', 'unknown')}")
                 else:
                     logger.warning("Enhanced LLM service returned empty/invalid response, trying RAG...")
                     
+            except asyncio.TimeoutError:
+                logger.error(f"⏰ Overall LLM service timeout (45s) for {personality_id}, falling back to RAG")
             except Exception as e:
                 logger.error(f"Enhanced LLM service failed, falling back to RAG: {e}")
         
