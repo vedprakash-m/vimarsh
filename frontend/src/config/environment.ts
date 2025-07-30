@@ -4,6 +4,8 @@
  * Provides proper Entra ID settings per Apps_Auth_Requirement.md
  */
 
+import { AUTH_IDS } from './authIds';
+
 // Environment detection
 export const isProduction = process.env.NODE_ENV === 'production';
 export const isDevelopment = process.env.NODE_ENV === 'development';
@@ -91,9 +93,9 @@ export const isValidProduction = (): boolean => {
 
 // Entra ID Configuration for Vedprakash Domain - Multi-Domain Support
 export const ENTRA_ID_CONFIG = {
-  tenantId: process.env.REACT_APP_TENANT_ID || 'common', // Allow both personal and work/school accounts
-  authority: process.env.REACT_APP_AUTHORITY || 'https://login.microsoftonline.com/common',
-  clientId: process.env.REACT_APP_CLIENT_ID || '52747449-829f-4fbe-bb5e-b4c54c9b1fbe', // Vimarsh app registration (vedId tenant)
+  tenantId: process.env.REACT_APP_TENANT_ID || AUTH_IDS.getTenantConfig().tenantId,
+  authority: process.env.REACT_APP_AUTHORITY || AUTH_IDS.getTenantConfig().authority,
+  clientId: AUTH_IDS.getClientId(), // Centralized Client ID management
   scopes: ['openid', 'profile', 'email', 'User.Read'],
 };
 
