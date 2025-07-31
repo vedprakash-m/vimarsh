@@ -204,7 +204,7 @@ class AdminService {
   }
 
   async getSpiritualGuidance(accessToken: string, query: string, language: string = 'English'): Promise<any> {
-    return this.makeRequest('/spiritual_guidance', 'POST', { query, language }, accessToken);
+    return this.makeRequest('/guidance', 'POST', { query, language }, accessToken);
   }
 }
 

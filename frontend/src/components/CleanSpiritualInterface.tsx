@@ -94,10 +94,10 @@ export default function CleanSpiritualInterface() {
         content: msg.text
       }));
 
-      // Call real spiritual guidance API with conversation context
+      // Call real guidance API with conversation context
       const apiUrl = getApiBaseUrl();
       const authHeaders = await getAuthHeaders();
-      const response = await fetch(`${apiUrl}/spiritual_guidance`, {
+      const response = await fetch(`${apiUrl}/guidance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,12 +131,12 @@ export default function CleanSpiritualInterface() {
       setMessages(prev => [...prev, apiResponse]);
       
     } catch (error) {
-      console.error('Error calling spiritual guidance API:', error);
+      console.error('Error calling guidance API:', error);
       
       // Fallback response for errors
       const errorResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: "🙏 I'm having trouble connecting to the spiritual guidance service. Please check your connection and try again, dear soul. (Frontend Error)",
+        text: "🤔 I'm having trouble connecting to the guidance service. Please check your connection and try again. (Frontend Error)",
         isUser: false,
         timestamp: new Date()
       };
@@ -460,7 +460,7 @@ export default function CleanSpiritualInterface() {
                   textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                 }}>
                   <strong>Wisdom Without Boundaries</strong><br/>
-                  Choose your spiritual guide to begin your journey of divine wisdom and enlightenment.
+                  Choose your wisdom guide to begin your journey of knowledge and insight.
                 </p>
                 <button
                   onClick={() => setShowPersonalitySelector(true)}
@@ -485,7 +485,7 @@ export default function CleanSpiritualInterface() {
                     e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
                   }}
                 >
-                  Choose Your Spiritual Guide
+                  Choose Your Wisdom Guide
                 </button>
               </>
             ) : (
@@ -607,7 +607,7 @@ export default function CleanSpiritualInterface() {
                     alignItems: 'center',
                     gap: '0.5rem'
                   }}>
-                    <span>🎭</span> {selectedPersonality?.display_name || 'Spiritual Guide'}
+                    <span>🎭</span> {selectedPersonality?.display_name || 'Wisdom Guide'}
                   </div>
                 )}
                 <div style={{

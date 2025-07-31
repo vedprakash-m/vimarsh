@@ -671,9 +671,9 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
             headers={"Content-Type": "application/json"}
         )
 
-@app.route(route="spiritual_guidance", methods=["POST"])
-async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced spiritual guidance with authenticated user tracking"""
+@app.route(route="guidance", methods=["POST"])
+async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced wisdom guidance with authenticated user tracking"""
     start_time = datetime.now()
     
     try:
@@ -1069,7 +1069,7 @@ async def spiritual_guidance_endpoint(req: func.HttpRequest) -> func.HttpRespons
         )
         
     except Exception as e:
-        logger.error(f"❌ Error in spiritual_guidance endpoint: {str(e)}")
+        logger.error(f"❌ Error in guidance endpoint: {str(e)}")
         return func.HttpResponse(
             json.dumps({
                 "error": "Internal server error",

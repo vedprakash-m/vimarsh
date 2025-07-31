@@ -218,7 +218,7 @@ export const useSpiritualChat = (config: SpiritualChatConfig = {}) => {
       // Create new abort controller for this request
       abortControllerRef.current = new AbortController();
       
-      const apiUrl = `${finalConfig.apiBaseUrl}/spiritual_guidance`;
+      const apiUrl = `${finalConfig.apiBaseUrl}/guidance`;
       
       // Get authentication headers
       const authHeaders = await getAuthHeaders();
