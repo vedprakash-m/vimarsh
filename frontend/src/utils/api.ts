@@ -73,14 +73,18 @@ class SpiritualGuidanceAPI {
 
     // Request interceptor for authentication and logging
     instance.interceptors.request.use(
-      (config) => {
+      async (config) => {
         // Add timestamp to all requests
         (config as any).metadata = { startTime: Date.now() };
         
         // Add authentication if available
-        const token = this.getAuthToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        try {
+          const token = await this.getAuthToken();
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } catch (error) {
+          console.warn('Failed to add auth token to request:', error);
         }
 
         console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
@@ -139,9 +143,15 @@ class SpiritualGuidanceAPI {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private getAuthToken(): string | null {
-    // This will be integrated with MSAL when authentication is implemented
-    return localStorage.getItem('vimarsh_auth_token');
+  private async getAuthToken(): Promise<string | null> {
+    // Get token from the auth service instead of localStorage
+    try {
+      const { authService } = await import('../auth/authService');
+      return await authService.getToken();
+    } catch (error) {
+      console.warn('Failed to get auth token:', error);
+      return null;
+    }
   }
 
   private formatError(error: any): ApiError {

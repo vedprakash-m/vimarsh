@@ -166,7 +166,7 @@ class UserProfileService:
             cosmos_endpoint = os.getenv("COSMOS_DB_ENDPOINT")
             cosmos_key = os.getenv("COSMOS_DB_KEY")
             cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING") or os.getenv("COSMOS_CONNECTION_STRING")
-            database_name = os.getenv("COSMOS_DB_NAME") or os.getenv("COSMOS_DATABASE_NAME", "vimarsh-db")
+            database_name = os.getenv("AZURE_COSMOS_DATABASE_NAME") or os.getenv("COSMOS_DB_NAME") or os.getenv("COSMOS_DATABASE_NAME", "vimarsh-db")
             
             if not cosmos_endpoint and not cosmos_connection_string:
                 logger.warning("📁 No Cosmos DB configuration found - using local storage")
