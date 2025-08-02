@@ -568,31 +568,6 @@
     "type": "usage_tracking"
   },
   {
-    "id": "stats_test_user_1",
-    "userId": "test_user_1",
-    "userEmail": "test1@vimarsh.com",
-    "totalRequests": 2,
-    "totalTokens": 260,
-    "totalCostUsd": 7.725e-05,
-    "currentMonthTokens": 260,
-    "currentMonthCostUsd": 7.725e-05,
-    "lastRequest": "2025-07-10T16:49:27.115687",
-    "avgTokensPerRequest": 130.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 2
-    },
-    "qualityBreakdown": {
-      "high": 1,
-      "medium": 1
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T16:49:27.127757"
-  },
-  {
     "id": "usage_test_user_2_20250710_164927",
     "userId": "test_user_2",
     "userEmail": "test2@vimarsh.com",
@@ -607,30 +582,6 @@
     "responseQuality": "high",
     "personality": "buddha",
     "type": "usage_tracking"
-  },
-  {
-    "id": "stats_test_user_2",
-    "userId": "test_user_2",
-    "userEmail": "test2@vimarsh.com",
-    "totalRequests": 1,
-    "totalTokens": 300,
-    "totalCostUsd": 0.00075,
-    "currentMonthTokens": 300,
-    "currentMonthCostUsd": 0.00075,
-    "lastRequest": "2025-07-10T16:49:27.115699",
-    "avgTokensPerRequest": 300.0,
-    "favoriteModel": "gemini-1.5-pro",
-    "personalityUsage": {
-      "buddha": 1
-    },
-    "qualityBreakdown": {
-      "high": 1
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T21:49:27.150319"
   },
   {
     "id": "usage_concurrent_user_1_20250710_164927",
@@ -713,30 +664,6 @@
     "type": "usage_tracking"
   },
   {
-    "id": "stats_concurrent_user_1",
-    "userId": "concurrent_user_1",
-    "userEmail": "concurrent_user_1@vimarsh.com",
-    "totalRequests": 5,
-    "totalTokens": 395,
-    "totalCostUsd": 0.00011999999999999999,
-    "currentMonthTokens": 395,
-    "currentMonthCostUsd": 0.00011999999999999999,
-    "lastRequest": "2025-07-10T16:49:27.622980",
-    "avgTokensPerRequest": 79.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 5
-    },
-    "qualityBreakdown": {
-      "high": 5
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T16:49:27.674256"
-  },
-  {
     "id": "usage_concurrent_user_2_20250710_164927",
     "userId": "concurrent_user_2",
     "userEmail": "concurrent_user_2@vimarsh.com",
@@ -817,30 +744,6 @@
     "type": "usage_tracking"
   },
   {
-    "id": "stats_concurrent_user_2",
-    "userId": "concurrent_user_2",
-    "userEmail": "concurrent_user_2@vimarsh.com",
-    "totalRequests": 5,
-    "totalTokens": 395,
-    "totalCostUsd": 0.00011999999999999999,
-    "currentMonthTokens": 395,
-    "currentMonthCostUsd": 0.00011999999999999999,
-    "lastRequest": "2025-07-10T16:49:27.623036",
-    "avgTokensPerRequest": 79.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 5
-    },
-    "qualityBreakdown": {
-      "high": 5
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T16:49:27.714100"
-  },
-  {
     "id": "usage_concurrent_user_3_20250710_164927",
     "userId": "concurrent_user_3",
     "userEmail": "concurrent_user_3@vimarsh.com",
@@ -919,30 +822,6 @@
     "responseQuality": "high",
     "personality": "krishna",
     "type": "usage_tracking"
-  },
-  {
-    "id": "stats_concurrent_user_3",
-    "userId": "concurrent_user_3",
-    "userEmail": "concurrent_user_3@vimarsh.com",
-    "totalRequests": 5,
-    "totalTokens": 395,
-    "totalCostUsd": 0.00011999999999999999,
-    "currentMonthTokens": 395,
-    "currentMonthCostUsd": 0.00011999999999999999,
-    "lastRequest": "2025-07-10T16:49:27.623080",
-    "avgTokensPerRequest": 79.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 5
-    },
-    "qualityBreakdown": {
-      "high": 5
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T16:49:27.772377"
   },
   {
     "id": "demo_usage_success",
@@ -1031,30 +910,6 @@
     "responseQuality": "high",
     "personality": "krishna",
     "type": "usage_tracking"
-  },
-  {
-    "id": "stats_atomic_user",
-    "userId": "atomic_user",
-    "userEmail": "atomic@vimarsh.com",
-    "totalRequests": 1,
-    "totalTokens": 450,
-    "totalCostUsd": 0.075,
-    "currentMonthTokens": 450,
-    "currentMonthCostUsd": 0.075,
-    "lastRequest": "2025-07-10T16:50:33.501739",
-    "avgTokensPerRequest": 450.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 1
-    },
-    "qualityBreakdown": {
-      "high": 1
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T21:50:33.501761"
   },
   {
     "id": "usage_test-user-123_20250710_174329",
@@ -1557,30 +1412,6 @@
     "responseQuality": "high",
     "personality": "krishna",
     "type": "usage_tracking"
-  },
-  {
-    "id": "stats_tracker_user",
-    "userId": "tracker_user",
-    "userEmail": "tracker@example.com",
-    "totalRequests": 1,
-    "totalTokens": 150,
-    "totalCostUsd": 4.4999999999999996e-05,
-    "currentMonthTokens": 150,
-    "currentMonthCostUsd": 4.4999999999999996e-05,
-    "lastRequest": "2025-07-10T20:59:23.984705",
-    "avgTokensPerRequest": 150.0,
-    "favoriteModel": "gemini-2.5-flash",
-    "personalityUsage": {
-      "krishna": 1
-    },
-    "qualityBreakdown": {
-      "high": 1
-    },
-    "riskScore": 0.0,
-    "isBlocked": false,
-    "blockReason": null,
-    "type": "user_stats",
-    "updatedAt": "2025-07-10T20:59:23.985695"
   },
   {
     "id": "usage_fallback_user_20250710_205924",
@@ -4078,5 +3909,526 @@
     "domain": "historical",
     "type": "personality_config",
     "createdAt": "2025-07-25T18:31:41.344689"
+  },
+  {
+    "id": "usage_test_user_1_20250802_025843",
+    "userId": "test_user_1",
+    "userEmail": "test1@vimarsh.com",
+    "sessionId": "session_001",
+    "timestamp": "2025-08-02T02:58:43.248241",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 100,
+    "outputTokens": 50,
+    "totalTokens": 150,
+    "costUsd": 4.4999999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_test_user_1_20250802_025843",
+    "userId": "test_user_1",
+    "userEmail": "test1@vimarsh.com",
+    "sessionId": "session_001",
+    "timestamp": "2025-08-02T02:58:43.248277",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 75,
+    "outputTokens": 35,
+    "totalTokens": 110,
+    "costUsd": 3.225e-05,
+    "requestType": "rag_query",
+    "responseQuality": "medium",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_test_user_1",
+    "userId": "test_user_1",
+    "userEmail": "test1@vimarsh.com",
+    "totalRequests": 2,
+    "totalTokens": 260,
+    "totalCostUsd": 7.725e-05,
+    "currentMonthTokens": 260,
+    "currentMonthCostUsd": 7.725e-05,
+    "lastRequest": "2025-08-02T02:58:43.248277",
+    "avgTokensPerRequest": 130.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 2
+    },
+    "qualityBreakdown": {
+      "high": 1,
+      "medium": 1
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-02T02:58:43.261389"
+  },
+  {
+    "id": "usage_test_user_2_20250802_025843",
+    "userId": "test_user_2",
+    "userEmail": "test2@vimarsh.com",
+    "sessionId": "session_002",
+    "timestamp": "2025-08-02T02:58:43.248293",
+    "model": "gemini-1.5-pro",
+    "inputTokens": 200,
+    "outputTokens": 100,
+    "totalTokens": 300,
+    "costUsd": 0.00075,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "buddha",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_test_user_2",
+    "userId": "test_user_2",
+    "userEmail": "test2@vimarsh.com",
+    "totalRequests": 1,
+    "totalTokens": 300,
+    "totalCostUsd": 0.00075,
+    "currentMonthTokens": 300,
+    "currentMonthCostUsd": 0.00075,
+    "lastRequest": "2025-08-02T02:58:43.248293",
+    "avgTokensPerRequest": 300.0,
+    "favoriteModel": "gemini-1.5-pro",
+    "personalityUsage": {
+      "buddha": 1
+    },
+    "qualityBreakdown": {
+      "high": 1
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-02T02:58:43.272123"
+  },
+  {
+    "id": "usage_concurrent_user_1_20250802_025843",
+    "userId": "concurrent_user_1",
+    "userEmail": "concurrent_user_1@vimarsh.com",
+    "sessionId": "session_1",
+    "timestamp": "2025-08-02T02:58:43.751034",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 50,
+    "outputTokens": 25,
+    "totalTokens": 75,
+    "costUsd": 2.2499999999999998e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_1_20250802_025843",
+    "userId": "concurrent_user_1",
+    "userEmail": "concurrent_user_1@vimarsh.com",
+    "sessionId": "session_1",
+    "timestamp": "2025-08-02T02:58:43.751065",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 51,
+    "outputTokens": 26,
+    "totalTokens": 77,
+    "costUsd": 2.3249999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_1_20250802_025843",
+    "userId": "concurrent_user_1",
+    "userEmail": "concurrent_user_1@vimarsh.com",
+    "sessionId": "session_1",
+    "timestamp": "2025-08-02T02:58:43.751077",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 52,
+    "outputTokens": 27,
+    "totalTokens": 79,
+    "costUsd": 2.3999999999999994e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_1_20250802_025843",
+    "userId": "concurrent_user_1",
+    "userEmail": "concurrent_user_1@vimarsh.com",
+    "sessionId": "session_1",
+    "timestamp": "2025-08-02T02:58:43.751089",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 53,
+    "outputTokens": 28,
+    "totalTokens": 81,
+    "costUsd": 2.475e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_1_20250802_025843",
+    "userId": "concurrent_user_1",
+    "userEmail": "concurrent_user_1@vimarsh.com",
+    "sessionId": "session_1",
+    "timestamp": "2025-08-02T02:58:43.751100",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 54,
+    "outputTokens": 29,
+    "totalTokens": 83,
+    "costUsd": 2.5499999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_concurrent_user_1",
+    "userId": "concurrent_user_1",
+    "userEmail": "concurrent_user_1@vimarsh.com",
+    "totalRequests": 5,
+    "totalTokens": 395,
+    "totalCostUsd": 0.00011999999999999999,
+    "currentMonthTokens": 395,
+    "currentMonthCostUsd": 0.00011999999999999999,
+    "lastRequest": "2025-08-02T02:58:43.751100",
+    "avgTokensPerRequest": 79.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 5
+    },
+    "qualityBreakdown": {
+      "high": 5
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-02T02:58:43.798053"
+  },
+  {
+    "id": "usage_concurrent_user_2_20250802_025843",
+    "userId": "concurrent_user_2",
+    "userEmail": "concurrent_user_2@vimarsh.com",
+    "sessionId": "session_2",
+    "timestamp": "2025-08-02T02:58:43.751114",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 50,
+    "outputTokens": 25,
+    "totalTokens": 75,
+    "costUsd": 2.2499999999999998e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_2_20250802_025843",
+    "userId": "concurrent_user_2",
+    "userEmail": "concurrent_user_2@vimarsh.com",
+    "sessionId": "session_2",
+    "timestamp": "2025-08-02T02:58:43.751126",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 51,
+    "outputTokens": 26,
+    "totalTokens": 77,
+    "costUsd": 2.3249999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_2_20250802_025843",
+    "userId": "concurrent_user_2",
+    "userEmail": "concurrent_user_2@vimarsh.com",
+    "sessionId": "session_2",
+    "timestamp": "2025-08-02T02:58:43.751136",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 52,
+    "outputTokens": 27,
+    "totalTokens": 79,
+    "costUsd": 2.3999999999999994e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_2_20250802_025843",
+    "userId": "concurrent_user_2",
+    "userEmail": "concurrent_user_2@vimarsh.com",
+    "sessionId": "session_2",
+    "timestamp": "2025-08-02T02:58:43.751145",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 53,
+    "outputTokens": 28,
+    "totalTokens": 81,
+    "costUsd": 2.475e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_2_20250802_025843",
+    "userId": "concurrent_user_2",
+    "userEmail": "concurrent_user_2@vimarsh.com",
+    "sessionId": "session_2",
+    "timestamp": "2025-08-02T02:58:43.751155",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 54,
+    "outputTokens": 29,
+    "totalTokens": 83,
+    "costUsd": 2.5499999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_concurrent_user_2",
+    "userId": "concurrent_user_2",
+    "userEmail": "concurrent_user_2@vimarsh.com",
+    "totalRequests": 5,
+    "totalTokens": 395,
+    "totalCostUsd": 0.00011999999999999999,
+    "currentMonthTokens": 395,
+    "currentMonthCostUsd": 0.00011999999999999999,
+    "lastRequest": "2025-08-02T02:58:43.751155",
+    "avgTokensPerRequest": 79.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 5
+    },
+    "qualityBreakdown": {
+      "high": 5
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-02T02:58:43.860875"
+  },
+  {
+    "id": "usage_concurrent_user_3_20250802_025843",
+    "userId": "concurrent_user_3",
+    "userEmail": "concurrent_user_3@vimarsh.com",
+    "sessionId": "session_3",
+    "timestamp": "2025-08-02T02:58:43.751166",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 50,
+    "outputTokens": 25,
+    "totalTokens": 75,
+    "costUsd": 2.2499999999999998e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_3_20250802_025843",
+    "userId": "concurrent_user_3",
+    "userEmail": "concurrent_user_3@vimarsh.com",
+    "sessionId": "session_3",
+    "timestamp": "2025-08-02T02:58:43.751178",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 51,
+    "outputTokens": 26,
+    "totalTokens": 77,
+    "costUsd": 2.3249999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_3_20250802_025843",
+    "userId": "concurrent_user_3",
+    "userEmail": "concurrent_user_3@vimarsh.com",
+    "sessionId": "session_3",
+    "timestamp": "2025-08-02T02:58:43.751188",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 52,
+    "outputTokens": 27,
+    "totalTokens": 79,
+    "costUsd": 2.3999999999999994e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_3_20250802_025843",
+    "userId": "concurrent_user_3",
+    "userEmail": "concurrent_user_3@vimarsh.com",
+    "sessionId": "session_3",
+    "timestamp": "2025-08-02T02:58:43.751197",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 53,
+    "outputTokens": 28,
+    "totalTokens": 81,
+    "costUsd": 2.475e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "usage_concurrent_user_3_20250802_025843",
+    "userId": "concurrent_user_3",
+    "userEmail": "concurrent_user_3@vimarsh.com",
+    "sessionId": "session_3",
+    "timestamp": "2025-08-02T02:58:43.751207",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 54,
+    "outputTokens": 29,
+    "totalTokens": 83,
+    "costUsd": 2.5499999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_concurrent_user_3",
+    "userId": "concurrent_user_3",
+    "userEmail": "concurrent_user_3@vimarsh.com",
+    "totalRequests": 5,
+    "totalTokens": 395,
+    "totalCostUsd": 0.00011999999999999999,
+    "currentMonthTokens": 395,
+    "currentMonthCostUsd": 0.00011999999999999999,
+    "lastRequest": "2025-08-02T02:58:43.751207",
+    "avgTokensPerRequest": 79.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 5
+    },
+    "qualityBreakdown": {
+      "high": 5
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-02T02:58:43.939159"
+  },
+  {
+    "id": "atomic_test_usage",
+    "userId": "atomic_user",
+    "userEmail": "atomic@vimarsh.com",
+    "sessionId": "atomic_session",
+    "timestamp": "2025-08-02T02:58:44.955673",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 200,
+    "outputTokens": 100,
+    "totalTokens": 300,
+    "costUsd": 0.05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_atomic_user",
+    "userId": "atomic_user",
+    "userEmail": "atomic@vimarsh.com",
+    "totalRequests": 1,
+    "totalTokens": 300,
+    "totalCostUsd": 0.05,
+    "currentMonthTokens": 300,
+    "currentMonthCostUsd": 0.05,
+    "lastRequest": "2025-08-02T02:58:44.955682",
+    "avgTokensPerRequest": 300.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 1
+    },
+    "qualityBreakdown": {
+      "high": 1
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-01T19:58:44.955685"
+  },
+  {
+    "id": "atomic_conv_123",
+    "userId": "atomic_user",
+    "userEmail": "atomic@vimarsh.com",
+    "sessionId": "atomic_session",
+    "timestamp": "2025-08-02T02:58:44.966440",
+    "question": "What is the meaning of dharma?",
+    "response": "Dharma refers to righteous duty and moral law...",
+    "citations": [
+      "Bhagavad Gita 2.47",
+      "Mahabharata 12.109.10"
+    ],
+    "personality": "krishna",
+    "metadata": {},
+    "type": "conversation"
+  },
+  {
+    "id": "usage_tracker_user_20250802_025845",
+    "userId": "tracker_user",
+    "userEmail": "tracker@example.com",
+    "sessionId": "tracker_session",
+    "timestamp": "2025-08-02T02:58:45.013069",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 100,
+    "outputTokens": 50,
+    "totalTokens": 150,
+    "costUsd": 4.4999999999999996e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
+  },
+  {
+    "id": "stats_tracker_user",
+    "userId": "tracker_user",
+    "userEmail": "tracker@example.com",
+    "totalRequests": 1,
+    "totalTokens": 150,
+    "totalCostUsd": 4.4999999999999996e-05,
+    "currentMonthTokens": 150,
+    "currentMonthCostUsd": 4.4999999999999996e-05,
+    "lastRequest": "2025-08-02T02:58:45.013069",
+    "avgTokensPerRequest": 150.0,
+    "favoriteModel": "gemini-2.5-flash",
+    "personalityUsage": {
+      "krishna": 1
+    },
+    "qualityBreakdown": {
+      "high": 1
+    },
+    "riskScore": 0.0,
+    "isBlocked": false,
+    "blockReason": null,
+    "type": "user_stats",
+    "updatedAt": "2025-08-02T02:58:45.014671"
+  },
+  {
+    "id": "usage_fallback_user_20250802_025845",
+    "userId": "fallback_user",
+    "userEmail": "fallback@example.com",
+    "sessionId": "fallback_session",
+    "timestamp": "2025-08-02T02:58:45.117620",
+    "model": "gemini-2.5-flash",
+    "inputTokens": 75,
+    "outputTokens": 25,
+    "totalTokens": 100,
+    "costUsd": 2.6249999999999998e-05,
+    "requestType": "spiritual_guidance",
+    "responseQuality": "high",
+    "personality": "krishna",
+    "type": "usage_tracking"
   }
 ]
