@@ -1322,6 +1322,50 @@ def test_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
+# Import admin endpoints
+from admin.admin_endpoints import (
+    admin_get_user_role, 
+    admin_cost_dashboard, 
+    admin_user_management,
+    admin_budget_management,
+    admin_system_health
+)
+
+@app.route(route="vimarsh-admin/role", methods=["GET"])
+async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin role check endpoint"""
+    return await admin_get_user_role(req)
+
+@app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"])
+async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin cost dashboard endpoint"""
+    return await admin_cost_dashboard(req)
+
+@app.route(route="vimarsh-admin/users", methods=["GET", "POST"])
+async def admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin user management endpoint"""
+    return await admin_user_management(req)
+
+@app.route(route="vimarsh-admin/users/{user_id}/block", methods=["POST"])
+async def admin_block_user_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin block user endpoint"""
+    return await admin_user_management(req)
+
+@app.route(route="vimarsh-admin/users/{user_id}/unblock", methods=["POST"])
+async def admin_unblock_user_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin unblock user endpoint"""
+    return await admin_user_management(req)
+
+@app.route(route="vimarsh-admin/budget/{user_id}", methods=["PUT"])
+async def admin_budget_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin budget management endpoint"""
+    return await admin_budget_management(req)
+
+@app.route(route="vimarsh-admin/health", methods=["GET"])
+async def admin_health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin health check endpoint"""
+    return await admin_system_health(req)
+
 # CORS handling
 @app.route(route="{*route}", methods=["OPTIONS"])
 def handle_options(req: func.HttpRequest) -> func.HttpResponse:

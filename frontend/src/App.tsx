@@ -18,6 +18,7 @@ import { DomainThemeManager } from './components/DomainThemeManager';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
 import { AuthProvider } from './auth/AuthProvider';
+import { AdminProvider } from './contexts/AdminContext';
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -85,8 +86,9 @@ function App() {
     <div className="App">
       <MsalProvider instance={msalInstance}>
         <AuthProvider>
-          <PersonalityProvider>
-            <LanguageProvider>
+          <AdminProvider>
+            <PersonalityProvider>
+              <LanguageProvider>
               <DomainThemeManager />
               <Router>
                 <Suspense fallback={<SpiritualLoadingSpinner />}>
@@ -114,6 +116,7 @@ function App() {
             </Router>
           </LanguageProvider>
         </PersonalityProvider>
+        </AdminProvider>
       </AuthProvider>
     </MsalProvider>
     </div>
