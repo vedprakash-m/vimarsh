@@ -208,7 +208,7 @@ class AuthenticatedUser:
             "profile": self.profile,
             "attributes": self.attributes,
             "created_at": self.created_at.isoformat(),
-            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "last_login": self.last_login,  # last_login is already a string in ISO format
             "is_active": self.is_active
         }
     
