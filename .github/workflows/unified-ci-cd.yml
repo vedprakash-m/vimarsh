@@ -389,7 +389,13 @@ jobs:
         cd backend
         # Create deployment package
         mkdir -p dist
-        cp -r . dist/
+        # Copy all content except the dist directory itself
+        shopt -s dotglob
+        for item in *; do
+          if [ "$item" != "dist" ]; then
+            cp -r "$item" dist/
+          fi
+        done
         cd dist && rm -rf tests/ __pycache__/ .pytest_cache/
 
     - name: 📤 Upload Backend Artifact
