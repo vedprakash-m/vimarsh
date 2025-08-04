@@ -500,12 +500,24 @@ jobs:
         production_branch: "main"
         skip_api_build: true
 
-    - name: 🚀 Deploy Backend to Azure Functions
-      uses: Azure/functions-action@v1
+    - name: � Setup Azure Functions Core Tools
+      run: |
+        curl -s https://api.github.com/repos/Azure/azure-functions-core-tools/releases/latest | \
+        grep "browser_download_url.*Azure.Functions.Cli.*linux-x64" | \
+        cut -d '"' -f 4 | \
+        xargs curl -L -o /tmp/Azure.Functions.Cli.zip
+        sudo unzip -q /tmp/Azure.Functions.Cli.zip -d /usr/local/bin/
+        sudo chmod +x /usr/local/bin/func
+
+    - name: 🔑 Azure Login
+      uses: azure/login@v1
       with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: './backend-dist'
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🚀 Deploy Backend to Azure Functions
+      run: |
+        cd ./backend-dist
+        func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }} --python --force
         
     - name: 🔍 Verify Deployment
       run: |
