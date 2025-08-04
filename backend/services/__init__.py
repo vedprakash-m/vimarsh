@@ -5,12 +5,12 @@ Provides database, LLM, and transaction management services
 
 # Import key services for easier access
 from .database_service import DatabaseService, db_service
-from .llm_service import EnhancedLLMService
+from .enhanced_simple_llm_service import EnhancedSimpleLLMService
 from .transaction_manager import DatabaseTransactionManager
 
 __all__ = [
     'DatabaseService',
     'db_service', 
-    'EnhancedLLMService',
+    'EnhancedSimpleLLMService',
     'DatabaseTransactionManager'
 ]

@@ -20,7 +20,7 @@ import json
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
 from services.personality_service import personality_service, PersonalitySearchFilter
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 from services.prompt_template_service import prompt_template_service
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ async def test_complete_conversation_flow():
     
     # Test conversation with each domain
     domains_tested = set()
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     for personality in personalities:
         if personality.domain.value in domains_tested:
@@ -287,7 +287,7 @@ async def test_system_performance():
     
     # Test LLM service performance
     if personalities:
-        llm_service = EnhancedLLMService()
+        llm_service = EnhancedSimpleLLMService()
         personality = personalities[0]
         
         start_time = time.time()
@@ -307,7 +307,7 @@ async def test_error_handling():
     
     # Test invalid personality ID
     try:
-        llm_service = EnhancedLLMService()
+        llm_service = EnhancedSimpleLLMService()
         response = await llm_service.generate_personality_response(
             query="Test query",
             personality_id="invalid_personality_id",

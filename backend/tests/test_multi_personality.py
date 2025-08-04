@@ -11,7 +11,7 @@ import sys
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 from services.personality_service import personality_service
 
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +21,7 @@ async def test_personalities():
     """Test different personalities"""
     
     # Initialize LLM service
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     # Test query
     query = "What is the meaning of life?"
@@ -42,7 +42,7 @@ async def test_personalities():
                 continue
             
             # Generate response
-            response = await llm_service.get_spiritual_guidance(
+            response = await llm_service.generate_personality_response(
                 query=query,
                 context="philosophy",
                 personality_id=personality_id

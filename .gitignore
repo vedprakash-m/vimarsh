@@ -281,6 +281,8 @@ obj
 appsettings.json
 local.settings.json
 local.settings.*.json
+backend/local.settings.json
+backend/local.settings.*.json
 .azure/
 
 # Azure Functions build artifacts
@@ -428,6 +430,7 @@ $RECYCLE.BIN/
 
 # Archive directories (Phase 2, 3 legacy code)
 .archives/
+.archive/
 
 # Spiritual texts and data (large files, will be handled separately)
 data/sources/

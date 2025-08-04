@@ -19,7 +19,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
 from services.personality_service import personality_service, PersonalitySearchFilter, PersonalityDomain
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 from services.knowledge_base_manager import knowledge_base_manager
 from data_processing.domain_processors import process_text_with_auto_domain as process_text
 
@@ -192,7 +192,7 @@ async def test_multi_personality_conversations():
     print("\n🧪 Testing Multi-Personality Conversations...")
     
     try:
-        llm_service = EnhancedLLMService()
+        llm_service = EnhancedSimpleLLMService()
         
         # Test queries for different personality types
         test_conversations = [
@@ -361,7 +361,7 @@ async def test_end_to_end_user_workflow():
         
         # 4. System generates personality response
         print("👤 Step 4: System generates response...")
-        llm_service = EnhancedLLMService()
+        llm_service = EnhancedSimpleLLMService()
         
         response = await llm_service.generate_personality_response(
             query=user_query,

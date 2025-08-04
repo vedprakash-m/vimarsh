@@ -650,7 +650,7 @@ def secure_admin_endpoint(required_scopes: List[str] = None,
                         'function': func.__name__,
                         'method': request.method,
                         'client_ip': client_ip,
-                        'user_id': validation_result.get('jwt_payload', {}).get('sub'),
+                        'user_id': (validation_result.get('jwt_payload') or {}).get('sub'),
                         'scopes': required_scopes,
                         'request_size': len(str(request_data))
                     }
@@ -684,7 +684,7 @@ def secure_admin_endpoint(required_scopes: List[str] = None,
                     {
                         'function': func.__name__,
                         'client_ip': client_ip,
-                        'user_id': validation_result.get('jwt_payload', {}).get('sub'),
+                        'user_id': (validation_result.get('jwt_payload') or {}).get('sub'),
                         'response_code': getattr(result, 'status_code', 200)
                     }
                 )

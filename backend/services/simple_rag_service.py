@@ -76,7 +76,11 @@ class SimpleRAGService:
             "marcus_aurelius": ["marcus_aurelius_teachings.json"],
             "lao_tzu": ["lao_tzu_teachings.json"],
             "rumi": ["rumi_teachings.json"],
-            # Add more as files are available
+            "confucius": ["confucius_teachings.json"],
+            "newton": ["newton_teachings.json"],
+            "tesla": ["tesla_teachings.json"],
+            "chanakya": ["chanakya_teachings.json"],
+            "muhammad": ["muhammad_teachings.json"]
         }
         
         # Load content on initialization
@@ -85,7 +89,7 @@ class SimpleRAGService:
     def _load_content(self):
         """Load spiritual content from local JSON files"""
         try:
-            data_dir = os.path.join(os.path.dirname(__file__), "..", "..", "data", "sources")
+            data_dir = os.path.join(os.path.dirname(__file__), "..", "data", "sources")
             
             for personality, files in self.personality_sources.items():
                 personality_content = []

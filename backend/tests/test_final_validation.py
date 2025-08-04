@@ -19,7 +19,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
 from services.personality_service import personality_service, PersonalitySearchFilter, PersonalityDomain
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 from services.prompt_template_service import prompt_template_service, TemplateRenderContext
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ async def test_multi_personality_responses():
     """Test LLM responses for different personalities"""
     print("\n🧪 Testing Multi-Personality LLM Responses...")
     
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     # Test cases for different domains
     test_cases = [
@@ -246,7 +246,7 @@ async def test_system_integration():
         print(f"🎯 Testing with {test_personality.display_name}")
         
         # Generate a response
-        llm_service = EnhancedLLMService()
+        llm_service = EnhancedSimpleLLMService()
         response = await llm_service.generate_personality_response(
             query="Tell me about yourself",
             personality_id=test_personality.id,

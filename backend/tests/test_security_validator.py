@@ -425,9 +425,7 @@ class TestSecureAdminEndpointDecorator:
         mock_req.route_params = {}  # Add proper route_params as dict
         
         # Mock security validator
-        with patch('auth.security_validator.SecurityValidator') as MockValidator:
-            mock_validator_instance = Mock()
-            MockValidator.return_value = mock_validator_instance
+        with patch('auth.security_validator.security_validator') as mock_validator_instance:
             mock_validator_instance.validate_admin_request.return_value = {
                 'sanitized_data': {},
                 'jwt_payload': {'sub': 'test-user'},
@@ -457,18 +455,14 @@ class TestSecureAdminEndpointDecorator:
         mock_req.route_params = {}  # Add proper route_params as dict
         
         # Mock security validator to raise error
-        with patch('auth.security_validator.SecurityValidator') as MockValidator:
-            mock_validator_instance = Mock()
-            MockValidator.return_value = mock_validator_instance
+        with patch('auth.security_validator.security_validator') as mock_validator_instance:
             mock_validator_instance.validate_admin_request.side_effect = SecurityValidationError("Test error")
             
-            # Patch the global instance
-            with patch('auth.security_validator.security_validator', mock_validator_instance):
-                result = await test_endpoint(req=mock_req)
-                
-                # Should return HTTP error response, not raise exception
-                assert hasattr(result, 'status_code')
-                assert result.status_code in [401, 403]
+            result = await test_endpoint(req=mock_req)
+            
+            # Should return HTTP error response, not raise exception
+            assert hasattr(result, 'status_code')
+            assert result.status_code in [401, 403]
 
 
 class TestEnhancedSecurityFeatures:

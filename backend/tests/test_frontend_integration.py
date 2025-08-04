@@ -13,7 +13,7 @@ import json
 sys.path.append(os.path.dirname(__file__))
 
 from services.personality_service import personality_service, PersonalitySearchFilter
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -84,7 +84,7 @@ async def test_chat_integration():
     print("\n🧪 Testing Chat Integration")
     print("=" * 60)
     
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     test_query = "What is the meaning of life?"
     
     # Get available personalities
@@ -97,7 +97,7 @@ async def test_chat_integration():
         
         try:
             # This simulates what the frontend does
-            response = await llm_service.get_spiritual_guidance(
+            response = await llm_service.generate_personality_response(
                 query=test_query,
                 context="general",
                 personality_id=personality.id
@@ -116,7 +116,7 @@ async def test_personality_switching():
     print("\n🔄 Testing Personality Switching")
     print("=" * 60)
     
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     test_query = "How should I handle difficult situations?"
     
     # Get different personalities
@@ -130,7 +130,7 @@ async def test_personality_switching():
         print("-" * 30)
         
         try:
-            response = await llm_service.get_spiritual_guidance(
+            response = await llm_service.generate_personality_response(
                 query=test_query,
                 context="guidance",
                 personality_id=personality.id

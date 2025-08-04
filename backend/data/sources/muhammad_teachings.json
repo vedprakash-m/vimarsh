@@ -1,0 +1,26 @@
+[
+  {
+    "text": "The best of people are those who benefit others.",
+    "source": "Hadith",
+    "title": "Serving Others",
+    "metadata": {
+      "type": "service"
+    }
+  },
+  {
+    "text": "Seek knowledge from the cradle to the grave.",
+    "source": "Hadith",
+    "title": "Lifelong Learning",
+    "metadata": {
+      "type": "education"
+    }
+  },
+  {
+    "text": "A kind word is a form of charity.",
+    "source": "Hadith",
+    "title": "Kindness",
+    "metadata": {
+      "type": "compassion"
+    }
+  }
+]

@@ -35,7 +35,10 @@ class TestPhase1Completion:
         """Test that LLM service generates responses"""
         from services.llm_service import llm_service
         
-        response = await llm_service.get_spiritual_guidance("What is dharma?")
+        response = await llm_service.get_spiritual_guidance(
+            "What is dharma?", 
+            personality_id="krishna"
+        )
         
         assert response is not None
         assert len(response.content) > 50
@@ -69,7 +72,10 @@ class TestPhase1Completion:
         ]
         
         for query in queries:
-            response = await llm_service.get_spiritual_guidance(query)
+            response = await llm_service.get_spiritual_guidance(
+                query, 
+                personality_id="krishna"
+            )
             assert response is not None
             assert len(response.content) > 30
             assert response.confidence > 0

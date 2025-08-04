@@ -55,6 +55,9 @@ async def admin_cost_dashboard(req: HttpRequest) -> HttpResponse:
         if isinstance(security_context, str):
             # Handle case where security_context is a string
             sanitized_data = {}
+        elif security_context is None or not isinstance(security_context, dict):
+            # Handle case where security_context is None or not a dict
+            sanitized_data = {}
         else:
             sanitized_data = security_context.get('sanitized_data', {})
         

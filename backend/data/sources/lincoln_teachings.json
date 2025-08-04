@@ -1,0 +1,26 @@
+[
+  {
+    "text": "A house divided against itself cannot stand.",
+    "source": "Lincoln Speech 1858",
+    "title": "House Divided",
+    "metadata": {
+      "type": "political_wisdom"
+    }
+  },
+  {
+    "text": "Nearly all men can stand adversity, but if you want to test a man's character, give him power.",
+    "source": "Lincoln Quote",
+    "title": "Character Test",
+    "metadata": {
+      "type": "leadership"
+    }
+  },
+  {
+    "text": "Government of the people, by the people, for the people, shall not perish from the earth.",
+    "source": "Gettysburg Address",
+    "title": "Democratic Ideal",
+    "metadata": {
+      "type": "democracy"
+    }
+  }
+]

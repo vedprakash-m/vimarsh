@@ -17,7 +17,7 @@ sys.path.append(os.path.dirname(__file__))
 
 from data_processing.text_processor import create_text_processor
 from services.personality_service import personality_service, PersonalitySearchFilter
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -43,7 +43,7 @@ async def demonstrate_complete_system():
     
     # Initialize components
     processor = create_text_processor()
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     # Sample content for each domain
     domain_samples = {
@@ -140,7 +140,7 @@ async def demonstrate_complete_system():
         
         # 3. Personality Response
         try:
-            response = await llm_service.get_spiritual_guidance(
+            response = await llm_service.generate_personality_response(
                 query="What is the main teaching in this text?",
                 context="teaching",
                 personality_id=sample['personality']

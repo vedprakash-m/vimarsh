@@ -11,7 +11,7 @@ import os
 # Add backend to path
 sys.path.append(os.path.dirname(__file__))
 
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +21,7 @@ async def test_function_app_integration():
     """Test the function_app integration with multi-personality support"""
     
     # Initialize LLM service (same way function_app does)
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     print("🧪 Testing Function App Integration")
     print("=" * 50)
@@ -36,7 +36,7 @@ async def test_function_app_integration():
         
         try:
             # This is how function_app calls it
-            response = await llm_service.get_spiritual_guidance(
+            response = await llm_service.generate_personality_response(
                 query=test_query,
                 context="guidance",
                 personality_id=personality_id
@@ -54,7 +54,7 @@ async def test_function_app_integration():
     print("-" * 40)
     
     try:
-        response = await llm_service.get_spiritual_guidance(
+        response = await llm_service.generate_personality_response(
             query=test_query,
             context="guidance"
             # No personality_id provided

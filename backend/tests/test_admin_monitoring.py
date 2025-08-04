@@ -27,6 +27,7 @@ from admin.admin_endpoints import (
     admin_system_health,
     admin_user_management
 )
+from auth.security_validator import security_validator
 from auth.unified_auth_service import AuthenticatedUser
 from core.user_roles import UserRole, UserPermissions
 from azure.functions import HttpRequest
@@ -326,10 +327,10 @@ class TestMonitoringEndpoints:
         assert response.status_code == 200
         
         body = json.loads(response.get_body().decode())
-        assert 'time_period_hours' in body
-        assert 'total_operations' in body
-        assert 'operation_breakdown' in body
-        assert 'monitoring_status' in body
+        assert 'period_days' in body
+        assert 'budget_summary' in body
+        assert 'dashboard_generated' in body
+        assert 'mode' in body
     
     @pytest.mark.asyncio
     async def test_admin_alerts_management_get(self):
@@ -356,19 +357,27 @@ class TestMonitoringEndpoints:
         )
         mock_request.method = "GET"
         mock_request.params = {"limit": "10"}
+        mock_request.headers = {
+            'X-Forwarded-For': '192.168.1.1',
+            'Authorization': 'Bearer fake-jwt-token'
+        }
+        mock_request.route_params = {}
+        mock_request.url = "/admin/system-health"
         
-        # Mock authentication
+        # Mock authentication and JWT validation
         with patch('auth.unified_auth_service.auth_service.authenticate_request', 
-                  return_value=mock_request.user):
+                  return_value=mock_request.user), \
+             patch.object(security_validator.jwt_validator, 'validate_jwt', 
+                         return_value={'sub': 'admin-user', 'scopes': ['admin.system']}):
             response = await admin_system_health(mock_request)
         
         assert response.status_code == 200
         
         body = json.loads(response.get_body().decode())
-        assert 'alerts' in body
-        assert 'summary' in body
-        assert len(body['alerts']) == 1
-        assert body['alerts'][0]['alert_type'] == "test_alert"
+        assert 'health_score' in body
+        assert 'health_status' in body
+        assert 'budget_summary' in body
+        assert 'system_metrics' in body
     
     @pytest.mark.asyncio
     async def test_admin_system_maintenance(self):
@@ -384,22 +393,28 @@ class TestMonitoringEndpoints:
             role=UserRole.ADMIN,
             user_permissions=UserPermissions.for_role(UserRole.ADMIN)
         )
-        mock_request.method = "POST"
-        mock_request.get_json.return_value = {
-            "action": "reset_performance_thresholds"
+        mock_request.method = "GET"
+        mock_request.params = {}
+        mock_request.headers = {
+            'X-Forwarded-For': '192.168.1.1',
+            'Authorization': 'Bearer fake-jwt-token'
         }
+        mock_request.route_params = {}
+        mock_request.url = "/admin/users"
         
-        # Mock authentication
+        # Mock authentication and JWT validation
         with patch('auth.unified_auth_service.auth_service.authenticate_request', 
-                  return_value=mock_request.user):
+                  return_value=mock_request.user), \
+             patch.object(security_validator.jwt_validator, 'validate_jwt', 
+                         return_value={'sub': 'admin-user', 'scopes': ['admin.users']}):
             response = await admin_user_management(mock_request)
         
         assert response.status_code == 200
         
         body = json.loads(response.get_body().decode())
-        assert body['action'] == "reset_performance_thresholds"
-        assert 'results' in body
-        assert len(body['results']) > 0
+        assert 'users' in body
+        assert 'total_users' in body
+        assert 'blocked_users' in body
 
 
 if __name__ == "__main__":

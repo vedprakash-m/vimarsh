@@ -1,0 +1,26 @@
+[
+  {
+    "text": "It does not matter how slowly you go as long as you do not stop.",
+    "source": "Analects",
+    "title": "Persistence",
+    "metadata": {
+      "type": "perseverance"
+    }
+  },
+  {
+    "text": "The man who moves a mountain begins by carrying away small stones.",
+    "source": "Confucian Teaching",
+    "title": "Small Steps",
+    "metadata": {
+      "type": "progress"
+    }
+  },
+  {
+    "text": "Choose a job you love, and you will never have to work a day in your life.",
+    "source": "Confucian Wisdom",
+    "title": "Work and Love",
+    "metadata": {
+      "type": "career"
+    }
+  }
+]

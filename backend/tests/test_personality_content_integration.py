@@ -16,7 +16,7 @@ sys.path.append(os.path.dirname(__file__))
 
 from data_processing.text_processor import create_text_processor
 from services.personality_service import personality_service, PersonalitySearchFilter
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -92,8 +92,8 @@ async def test_personality_content_matching():
         print(f"🤖 Testing with {expected_personality} personality...")
         
         try:
-            llm_service = EnhancedLLMService()
-            response = await llm_service.get_spiritual_guidance(
+            llm_service = EnhancedSimpleLLMService()
+            response = await llm_service.generate_personality_response(
                 query="What does this text teach us?",
                 context="teaching",
                 personality_id=expected_personality

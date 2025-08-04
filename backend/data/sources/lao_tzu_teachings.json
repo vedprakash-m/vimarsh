@@ -1,0 +1,26 @@
+[
+  {
+    "text": "The journey of a thousand miles begins with one step.",
+    "source": "Tao Te Ching",
+    "title": "Beginning",
+    "metadata": {
+      "type": "wisdom"
+    }
+  },
+  {
+    "text": "When I let go of what I am, I become what I might be.",
+    "source": "Tao Te Ching",
+    "title": "Letting Go",
+    "metadata": {
+      "type": "transformation"
+    }
+  },
+  {
+    "text": "Nature does not hurry, yet everything is accomplished.",
+    "source": "Tao Te Ching",
+    "title": "Natural Timing",
+    "metadata": {
+      "type": "patience"
+    }
+  }
+]

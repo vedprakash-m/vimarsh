@@ -11,7 +11,7 @@ import os
 # Add backend to path
 sys.path.append(os.path.dirname(__file__))
 
-from services.llm_service import EnhancedLLMService
+from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +21,7 @@ async def test_multi_personality_responses():
     """Test responses from different personalities"""
     
     # Initialize LLM service
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     # Test query
     test_query = "What is the meaning of life?"
@@ -38,7 +38,7 @@ async def test_multi_personality_responses():
         
         try:
             # Generate response
-            response = await llm_service.generate_multi_personality_response(
+            response = await llm_service.generate_personality_response(
                 query=test_query,
                 context="general",
                 personality_id=personality_id
@@ -58,14 +58,14 @@ async def test_multi_personality_responses():
 async def test_error_handling():
     """Test error handling with different personalities"""
     
-    llm_service = EnhancedLLMService()
+    llm_service = EnhancedSimpleLLMService()
     
     print("\n🧪 Testing Error Handling")
     print("=" * 50)
     
     # Test with invalid personality
     try:
-        response = await llm_service.generate_multi_personality_response(
+        response = await llm_service.generate_personality_response(
             query="Test query",
             context="general",
             personality_id="invalid_personality"
@@ -76,7 +76,7 @@ async def test_error_handling():
     
     # Test without personality_id
     try:
-        response = await llm_service.generate_multi_personality_response(
+        response = await llm_service.generate_personality_response(
             query="Test query",
             context="general",
             personality_id=None
