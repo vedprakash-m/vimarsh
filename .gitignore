@@ -437,6 +437,21 @@ data/sources/
 data/processed/
 data/vectors/
 data/embeddings/
+data/cache/
+data/cost_tracking/
+data/demo_analytics/
+data/real_time_monitoring/
+data/real_time_demo/
+data/validation_test/
+data/spiritual_validation_test/
+data/test_vector_storage/
+data/rag_llm_test_storage/
+data/vector_storage/
+data/*.jsonl
+data/*/*.jsonl
+data/**/*.jsonl
+data/.DS_Store
+data/**/.DS_Store
 
 # Local vector storage
 backend/data/vectors/
