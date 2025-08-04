@@ -465,6 +465,12 @@ jobs:
         name: frontend-build
         path: ./frontend-build
 
+    - name: 📥 Download Backend Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: backend-package
+        path: ./backend-dist
+
     - name: Debug - List Frontend Artifact Contents
       run: |
         echo "📂 Contents of frontend-build directory:"
@@ -473,6 +479,15 @@ jobs:
         head -n 10 ./frontend-build/index.html
         echo "📦 Checking if staticwebapp.config.json exists:"
         ls -la ./frontend-build/staticwebapp.config.json || echo "No staticwebapp.config.json found"
+
+    - name: Debug - List Backend Artifact Contents
+      run: |
+        echo "📂 Contents of backend-dist directory:"
+        ls -la ./backend-dist
+        echo "📄 Checking function_app.py exists:"
+        ls -la ./backend-dist/function_app.py || echo "No function_app.py found"
+        echo "📦 Checking requirements.txt exists:"
+        ls -la ./backend-dist/requirements.txt || echo "No requirements.txt found"
 
     - name: 🌐 Deploy Frontend to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
@@ -484,12 +499,24 @@ jobs:
         skip_app_build: true
         production_branch: "main"
         skip_api_build: true
+
+    - name: 🚀 Deploy Backend to Azure Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: './backend-dist'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         
     - name: 🔍 Verify Deployment
       run: |
-        echo "✅ Deployment completed to Azure Static Web Apps"
-        echo "🌐 Expected URL: https://vimarsh.vedprakash.net"
-        echo "🚀 Resource: vimarsh-frontend" 
+        echo "✅ Frontend deployment completed to Azure Static Web Apps"
+        echo "🌐 Frontend URL: https://vimarsh.vedprakash.net"
+        echo "🚀 Frontend Resource: vimarsh-frontend"
+        echo ""
+        echo "✅ Backend deployment completed to Azure Functions"
+        echo "🔗 Backend URL: https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api"
+        echo "🚀 Backend Resource: ${{ env.AZURE_FUNCTIONAPP_NAME }}"
+        echo ""
         echo "📅 Deployment time: $(date)"
 
   # ===== STAGE 7: POST-DEPLOYMENT VALIDATION =====
