@@ -84,9 +84,7 @@ async def test_complete_conversation_flow():
                 
                 response = await llm_service.generate_personality_response(
                     query=query,
-                    personality_id=personality.id,
-                    context_chunks=[],
-                    language="English"
+                    personality_id=personality.id
                 )
                 
                 print(f"   ✅ Response: {response.content[:100]}...")
@@ -293,9 +291,7 @@ async def test_system_performance():
         start_time = time.time()
         response = await llm_service.generate_personality_response(
             query="What is wisdom?",
-            personality_id=personality.id,
-            context_chunks=[],
-            language="English"
+            personality_id=personality.id
         )
         response_time = time.time() - start_time
         print(f"✅ LLM response generation: {response_time:.3f}s")
@@ -310,9 +306,7 @@ async def test_error_handling():
         llm_service = EnhancedSimpleLLMService()
         response = await llm_service.generate_personality_response(
             query="Test query",
-            personality_id="invalid_personality_id",
-            context_chunks=[],
-            language="English"
+            personality_id="invalid_personality_id"
         )
         print("✅ Invalid personality ID handled gracefully")
         print(f"   Response: {response.content[:50]}...")

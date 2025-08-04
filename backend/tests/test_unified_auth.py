@@ -25,9 +25,20 @@ class TestUnifiedAuthService:
     
     def test_development_mode_initialization(self):
         """Test service initialization in development mode"""
-        service = UnifiedAuthService(mode=AuthenticationMode.DEVELOPMENT)
-        assert service.mode == AuthenticationMode.DEVELOPMENT
-        assert not service.is_enabled  # Auth disabled in dev by default
+        # Ensure clean environment for this test
+        import os
+        original_enable_auth = os.environ.get('ENABLE_AUTH')
+        if 'ENABLE_AUTH' in os.environ:
+            del os.environ['ENABLE_AUTH']
+        
+        try:
+            service = UnifiedAuthService(mode=AuthenticationMode.DEVELOPMENT)
+            assert service.mode == AuthenticationMode.DEVELOPMENT
+            assert not service.is_enabled  # Auth disabled in dev by default
+        finally:
+            # Restore original environment
+            if original_enable_auth is not None:
+                os.environ['ENABLE_AUTH'] = original_enable_auth
     
     def test_production_mode_initialization(self):
         """Test service initialization in production mode"""

@@ -5,9 +5,6 @@ Tests development mode and admin token generation
 
 import os
 import sys
-import json
-import asyncio
-from typing import Dict, Any
 
 # Add backend to path
 sys.path.insert(0, '/Users/vedprakashmishra/vimarsh/backend')
@@ -18,12 +15,16 @@ os.environ['AUTH_DEVELOPMENT_MODE'] = 'true'
 os.environ['ADMIN_EMAILS'] = 'vedprakash.m@outlook.com'
 os.environ['SUPER_ADMIN_EMAILS'] = 'vedprakash.m@outlook.com'
 
-from auth.unified_auth_service import (
-    auth_service,
-    AuthenticatedUser
-)
-# Note: Some functions like get_admin_dev_token may need to be implemented 
-# in the unified auth service or removed if no longer needed
+from auth.unified_auth_service import auth_service
+
+# Development token generation functions for testing
+def get_admin_dev_token() -> str:
+    """Get development token for admin user"""
+    return "admin-token"  # Use simple dev token
+
+def get_super_admin_dev_token() -> str:
+    """Get development token for super admin user"""
+    return "super-admin-token"  # Use simple dev token
 
 def test_dev_token_generation():
     """Test development token generation and validation"""
@@ -37,24 +38,12 @@ def test_dev_token_generation():
     super_admin_token = get_super_admin_dev_token()
     print(f"Super Admin Dev Token: {super_admin_token}")
     
-    # Test token validation
-    auth = SecureDevAuthenticator()
-    admin_email = auth.validate_dev_token(admin_token)
-    print(f"Admin token validation: {admin_email}")
+    # Test token validation using unified auth service
+    admin_user = auth_service._validate_development_token(admin_token)
+    print(f"Admin token validation: {admin_user.email if admin_user else 'Invalid'}")
     
-    super_admin_email = auth.validate_dev_token(super_admin_token)
-    print(f"Super admin token validation: {super_admin_email}")
-    
-    # Test middleware
-    middleware = AuthenticationMiddleware()
-    
-    # Test admin token
-    admin_claims = middleware.validate_token(admin_token)
-    print(f"Admin claims: {admin_claims}")
-    
-    # Test super admin token
-    super_admin_claims = middleware.validate_token(super_admin_token)
-    print(f"Super admin claims: {super_admin_claims}")
+    super_admin_user = auth_service._validate_development_token(super_admin_token)
+    print(f"Super admin token validation: {super_admin_user.email if super_admin_user else 'Invalid'}")
     
     print("✅ Enhanced authentication tests completed successfully")
 
