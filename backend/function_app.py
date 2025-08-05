@@ -1511,6 +1511,154 @@ async def debug_auth_config_endpoint(req: func.HttpRequest) -> func.HttpResponse
             }
         )
 
+@app.route(route="debug/jwt-validation", methods=["POST"])
+async def debug_jwt_validation_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Deep debug endpoint to analyze JWT validation failures"""
+    try:
+        import jwt
+        import json
+        from auth.unified_auth_service import UnifiedAuthService
+        
+        # Get the authorization header
+        auth_header = req.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "No Bearer token provided",
+                    "auth_header_present": bool(auth_header),
+                    "auth_header_format": auth_header[:20] + "..." if auth_header else "none"
+                }),
+                status_code=400,
+                headers={"Content-Type": "application/json"}
+            )
+        
+        token = auth_header[7:]  # Remove "Bearer " prefix
+        
+        # Decode token WITHOUT verification to see its contents
+        try:
+            unverified_token = jwt.decode(token, options={"verify_signature": False})
+        except Exception as decode_error:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Token decode failed",
+                    "decode_error": str(decode_error),
+                    "token_length": len(token),
+                    "token_preview": token[:50] + "..."
+                }),
+                status_code=400,
+                headers={"Content-Type": "application/json"}
+            )
+        
+        # Extract key claims
+        user_email = unverified_token.get("preferred_username") or unverified_token.get("email") or unverified_token.get("upn")
+        token_audience = unverified_token.get("aud")
+        token_issuer = unverified_token.get("iss")
+        token_appid = unverified_token.get("appid")
+        token_tenant = unverified_token.get("tid")
+        token_subject = unverified_token.get("sub")
+        token_version = unverified_token.get("ver")
+        token_scopes = unverified_token.get("scp", "").split() if unverified_token.get("scp") else []
+        
+        # Get environment configuration
+        client_id = os.getenv("ENTRA_CLIENT_ID")
+        tenant_id = os.getenv("ENTRA_TENANT_ID")
+        
+        # Try to validate with auth service
+        auth_service = UnifiedAuthService()
+        validation_result = None
+        validation_error = None
+        
+        try:
+            # Mock request with the token
+            class MockRequest:
+                def __init__(self, token):
+                    self.headers = {"Authorization": f"Bearer {token}"}
+            
+            mock_req = MockRequest(token)
+            validation_result = await auth_service.extract_user_from_request(mock_req)
+        except Exception as validation_err:
+            validation_error = str(validation_err)
+        
+        debug_data = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "token_analysis": {
+                "user_email": user_email,
+                "audience": token_audience,
+                "issuer": token_issuer,
+                "appid": token_appid,
+                "tenant": token_tenant,
+                "subject": token_subject,
+                "version": token_version,
+                "scopes": token_scopes,
+                "exp": unverified_token.get("exp"),
+                "iat": unverified_token.get("iat"),
+                "nbf": unverified_token.get("nbf")
+            },
+            "expected_config": {
+                "client_id": client_id,
+                "tenant_id": tenant_id,
+                "expected_audiences": [
+                    client_id,
+                    f"api://{client_id}",
+                    "https://graph.microsoft.com"
+                ]
+            },
+            "validation_result": {
+                "success": validation_result is not None,
+                "user_data": {
+                    "email": validation_result.email if validation_result else None,
+                    "name": validation_result.name if validation_result else None,
+                    "id": validation_result.id if validation_result else None
+                } if validation_result else None,
+                "error": validation_error
+            },
+            "audience_mismatch": {
+                "token_audience": token_audience,
+                "client_id_match": token_audience == client_id,
+                "api_client_id_match": token_audience == f"api://{client_id}",
+                "graph_api_match": token_audience == "https://graph.microsoft.com"
+            },
+            "admin_check": None
+        }
+        
+        # If validation succeeded, check admin status
+        if validation_result:
+            from core.user_roles import admin_role_manager
+            is_admin = admin_role_manager.is_admin(validation_result.email)
+            is_super_admin = admin_role_manager.is_super_admin(validation_result.email)
+            
+            debug_data["admin_check"] = {
+                "is_admin": is_admin,
+                "is_super_admin": is_super_admin,
+                "admin_emails": getattr(admin_role_manager, 'admin_emails', []),
+                "super_admin_emails": getattr(admin_role_manager, 'super_admin_emails', [])
+            }
+        
+        return func.HttpResponse(
+            json.dumps(debug_data, indent=2),
+            status_code=200,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+        
+    except Exception as e:
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Debug JWT validation error",
+                "message": str(e),
+                "timestamp": datetime.utcnow().isoformat()
+            }),
+            status_code=500,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+
 # CORS handling
 @app.route(route="{*route}", methods=["OPTIONS"])
 def handle_options(req: func.HttpRequest) -> func.HttpResponse:
