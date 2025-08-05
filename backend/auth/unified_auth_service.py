@@ -61,10 +61,10 @@ class UnifiedAuthService:
         
         # Auto-detect: use production if we're in Azure production environment
         if environment == "production" or azure_env == "production":
-            logger.info("🔐 Auto-detected production environment, using production authentication")
+            logger.info(f"🔐 Auto-detected production environment (env={environment}, azure_env={azure_env}), using production authentication")
             return AuthenticationMode.PRODUCTION
         else:
-            logger.info("🔧 Auto-detected development environment, using development authentication")
+            logger.info(f"🔧 Auto-detected development environment (env={environment}, azure_env={azure_env}), using development authentication")
             return AuthenticationMode.DEVELOPMENT
     
     def _get_auth_enabled(self) -> bool:
