@@ -262,9 +262,9 @@ jobs:
     - name: 📦 Upload Backend Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: backend-build-${{ github.sha }}
+        name: backend-package
         path: backend/dist/
-        retention-days: 7
+        retention-days: 30
 
   build-frontend:
     name: 🏗️ Build Frontend
@@ -388,18 +388,17 @@ jobs:
           
         echo "✅ Backend deployed successfully"
         
-    - name: 🚀 Deploy Frontend
+    - name: 🌐 Deploy Frontend to Azure Static Web Apps
       if: steps.azure-login.outcome == 'success' && (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
-      run: |
-        echo "🎨 Deploying frontend to Static Web Apps..."
-        
-        # Use Azure Static Web Apps CLI for faster deployment
-        npx @azure/static-web-apps-cli deploy \
-          --app-location "./frontend-deploy" \
-          --deployment-token "${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}" \
-          --skip-api-build
-          
-        echo "✅ Frontend deployed successfully"
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        action: "upload"
+        app_location: "./frontend-deploy"
+        skip_app_build: true
+        production_branch: "main"
+        skip_api_build: true
 
   # ===== STAGE 5: QUICK VALIDATION =====
   validate-deployment:
