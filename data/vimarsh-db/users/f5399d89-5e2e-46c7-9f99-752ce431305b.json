@@ -1,0 +1,71 @@
+{
+  "id": "f5399d89-5e2e-46c7-9f99-752ce431305b",
+  "partition_key": "f5399d89-5e2e-46c7-9f99-752ce431305b",
+  "auth_id": "",
+  "email": "testuser@vimarsh.example.com",
+  "name": "Test User",
+  "document_type": "user_profile",
+  "given_name": "Test",
+  "family_name": "User",
+  "auth_provider": "microsoft",
+  "tenant_id": null,
+  "profile_picture_url": null,
+  "job_title": null,
+  "company_name": null,
+  "preferred_language": "en",
+  "timezone": null,
+  "user_preferences": {
+    "preferred_personalities": [],
+    "profile_id": "",
+    "subscription_tier": "free",
+    "created_at": "2025-08-04T20:32:46.584879"
+  },
+  "account_status": "active",
+  "created_at": "2025-08-04T20:32:46.585070",
+  "last_login": "2025-08-04T20:32:46.587196",
+  "last_activity": "2025-08-04T20:32:46.587199",
+  "usage_stats": {
+    "total_sessions": 0,
+    "total_queries": 1,
+    "total_tokens": 175,
+    "total_cost_usd": 0.023,
+    "avg_session_duration": 0,
+    "favorite_personalities": [
+      "krishna"
+    ],
+    "common_topics": [],
+    "monthly_usage": {}
+  },
+  "recent_activity": [
+    {
+      "timestamp": "2025-08-04T20:32:46.586639",
+      "query": "What is the meaning of dharma?",
+      "personality": "krishna",
+      "rating": null,
+      "bookmarked": false
+    }
+  ],
+  "bookmarks": [
+    {
+      "bookmark_id": "5e4528b2-e4e7-4121-8543-0d8b50b6bdfa",
+      "title": "Understanding Dharma",
+      "query": "What is the meaning of dharma?",
+      "response": "Dharma represents righteous duty and moral law in Hindu philosophy. It is the principle of natural order that regulates and coordinates the operation of the universe and everything within it....",
+      "personality": "krishna",
+      "bookmarked_at": "2025-08-04T20:32:46.586916",
+      "tags": [
+        "dharma",
+        "philosophy",
+        "hindu"
+      ],
+      "notes": "Great explanation for meditation practice"
+    }
+  ],
+  "risk_score": 0.0,
+  "abuse_flags": [],
+  "is_admin": false,
+  "admin_notes": null,
+  "data_retention_consent": true,
+  "analytics_consent": true,
+  "last_consent_update": "2025-08-04T20:32:46.585089"
+}

@@ -12,6 +12,7 @@ from functools import wraps, lru_cache
 from typing import Dict, Any, Optional, Callable
 from datetime import datetime, timedelta
 from azure.functions import HttpRequest, HttpResponse
+from jwt.algorithms import RSAAlgorithm
 
 # Import our new generic user model
 from auth.models import AuthenticatedUser, AuthenticationMode, create_authenticated_user
@@ -252,9 +253,18 @@ class UnifiedAuthService:
     def _validate_entra_token(self, token: str, tenant_id: str, client_id: str) -> Optional[Dict[str, Any]]:
         """Validate token against Microsoft Entra ID with multi-tenant support"""
         try:
-            # First decode token to get actual tenant if using "common"
+            # First decode token to get actual tenant and claims if using "common"
             unverified = jwt.decode(token, options={"verify_signature": False})
             actual_tenant = unverified.get("tid", tenant_id)
+            token_audience = unverified.get("aud")
+            token_issuer = unverified.get("iss")
+            token_version = unverified.get("ver")
+            token_appid = unverified.get("appid")
+            user_email = unverified.get("email", unverified.get("preferred_username", "unknown"))
+            
+            logger.info(f"🔍 Token Analysis: user={user_email}, tenant={actual_tenant}, version={token_version}")
+            logger.info(f"🔍 Token Claims: audience={token_audience}, issuer={token_issuer}, appid={token_appid}")
+            logger.info(f"🔍 Expected: client_id={client_id}, tenant_config={tenant_id}")
             
             # For multi-tenant, use common endpoint or specific tenant
             if tenant_id == "common":
@@ -267,31 +277,78 @@ class UnifiedAuthService:
                 expected_issuer = f"https://login.microsoftonline.com/{tenant_id}/v2.0"
             
             # Get JWKS from Microsoft
+            logger.debug(f"🔗 Fetching JWKS from: {jwks_url}")
             jwks_response = requests.get(jwks_url, timeout=10)
             jwks_response.raise_for_status()
             jwks = jwks_response.json()
             
             # Decode and validate JWT
             header = jwt.get_unverified_header(token)
-            key = None
+            kid = header.get("kid")
+            logger.debug(f"🔑 Looking for key with kid: {kid}")
             
+            key = None
             for jwk in jwks["keys"]:
-                if jwk["kid"] == header["kid"]:
-                    key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+                if jwk["kid"] == kid:
+                    key = RSAAlgorithm.from_jwk(json.dumps(jwk))
+                    logger.debug(f"✅ Found matching key for kid: {kid}")
                     break
             
             if not key:
-                logger.error("❌ No matching key found in JWKS")
+                logger.error(f"❌ No matching key found in JWKS for kid: {kid}")
                 return None
             
-            # Validate token with multi-tenant support
-            decoded_token = jwt.decode(
-                token,
-                key,
-                algorithms=["RS256"],
-                audience=client_id,
-                issuer=expected_issuer
-            )
+            # Validate token with flexible audience support
+            # Some tokens might have the client_id as audience, others might have 'api://{client_id}'
+            expected_audiences = [client_id, f"api://{client_id}"]
+            
+            # Also try appid from token if different from audience
+            if token_appid and token_appid != token_audience:
+                expected_audiences.extend([token_appid, f"api://{token_appid}"])
+            
+            logger.info(f"🎯 Trying audiences: {expected_audiences}")
+            logger.info(f"🎯 Expected issuer: {expected_issuer}")
+            
+            decoded_token = None
+            validation_error = None
+            
+            for audience in expected_audiences:
+                try:
+                    logger.debug(f"🔄 Attempting validation with audience: {audience}")
+                    decoded_token = jwt.decode(
+                        token,
+                        key,
+                        algorithms=["RS256"],
+                        audience=audience,
+                        issuer=expected_issuer,
+                        options={
+                            "verify_signature": True,
+                            "verify_exp": True,
+                            "verify_aud": True,
+                            "verify_iss": True
+                        }
+                    )
+                    logger.info(f"✅ Successfully validated token with audience: {audience}")
+                    break
+                except jwt.InvalidAudienceError as e:
+                    validation_error = e
+                    logger.debug(f"🔄 Audience {audience} failed: {str(e)}")
+                    continue
+                except jwt.InvalidIssuerError as e:
+                    validation_error = e
+                    logger.warning(f"🔄 Issuer validation failed with audience {audience}: {str(e)}")
+                    continue
+                except Exception as e:
+                    validation_error = e
+                    logger.warning(f"🔄 Validation failed with audience {audience}: {str(e)}")
+                    break
+            
+            if not decoded_token:
+                if validation_error:
+                    logger.warning(f"⚠️ Token validation failed: {str(validation_error)}")
+                    logger.warning(f"⚠️ Expected audiences: {expected_audiences}, Token audience: {token_audience}")
+                    logger.warning(f"⚠️ Expected issuer: {expected_issuer}, Token issuer: {token_issuer}")
+                return None
             
             logger.info(f"✅ Successfully validated Entra ID token for {decoded_token.get('email', 'unknown')} from tenant {actual_tenant}")
             return decoded_token

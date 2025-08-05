@@ -163,7 +163,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         try {
           console.log('🔄 Attempting silent token acquisition...');
           const tokenResponse = await instance.acquireTokenSilent({
-            scopes: ['openid', 'profile', 'email'],
+            scopes: ['e4bd74b8-9a82-40c6-8d52-3e231733095e/.default'],
             account
           });
           accessToken = tokenResponse.accessToken;
@@ -172,11 +172,11 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         } catch (silentError) {
           console.warn('⚠️ Silent token acquisition failed, trying interactive:', silentError);
           
-          // If silent fails, try interactive token acquisition
+                    // If silent fails, try interactive token acquisition
           try {
             console.log('🔄 Attempting interactive token acquisition...');
             const interactiveResponse = await instance.acquireTokenPopup({
-              scopes: ['openid', 'profile', 'email'],
+              scopes: ['e4bd74b8-9a82-40c6-8d52-3e231733095e/.default'],
               account
             });
             accessToken = interactiveResponse.accessToken;

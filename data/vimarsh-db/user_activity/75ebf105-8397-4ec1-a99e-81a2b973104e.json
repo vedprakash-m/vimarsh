@@ -1,0 +1,14 @@
+{
+  "id": "75ebf105-8397-4ec1-a99e-81a2b973104e",
+  "partition_key": "f5399d89-5e2e-46c7-9f99-752ce431305b",
+  "user_id": "f5399d89-5e2e-46c7-9f99-752ce431305b",
+  "document_type": "session",
+  "timestamp": "2025-08-04T20:32:46.585506",
+  "session_data": {
+    "session_id": "8176d726-dbf1-4ca6-b7e5-6ac00f428597",
+    "start_time": "2025-08-04T20:32:46.585496",
+    "status": "active"
+  },
+  "interaction_data": null,
+  "analytics_data": null
+}
