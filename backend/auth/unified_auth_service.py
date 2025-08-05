@@ -8,6 +8,7 @@ import os
 import requests
 import json
 import logging
+import httpx
 from functools import wraps, lru_cache
 from typing import Dict, Any, Optional, Callable
 from datetime import datetime, timedelta
@@ -79,7 +80,7 @@ class UnifiedAuthService:
         
         return enabled or is_production
     
-    def authenticate_request(self, req: HttpRequest) -> Optional[AuthenticatedUser]:
+    async def authenticate_request(self, req: HttpRequest) -> Optional[AuthenticatedUser]:
         """
         Authenticate incoming request and return user or None.
         
@@ -103,7 +104,7 @@ class UnifiedAuthService:
             if self.mode == AuthenticationMode.DEVELOPMENT:
                 return self._validate_development_token(token)
             elif self.mode == AuthenticationMode.PRODUCTION:
-                return self._validate_production_token(token)
+                return await self._validate_production_token(token)
             else:
                 logger.error(f"❌ Unsupported authentication mode: {self.mode}")
                 return None
@@ -123,7 +124,7 @@ class UnifiedAuthService:
         Returns:
             AuthenticatedUser if authenticated, None otherwise
         """
-        return self.authenticate_request(req)
+        return await self.authenticate_request(req)
     
     def _extract_token(self, req: HttpRequest) -> Optional[str]:
         """Extract JWT token from request headers"""
@@ -178,32 +179,25 @@ class UnifiedAuthService:
             logger.error(f"❌ Development token validation error: {str(e)}")
             return None
     
-    def _validate_production_token(self, token: str) -> Optional[AuthenticatedUser]:
-        """Validate token against Microsoft Entra ID"""
+    async def _validate_production_token(self, token: str) -> Optional[AuthenticatedUser]:
+        """Validate token against Microsoft Graph API"""
         try:
             # Check cache first
             if token in self._token_cache:
                 if datetime.utcnow() < self._cache_expiry[token]:
                     return self._token_cache[token]
             
-            # Get Entra ID configuration
-            tenant_id = os.getenv("ENTRA_TENANT_ID") or os.getenv("AZURE_TENANT_ID")
-            client_id = os.getenv("ENTRA_CLIENT_ID") or os.getenv("AZURE_CLIENT_ID")
+            # Validate token using Microsoft Graph API
+            user_data = await self._validate_microsoft_graph_token(token)
             
-            if not tenant_id or not client_id:
-                logger.error("❌ Missing Azure configuration for production auth")
-                return None
-            
-            # Validate against Microsoft Entra ID
-            token_data = self._validate_entra_token(token, tenant_id, client_id)
-            if token_data:
-                user = create_authenticated_user(token_data, self.application)
+            if user_data:
+                user = create_authenticated_user(user_data, self.application)
                 
                 # Cache the result
                 self._token_cache[token] = user
                 self._cache_expiry[token] = datetime.utcnow() + timedelta(minutes=55)  # Refresh before expiry
                 
-                logger.info(f"✅ Production token validated for {user.email}")
+                logger.info(f"✅ Production token validated for {user.email} via Microsoft Graph API")
                 return user
             else:
                 logger.warning("⚠️ Invalid production token")
@@ -211,6 +205,66 @@ class UnifiedAuthService:
                 
         except Exception as e:
             logger.error(f"❌ Production token validation error: {str(e)}")
+            return None
+    
+    def _detect_token_provider(self, token: str) -> str:
+        """Detect which identity provider issued the token"""
+        try:
+            # For JWT tokens, check issuer
+            if len(token.split('.')) == 3:  # JWT format
+                unverified = jwt.decode(token, options={"verify_signature": False})
+                issuer = unverified.get("iss", "")
+                if "microsoftonline.com" in issuer or "login.microsoft.com" in issuer:
+                    return "microsoft"
+            
+            # For opaque tokens or unknown format, default to Microsoft for now
+            # Since Microsoft Graph API tokens are opaque, default to Microsoft
+            return "microsoft"
+            
+        except Exception:
+            # If we can't decode, assume Microsoft (current setup)
+            return "microsoft"
+    
+    async def _validate_microsoft_graph_token(self, token: str) -> Optional[Dict[str, Any]]:
+        """Validate Microsoft Graph API token by calling Microsoft Graph API"""
+        try:
+            import httpx
+            
+            # Call Microsoft Graph API to validate token and get user info
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            }
+            
+            async with httpx.AsyncClient() as client:
+                # Get user profile from Microsoft Graph API
+                response = await client.get("https://graph.microsoft.com/v1.0/me", headers=headers)
+                
+                if response.status_code == 200:
+                    user_info = response.json()
+                    logger.info(f"✅ Microsoft Graph API validation successful for {user_info.get('mail', 'unknown')}")
+                    
+                    # Normalize Microsoft Graph API response to our format
+                    return {
+                        "sub": user_info.get("id"),
+                        "email": user_info.get("mail") or user_info.get("userPrincipalName"),
+                        "name": user_info.get("displayName"),
+                        "given_name": user_info.get("givenName"),
+                        "family_name": user_info.get("surname"),
+                        "preferred_username": user_info.get("userPrincipalName"),
+                        "iss": "https://graph.microsoft.com",
+                        "aud": "microsoft-graph-api",
+                        "provider": "microsoft"
+                    }
+                elif response.status_code == 401:
+                    logger.warning("⚠️ Microsoft Graph API token validation failed: Unauthorized")
+                    return None
+                else:
+                    logger.error(f"❌ Microsoft Graph API error: {response.status_code} - {response.text}")
+                    return None
+                    
+        except Exception as e:
+            logger.error(f"❌ Microsoft Graph API validation error: {str(e)}")
             return None
     
     def _is_development_token_valid(self, token: str) -> bool:
@@ -390,7 +444,7 @@ class UnifiedAuthService:
     
     def create_auth_decorator(self, require_admin: bool = False) -> Callable:
         """
-        Create authentication decorator for Azure Functions.
+        Create authentication decorator for Azure Functions (sync version for backward compatibility).
         
         Args:
             require_admin: Whether admin privileges are required
@@ -400,10 +454,10 @@ class UnifiedAuthService:
         """
         def decorator(func: Callable) -> Callable:
             @wraps(func)
-            def wrapper(req: HttpRequest) -> HttpResponse:
+            async def wrapper(req: HttpRequest) -> HttpResponse:
                 try:
                     # Authenticate user
-                    user = self.authenticate_request(req)
+                    user = await self.authenticate_request(req)
                     
                     if not user:
                         return HttpResponse(
@@ -436,7 +490,7 @@ class UnifiedAuthService:
                     req.user = user
                     
                     # Call the original function
-                    return func(req)
+                    return await func(req)
                     
                 except Exception as e:
                     logger.error(f"❌ Auth decorator error: {str(e)}")
@@ -469,9 +523,9 @@ def require_admin(func: Callable) -> Callable:
     return auth_service.create_auth_decorator(require_admin=True)(func)
 
 # Backward compatibility function
-def get_authenticated_user(req: HttpRequest) -> Optional[AuthenticatedUser]:
+async def get_authenticated_user(req: HttpRequest) -> Optional[AuthenticatedUser]:
     """Get authenticated user from request (backward compatibility)"""
-    return auth_service.authenticate_request(req)
+    return await auth_service.authenticate_request(req)
 
 # Backward compatibility decorators for existing code
 def admin_required(func: Callable) -> Callable:
