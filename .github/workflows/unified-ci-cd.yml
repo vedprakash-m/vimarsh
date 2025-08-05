@@ -355,16 +355,34 @@ jobs:
     - name: 🔍 Verify Azure Authentication
       run: |
         echo "🔐 Verifying Azure CLI authentication..."
+        echo "🔍 Debug Information:"
+        echo "  Repository: ${{ github.repository }}"
+        echo "  Ref: ${{ github.ref }}"
+        echo "  Environment: production"
+        echo "  Run ID: ${{ github.run_id }}"
+        echo ""
+        
         if az account show > /dev/null 2>&1; then
           echo "✅ Azure authentication successful"
-          az account show
+          az account show --output table
+          echo ""
+          echo "🔍 Available subscriptions:"
+          az account list --output table
         else
           echo "❌ Azure authentication failed - deployments will be skipped"
-          echo "Please check Azure service principal configuration:"
-          echo "  1. AZURE_CLIENT_ID secret"
-          echo "  2. AZURE_TENANT_ID secret" 
-          echo "  3. AZURE_SUBSCRIPTION_ID secret"
-          echo "  4. Service principal federated credentials"
+          echo ""
+          echo "🔍 Troubleshooting steps:"
+          echo "1. Verify the service principal exists in Azure AD"
+          echo "2. Check federated identity credentials are configured for:"
+          echo "   - Issuer: https://token.actions.githubusercontent.com"
+          echo "   - Subject: repo:${{ github.repository }}:environment:production"
+          echo "3. Ensure service principal has Contributor role on resource group"
+          echo "4. Verify tenant ID matches your Azure AD directory"
+          echo ""
+          echo "🔍 Current GitHub context:"
+          echo "  Repository: ${{ github.repository }}"
+          echo "  Environment: production"
+          echo "  Expected subject claim: repo:${{ github.repository }}:environment:production"
         fi
       continue-on-error: true
         
