@@ -1441,6 +1441,63 @@ async def admin_health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin health check endpoint"""
     return await admin_system_health(req)
 
+@app.route(route="debug/auth-config", methods=["GET"])
+async def debug_auth_config_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Debug endpoint to check authentication configuration in Azure"""
+    try:
+        from auth.unified_auth_service import UnifiedAuthService
+        
+        # Create auth service to test initialization
+        auth_service = UnifiedAuthService()
+        
+        # Get environment variables (safely)
+        environment = os.getenv("ENVIRONMENT", "not_set")
+        azure_env = os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "not_set")
+        enable_auth = os.getenv("ENABLE_AUTH", "not_set")
+        tenant_id = os.getenv("ENTRA_TENANT_ID", "not_set")
+        client_id = os.getenv("ENTRA_CLIENT_ID", "not_set")[:10] + "..." if os.getenv("ENTRA_CLIENT_ID") else "not_set"
+        
+        config_data = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "environment_vars": {
+                "ENVIRONMENT": environment,
+                "AZURE_FUNCTIONS_ENVIRONMENT": azure_env,
+                "ENABLE_AUTH": enable_auth,
+                "ENTRA_TENANT_ID": tenant_id,
+                "ENTRA_CLIENT_ID": client_id
+            },
+            "auth_service": {
+                "mode": str(auth_service.mode),
+                "is_enabled": auth_service.is_enabled
+            },
+            "status": "success"
+        }
+        
+        return func.HttpResponse(
+            json.dumps(config_data, indent=2),
+            status_code=200,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+        
+    except Exception as e:
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Debug endpoint error",
+                "message": str(e),
+                "timestamp": datetime.utcnow().isoformat()
+            }),
+            status_code=500,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+
 # CORS handling
 @app.route(route="{*route}", methods=["OPTIONS"])
 def handle_options(req: func.HttpRequest) -> func.HttpResponse:
