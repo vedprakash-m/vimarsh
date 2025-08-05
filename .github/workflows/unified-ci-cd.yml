@@ -245,22 +245,19 @@ jobs:
     - name: 🏗️ Build Optimized Package
       run: |
         cd backend
-        # Create minimal deployment package
+        # Create deployment package
         mkdir -p dist
         
-        # Copy essential files only
-        cp *.py dist/ 2>/dev/null || true
-        cp -r services/ dist/ 2>/dev/null || true
-        cp -r core/ dist/ 2>/dev/null || true
-        cp -r auth/ dist/ 2>/dev/null || true
-        cp requirements.txt dist/ 2>/dev/null || true
-        cp host.json dist/ 2>/dev/null || true
+        # Copy all content except the dist directory itself
+        shopt -s dotglob
+        for item in *; do
+          if [ "$item" != "dist" ]; then
+            cp -r "$item" dist/
+          fi
+        done
         
-        # Remove unnecessary files for faster upload
-        find dist/ -name "*.pyc" -delete
-        find dist/ -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
-        find dist/ -name "test_*" -delete
-        find dist/ -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
+        # Remove unnecessary files for faster deployment
+        cd dist && rm -rf tests/ __pycache__/ .pytest_cache/
         
     - name: 📦 Upload Backend Artifact
       uses: actions/upload-artifact@v4
@@ -371,21 +368,23 @@ jobs:
         fi
       continue-on-error: true
         
-    - name: 🚀 Deploy Backend
+    - name: �️ Setup Azure Functions Core Tools
+      run: |
+        curl -s https://api.github.com/repos/Azure/azure-functions-core-tools/releases/latest | \
+        grep "browser_download_url.*Azure.Functions.Cli.*linux-x64" | \
+        cut -d '"' -f 4 | \
+        xargs curl -L -o /tmp/Azure.Functions.Cli.zip
+        sudo unzip -q /tmp/Azure.Functions.Cli.zip -d /usr/local/bin/
+        sudo chmod +x /usr/local/bin/func
+        
+    - name: �🚀 Deploy Backend
       if: steps.azure-login.outcome == 'success' && (needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
       run: |
         echo "🐍 Deploying backend to Azure Functions..."
         cd backend-deploy
         
-        # Create deployment package
-        zip -r ../backend-deploy.zip .
-        
-        # Deploy using Azure CLI
-        az functionapp deployment source config-zip \
-          --resource-group "vimarsh-rg" \
-          --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" \
-          --src "../backend-deploy.zip" \
-          --timeout 300
+        # Deploy using Azure Functions Core Tools with remote build
+        func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }} --python --force
           
         echo "✅ Backend deployed successfully"
         
