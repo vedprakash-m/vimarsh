@@ -1,0 +1,28 @@
+{
+  "id": "c14c02e4-6343-47ad-ba20-b4628b03779f",
+  "partition_key": "412f37cc-17c0-473f-9b48-92a39d8b036a",
+  "user_id": "412f37cc-17c0-473f-9b48-92a39d8b036a",
+  "document_type": "interaction",
+  "timestamp": "2025-08-05T07:46:12.537341",
+  "session_data": null,
+  "interaction_data": {
+    "session_id": "test_session_20250805_004612",
+    "sequence": 1,
+    "user_query": "What is the meaning of dharma?",
+    "personality_used": "krishna",
+    "response_text": "Dharma represents righteous duty and moral law in Hindu philosophy. It is the principle of natural order that regulates and coordinates the operation of the universe and everything within it.",
+    "response_time_ms": 1200,
+    "model_used": "gemini-flash",
+    "input_tokens": 25,
+    "output_tokens": 150,
+    "cost_usd": 0.023,
+    "user_rating": null,
+    "was_bookmarked": false,
+    "content_themes": [
+      "philosophy",
+      "dharma",
+      "hinduism"
+    ]
+  },
+  "analytics_data": null
+}

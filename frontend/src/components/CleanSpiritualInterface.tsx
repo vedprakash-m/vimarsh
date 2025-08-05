@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Send, MessageSquare, Users } from 'lucide-react';
+import { Send, MessageSquare, Users, Settings, LogOut } from 'lucide-react';
 // Voice functionality temporarily disabled - imports kept for future implementation
 // import { Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
+import { useAdmin } from '../contexts/AdminContext';
+import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environment';
-import { getAuthHeaders } from '../auth/authService';
+import { getAuthHeaders, authService } from '../auth/authService';
 import '../styles/spiritual-theme.css';
 
 interface Message {
@@ -21,8 +23,23 @@ export default function CleanSpiritualInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Add animation styles
+  // Admin context for conditional admin panel access
+  const { user } = useAdmin();
+
+  // Logout functionality
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      // Navigate to login page or reload to trigger authentication flow
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate away even if logout fails
+      window.location.href = '/';
+    }
+  };  // Add animation styles
   useEffect(() => {
     const styles = `
       @keyframes pulse {
@@ -387,6 +404,52 @@ export default function CleanSpiritualInterface() {
             disabled={!selectedPersonality}
           >
             <Users size={18} />
+          </button>
+          
+          {/* Admin Panel Button - Only visible to admin users */}
+          {user?.isAdmin && (
+            <button 
+              onClick={() => navigate('/admin')}
+              style={{
+                background: 'rgba(251, 191, 36, 0.2)',
+                border: '1px solid rgba(251, 191, 36, 0.4)',
+                color: '#fbbf24',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'all 0.3s ease',
+                fontSize: '0.9rem',
+                fontWeight: '600'
+              }}
+              title="Admin Panel"
+            >
+              ⚙️ Admin
+            </button>
+          )}
+          
+          {/* Logout Button */}
+          <button 
+            onClick={handleLogout}
+            style={{
+              background: 'rgba(239, 68, 68, 0.2)',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              color: '#dc2626',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.3s ease',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              gap: '0.5rem'
+            }}
+            title="Logout"
+          >
+            <LogOut size={18} />
+            Logout
           </button>
           {/* Voice functionality temporarily hidden until fully implemented */}
           {/* 

@@ -19,6 +19,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
 import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminContext';
+import AdminDashboard from './components/admin/AdminDashboard';
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -105,6 +106,16 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <CleanSpiritualInterface />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Admin Dashboard - Protected Route */}
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <ProtectedRoute>
+                        <AdminDashboard />
                       </ProtectedRoute>
                     } 
                   />
