@@ -106,8 +106,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
             name: account.name || userEmail,
             role: roleResponse.role as UserRole,
             permissions: roleResponse.permissions,
-            isAdmin: roleResponse.role === UserRole.ADMIN || roleResponse.role === UserRole.SUPER_ADMIN,
-            isSuperAdmin: roleResponse.role === UserRole.SUPER_ADMIN
+            isAdmin: (roleResponse.role as string) === 'ADMIN' || (roleResponse.role as string) === 'SUPER_ADMIN' || roleResponse.role === UserRole.ADMIN || roleResponse.role === UserRole.SUPER_ADMIN,
+            isSuperAdmin: (roleResponse.role as string) === 'SUPER_ADMIN' || roleResponse.role === UserRole.SUPER_ADMIN
           };
 
           console.log('🧑‍💼 Created user object:', adminUser);
@@ -199,8 +199,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
           name: account.name || userEmail,
           role: roleResponse.role as UserRole,
           permissions: roleResponse.permissions,
-          isAdmin: roleResponse.role === UserRole.ADMIN || roleResponse.role === UserRole.SUPER_ADMIN,
-          isSuperAdmin: roleResponse.role === UserRole.SUPER_ADMIN
+          isAdmin: (roleResponse.role as string) === 'ADMIN' || (roleResponse.role as string) === 'SUPER_ADMIN' || roleResponse.role === UserRole.ADMIN || roleResponse.role === UserRole.SUPER_ADMIN,
+          isSuperAdmin: (roleResponse.role as string) === 'SUPER_ADMIN' || roleResponse.role === UserRole.SUPER_ADMIN
         };
 
         setUser(adminUser);
