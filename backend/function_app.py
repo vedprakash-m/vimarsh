@@ -1334,7 +1334,82 @@ from admin.admin_endpoints import (
 @app.route(route="vimarsh-admin/role", methods=["GET"])
 async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin role check endpoint"""
-    return await admin_get_user_role(req)
+    try:
+        # Import auth service and check admin status
+        from auth.unified_auth_service import UnifiedAuthService
+        from core.user_roles import admin_role_manager
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Authentication required",
+                    "message": "Valid access token must be provided",
+                    "code": "UNAUTHORIZED"
+                }),
+                status_code=401,
+                headers={
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                    "Access-Control-Allow-Credentials": "true"
+                }
+            )
+        
+        # Check if user is admin
+        is_admin = admin_role_manager.is_admin(authenticated_user.email)
+        is_super_admin = admin_role_manager.is_super_admin(authenticated_user.email)
+        
+        role = "USER"
+        permissions = []
+        
+        if is_super_admin:
+            role = "SUPER_ADMIN"
+            permissions = [
+                "admin.read", "admin.write", "admin.delete",
+                "users.read", "users.write", "users.block",
+                "cost.read", "cost.write", "system.health"
+            ]
+        elif is_admin:
+            role = "ADMIN"
+            permissions = [
+                "admin.read", "users.read", "cost.read", "system.health"
+            ]
+        
+        return func.HttpResponse(
+            json.dumps({
+                "role": role,
+                "permissions": permissions,
+                "user": {
+                    "email": authenticated_user.email,
+                    "name": authenticated_user.name,
+                    "id": authenticated_user.id
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }),
+            status_code=200,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error in admin role endpoint: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Internal server error",
+                "message": str(e)
+            }),
+            status_code=500,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
 
 @app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"])
 async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
