@@ -1474,6 +1474,18 @@ async def debug_auth_config_endpoint(req: func.HttpRequest) -> func.HttpResponse
             "status": "success"
         }
         
+        # Also check admin configuration
+        from core.user_roles import admin_role_manager
+        admin_emails = getattr(admin_role_manager, 'admin_emails', [])
+        super_admin_emails = getattr(admin_role_manager, 'super_admin_emails', [])
+        
+        config_data["admin_config"] = {
+            "admin_emails_count": len(admin_emails),
+            "super_admin_emails_count": len(super_admin_emails),
+            "admin_emails_env": os.getenv("ADMIN_EMAILS", "not_set"),
+            "super_admin_emails_env": os.getenv("SUPER_ADMIN_EMAILS", "not_set")
+        }
+        
         return func.HttpResponse(
             json.dumps(config_data, indent=2),
             status_code=200,
