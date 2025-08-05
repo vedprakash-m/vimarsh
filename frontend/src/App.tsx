@@ -7,7 +7,7 @@ import './styles/domain-themes.css';
 
 // Lazy load main components for better bundle splitting
 const LandingPage = lazy(() => import('./components/LandingPage'));
-const CleanSpiritualInterface = lazy(() => import('./components/CleanSpiritualInterface'));
+const GuidanceInterface = lazy(() => import('./components/GuidanceInterface'));
 
 // Keep lightweight components as regular imports
 import AuthCallback from './components/AuthCallback';
@@ -100,12 +100,12 @@ function App() {
                   {/* Authentication Callback - Public Route */}
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   
-                  {/* Spiritual Guidance Interface - Protected Route */}
+                                    {/* Guidance Interface - Protected Route */}
                   <Route 
                     path="/guidance" 
                     element={
                       <ProtectedRoute>
-                        <CleanSpiritualInterface />
+                        <GuidanceInterface />
                       </ProtectedRoute>
                     } 
                   />

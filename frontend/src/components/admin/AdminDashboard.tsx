@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Users, DollarSign, Activity, Database, Settings, Shield, BarChart3, MessageSquare, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ContentManagement from './ContentManagement';
+import { getApiBaseUrl } from '../../config/environment';
+import { getAuthHeaders } from '../../auth/authService';
 import '../../styles/admin.css';
 
 interface AdminUser {
@@ -52,20 +54,37 @@ const AdminDashboard: React.FC = () => {
       setLoading(true);
       
       // Make actual API calls to get system statistics
-      const response = await fetch('/api/admin/stats', {
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+      
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/cost-dashboard`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...authHeaders
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch system statistics');
+        throw new Error(`Failed to fetch system statistics: ${response.status}`);
       }
       
-      const apiStats = await response.json();
-      setStats(apiStats);
+      const apiData = await response.json();
+      
+      // Transform the API response to match our stats interface
+      const transformedStats: SystemStats = {
+        totalUsers: apiData.system_usage?.total_users || 0,
+        activeUsers: apiData.system_usage?.active_users || 0,
+        totalCost: apiData.system_usage?.total_cost || 0,
+        totalTokens: apiData.system_usage?.total_tokens || 0,
+        totalTexts: apiData.content_stats?.total_texts || 0,
+        totalPersonalities: apiData.content_stats?.total_personalities || 8,
+        systemHealth: 'healthy',
+        lastUpdated: apiData.dashboard_generated || new Date().toISOString()
+      };
+      
+      setStats(transformedStats);
+      setError(null);
     } catch (err) {
       console.error('Error loading stats:', err);
       
@@ -91,20 +110,34 @@ const AdminDashboard: React.FC = () => {
   const loadUsers = async () => {
     try {
       // Make actual API call to get users
-      const response = await fetch('/api/admin/users', {
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+      
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...authHeaders
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        throw new Error(`Failed to fetch users: ${response.status}`);
       }
       
-      const apiUsers = await response.json();
-      setUsers(apiUsers);
+      const apiData = await response.json();
+      
+      // Transform the API response to match our AdminUser interface
+      const transformedUsers: AdminUser[] = apiData.users?.map((user: any) => ({
+        id: user.user_id || user.id,
+        email: user.user_email || user.email,
+        role: user.role || 'User',
+        status: user.is_blocked ? 'blocked' : 'active',
+        permissions: ['read'],
+        lastLogin: user.last_active || new Date().toISOString()
+      })) || [];
+      
+      setUsers(transformedUsers);
     } catch (err) {
       console.error('Error loading users:', err);
       

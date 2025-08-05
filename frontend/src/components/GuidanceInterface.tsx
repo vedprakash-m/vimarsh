@@ -19,7 +19,7 @@ interface Message {
   personality?: string;
 }
 
-export default function CleanSpiritualInterface() {
+export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);

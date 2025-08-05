@@ -1,8 +1,10 @@
 // Language switching hook with integration support
 // Provides easy language switching with voice interface integration
 
+import { usePersonality } from '../contexts/PersonalityContext';
+
 import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from '../components/AuthenticationWrapper';
+import { useAuth } from '../auth/AuthProvider';
 
 export interface LanguageSwitchingOptions {
   persistToUser?: boolean;
@@ -19,7 +21,7 @@ export const useLanguageSwitching = () => {
     t 
   } = useLanguage();
   
-  const { user } = useAuth();
+  const { account } = useAuth();
 
   // Switch to specific language with options
   const switchToLanguage = async (
@@ -37,9 +39,9 @@ export const useLanguageSwitching = () => {
       setLanguage(language);
 
       // Persist to user profile if authenticated
-      if (persistToUser && user) {
+      if (persistToUser && account) {
         // TODO: Update user preference via API
-        console.log(`🌍 Saving language preference: ${language} for user ${user.name}`);
+        console.log(`🌍 Saving language preference: ${language} for user ${account.name}`);
       }
 
       // Show notification to user
