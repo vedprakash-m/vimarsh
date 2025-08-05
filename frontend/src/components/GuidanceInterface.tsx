@@ -411,9 +411,9 @@ export default function GuidanceInterface() {
             <button 
               onClick={() => navigate('/admin')}
               style={{
-                background: 'rgba(251, 191, 36, 0.2)',
-                border: '1px solid rgba(251, 191, 36, 0.4)',
-                color: '#fbbf24',
+                background: 'rgba(255, 255, 255, 0.95)',
+                border: '1px solid rgba(251, 191, 36, 0.6)',
+                color: '#92400e',
                 padding: '0.5rem 1rem',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
@@ -421,9 +421,21 @@ export default function GuidanceInterface() {
                 alignItems: 'center',
                 transition: 'all 0.3s ease',
                 fontSize: '0.9rem',
-                fontWeight: '600'
+                fontWeight: '600',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                backdropFilter: 'blur(10px)'
               }}
               title="Admin Panel"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+              }}
             >
               ⚙️ Admin
             </button>
@@ -433,9 +445,9 @@ export default function GuidanceInterface() {
           <button 
             onClick={handleLogout}
             style={{
-              background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.4)',
-              color: '#dc2626',
+              background: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid rgba(239, 68, 68, 0.6)',
+              color: '#991b1b',
               padding: '0.5rem 1rem',
               borderRadius: '0.5rem',
               cursor: 'pointer',
@@ -444,9 +456,21 @@ export default function GuidanceInterface() {
               transition: 'all 0.3s ease',
               fontSize: '0.9rem',
               fontWeight: '600',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              backdropFilter: 'blur(10px)'
             }}
             title="Logout"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+            }}
           >
             <LogOut size={18} />
             Logout

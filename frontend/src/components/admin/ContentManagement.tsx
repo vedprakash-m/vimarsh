@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../contexts/AdminContext';
+import { getApiBaseUrl } from '../../config/environment';
+import { getAuthHeaders } from '../../auth/authService';
 import '../../styles/admin.css';
 
 interface ContentItem {
@@ -81,17 +83,27 @@ const ContentManagement: React.FC = () => {
   const loadContent = async () => {
     try {
       setLoading(true);
-      // This would call the backend API
-      const response = await fetch('/api/admin/content', {
+      
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+      
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${await getAccessToken()}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...authHeaders
         }
       });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch content: ${response.status}`);
+      }
+      
       const data = await response.json();
       setContent(data.content || []);
     } catch (error) {
       console.error('Failed to load content:', error);
+      setContent([]);
     } finally {
       setLoading(false);
     }
@@ -113,11 +125,14 @@ const ContentManagement: React.FC = () => {
         }
       };
 
-      const response = await fetch('/api/admin/content', {
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${await getAccessToken()}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...authHeaders
         },
         body: JSON.stringify(contentData)
       });
@@ -154,10 +169,14 @@ const ContentManagement: React.FC = () => {
     if (!confirm('Are you sure you want to delete this content?')) return;
 
     try {
-      const response = await fetch(`/api/admin/content/${contentId}`, {
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content/${contentId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${await getAccessToken()}`
+          'Content-Type': 'application/json',
+          ...authHeaders
         }
       });
 
@@ -171,10 +190,14 @@ const ContentManagement: React.FC = () => {
 
   const handleApproveContent = async (contentId: string) => {
     try {
-      const response = await fetch(`/api/admin/content/${contentId}/approve`, {
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content/${contentId}/approve`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${await getAccessToken()}`
+          'Content-Type': 'application/json',
+          ...authHeaders
         }
       });
 
