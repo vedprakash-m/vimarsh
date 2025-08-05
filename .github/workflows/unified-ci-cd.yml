@@ -293,9 +293,13 @@ jobs:
         npm ci --prefer-offline --no-audit --no-fund
         
     - name: 🏗️ Build Production Bundle
+      env:
+        REACT_APP_AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        REACT_APP_AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        REACT_APP_BACKEND_URL: https://vimarsh-backend-app-flex.azurewebsites.net
       run: |
         cd frontend
-        # Build the production bundle
+        # Build the production bundle with environment variables
         npm run build || npm run build:prod || CI=false npm run build
         
     - name: 📦 Upload Frontend Artifact
