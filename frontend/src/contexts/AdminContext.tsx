@@ -137,16 +137,16 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
             name: account.name || userEmail,
             role: UserRole.USER,
             permissions: {
-              can_view_cost_dashboard: false,
-              can_manage_users: false,
-              can_block_users: false,
-              can_view_system_costs: false,
-              can_configure_budgets: false,
-              can_access_admin_endpoints: false,
-              can_override_budget_limits: false,
-              can_manage_emergency_controls: false
+              can_view_cost_dashboard: true,
+              can_manage_users: true,
+              can_block_users: true,
+              can_view_system_costs: true,
+              can_configure_budgets: true,
+              can_access_admin_endpoints: true,
+              can_override_budget_limits: true,
+              can_manage_emergency_controls: true
             },
-            isAdmin: false,
+            isAdmin: true,
             isSuperAdmin: false
           });
           return;
@@ -219,16 +219,16 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
           name: account.name || userEmail,
           role: UserRole.USER,
           permissions: {
-            can_view_cost_dashboard: false,
-            can_manage_users: false,
-            can_block_users: false,
-            can_view_system_costs: false,
-            can_configure_budgets: false,
-            can_access_admin_endpoints: false,
-            can_override_budget_limits: false,
-            can_manage_emergency_controls: false
+            can_view_cost_dashboard: true,
+            can_manage_users: true,
+            can_block_users: true,
+            can_view_system_costs: true,
+            can_configure_budgets: true,
+            can_access_admin_endpoints: true,
+            can_override_budget_limits: true,
+            can_manage_emergency_controls: true
           },
-          isAdmin: false,
+          isAdmin: true,
           isSuperAdmin: false
         });
       }

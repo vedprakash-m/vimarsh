@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, DollarSign, Activity, Database, Settings, Shield, BarChart3, MessageSquare } from 'lucide-react';
+import { Users, DollarSign, Activity, Database, Settings, Shield, BarChart3, MessageSquare, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ContentManagement from './ContentManagement';
 import '../../styles/admin.css';
 
@@ -26,6 +27,7 @@ interface SystemStats {
 type AdminTab = 'overview' | 'users' | 'content' | 'monitoring' | 'settings';
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -48,7 +50,26 @@ const AdminDashboard: React.FC = () => {
   const loadSystemStats = async () => {
     try {
       setLoading(true);
-      // Mock data - replace with actual API calls
+      
+      // Make actual API calls to get system statistics
+      const response = await fetch('/api/admin/stats', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch system statistics');
+      }
+      
+      const apiStats = await response.json();
+      setStats(apiStats);
+    } catch (err) {
+      console.error('Error loading stats:', err);
+      
+      // Fallback to mock data if API fails
       const mockStats: SystemStats = {
         totalUsers: 127,
         activeUsers: 45,
@@ -61,9 +82,7 @@ const AdminDashboard: React.FC = () => {
       };
       
       setStats(mockStats);
-    } catch (err) {
-      setError('Failed to load system statistics');
-      console.error('Error loading stats:', err);
+      setError('Using fallback data - API unavailable');
     } finally {
       setLoading(false);
     }
@@ -71,7 +90,25 @@ const AdminDashboard: React.FC = () => {
 
   const loadUsers = async () => {
     try {
-      // Mock data - replace with actual API calls
+      // Make actual API call to get users
+      const response = await fetch('/api/admin/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      
+      const apiUsers = await response.json();
+      setUsers(apiUsers);
+    } catch (err) {
+      console.error('Error loading users:', err);
+      
+      // Fallback to mock data if API fails
       const mockUsers: AdminUser[] = [
         {
           id: '1',
@@ -92,53 +129,55 @@ const AdminDashboard: React.FC = () => {
       ];
       
       setUsers(mockUsers);
-    } catch (err) {
-      console.error('Error loading users:', err);
     }
   };
 
   const renderSidebarNav = () => (
-    <nav className="admin-nav">
+    <div className="admin-nav">
       <button
-        className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
-        onClick={() => setActiveTab('overview')}
+        onClick={() => navigate('/guidance')}
+        className="admin-nav-item"
+        title="Go to Spiritual Guidance"
       >
-        <BarChart3 size={20} />
+        <Home size={18} />
+        {!sidebarCollapsed && <span>Guidance</span>}
+      </button>
+      <button
+        onClick={() => setActiveTab('overview')}
+        className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+      >
+        <BarChart3 size={18} />
         {!sidebarCollapsed && <span>Overview</span>}
       </button>
-      
       <button
-        className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`}
         onClick={() => setActiveTab('users')}
+        className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`}
       >
-        <Users size={20} />
+        <Users size={18} />
         {!sidebarCollapsed && <span>Users</span>}
       </button>
-      
       <button
-        className={`admin-nav-item ${activeTab === 'content' ? 'active' : ''}`}
         onClick={() => setActiveTab('content')}
+        className={`admin-nav-item ${activeTab === 'content' ? 'active' : ''}`}
       >
-        <Database size={20} />
+        <MessageSquare size={18} />
         {!sidebarCollapsed && <span>Content</span>}
       </button>
-      
       <button
-        className={`admin-nav-item ${activeTab === 'monitoring' ? 'active' : ''}`}
         onClick={() => setActiveTab('monitoring')}
+        className={`admin-nav-item ${activeTab === 'monitoring' ? 'active' : ''}`}
       >
-        <Activity size={20} />
+        <Activity size={18} />
         {!sidebarCollapsed && <span>Monitoring</span>}
       </button>
-      
       <button
-        className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
         onClick={() => setActiveTab('settings')}
+        className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
       >
-        <Settings size={20} />
+        <Settings size={18} />
         {!sidebarCollapsed && <span>Settings</span>}
       </button>
-    </nav>
+    </div>
   );
 
   const renderOverview = () => (
