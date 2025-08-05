@@ -235,7 +235,7 @@ const AdminDashboard: React.FC = () => {
       <button
         onClick={() => navigate('/guidance')}
         className="admin-nav-item"
-        title="Go to Spiritual Guidance"
+        title="Return to Spiritual Guidance"
       >
         <Home size={18} />
         {!sidebarCollapsed && <span>Guidance</span>}
@@ -325,7 +325,7 @@ const AdminDashboard: React.FC = () => {
           <div className="vimarsh-admin-card">
             <div className="card-header">
               <Database size={20} />
-              <h3>Spiritual Texts</h3>
+              <h3>Foundational Texts</h3>
             </div>
             <div className="card-value">{stats.totalTexts}</div>
           </div>

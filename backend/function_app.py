@@ -1416,19 +1416,48 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin cost dashboard endpoint"""
     try:
-        # Simple test without decorators first
-        logger.info("Admin cost dashboard endpoint called")
+        logger.info("🕉️ Admin cost dashboard endpoint called")
         
-        # Test basic functionality without complex decorators
-        from core.token_tracker import token_tracker
+        # Use database service directly for accurate analytics
+        from services.database_service import db_service
         from core.budget_validator import budget_validator
         
-        # Get basic system data
-        system_usage = token_tracker.get_system_usage(30)
+        # Get actual usage records from database
+        usage_records = await db_service.get_usage_records(days=30, limit=5000)
+        top_users = await db_service.get_top_users(limit=100)
+        blocked_users = await db_service.get_blocked_users()
+        
+        # Calculate system-wide statistics from database records
+        total_tokens = sum(record.totalTokens for record in usage_records)
+        total_cost = sum(record.costUsd for record in usage_records)
+        unique_users = len(set(record.userId for record in usage_records))
+        active_users = len([user for user in top_users if user.lastRequest and 
+                           datetime.fromisoformat(user.lastRequest) > datetime.utcnow() - timedelta(days=7)])
+        
+        # Count foundational texts from database
+        foundational_texts = await db_service.get_texts(limit=1000)  # Get all texts for count
+        
+        system_usage = {
+            'total_users': unique_users,
+            'active_users': active_users,
+            'total_requests': len(usage_records),
+            'total_tokens': total_tokens,
+            'total_cost_usd': total_cost,
+            'avg_tokens_per_request': total_tokens / len(usage_records) if usage_records else 0,
+            'cost_per_user': total_cost / unique_users if unique_users > 0 else 0.0
+        }
+        
+        content_stats = {
+            'total_texts': len(foundational_texts),
+            'total_personalities': 8,  # Fixed count of available personalities
+            'blocked_users_count': len(blocked_users)
+        }
+        
         budget_summary = budget_validator.get_budget_summary()
         
         response_data = {
             'system_usage': system_usage,
+            'content_stats': content_stats,
             'budget_summary': budget_summary,
             'performance_metrics': {
                 'avg_response_time': '1.2s',
@@ -1475,21 +1504,38 @@ async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpRespo
 async def admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin user management endpoint"""
     try:
-        logger.info("Admin users endpoint called")
+        logger.info("🕉️ Admin users endpoint called")
         
-        # Test basic functionality without complex decorators
-        from core.token_tracker import token_tracker
+        # Use database service directly for accurate user data
+        from services.database_service import db_service
         from core.budget_validator import budget_validator
         
         if req.method == "GET":
-            # Get top users with basic data
-            users = token_tracker.get_top_users(100)
+            # Get users with actual data from database
+            top_users = await db_service.get_top_users(100)
+            blocked_users = await db_service.get_blocked_users()
+            
+            # Transform to match expected format
+            users_data = []
+            for user in top_users:
+                users_data.append({
+                    'user_id': user.userId,
+                    'user_email': user.userEmail,
+                    'role': 'Admin' if user.userEmail in ['admin@vimarsh.com', 'ved@vedprakash.net'] else 'User',
+                    'is_blocked': user.isBlocked,
+                    'last_active': user.lastRequest,
+                    'total_requests': user.totalRequests,
+                    'total_tokens': user.totalTokens,
+                    'total_cost_usd': user.totalCostUsd,
+                    'risk_score': user.riskScore,
+                    'block_reason': user.blockReason
+                })
             
             return func.HttpResponse(
                 json.dumps({
-                    'users': users,
-                    'total_users': len(users),
-                    'blocked_users': len(budget_validator.blocked_users),
+                    'users': users_data,
+                    'total_users': len(users_data),
+                    'blocked_users': len(blocked_users),
                     'timestamp': datetime.utcnow().isoformat()
                 }),
                 mimetype="application/json",
