@@ -6,6 +6,7 @@ Enhanced with comprehensive safety and content filtering systems for each person
 import azure.functions as func
 import json
 import logging
+import os
 import re
 import asyncio
 from datetime import datetime
