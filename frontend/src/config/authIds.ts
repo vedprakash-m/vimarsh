@@ -12,7 +12,7 @@ const CLIENT_ID_MAP = {
   // Production - multitenant + personal accounts (matches Azure app registration)
   production: {
     clientId: 'e4bd74b8-9a82-40c6-8d52-3e231733095e',
-    tenantId: '80feb807-105c-4fb9-ab03-c9a818e35848', // Your actual tenant ID
+    tenantId: '80fe68b7-105c-4fb9-ab03-c9a818e35848', // Your actual tenant ID
     environment: 'multitenant-production',
     accountType: 'multitenant-personal' // Any Microsoft Entra ID tenant + personal accounts
   },
@@ -20,7 +20,7 @@ const CLIENT_ID_MAP = {
   // Development - same configuration for consistency
   development: {
     clientId: 'e4bd74b8-9a82-40c6-8d52-3e231733095e', // Same client ID
-    tenantId: '80feb807-105c-4fb9-ab03-c9a818e35848', // Your actual tenant ID
+    tenantId: '80fe68b7-105c-4fb9-ab03-c9a818e35848', // Your actual tenant ID
     environment: 'multitenant-development',
     accountType: 'multitenant-personal' // Any Microsoft Entra ID tenant + personal accounts
   }
