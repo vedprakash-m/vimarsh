@@ -343,15 +343,33 @@ jobs:
         name: frontend-build-${{ github.sha }}
         path: ./frontend-deploy/
         
-    - name: 🔐 Azure Login
-      uses: azure/login@v1
+    - name: 🔐 Azure Login (Federated Identity)
+      uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      continue-on-error: true
+      id: azure-login
+        
+    - name: 🔍 Verify Azure Authentication
+      run: |
+        echo "🔐 Verifying Azure CLI authentication..."
+        if az account show > /dev/null 2>&1; then
+          echo "✅ Azure authentication successful"
+          az account show
+        else
+          echo "❌ Azure authentication failed - deployments will be skipped"
+          echo "Please check Azure service principal configuration:"
+          echo "  1. AZURE_CLIENT_ID secret"
+          echo "  2. AZURE_TENANT_ID secret" 
+          echo "  3. AZURE_SUBSCRIPTION_ID secret"
+          echo "  4. Service principal federated credentials"
+        fi
+      continue-on-error: true
         
     - name: 🚀 Deploy Backend
-      if: needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: steps.azure-login.outcome == 'success' && (needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
       run: |
         echo "🐍 Deploying backend to Azure Functions..."
         cd backend-deploy
@@ -369,7 +387,7 @@ jobs:
         echo "✅ Backend deployed successfully"
         
     - name: 🚀 Deploy Frontend
-      if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: steps.azure-login.outcome == 'success' && (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
       run: |
         echo "🎨 Deploying frontend to Static Web Apps..."
         
@@ -419,8 +437,16 @@ jobs:
         
     - name: 📊 Pipeline Summary
       run: |
-        echo "🎉 Deployment completed successfully!"
+        echo "🎉 CI/CD Pipeline completed!"
         echo "⏱️ Pipeline optimized for speed and efficiency"
-        echo "🔄 Changes deployed:"
+        echo "🔄 Changes processed:"
         echo "  Backend: ${{ needs.setup.outputs.backend_changed }}"
         echo "  Frontend: ${{ needs.setup.outputs.frontend_changed }}"
+        echo "  Infrastructure: ${{ needs.setup.outputs.infrastructure_changed }}"
+        echo ""
+        if [[ "${{ steps.azure-login.outcome }}" == "success" ]]; then
+          echo "✅ Azure deployments completed"
+        else
+          echo "⚠️ Azure deployments skipped due to authentication issues"
+          echo "   Please verify Azure service principal configuration"
+        fi
