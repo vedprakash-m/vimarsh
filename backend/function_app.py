@@ -1415,12 +1415,117 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"])
 async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin cost dashboard endpoint"""
-    return await admin_cost_dashboard(req)
+    try:
+        # Simple test without decorators first
+        logger.info("Admin cost dashboard endpoint called")
+        
+        # Test basic functionality without complex decorators
+        from core.token_tracker import token_tracker
+        from core.budget_validator import budget_validator
+        
+        # Get basic system data
+        system_usage = token_tracker.get_system_usage(30)
+        budget_summary = budget_validator.get_budget_summary()
+        
+        response_data = {
+            'system_usage': system_usage,
+            'budget_summary': budget_summary,
+            'dashboard_generated': datetime.utcnow().isoformat(),
+            'mode': 'production' if os.getenv('AZURE_FUNCTIONS_ENVIRONMENT') == 'Production' else 'development'
+        }
+        
+        return func.HttpResponse(
+            json.dumps(response_data),
+            mimetype="application/json",
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Admin cost dashboard error: {e}")
+        import traceback
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Failed to generate cost dashboard",
+                "message": str(e),
+                "traceback": traceback.format_exc()
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
+        )
 
 @app.route(route="vimarsh-admin/users", methods=["GET", "POST"])
 async def admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin user management endpoint"""
-    return await admin_user_management(req)
+    try:
+        logger.info("Admin users endpoint called")
+        
+        # Test basic functionality without complex decorators
+        from core.token_tracker import token_tracker
+        from core.budget_validator import budget_validator
+        
+        if req.method == "GET":
+            # Get top users with basic data
+            users = token_tracker.get_top_users(100)
+            
+            return func.HttpResponse(
+                json.dumps({
+                    'users': users,
+                    'total_users': len(users),
+                    'blocked_users': len(budget_validator.blocked_users),
+                    'timestamp': datetime.utcnow().isoformat()
+                }),
+                mimetype="application/json",
+                status_code=200,
+                headers={
+                    "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET, POST",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                }
+            )
+        else:
+            return func.HttpResponse(
+                json.dumps({'error': 'Method not supported in simplified version'}),
+                status_code=405,
+                mimetype="application/json",
+                headers={
+                    "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET, POST",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                }
+            )
+        
+    except Exception as e:
+        logger.error(f"Admin users endpoint error: {e}")
+        import traceback
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Failed to get users",
+                "message": str(e),
+                "traceback": traceback.format_exc()
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
+        )
 
 @app.route(route="vimarsh-admin/users/{user_id}/block", methods=["POST"])
 async def admin_block_user_endpoint(req: func.HttpRequest) -> func.HttpResponse:
@@ -1441,6 +1546,119 @@ async def admin_budget_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 async def admin_health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin health check endpoint"""
     return await admin_system_health(req)
+
+@app.route(route="vimarsh-admin/diagnostic", methods=["GET"])
+async def admin_diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Diagnostic endpoint to check admin dependencies"""
+    try:
+        diagnostic_data = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "dependencies": {},
+            "services": {},
+            "errors": []
+        }
+        
+        # Test core dependencies
+        try:
+            from core.token_tracker import token_tracker
+            diagnostic_data["dependencies"]["token_tracker"] = "imported"
+            
+            # Test token_tracker service
+            system_usage = token_tracker.get_system_usage(7)
+            diagnostic_data["services"]["token_tracker"] = {
+                "status": "working",
+                "sample_data": system_usage
+            }
+        except Exception as e:
+            diagnostic_data["dependencies"]["token_tracker"] = f"error: {str(e)}"
+            diagnostic_data["errors"].append(f"token_tracker: {str(e)}")
+        
+        try:
+            from core.budget_validator import budget_validator
+            diagnostic_data["dependencies"]["budget_validator"] = "imported"
+            
+            # Test budget_validator service
+            budget_summary = budget_validator.get_budget_summary()
+            diagnostic_data["services"]["budget_validator"] = {
+                "status": "working",
+                "sample_data": budget_summary
+            }
+        except Exception as e:
+            diagnostic_data["dependencies"]["budget_validator"] = f"error: {str(e)}"
+            diagnostic_data["errors"].append(f"budget_validator: {str(e)}")
+        
+        try:
+            from core.user_roles import admin_role_manager
+            diagnostic_data["dependencies"]["admin_role_manager"] = "imported"
+            
+            # Test admin_role_manager service
+            all_admins = admin_role_manager.get_all_admins()
+            diagnostic_data["services"]["admin_role_manager"] = {
+                "status": "working",
+                "sample_data": all_admins
+            }
+        except Exception as e:
+            diagnostic_data["dependencies"]["admin_role_manager"] = f"error: {str(e)}"
+            diagnostic_data["errors"].append(f"admin_role_manager: {str(e)}")
+        
+        try:
+            from auth.unified_auth_service import admin_required
+            diagnostic_data["dependencies"]["admin_required"] = "imported"
+        except Exception as e:
+            diagnostic_data["dependencies"]["admin_required"] = f"error: {str(e)}"
+            diagnostic_data["errors"].append(f"admin_required: {str(e)}")
+        
+        try:
+            from auth.security_validator import secure_admin_endpoint
+            diagnostic_data["dependencies"]["secure_admin_endpoint"] = "imported"
+        except Exception as e:
+            diagnostic_data["dependencies"]["secure_admin_endpoint"] = f"error: {str(e)}"
+            diagnostic_data["errors"].append(f"secure_admin_endpoint: {str(e)}")
+        
+        # Test admin endpoint function import
+        try:
+            from admin.admin_endpoints import admin_cost_dashboard, admin_user_management
+            diagnostic_data["dependencies"]["admin_endpoints"] = "imported"
+        except Exception as e:
+            diagnostic_data["dependencies"]["admin_endpoints"] = f"error: {str(e)}"
+            diagnostic_data["errors"].append(f"admin_endpoints: {str(e)}")
+        
+        # Environment info
+        diagnostic_data["environment"] = {
+            "AZURE_FUNCTIONS_ENVIRONMENT": os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "not_set"),
+            "ENVIRONMENT": os.getenv("ENVIRONMENT", "not_set"),
+            "ENABLE_AUTH": os.getenv("ENABLE_AUTH", "not_set")
+        }
+        
+        return func.HttpResponse(
+            json.dumps(diagnostic_data, indent=2),
+            mimetype="application/json",
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
+        )
+        
+    except Exception as e:
+        import traceback
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Diagnostic endpoint failed",
+                "message": str(e),
+                "traceback": traceback.format_exc()
+            }),
+            mimetype="application/json",
+            status_code=500,
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            }
+        )
 
 @app.route(route="debug/auth-config", methods=["GET"])
 async def debug_auth_config_endpoint(req: func.HttpRequest) -> func.HttpResponse:
