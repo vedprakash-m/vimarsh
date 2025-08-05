@@ -12,19 +12,9 @@ name: 🚀 Vimarsh Optimized CI/CD Pipeline
         required: false
         default: 'production'
         type: choice
-        optio    - name: 📥 Download Backend Artifact
-      if: needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
-      uses: actions/download-artifact@v3
-      with:
-        name: backend-build-${{ github.sha }}
-        path: ./backend-deploy/
-        
-    - name: 📱 Download Frontend Artifact
-      if: needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
-      uses: actions/download-artifact@v3
-      with:
-        name: frontend-build-${{ github.sha }}
-        path: ./frontend-deploy/ production
+        options:
+          - staging
+          - production
       force_full_pipeline:
         description: 'Force full pipeline execution'
         required: false
@@ -333,14 +323,14 @@ jobs:
           scripts/
         
     - name: 📦 Download Backend Artifact
-      if: needs.setup.outputs.backend_changed == 'true'
+      if: needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       uses: actions/download-artifact@v3
       with:
         name: backend-build-${{ github.sha }}
         path: ./backend-deploy/
         
-    - name: � Download Frontend Artifact  
-      if: needs.setup.outputs.frontend_changed == 'true'
+    - name: 📱 Download Frontend Artifact
+      if: needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       uses: actions/download-artifact@v3
       with:
         name: frontend-build-${{ github.sha }}
