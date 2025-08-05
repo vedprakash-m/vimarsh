@@ -343,24 +343,16 @@ jobs:
         name: frontend-build-${{ github.sha }}
         path: ./frontend-deploy/
         
-    - name: 🔐 Azure Login (Federated Identity)
-      uses: azure/login@v2
+    - name: 🔐 Azure Login
+      uses: azure/login@v1
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
       continue-on-error: true
       id: azure-login
         
     - name: 🔍 Verify Azure Authentication
       run: |
         echo "🔐 Verifying Azure CLI authentication..."
-        echo "🔍 Debug Information:"
-        echo "  Repository: ${{ github.repository }}"
-        echo "  Ref: ${{ github.ref }}"
-        echo "  Environment: production"
-        echo "  Run ID: ${{ github.run_id }}"
-        echo ""
         
         if az account show > /dev/null 2>&1; then
           echo "✅ Azure authentication successful"
@@ -372,17 +364,10 @@ jobs:
           echo "❌ Azure authentication failed - deployments will be skipped"
           echo ""
           echo "🔍 Troubleshooting steps:"
-          echo "1. Verify the service principal exists in Azure AD"
-          echo "2. Check federated identity credentials are configured for:"
-          echo "   - Issuer: https://token.actions.githubusercontent.com"
-          echo "   - Subject: repo:${{ github.repository }}:environment:production"
+          echo "1. Verify AZURE_CREDENTIALS secret is configured correctly"
+          echo "2. Check that the service principal JSON contains:"
+          echo "   - clientId, clientSecret, subscriptionId, tenantId"
           echo "3. Ensure service principal has Contributor role on resource group"
-          echo "4. Verify tenant ID matches your Azure AD directory"
-          echo ""
-          echo "🔍 Current GitHub context:"
-          echo "  Repository: ${{ github.repository }}"
-          echo "  Environment: production"
-          echo "  Expected subject claim: repo:${{ github.repository }}:environment:production"
         fi
       continue-on-error: true
         
