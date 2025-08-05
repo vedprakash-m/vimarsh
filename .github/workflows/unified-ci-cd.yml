@@ -330,7 +330,7 @@ jobs:
       if: needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       uses: actions/download-artifact@v4
       with:
-        name: backend-build-${{ github.sha }}
+        name: backend-package
         path: ./backend-deploy/
         
     - name: 📱 Download Frontend Artifact
