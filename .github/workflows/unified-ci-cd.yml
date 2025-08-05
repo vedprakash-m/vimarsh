@@ -263,7 +263,7 @@ jobs:
         find dist/ -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
         
     - name: 📦 Upload Backend Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: backend-build-${{ github.sha }}
         path: backend/dist/
@@ -302,7 +302,7 @@ jobs:
         npm run build || npm run build:prod || CI=false npm run build
         
     - name: 📦 Upload Frontend Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frontend-build-${{ github.sha }}
         path: frontend/build/
@@ -331,14 +331,14 @@ jobs:
         
     - name: 📦 Download Backend Artifact
       if: needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: backend-build-${{ github.sha }}
         path: ./backend-deploy/
         
     - name: 📱 Download Frontend Artifact
       if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: frontend-build-${{ github.sha }}
         path: ./frontend-deploy/
