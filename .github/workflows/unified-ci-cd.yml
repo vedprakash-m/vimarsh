@@ -100,19 +100,21 @@ jobs:
         # Smart pipeline execution based on changes
         BACKEND_CHANGED="${{ steps.changes.outputs.backend }}"
         FRONTEND_CHANGED="${{ steps.changes.outputs.frontend }}"
+        INFRASTRUCTURE_CHANGED="${{ steps.changes.outputs.infrastructure }}"
         DOCS_ONLY="${{ steps.changes.outputs.docs_only }}"
         IS_MAIN="${{ github.ref == 'refs/heads/main' }}"
         FORCE_FULL="${{ github.event.inputs.force_full_pipeline }}"
         
         echo "🔍 Change Detection Results:"
         echo "Backend changed: $BACKEND_CHANGED"
-        echo "Frontend changed: $FRONTEND_CHANGED" 
+        echo "Frontend changed: $FRONTEND_CHANGED"
+        echo "Infrastructure changed: $INFRASTRUCTURE_CHANGED" 
         echo "Docs only: $DOCS_ONLY"
         echo "Is main branch: $IS_MAIN"
         echo "Force full pipeline: $FORCE_FULL"
         
-        # Decision logic - More permissive for main branch
-        if [[ "$DOCS_ONLY" == "true" && "$BACKEND_CHANGED" == "false" && "$FRONTEND_CHANGED" == "false" ]]; then
+        # Decision logic - More permissive for main branch and infrastructure changes
+        if [[ "$DOCS_ONLY" == "true" && "$BACKEND_CHANGED" == "false" && "$FRONTEND_CHANGED" == "false" && "$INFRASTRUCTURE_CHANGED" == "false" ]]; then
           echo "📝 Docs-only changes detected, skipping CI/CD"
           echo "should_test=false" >> $GITHUB_OUTPUT
           echo "should_build=false" >> $GITHUB_OUTPUT
@@ -124,6 +126,11 @@ jobs:
           echo "should_deploy=true" >> $GITHUB_OUTPUT
         elif [[ "$FORCE_FULL" == "true" ]]; then
           echo "🚀 Forced full pipeline"
+          echo "should_test=true" >> $GITHUB_OUTPUT
+          echo "should_build=true" >> $GITHUB_OUTPUT
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+        elif [[ "$INFRASTRUCTURE_CHANGED" == "true" ]]; then
+          echo "🔧 Infrastructure changes - running full pipeline to test deployment"
           echo "should_test=true" >> $GITHUB_OUTPUT
           echo "should_build=true" >> $GITHUB_OUTPUT
           echo "should_deploy=true" >> $GITHUB_OUTPUT
@@ -145,7 +152,7 @@ jobs:
     name: 🧪 Backend Tests
     runs-on: ubuntu-latest
     needs: setup
-    if: needs.setup.outputs.should_test == 'true' && (needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
+    if: needs.setup.outputs.should_test == 'true' && (needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
     timeout-minutes: 10
     steps:
     - name: 📥 Checkout
@@ -189,7 +196,7 @@ jobs:
     name: 🧪 Frontend Tests
     runs-on: ubuntu-latest
     needs: setup
-    if: needs.setup.outputs.should_test == 'true' && (needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
+    if: needs.setup.outputs.should_test == 'true' && (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true')
     timeout-minutes: 8
     steps:
     - name: 📥 Checkout
@@ -221,7 +228,7 @@ jobs:
     if: |
       always() && 
       needs.setup.outputs.should_build == 'true' && 
-      (needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true') &&
+      (needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true') &&
       (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped')
     timeout-minutes: 6
     steps:
@@ -269,7 +276,7 @@ jobs:
     if: |
       always() && 
       needs.setup.outputs.should_build == 'true' && 
-      (needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true') &&
+      (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true') &&
       (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
     timeout-minutes: 6
     steps:
@@ -323,14 +330,14 @@ jobs:
           scripts/
         
     - name: 📦 Download Backend Artifact
-      if: needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       uses: actions/download-artifact@v3
       with:
         name: backend-build-${{ github.sha }}
         path: ./backend-deploy/
         
     - name: 📱 Download Frontend Artifact
-      if: needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       uses: actions/download-artifact@v3
       with:
         name: frontend-build-${{ github.sha }}
@@ -344,7 +351,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         
     - name: 🚀 Deploy Backend
-      if: needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       run: |
         echo "🐍 Deploying backend to Azure Functions..."
         cd backend-deploy
@@ -362,7 +369,7 @@ jobs:
         echo "✅ Backend deployed successfully"
         
     - name: 🚀 Deploy Frontend
-      if: needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       run: |
         echo "🎨 Deploying frontend to Static Web Apps..."
         
@@ -383,7 +390,7 @@ jobs:
     timeout-minutes: 5
     steps:
     - name: 🔍 Backend Health Check
-      if: needs.setup.outputs.backend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: needs.setup.outputs.backend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       run: |
         echo "🔍 Checking backend health..."
         BACKEND_URL="https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net"
@@ -399,7 +406,7 @@ jobs:
         fi
         
     - name: 🔍 Frontend Health Check
-      if: needs.setup.outputs.frontend_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
+      if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.infrastructure_changed == 'true' || github.event.inputs.force_full_pipeline == 'true'
       run: |
         echo "🔍 Checking frontend accessibility..."
         FRONTEND_URL="https://${{ env.AZURE_STATICWEBAPP_NAME }}.azurestaticapps.net"
