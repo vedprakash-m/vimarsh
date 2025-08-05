@@ -8,7 +8,6 @@ import os
 import requests
 import json
 import logging
-import httpx
 from functools import wraps, lru_cache
 from typing import Dict, Any, Optional, Callable
 from datetime import datetime, timedelta
