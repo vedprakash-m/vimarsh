@@ -299,8 +299,13 @@ class UnifiedAuthService:
                 return None
             
             # Validate token with flexible audience support
-            # Some tokens might have the client_id as audience, others might have 'api://{client_id}'
-            expected_audiences = [client_id, f"api://{client_id}"]
+            # Accept both our client_id and Microsoft Graph API audience
+            expected_audiences = [
+                client_id, 
+                f"api://{client_id}",
+                "https://graph.microsoft.com",
+                "00000003-0000-0000-c000-000000000000"  # Microsoft Graph service principal ID
+            ]
             
             # Also try appid from token if different from audience
             if token_appid and token_appid != token_audience:

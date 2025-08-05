@@ -163,7 +163,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         try {
           console.log('🔄 Attempting silent token acquisition...');
           const tokenResponse = await instance.acquireTokenSilent({
-            scopes: ['e4bd74b8-9a82-40c6-8d52-3e231733095e/.default'],
+            scopes: ['https://graph.microsoft.com/User.Read'],
             account
           });
           accessToken = tokenResponse.accessToken;
@@ -176,7 +176,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
           try {
             console.log('🔄 Attempting interactive token acquisition...');
             const interactiveResponse = await instance.acquireTokenPopup({
-              scopes: ['e4bd74b8-9a82-40c6-8d52-3e231733095e/.default'],
+              scopes: ['https://graph.microsoft.com/User.Read'],
               account
             });
             accessToken = interactiveResponse.accessToken;
