@@ -294,8 +294,8 @@ jobs:
         
     - name: 🏗️ Build Production Bundle
       env:
-        REACT_APP_AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        REACT_APP_AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        REACT_APP_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        REACT_APP_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         REACT_APP_BACKEND_URL: https://vimarsh-backend-app-flex.azurewebsites.net
       run: |
         cd frontend
@@ -403,6 +403,10 @@ jobs:
         skip_app_build: true
         production_branch: "main"
         skip_api_build: true
+      env:
+        # Ensure the deployment uses our existing Vimarsh app registration
+        AZURE_CLIENT_ID: 'e4bd74b8-9a82-40c6-8d52-3e231733095e'
+        AZURE_TENANT_ID: '80fe68b7-105c-4fb9-ab03-c9a818e35848'
 
   # ===== STAGE 5: QUICK VALIDATION =====
   validate-deployment:
