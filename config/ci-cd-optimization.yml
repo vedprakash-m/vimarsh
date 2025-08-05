@@ -1,0 +1,76 @@
+# Enhanced caching configuration for Vimarsh CI/CD pipeline
+# This configuration implements aggressive caching to reduce dependency installation time
+
+cache_configs:
+  python:
+    # Multi-level Python caching
+    primary_key: "python-${{ env.PYTHON_VERSION }}-${{ hashFiles('backend/requirements*.txt', 'backend/pyproject.toml') }}"
+    restore_keys: |
+      python-${{ env.PYTHON_VERSION }}-
+      python-
+    paths:
+      - ~/.cache/pip
+      - backend/.venv
+      - backend/__pycache__
+      - backend/**/__pycache__
+    
+  node:
+    # Aggressive Node.js caching
+    primary_key: "node-${{ env.NODE_VERSION }}-${{ hashFiles('frontend/package*.json') }}"
+    restore_keys: |
+      node-${{ env.NODE_VERSION }}-
+      node-
+    paths:
+      - ~/.npm
+      - frontend/node_modules
+      - frontend/.next/cache  # If using Next.js
+      - frontend/build/cache
+    
+  build_artifacts:
+    # Cache build outputs between runs
+    backend_key: "backend-build-${{ github.sha }}"
+    frontend_key: "frontend-build-${{ github.sha }}"
+    retention_days: 3  # Short retention for faster cleanup
+
+optimization_strategies:
+  dependency_installation:
+    python:
+      # Use pip-tools for faster, more reliable installs
+      - "pip install --upgrade pip setuptools wheel pip-tools"
+      - "pip-sync requirements.txt"  # Faster than pip install -r
+      # Or use uv for ultra-fast Python package installation
+      - "pip install uv"
+      - "uv pip install -r requirements.txt"
+    
+    node:
+      # Use npm ci with optimizations
+      - "npm ci --prefer-offline --no-audit --no-fund"
+      # Or use pnpm/yarn for faster installs
+      - "npm install -g pnpm"
+      - "pnpm install --frozen-lockfile"
+  
+  test_execution:
+    # Parallel test execution with resource limits
+    python_parallel: "python -m pytest -n auto --maxfail=5"
+    node_parallel: "npm test -- --maxWorkers=50%"
+    
+  build_optimization:
+    # Incremental builds and tree shaking
+    frontend_build: "npm run build -- --profile --progress=false"
+    backend_package: "python -m build --wheel"
+
+# Docker layer caching for self-hosted runners (if applicable)
+docker_optimization:
+  base_images:
+    - "python:3.12-slim"  # Smaller base image
+    - "node:18-alpine"    # Alpine for smaller size
+  
+  multi_stage_build: |
+    # Use multi-stage builds for smaller final images
+    FROM python:3.12-slim as base
+    COPY requirements.txt .
+    RUN pip install --no-cache-dir -r requirements.txt
+    
+    FROM base as final
+    COPY . .
+    # Only copy necessary files

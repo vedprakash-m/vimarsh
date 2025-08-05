@@ -22,13 +22,13 @@
   },
   "account_status": "active",
   "created_at": "2025-07-30T08:20:21.330483",
-  "last_login": "2025-08-05T07:49:41.206006",
-  "last_activity": "2025-08-05T07:49:41.206011",
+  "last_login": "2025-08-05T09:33:03.468490",
+  "last_activity": "2025-08-05T09:33:03.468493",
   "usage_stats": {
     "total_sessions": 0,
-    "total_queries": 6,
-    "total_tokens": 1050,
-    "total_cost_usd": 0.13799999999999998,
+    "total_queries": 8,
+    "total_tokens": 1400,
+    "total_cost_usd": 0.18399999999999997,
     "avg_session_duration": 0,
     "favorite_personalities": [
       "krishna"
@@ -37,6 +37,20 @@
     "monthly_usage": {}
   },
   "recent_activity": [
+    {
+      "timestamp": "2025-08-05T09:33:03.467387",
+      "query": "What is the meaning of dharma?",
+      "personality": "krishna",
+      "rating": null,
+      "bookmarked": false
+    },
+    {
+      "timestamp": "2025-08-05T09:29:53.243565",
+      "query": "What is the meaning of dharma?",
+      "personality": "krishna",
+      "rating": null,
+      "bookmarked": false
+    },
     {
       "timestamp": "2025-08-05T07:49:41.204506",
       "query": "What is the meaning of dharma?",
@@ -158,6 +172,34 @@
       "response": "Dharma represents righteous duty and moral law in Hindu philosophy. It is the principle of natural order that regulates and coordinates the operation of the universe and everything within it....",
       "personality": "krishna",
       "bookmarked_at": "2025-08-05T07:49:41.205213",
+      "tags": [
+        "dharma",
+        "philosophy",
+        "hindu"
+      ],
+      "notes": "Great explanation for meditation practice"
+    },
+    {
+      "bookmark_id": "ab09fcea-ab62-4b18-b51e-86de9cf8c7a7",
+      "title": "Understanding Dharma",
+      "query": "What is the meaning of dharma?",
+      "response": "Dharma represents righteous duty and moral law in Hindu philosophy. It is the principle of natural order that regulates and coordinates the operation of the universe and everything within it....",
+      "personality": "krishna",
+      "bookmarked_at": "2025-08-05T09:29:53.244041",
+      "tags": [
+        "dharma",
+        "philosophy",
+        "hindu"
+      ],
+      "notes": "Great explanation for meditation practice"
+    },
+    {
+      "bookmark_id": "819057e7-15df-46a6-80d2-801012e87fb6",
+      "title": "Understanding Dharma",
+      "query": "What is the meaning of dharma?",
+      "response": "Dharma represents righteous duty and moral law in Hindu philosophy. It is the principle of natural order that regulates and coordinates the operation of the universe and everything within it....",
+      "personality": "krishna",
+      "bookmarked_at": "2025-08-05T09:33:03.467866",
       "tags": [
         "dharma",
         "philosophy",
