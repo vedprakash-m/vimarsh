@@ -47,11 +47,24 @@ class UnifiedAuthService:
     
     def _get_auth_mode(self) -> AuthenticationMode:
         """Determine authentication mode from environment"""
-        mode_str = os.getenv("AUTH_MODE", "development").lower()
-        try:
-            return AuthenticationMode(mode_str)
-        except ValueError:
-            logger.warning(f"⚠️ Invalid AUTH_MODE '{mode_str}', defaulting to development")
+        # Auto-detect production mode based on environment
+        environment = os.getenv("ENVIRONMENT", "").lower()
+        azure_env = os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "").lower()
+        
+        # If explicitly set, use that
+        mode_str = os.getenv("AUTH_MODE", "").lower()
+        if mode_str:
+            try:
+                return AuthenticationMode(mode_str)
+            except ValueError:
+                logger.warning(f"⚠️ Invalid AUTH_MODE '{mode_str}', defaulting to auto-detection")
+        
+        # Auto-detect: use production if we're in Azure production environment
+        if environment == "production" or azure_env == "production":
+            logger.info("🔐 Auto-detected production environment, using production authentication")
+            return AuthenticationMode.PRODUCTION
+        else:
+            logger.info("🔧 Auto-detected development environment, using development authentication")
             return AuthenticationMode.DEVELOPMENT
     
     def _get_auth_enabled(self) -> bool:
