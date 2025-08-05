@@ -69,8 +69,15 @@ class UnifiedAuthService:
     
     def _get_auth_enabled(self) -> bool:
         """Check if authentication is enabled"""
+        # Check explicit ENABLE_AUTH setting
         enabled = os.getenv("ENABLE_AUTH", "false").lower() == "true"
-        return enabled or self.mode == AuthenticationMode.PRODUCTION
+        
+        # Also enable auth if we're in a production environment
+        environment = os.getenv("ENVIRONMENT", "").lower()
+        azure_env = os.getenv("AZURE_FUNCTIONS_ENVIRONMENT", "").lower()
+        is_production = environment == "production" or azure_env == "production"
+        
+        return enabled or is_production
     
     def authenticate_request(self, req: HttpRequest) -> Optional[AuthenticatedUser]:
         """
