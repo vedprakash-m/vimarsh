@@ -166,7 +166,7 @@ class UserProfileService:
             cosmos_endpoint = os.getenv("COSMOS_DB_ENDPOINT")
             cosmos_key = os.getenv("COSMOS_DB_KEY")
             cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING") or os.getenv("COSMOS_CONNECTION_STRING")
-            database_name = os.getenv("AZURE_COSMOS_DATABASE_NAME") or os.getenv("COSMOS_DB_NAME") or os.getenv("COSMOS_DATABASE_NAME", "vimarsh-db")
+            database_name = os.getenv("AZURE_COSMOS_DATABASE_NAME") or os.getenv("COSMOS_DB_NAME") or os.getenv("COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
             
             if not cosmos_endpoint and not cosmos_connection_string:
                 logger.warning("📁 No Cosmos DB configuration found - using local storage")
@@ -189,14 +189,14 @@ class UserProfileService:
                 self.cosmos_client = CosmosClient(cosmos_endpoint, credential)
                 logger.info("🔐 Connected to Cosmos DB with managed identity")
             
-            # Get database and containers
+            # Get database and containers - Updated for new 11-container architecture
             self.database = self.cosmos_client.get_database_client(database_name)
-            self.users_container = self.database.get_container_client("users")
-            self.activity_container = self.database.get_container_client("user_activity")
+            self.users_container = self.database.get_container_client("user_profiles")  # Updated container name
+            self.activity_container = self.database.get_container_client("user_activity")  # Updated container name
             
             logger.info("✅ Cosmos DB containers connected successfully")
             logger.info(f"   Database: {database_name}")
-            logger.info("   Containers: users, user_activity")
+            logger.info("   Containers: user_profiles, user_activity")
             
         except Exception as e:
             logger.error(f"❌ Failed to connect to Cosmos DB: {e}")
@@ -291,7 +291,7 @@ class UserProfileService:
     async def _find_user_cosmos(self, auth_id: str) -> Optional[UserDocument]:
         """Find user in Cosmos DB by auth_id"""
         try:
-            query = "SELECT * FROM users u WHERE u.auth_id = @auth_id"
+            query = "SELECT * FROM user_profiles u WHERE u.auth_id = @auth_id"
             parameters = [{"name": "@auth_id", "value": auth_id}]
             
             items = list(self.users_container.query_items(

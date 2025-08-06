@@ -134,7 +134,7 @@ python scripts/setup_production.py
 ├── HistoricalTexts - Leadership and governance documents (Lincoln, Chanakya, Confucius)
 ├── PhilosophicalTexts - Wisdom literature (Marcus Aurelius, Lao Tzu)
 ├── ScientificWorks - Scientific papers and research (Einstein, Newton, Tesla)
-└── SacredScriptures - Foundational spiritual texts (Krishna, Buddha, Jesus, Rumi)
+└── SacredScriptures - Foundational texts (Krishna, Buddha, Jesus, Rumi)
 
 🔧 Infrastructure Layer (Azure Cloud)
 ├── Unified Resource Management - Simplified cost optimization

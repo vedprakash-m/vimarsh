@@ -16,7 +16,7 @@ try:
         DailyAnalyticsSummary, model_to_dict, 
         dict_to_model, generate_analytics_id
     )
-    from services.database_service import DatabaseService
+    from services.database_service import database_service  # Updated import
     from services.cache_service import CacheService
 except ImportError as e:
     logging.warning(f"Import warning in analytics_service: {e}")
@@ -32,8 +32,8 @@ class AnalyticsService:
     
     def __init__(self):
         """Initialize analytics service"""
-        self.db_service = DatabaseService()
-        self.cache_service = CacheService()
+        self.db_service = database_service  # Updated to use global instance
+        self.cache_service = CacheService() if 'CacheService' in globals() else None
         
         # Local storage for development
         self.local_storage_path = "data/analytics"

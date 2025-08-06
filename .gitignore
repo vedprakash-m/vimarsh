@@ -431,7 +431,7 @@ $RECYCLE.BIN/
 .archives/
 .archive/
 
-# Spiritual texts and data (large files, will be handled separately)
+# Foundational texts and data (large files, will be handled separately)
 data/sources/
 data/processed/
 data/vectors/

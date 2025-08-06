@@ -85,9 +85,14 @@ class DatabaseStats:
     failed_embeddings: int
 
 class VectorDatabaseService:
-    """Enhanced vector database service for multi-personality system"""
+    """Enhanced vector database service for multi-personality system - UPDATED FOR NEW ARCHITECTURE"""
     
     def __init__(self):
+        # Updated for new 11-container architecture
+        self.cosmos_db_name = "vimarsh-multi-personality"
+        self.container_name = "personality_vectors"  # Updated from "personality-vectors"
+        self.partition_strategy = "hierarchical"     # New hierarchical partition strategy
+        
         self.cosmos_client = None
         self.database = None
         self.container = None
@@ -357,6 +362,98 @@ class VectorDatabaseService:
             
         except Exception as e:
             logger.error(f"❌ Semantic search failed: {e}")
+            return []
+    
+    async def search_vectors_by_personality(self, query: str, personality_id: str, limit: int = 10) -> List[SearchResult]:
+        """
+        Optimized search using new hierarchical partition key strategy.
+        Searches within a specific personality partition for better performance.
+        """
+        try:
+            if not self.embedding_model or not self.container:
+                logger.error("❌ Embedding model or database not available")
+                return []
+            
+            # Generate query embedding
+            query_embedding = self.embedding_model.encode(query)
+            if hasattr(query_embedding, 'tolist'):
+                query_embedding = query_embedding.tolist()
+            elif not isinstance(query_embedding, list):
+                query_embedding = list(query_embedding)
+            
+            # Use new partition key aware query for better performance
+            sql_query = """
+            SELECT c.id, c.content, c.source, c.citation, c.embedding, c.personality_id, c.partition_key
+            FROM c 
+            WHERE c.personality_id = @personality_id
+            ORDER BY VectorDistance(c.embedding, @query_embedding)
+            OFFSET 0 LIMIT @limit
+            """
+            
+            parameters = [
+                {"name": "@personality_id", "value": personality_id},
+                {"name": "@query_embedding", "value": query_embedding},
+                {"name": "@limit", "value": limit}
+            ]
+            
+            # Execute optimized query
+            items = list(self.container.query_items(
+                query=sql_query,
+                parameters=parameters,
+                enable_cross_partition_query=False  # More efficient with partition key
+            ))
+            
+            # Process results
+            results = []
+            for item in items:
+                if not item.get('embedding'):
+                    continue
+                
+                # Calculate similarity score
+                doc_embedding = np.array(item['embedding'])
+                query_embedding_np = np.array(query_embedding)
+                
+                similarity = np.dot(doc_embedding, query_embedding_np) / (
+                    np.linalg.norm(doc_embedding) * np.linalg.norm(query_embedding_np)
+                )
+                
+                # Create search result with updated schema
+                vector_doc = VectorDocument(
+                    id=item['id'],
+                    content=item.get('content', ''),
+                    personality=PersonalityType(personality_id) if personality_id in [p.value for p in PersonalityType] else PersonalityType.KRISHNA,
+                    content_type=ContentType(item.get('content_type', 'verse')),
+                    source=item.get('source', ''),
+                    title=item.get('title'),
+                    chapter=item.get('chapter'),
+                    verse=item.get('verse'),
+                    sanskrit=item.get('sanskrit'),
+                    translation=item.get('translation'),
+                    citation=item.get('citation', ''),
+                    category=item.get('category', 'general'),
+                    language=item.get('language', 'English'),
+                    embedding=item.get('embedding'),
+                    relevance_score=float(similarity)
+                )
+                
+                search_result = SearchResult(
+                    document=vector_doc,
+                    relevance_score=float(similarity),
+                    personality_match=True,
+                    content_type_match=True,
+                    query_embedding=query_embedding
+                )
+                
+                results.append(search_result)
+            
+            # Sort by relevance
+            results.sort(key=lambda x: x.relevance_score, reverse=True)
+            
+            logger.info(f"✅ Found {len(results)} results for personality {personality_id}")
+            return results
+            
+        except Exception as e:
+            logger.error(f"❌ Vector search failed: {e}")
             return []
     
     async def get_database_stats(self) -> DatabaseStats:

@@ -144,10 +144,28 @@ class DatabaseService:
     """Database service aligned with production Cosmos DB setup"""
     
     def __init__(self):
-        # Production Cosmos DB configuration
-        self.cosmos_db_name = "vimarsh-multi-personality"  # Updated DB name
-        self.spiritual_texts_container = "personality-vectors"  # Updated container name
-        self.conversations_container = "conversations"  # Production container
+        # Production Cosmos DB configuration - UPDATED FOR NEW ARCHITECTURE
+        self.cosmos_db_name = "vimarsh-multi-personality"
+        
+        # Updated container references for new 11-container architecture
+        self.containers = {
+            "users": "users",
+            "user_sessions": "user_sessions", 
+            "user_interactions": "user_interactions",
+            "personalities": "personalities",
+            "personality_vectors": "personality_vectors",  # Updated from "personality-vectors"
+            "user_analytics": "user_analytics",
+            "content_analytics": "content_analytics",
+            "daily_metrics": "daily_metrics",
+            "abuse_incidents": "abuse_incidents",
+            "engagement_summary": "engagement_summary",
+            "content_popularity": "content_popularity",
+            "incidents_by_content": "incidents_by_content"
+        }
+        
+        # Legacy container names for backward compatibility during transition
+        self.spiritual_texts_container = "personality_vectors"  # Updated to new name
+        self.conversations_container = "user_interactions"  # Updated to new structure
         
         # Local development storage paths
         self.storage_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'vimarsh-db')

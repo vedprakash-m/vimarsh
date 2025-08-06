@@ -1332,6 +1332,22 @@ from admin.admin_endpoints import (
     admin_system_health
 )
 
+# Import enhanced admin endpoints
+try:
+    from admin.enhanced_admin_endpoints import (
+        enhanced_admin_cost_dashboard,
+        admin_detailed_users_endpoint,
+        admin_personality_analytics_endpoint,
+        admin_abuse_prevention_endpoint,
+        admin_content_management_endpoint,
+        admin_personality_management_endpoint
+    )
+    ENHANCED_ADMIN_AVAILABLE = True
+    logger.info("✅ Enhanced admin endpoints imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Enhanced admin endpoints not available: {e}")
+    ENHANCED_ADMIN_AVAILABLE = False
+
 @app.route(route="vimarsh-admin/role", methods=["GET"])
 async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin role check endpoint"""
@@ -1771,6 +1787,103 @@ async def admin_monitoring_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
             }
         )
+
+# Enhanced Admin Analytics Endpoints
+@app.route(route="vimarsh-admin/enhanced-dashboard", methods=["GET"])
+async def enhanced_admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin dashboard with comprehensive analytics"""
+    if not ENHANCED_ADMIN_AVAILABLE:
+        return func.HttpResponse(
+            json.dumps({"error": "Enhanced admin endpoints not available"}),
+            status_code=503,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+    
+    return await enhanced_admin_cost_dashboard(req)
+
+@app.route(route="vimarsh-admin/detailed-users", methods=["GET"])  
+async def enhanced_admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin user analytics endpoint"""
+    if not ENHANCED_ADMIN_AVAILABLE:
+        return func.HttpResponse(
+            json.dumps({"error": "Enhanced admin endpoints not available"}),
+            status_code=503,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+    
+    return await admin_detailed_users_endpoint(req)
+
+@app.route(route="vimarsh-admin/personality-analytics", methods=["GET"])
+async def enhanced_admin_personality_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin personality analytics endpoint"""
+    if not ENHANCED_ADMIN_AVAILABLE:
+        return func.HttpResponse(
+            json.dumps({"error": "Enhanced admin endpoints not available"}),
+            status_code=503,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+    
+    return await admin_personality_analytics_endpoint(req)
+
+@app.route(route="vimarsh-admin/abuse-prevention", methods=["GET"])
+async def enhanced_admin_abuse_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin abuse prevention endpoint"""
+    if not ENHANCED_ADMIN_AVAILABLE:
+        return func.HttpResponse(
+            json.dumps({"error": "Enhanced admin endpoints not available"}),
+            status_code=503,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+    
+    return await admin_abuse_prevention_endpoint(req)
+
+@app.route(route="vimarsh-admin/content-management", methods=["GET"])
+async def enhanced_admin_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin content management endpoint"""
+    if not ENHANCED_ADMIN_AVAILABLE:
+        return func.HttpResponse(
+            json.dumps({"error": "Enhanced admin endpoints not available"}),
+            status_code=503,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+    
+    return await admin_content_management_endpoint(req)
+
+@app.route(route="vimarsh-admin/personality-management", methods=["GET"])
+async def enhanced_admin_personality_mgmt_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin personality management endpoint"""
+    if not ENHANCED_ADMIN_AVAILABLE:
+        return func.HttpResponse(
+            json.dumps({"error": "Enhanced admin endpoints not available"}),
+            status_code=503,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+    
+    return await admin_personality_management_endpoint(req)
 
 @app.route(route="vimarsh-admin/diagnostic", methods=["GET"])
 async def admin_diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
