@@ -146,7 +146,8 @@ class UserProfileService:
         self.cosmos_client = None
         self.database = None
         self.users_container = None
-        self.activity_container = None
+        self.sessions_container = None
+        self.interactions_container = None
         self.local_storage_path = "data/vimarsh-db"
         
         # Initialize connection
@@ -191,12 +192,13 @@ class UserProfileService:
             
             # Get database and containers - Updated for new 11-container architecture
             self.database = self.cosmos_client.get_database_client(database_name)
-            self.users_container = self.database.get_container_client("user_profiles")  # Updated container name
-            self.activity_container = self.database.get_container_client("user_activity")  # Updated container name
+            self.users_container = self.database.get_container_client("users")  # Fixed: users not user_profiles
+            self.sessions_container = self.database.get_container_client("user_sessions")  # New: sessions container
+            self.interactions_container = self.database.get_container_client("user_interactions")  # New: interactions container
             
             logger.info("✅ Cosmos DB containers connected successfully")
             logger.info(f"   Database: {database_name}")
-            logger.info("   Containers: user_profiles, user_activity")
+            logger.info("   Containers: users, user_sessions, user_interactions")
             
         except Exception as e:
             logger.error(f"❌ Failed to connect to Cosmos DB: {e}")
@@ -207,7 +209,8 @@ class UserProfileService:
     def _ensure_local_directories(self):
         """Create local storage directories"""
         os.makedirs(f"{self.local_storage_path}/users", exist_ok=True)
-        os.makedirs(f"{self.local_storage_path}/user_activity", exist_ok=True)
+        os.makedirs(f"{self.local_storage_path}/user_sessions", exist_ok=True)
+        os.makedirs(f"{self.local_storage_path}/user_interactions", exist_ok=True)
     
     async def get_or_create_user_profile(self, auth_user: AuthenticatedUser) -> UserDocument:
         """
@@ -302,6 +305,12 @@ class UserProfileService:
             
             if items:
                 user_data = items[0]
+                
+                # Remove Cosmos DB metadata fields
+                cosmos_fields = ['_rid', '_self', '_etag', '_attachments', '_ts']
+                for field in cosmos_fields:
+                    user_data.pop(field, None)
+                
                 # Convert datetime strings back to datetime objects
                 if isinstance(user_data.get('created_at'), str):
                     user_data['created_at'] = datetime.fromisoformat(user_data['created_at'].replace('Z', '+00:00'))
@@ -403,31 +412,41 @@ class UserProfileService:
             interaction_data: Interaction details
         """
         try:
-            # Create interaction activity document
-            interaction_doc = UserActivityDocument(
-                id=str(uuid.uuid4()),
-                partition_key=user_id,
-                document_type=DocumentType.INTERACTION.value,
-                user_id=user_id,
-                interaction_data={
-                    "session_id": session_id,
-                    "sequence": interaction_data.get("sequence", 1),
-                    "user_query": interaction_data.get("query", ""),
-                    "personality_used": interaction_data.get("personality", "krishna"),
-                    "response_text": interaction_data.get("response", ""),
-                    "response_time_ms": interaction_data.get("response_time_ms", 0),
+            # Ensure session exists (create if not exists)
+            await self._ensure_session_exists(user_id, session_id)
+            
+            # Create interaction document for user_interactions container
+            interaction_doc = {
+                "id": str(uuid.uuid4()),
+                "partition_key": user_id,
+                "user_id": user_id,
+                "document_type": "user_interaction",
+                "interaction_id": str(uuid.uuid4()),
+                "session_id": session_id,
+                "timestamp": datetime.utcnow().isoformat(),
+                "personality_id": interaction_data.get("personality", "krishna"),
+                "interaction_type": "chat",
+                "user_input": interaction_data.get("query", ""),
+                "ai_response": interaction_data.get("response", ""),
+                "response_time_ms": interaction_data.get("response_time_ms", 0),
+                "user_feedback": interaction_data.get("rating"),
+                "feedback_rating": interaction_data.get("rating"),
+                "content_flags": [],
+                "context_data": {
                     "model_used": interaction_data.get("model", "gemini-flash"),
                     "input_tokens": interaction_data.get("input_tokens", 0),
                     "output_tokens": interaction_data.get("output_tokens", 0),
                     "cost_usd": interaction_data.get("cost_usd", 0.0),
-                    "user_rating": interaction_data.get("rating"),
                     "was_bookmarked": interaction_data.get("bookmarked", False),
                     "content_themes": interaction_data.get("themes", [])
-                }
-            )
+                },
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat(),
+                "_ttl": 15552000  # 180 days
+            }
             
-            # Save interaction to activity container
-            await self._save_activity_document(interaction_doc)
+            # Save interaction to user_interactions container
+            await self._save_interaction_document(interaction_doc)
             
             # Update user's aggregated stats and recent activity
             await self._update_user_stats(user_id, interaction_data)
@@ -443,63 +462,147 @@ class UserProfileService:
         session_id = str(uuid.uuid4())
         
         try:
-            session_doc = UserActivityDocument(
-                id=str(uuid.uuid4()),
-                partition_key=user_id,
-                document_type=DocumentType.SESSION.value,
-                user_id=user_id,
-                session_data={
-                    "session_id": session_id,
-                    "start_time": datetime.utcnow().isoformat(),
-                    "status": "active"
-                }
-            )
+            session_doc = {
+                "id": str(uuid.uuid4()),
+                "partition_key": user_id,
+                "user_id": user_id,
+                "document_type": "user_session",
+                "session_id": session_id,
+                "start_time": datetime.utcnow().isoformat(),
+                "end_time": None,
+                "duration_seconds": None,
+                "platform": "web",
+                "device_info": {},
+                "location": None,
+                "ip_address": None,
+                "user_agent": None,
+                "interactions_count": 0,
+                "session_quality": "active",
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat(),
+                "_ttl": 7776000  # 90 days
+            }
             
-            await self._save_activity_document(session_doc)
+            await self._save_session_document(session_doc)
             logger.info(f"🎯 Started session {session_id} for user {user_id}")
             return session_id
             
         except Exception as e:
             logger.error(f"❌ Error starting session: {e}")
             return session_id  # Return session_id even if recording fails
-    
-    async def _save_activity_document(self, activity_doc: UserActivityDocument):
-        """Save activity document to storage"""
-        if self.cosmos_client:
-            await self._save_activity_cosmos(activity_doc)
-        else:
-            await self._save_activity_local(activity_doc)
-    
-    async def _save_activity_cosmos(self, activity_doc: UserActivityDocument):
-        """Save activity document to Cosmos DB"""
+
+    async def _ensure_session_exists(self, user_id: str, session_id: str):
+        """Ensure a session document exists, create if not"""
         try:
-            activity_dict = asdict(activity_doc)
-            
-            # Convert datetime to ISO string
-            if isinstance(activity_dict.get('timestamp'), datetime):
-                activity_dict['timestamp'] = activity_dict['timestamp'].isoformat()
-            
-            self.activity_container.upsert_item(activity_dict)
-            
+            if self.cosmos_client:
+                # Try to find existing session
+                query = f"SELECT * FROM c WHERE c.user_id = '{user_id}' AND c.session_id = '{session_id}'"
+                existing_sessions = list(self.sessions_container.query_items(
+                    query=query,
+                    enable_cross_partition_query=True,
+                    max_item_count=1
+                ))
+                
+                if not existing_sessions:
+                    # Create new session
+                    session_doc = {
+                        "id": str(uuid.uuid4()),
+                        "partition_key": user_id,
+                        "user_id": user_id,
+                        "document_type": "user_session",
+                        "session_id": session_id,
+                        "start_time": datetime.utcnow().isoformat(),
+                        "end_time": None,
+                        "duration_seconds": None,
+                        "platform": "web",
+                        "device_info": {},
+                        "location": None,
+                        "ip_address": None,
+                        "user_agent": None,
+                        "interactions_count": 0,
+                        "session_quality": "active",
+                        "created_at": datetime.utcnow().isoformat(),
+                        "updated_at": datetime.utcnow().isoformat(),
+                        "_ttl": 7776000  # 90 days
+                    }
+                    await self._save_session_document(session_doc)
+                    logger.info(f"🆕 Created session {session_id} for user {user_id}")
+                else:
+                    logger.debug(f"📋 Session {session_id} already exists for user {user_id}")
+            else:
+                # For local storage, always create session file if it doesn't exist
+                session_file = f"{self.local_storage_path}/user_sessions/{session_id}.json"
+                if not os.path.exists(session_file):
+                    session_doc = {
+                        "id": str(uuid.uuid4()),
+                        "partition_key": user_id,
+                        "user_id": user_id,
+                        "document_type": "user_session",
+                        "session_id": session_id,
+                        "start_time": datetime.utcnow().isoformat(),
+                        "platform": "web",
+                        "interactions_count": 0,
+                        "session_quality": "active",
+                        "created_at": datetime.utcnow().isoformat(),
+                        "_ttl": 7776000
+                    }
+                    await self._save_session_document(session_doc)
+                    logger.info(f"🆕 Created local session {session_id} for user {user_id}")
+                    
         except Exception as e:
-            logger.error(f"❌ Error saving activity to Cosmos DB: {e}")
+            logger.warning(f"⚠️ Could not ensure session exists (non-critical): {e}")
+            # Don't fail the interaction if session creation fails
+
+    async def _save_session_document(self, session_doc: Dict[str, Any]):
+        """Save session document to user_sessions container"""
+        if self.cosmos_client:
+            await self._save_session_cosmos(session_doc)
+        else:
+            await self._save_session_local(session_doc)
+    
+    async def _save_session_cosmos(self, session_doc: Dict[str, Any]):
+        """Save session document to Cosmos DB"""
+        try:
+            self.sessions_container.upsert_item(session_doc)
+            logger.info(f"💾 Saved session to Cosmos DB: {session_doc['session_id']}")
+        except Exception as e:
+            logger.error(f"❌ Error saving session to Cosmos DB: {e}")
             raise
     
-    async def _save_activity_local(self, activity_doc: UserActivityDocument):
-        """Save activity document to local JSON storage"""
+    async def _save_session_local(self, session_doc: Dict[str, Any]):
+        """Save session document to local JSON storage"""
         try:
-            activity_dict = asdict(activity_doc)
-            
-            # Convert datetime to ISO string
-            if isinstance(activity_dict.get('timestamp'), datetime):
-                activity_dict['timestamp'] = activity_dict['timestamp'].isoformat()
-            
-            filepath = f"{self.local_storage_path}/user_activity/{activity_doc.id}.json"
+            filepath = f"{self.local_storage_path}/user_sessions/{session_doc['id']}.json"
             with open(filepath, 'w') as f:
-                json.dump(activity_dict, f, indent=2, default=str)
-                
+                json.dump(session_doc, f, indent=2, default=str)
         except Exception as e:
-            logger.error(f"❌ Error saving activity to local storage: {e}")
+            logger.error(f"❌ Error saving session to local storage: {e}")
+            raise
+
+    async def _save_interaction_document(self, interaction_doc: Dict[str, Any]):
+        """Save interaction document to user_interactions container"""
+        if self.cosmos_client:
+            await self._save_interaction_cosmos(interaction_doc)
+        else:
+            await self._save_interaction_local(interaction_doc)
+    
+    async def _save_interaction_cosmos(self, interaction_doc: Dict[str, Any]):
+        """Save interaction document to Cosmos DB"""
+        try:
+            self.interactions_container.upsert_item(interaction_doc)
+            logger.info(f"💾 Saved interaction to Cosmos DB: {interaction_doc['interaction_id']}")
+        except Exception as e:
+            logger.error(f"❌ Error saving interaction to Cosmos DB: {e}")
+            raise
+    
+    async def _save_interaction_local(self, interaction_doc: Dict[str, Any]):
+        """Save interaction document to local JSON storage"""
+        try:
+            filepath = f"{self.local_storage_path}/user_interactions/{interaction_doc['id']}.json"
+            with open(filepath, 'w') as f:
+                json.dump(interaction_doc, f, indent=2, default=str)
+        except Exception as e:
+            logger.error(f"❌ Error saving interaction to local storage: {e}")
             raise
     
     async def _update_user_stats(self, user_id: str, interaction_data: Dict[str, Any]):
@@ -551,6 +654,11 @@ class UserProfileService:
         if self.cosmos_client:
             try:
                 user_data = self.users_container.read_item(item=user_id, partition_key=user_id)
+                
+                # Remove Cosmos DB metadata fields
+                cosmos_fields = ['_rid', '_self', '_etag', '_attachments', '_ts']
+                for field in cosmos_fields:
+                    user_data.pop(field, None)
                 
                 # Convert datetime strings back to datetime objects
                 if isinstance(user_data.get('created_at'), str):
