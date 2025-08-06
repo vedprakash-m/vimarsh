@@ -211,27 +211,6 @@ const AdminDashboard: React.FC = () => {
       
       setStats(transformedStats);
       setError(null);
-        const transformedStats: SystemStats = {
-          totalUsers: apiData.system_usage?.total_users || 127,
-          activeUsers: apiData.system_usage?.active_users || 45,
-          totalCost: apiData.system_usage?.total_cost_usd || 2847.50,
-          totalTokens: apiData.system_usage?.total_tokens || 1205000,
-          totalTexts: apiData.system_usage?.total_texts || 343,
-          totalPersonalities: 8,
-          systemHealth: 'healthy',
-          lastUpdated: apiData.dashboard_generated || new Date().toISOString(),
-          userAnalytics: apiData.user_analytics,
-          personalityAnalytics: apiData.personality_analytics,
-          abusePreventionData: apiData.abuse_prevention
-        };
-        
-        // Store performance metrics separately
-        if (apiData.performance_metrics) {
-          setPerformanceMetrics(apiData.performance_metrics);
-        }
-        
-        setStats(transformedStats);
-        setError(null);
     } catch (err) {
       console.error('Error loading stats:', err);
       
@@ -610,7 +589,7 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
-
+  const renderSettings = () => (
     <div className="vimarsh-admin-dashboard">
       <div className="vimarsh-admin-header">
         <h1>System Settings</h1>
