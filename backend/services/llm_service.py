@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Enhanced Simple LLM Service - Refactored for production with lessons learned
+LLM Service - Production service for language model operations
 
-This combines the reliability of the simple service with the multi-personality 
-architecture of the enhanced service, incorporating all our optimization learnings.
+This combines reliability with multi-personality architecture, 
+incorporating optimization learnings for production deployment.
 """
 
 import os
@@ -47,42 +47,12 @@ class SpiritualResponse:
     max_allowed: int
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-class EnhancedSimpleLLMService:
-    """Enhanced LLM service with proper multi-personality support and optimized prompts"""
+class LLMService:
+    """Production LLM service for generating spiritual guidance responses"""
     
-    def __init__(self, api_key: Optional[str] = None):
-        """Initialize enhanced service with all personalities"""
-        # Get API key
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_AI_API_KEY")
-        
-        if not self.api_key:
-            logger.error("No GEMINI_API_KEY found!")
-            self.is_configured = False
-            return
-        
-        # Configure Gemini
-        try:
-            genai.configure(api_key=self.api_key)
-            
-            # Initialize model with optimized settings
-            self.model = genai.GenerativeModel(
-                model_name="gemini-2.5-flash",
-                generation_config={
-                    "temperature": 0.7,
-                    "top_p": 0.8,
-                    "top_k": 40,
-                }
-            )
-            
-            # Initialize personality configurations with learned optimizations
-            self._initialize_personalities()
-            
-            self.is_configured = True
-            logger.info("✅ Enhanced Simple LLM service configured successfully!")
-            
-        except Exception as e:
-            logger.error(f"❌ Failed to configure Enhanced LLM service: {e}")
-            self.is_configured = False
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.api_key = os.environ.get('GEMINI_API_KEY')
     
     def _initialize_personalities(self):
         """Initialize all personality configurations with standardized 500 character limit"""

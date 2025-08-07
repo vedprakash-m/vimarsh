@@ -1,5 +1,5 @@
 """
-Simple RAG Service - Phase 6b Implementation
+RAG Service - Phase 6b Implementation
 
 This service provides basic RAG functionality using local JSON files
 until the full vector database migration is complete. It provides:
