@@ -231,16 +231,14 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
 def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced admin role endpoint with service status and proper authentication"""
     try:
-        # Extract user email from headers (set by frontend authentication)
-        user_email = req.headers.get('x-user-email') or req.headers.get('X-User-Email')
+        # Import MSAL token validator
+        from auth.msal_token_validator import msal_validator
         
-        # Also try to extract from Authorization header if MSAL token is provided
-        if not user_email:
-            auth_header = req.headers.get('Authorization', '')
-            if auth_header.startswith('Bearer '):
-                # For production, we should decode the MSAL token
-                # For now, we'll extract email from header or default to None
-                user_email = None
+        # Extract user email using comprehensive validation
+        user_email = msal_validator.extract_user_email_from_request(req)
+        user_context = msal_validator.get_user_context(req)
+        
+        logger.info(f"🔐 Admin role check for user: {user_email} (source: {user_context.get('source', 'unknown')})")
         
         # Use admin service if available, otherwise fallback
         if admin_service:
@@ -252,6 +250,8 @@ def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "admin_service": True,
                 "architecture": "modular"
             }
+            # Add authentication context
+            response_data["auth_context"] = user_context
         else:
             # Fallback without admin service - should not give admin access to unknown users
             response_data = {
@@ -264,6 +264,7 @@ def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     "admin_service": False,
                     "architecture": "modular"
                 },
+                "auth_context": user_context,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "warning": "Admin service unavailable - defaulting to user role"
             }
