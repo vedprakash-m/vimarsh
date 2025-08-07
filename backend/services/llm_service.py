@@ -53,6 +53,16 @@ class LLMService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.api_key = os.environ.get('GEMINI_API_KEY')
+        self.is_configured = bool(self.api_key)  # Check if API key is available
+        
+        # Initialize Gemini model if configured
+        if self.is_configured:
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
+        else:
+            self.model = None
+            
+        self._initialize_personalities()
     
     def _initialize_personalities(self):
         """Initialize all personality configurations with standardized 500 character limit"""
@@ -460,6 +470,8 @@ Response:"""
     
     async def _generate_gemini_response(self, prompt: str):
         """Generate response from Gemini API with async wrapper"""
+        if not self.model:
+            raise RuntimeError("Gemini model not configured")
         # Wrap the synchronous Gemini call in an async context
         return await asyncio.get_event_loop().run_in_executor(
             None, 

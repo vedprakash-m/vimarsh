@@ -149,9 +149,9 @@ async def test_content_personality_association():
         
         if result.chunks:
             chunk = result.chunks[0]
-            print(f"   Quality: {chunk:.1f}")
+            print(f"   Quality: {chunk.quality_score:.1f}")
             print(f"   Key terms: {chunk.key_terms[:3]}")
-            print(f"   Associated personalities: {[p.display_name for p in domain_personalities.get(domain, [])]}")
+            print(f"   Associated personalities: {[p.get('name', p.get('id', 'Unknown')) for p in domain_personalities.get(domain, [])]}")
 
 async def test_cross_domain_content():
     """Test how the system handles content that spans multiple domains"""
@@ -181,7 +181,7 @@ async def test_cross_domain_content():
         
         if result.chunks:
             chunk = result.chunks[0]
-            print(f"   Quality: {chunk:.1f}")
+            print(f"   Quality: {chunk.quality_score:.1f}")
             print(f"   Key terms: {chunk.key_terms[:4]}")
             print(f"   Domain-specific processing: {chunk.chunk_type}")
 
