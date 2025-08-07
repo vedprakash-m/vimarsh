@@ -228,21 +228,33 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 @app.route(route="vimarsh-admin/role", methods=["GET"])
-def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced admin role endpoint with service status and proper authentication"""
     try:
-        # Import MSAL token validator
-        from auth.msal_token_validator import msal_validator
+        # Import working auth service (from backup version)
+        from auth.unified_auth_service import UnifiedAuthService
+        from services.admin_service import AdminService
         
-        # Extract user email using comprehensive validation
-        user_email = msal_validator.extract_user_email_from_request(req)
-        user_context = msal_validator.get_user_context(req)
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
         
-        logger.info(f"🔐 Admin role check for user: {user_email} (source: {user_context.get('source', 'unknown')})")
+        if not authenticated_user:
+            logger.warning("🚫 No authenticated user found")
+            return func.HttpResponse(
+                json.dumps({
+                    "error": "Authentication required",
+                    "message": "Valid access token must be provided",
+                    "code": "UNAUTHORIZED"
+                }),
+                status_code=401,
+                headers=get_cors_headers()
+            )
         
-        # Use admin service if available, otherwise fallback
+        logger.info(f"🔐 Admin role check for user: {authenticated_user.email}")
+        
+        # Use admin service if available, otherwise fallback to basic role check
         if admin_service:
-            response_data = admin_service.get_user_role(user_email=user_email)
+            response_data = admin_service.get_user_role(user_email=authenticated_user.email)
             # Add service status information
             response_data["service_status"] = {
                 "personality_models": personality_models_available,
@@ -251,22 +263,35 @@ def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "architecture": "modular"
             }
             # Add authentication context
-            response_data["auth_context"] = user_context
+            response_data["auth_context"] = {
+                "source": "unified_auth_service",
+                "email": authenticated_user.email,
+                "authenticated": True
+            }
         else:
-            # Fallback without admin service - should not give admin access to unknown users
+            # Fallback without admin service - check environment variables directly
+            import os
+            admin_emails = os.getenv('ADMIN_EMAILS', 'vedprakash.m@outlook.com').split(',')
+            is_admin = authenticated_user.email.strip().lower() in [email.strip().lower() for email in admin_emails]
+            
             response_data = {
-                "role": "user",  # Changed from "admin" to "user" - security fix!
-                "permissions": ["read"],  # Changed from admin permissions
-                "user_email": user_email or "anonymous",
+                "role": "admin" if is_admin else "user",
+                "permissions": ["read", "write", "admin"] if is_admin else ["read"],
+                "user_email": authenticated_user.email,
+                "user_id": authenticated_user.id,
                 "service_status": {
                     "personality_models": personality_models_available,
                     "personality_service": personality_service_available,
                     "admin_service": False,
                     "architecture": "modular"
                 },
-                "auth_context": user_context,
+                "auth_context": {
+                    "source": "unified_auth_service",
+                    "email": authenticated_user.email,
+                    "authenticated": True
+                },
                 "timestamp": datetime.now(timezone.utc).isoformat(),
-                "warning": "Admin service unavailable - defaulting to user role"
+                "warning": "Admin service unavailable - using environment variable check"
             }
         
         return func.HttpResponse(
