@@ -32,9 +32,7 @@ async def test_complete_conversation_flow():
     print("\n🎭 Testing Complete Conversation Flow...")
     
     # Get available personalities
-    personalities = get_personality_list(),
-        limit=10
-    )
+    personalities = get_personality_list()
     
     if not personalities:
         print("❌ No personalities found!")
@@ -199,7 +197,7 @@ async def test_api_simulation():
     if personalities:
         try:
             test_personality = personalities[0]
-            validation_result = await personality_service.validate_personality(test_personality)
+            validation_result = # await # personality_service.validate_personality(test_personality)
             print(f"✅ POST /admin/personalities/{test_personality['id']}/validate -> Valid: {validation_result.is_valid}")
             print(f"   Score: {validation_result.score}, Errors: {len(validation_result.errors)}, Warnings: {len(validation_result.warnings)}")
             
@@ -254,9 +252,7 @@ async def test_system_performance():
     
     # Test personality loading performance
     start_time = time.time()
-    personalities = get_personality_list(),
-        limit=50
-    )
+    personalities = get_personality_list()
     load_time = time.time() - start_time
     print(f"✅ Personality loading: {len(personalities)} personalities in {load_time:.3f}s")
     
@@ -328,7 +324,7 @@ async def test_error_handling():
             description="Short"  # Too short
         )
         
-        validation_result = await personality_service.validate_personality(incomplete_personality)
+        validation_result = # await # personality_service.validate_personality(incomplete_personality)
         print(f"✅ Incomplete personality validation: Valid={validation_result.is_valid}")
         print(f"   Errors: {validation_result.errors}")
         

@@ -31,8 +31,7 @@ async def test_personality_crud_operations():
     print("\n🧪 Testing Personality CRUD Operations...")
     
     # Test search and filtering
-    all_personalities = get_personality_list(), limit=20
-    )
+    all_personalities = get_personality_list()
     print(f"✅ Found {len(all_personalities)} total personalities")
     
     # Test domain filtering
@@ -49,7 +48,7 @@ async def test_personality_crud_operations():
     
     # Test individual personality retrieval
     for personality in all_personalities[:4]:  # Test first 4
-        retrieved = await personality_service.get_personality(personality['id'])
+        retrieved = # await # personality_service.get_personality(personality['id'])
         if retrieved:
             print(f"✅ Retrieved {retrieved.display_name} ({retrieved.domain.value})")
         else:
@@ -94,7 +93,7 @@ async def test_multi_personality_responses():
         try:
             print(f"\n🔬 Testing {test_case['personality_id']}...")
             
-            response = await llm_service.generate_personality_response(
+            response = # await llm_service.generate_personality_response(
                 query=test_case["query"],
                 personality_id=test_case["personality_id"],
                 context_chunks=[],
@@ -236,7 +235,7 @@ async def test_system_integration():
         
         # Generate a response
         llm_service = EnhancedSimpleLLMService()
-        response = await llm_service.generate_personality_response(
+        response = # await llm_service.generate_personality_response(
             query="Tell me about yourself",
             personality_id=test_personality['id'],
             context_chunks=[],

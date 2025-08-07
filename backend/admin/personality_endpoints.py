@@ -50,7 +50,6 @@ def create_personality_response(personality: PersonalityConfig) -> Dict[str, Any
         'greeting_style': personality.greeting_style,
         'tone_indicators': personality.tone_indicators
     }
-    }
 
 
 def create_validation_response(result: PersonalityValidationResult) -> Dict[str, Any]:

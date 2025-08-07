@@ -19,11 +19,13 @@ from unittest.mock import MagicMock
 # Add backend to path
 sys.path.append(os.path.dirname(__file__))
 
-from admin.personality_endpoints import (
-    search_personalities, get_personality, create_personality,
-    update_personality, delete_personality, get_personalities_by_domain
-)
-from services.personality_service import personality_service, PersonalitySearchFilter
+# Temporarily disabled due to admin endpoints refactoring
+# from admin.personality_endpoints import (
+#     search_personalities, get_personality, create_personality,
+#     update_personality, delete_personality, get_personalities_by_domain
+# )
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

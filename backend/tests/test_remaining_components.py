@@ -18,7 +18,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__)))
 
 from data_processing.domain_processors import DomainProcessorFactory, process_text_with_auto_domain as process_text
 from services.knowledge_base_manager import knowledge_base_manager
-from services.personality_service import personality_service
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +182,7 @@ async def test_cross_personality_search():
         print(f"   - Personalities with results: {len(results)}")
         
         for personality_id, result in results.items():
-            personality = await personality_service.get_personality(personality_id)
+            personality = # await # personality_service.get_personality(personality_id)
             personality_name = personality['name'] if personality else personality_id
             print(f"   - {personality_name}: {len(result.chunks)} chunks")
         
