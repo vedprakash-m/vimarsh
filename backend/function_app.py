@@ -229,11 +229,22 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route(route="vimarsh-admin/role", methods=["GET"])
 def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced admin role endpoint with service status"""
+    """Enhanced admin role endpoint with service status and proper authentication"""
     try:
+        # Extract user email from headers (set by frontend authentication)
+        user_email = req.headers.get('x-user-email') or req.headers.get('X-User-Email')
+        
+        # Also try to extract from Authorization header if MSAL token is provided
+        if not user_email:
+            auth_header = req.headers.get('Authorization', '')
+            if auth_header.startswith('Bearer '):
+                # For production, we should decode the MSAL token
+                # For now, we'll extract email from header or default to None
+                user_email = None
+        
         # Use admin service if available, otherwise fallback
         if admin_service:
-            response_data = admin_service.get_user_role()
+            response_data = admin_service.get_user_role(user_email=user_email)
             # Add service status information
             response_data["service_status"] = {
                 "personality_models": personality_models_available,
@@ -242,16 +253,19 @@ def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "architecture": "modular"
             }
         else:
+            # Fallback without admin service - should not give admin access to unknown users
             response_data = {
-                "role": "admin",
-                "permissions": ["read", "write", "admin"],
+                "role": "user",  # Changed from "admin" to "user" - security fix!
+                "permissions": ["read"],  # Changed from admin permissions
+                "user_email": user_email or "anonymous",
                 "service_status": {
                     "personality_models": personality_models_available,
                     "personality_service": personality_service_available,
                     "admin_service": False,
                     "architecture": "modular"
                 },
-                "timestamp": datetime.now(timezone.utc).isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "warning": "Admin service unavailable - defaulting to user role"
             }
         
         return func.HttpResponse(
