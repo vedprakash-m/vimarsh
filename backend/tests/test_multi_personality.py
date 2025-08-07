@@ -11,7 +11,7 @@ import sys
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 from services.personality_service import personality_service
 
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +36,7 @@ async def test_personalities():
             # Get personality info
             personality = await personality_service.get_personality(personality_id)
             if personality:
-                logger.info(f"✅ Found personality: {personality.display_name} ({personality.domain.value})")
+                logger.info(f"✅ Found personality: {personality['name']} ({personality['domain']})")
             else:
                 logger.warning(f"❌ Personality {personality_id} not found")
                 continue
@@ -48,7 +48,7 @@ async def test_personalities():
                 personality_id=personality_id
             )
             
-            logger.info(f"📝 Response from {personality.display_name}:")
+            logger.info(f"📝 Response from {personality['name']}:")
             logger.info(f"   {response.content[:200]}...")
             logger.info(f"   Confidence: {response.confidence}")
             logger.info(f"   Safety passed: {response.safety_passed}")

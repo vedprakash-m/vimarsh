@@ -12,8 +12,9 @@ import json
 # Add backend to path
 sys.path.append(os.path.dirname(__file__))
 
-from services.personality_service import personality_service, PersonalitySearchFilter
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -30,28 +31,28 @@ async def test_personalities_api():
     print("-" * 40)
     
     try:
-        filters = PersonalitySearchFilter(is_active=True)
-        personalities = await personality_service.search_personalities(filters, limit=50)
+        filters = {}
+        personalities = get_personality_list()
         
         print(f"✅ Found {len(personalities)} active personalities:")
         for personality in personalities:
-            print(f"   - {personality.display_name} ({personality.domain.value}) - Score: {personality.quality_score}")
+            print(f"   - {personality['name']} ({personality['domain']}) - Score: {personality}")
         
         # Convert to API format (like function_app.py does)
         personality_data = []
         for personality in personalities:
             personality_data.append({
-                "id": personality.id,
+                "id": personality['id'],
                 "name": personality.name,
-                "display_name": personality.display_name,
-                "domain": personality.domain.value,
+                "display_name": personality['name'],
+                "domain": personality['domain'],
                 "time_period": personality.time_period,
-                "description": personality.description,
+                "description": personality['description'],
                 "expertise_areas": personality.expertise_areas,
                 "cultural_context": personality.cultural_context,
-                "quality_score": personality.quality_score,
-                "usage_count": personality.usage_count,
-                "is_active": personality.is_active,
+                "quality_score": personality,
+                "usage_count": personality,
+                "is_active": personality,
                 "tags": personality.tags
             })
         
@@ -72,8 +73,8 @@ async def test_personalities_api():
         try:
             from services.personality_service import PersonalityDomain
             domain_enum = PersonalityDomain(domain)
-            filters = PersonalitySearchFilter(domain=domain_enum, is_active=True)
-            personalities = await personality_service.search_personalities(filters)
+            filters = {}
+            personalities = get_personality_list()
             print(f"   {domain.capitalize()}: {len(personalities)} personalities")
         except Exception as e:
             print(f"   {domain.capitalize()}: Error - {e}")
@@ -88,11 +89,11 @@ async def test_chat_integration():
     test_query = "What is the meaning of life?"
     
     # Get available personalities
-    filters = PersonalitySearchFilter(is_active=True)
-    personalities = await personality_service.search_personalities(filters, limit=4)
+    filters = {}
+    personalities = get_personality_list()
     
     for personality in personalities[:4]:  # Test first 4
-        print(f"\n🎭 Testing chat with {personality.display_name}:")
+        print(f"\n🎭 Testing chat with {personality['name']}:")
         print("-" * 40)
         
         try:
@@ -100,7 +101,7 @@ async def test_chat_integration():
             response = await llm_service.generate_personality_response(
                 query=test_query,
                 context="general",
-                personality_id=personality.id
+                personality_id=personality['id']
             )
             
             print(f"✅ Response: {response.content[:100]}...")
@@ -108,7 +109,7 @@ async def test_chat_integration():
             print(f"🎯 Confidence: {response.confidence}")
             
         except Exception as e:
-            print(f"❌ Error with {personality.display_name}: {e}")
+            print(f"❌ Error with {personality['name']}: {e}")
 
 async def test_personality_switching():
     """Test personality switching scenario"""
@@ -120,20 +121,20 @@ async def test_personality_switching():
     test_query = "How should I handle difficult situations?"
     
     # Get different personalities
-    filters = PersonalitySearchFilter(is_active=True)
-    personalities = await personality_service.search_personalities(filters, limit=4)
+    filters = {}
+    personalities = get_personality_list()
     
     print("Simulating user switching between personalities in same session:")
     
     for i, personality in enumerate(personalities[:3]):
-        print(f"\n🔄 Switch {i+1}: User selects {personality.display_name}")
+        print(f"\n🔄 Switch {i+1}: User selects {personality['name']}")
         print("-" * 30)
         
         try:
             response = await llm_service.generate_personality_response(
                 query=test_query,
                 context="guidance",
-                personality_id=personality.id
+                personality_id=personality['id']
             )
             
             print(f"Response: {response.content[:150]}...")

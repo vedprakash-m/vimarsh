@@ -16,8 +16,9 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from data_processing.text_processor import create_text_processor
-from services.personality_service import personality_service, PersonalitySearchFilter
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -177,7 +178,7 @@ async def demonstrate_complete_system():
         if result.chunks:
             chunk = result.chunks[0]
             print(f"\n🔍 Processed as {domain.upper()}:")
-            print(f"   • Quality: {chunk.quality_score:.1f}")
+            print(f"   • Quality: {chunk:.1f}")
             print(f"   • Key terms: {chunk.key_terms[:4]}")
             print(f"   • Chunk type: {chunk.chunk_type}")
     
@@ -205,12 +206,12 @@ async def demonstrate_complete_system():
     print_subsection("PERFORMANCE METRICS")
     
     # Get personality statistics
-    filters = PersonalitySearchFilter(is_active=True)
-    personalities = await personality_service.search_personalities(filters, limit=20)
+    filters = {}
+    personalities = get_personality_list()
     
     domain_counts = {}
     for personality in personalities:
-        domain = personality.domain.value
+        domain = personality['domain']
         domain_counts[domain] = domain_counts.get(domain, 0) + 1
     
     print("📊 System Statistics:")

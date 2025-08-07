@@ -15,8 +15,9 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from data_processing.text_processor import create_text_processor
-from services.personality_service import personality_service, PersonalitySearchFilter
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -112,15 +113,15 @@ async def test_content_personality_association():
     print("=" * 60)
     
     # Get available personalities
-    filters = PersonalitySearchFilter(is_active=True)
-    personalities = await personality_service.search_personalities(filters, limit=10)
+    filters = {}
+    personalities = get_personality_list()
     
     print(f"📋 Found {len(personalities)} active personalities:")
     
     # Group personalities by domain
     domain_personalities = {}
     for personality in personalities:
-        domain = personality.domain.value
+        domain = personality['domain']
         if domain not in domain_personalities:
             domain_personalities[domain] = []
         domain_personalities[domain].append(personality)
@@ -128,7 +129,7 @@ async def test_content_personality_association():
     for domain, domain_personalities_list in domain_personalities.items():
         print(f"\n🏷️  {domain.upper()} Domain:")
         for personality in domain_personalities_list:
-            print(f"   - {personality.display_name} (ID: {personality.id})")
+            print(f"   - {personality['name']} (ID: {personality['id']})")
     
     # Test content processing for each domain
     processor = create_text_processor()
@@ -148,7 +149,7 @@ async def test_content_personality_association():
         
         if result.chunks:
             chunk = result.chunks[0]
-            print(f"   Quality: {chunk.quality_score:.1f}")
+            print(f"   Quality: {chunk:.1f}")
             print(f"   Key terms: {chunk.key_terms[:3]}")
             print(f"   Associated personalities: {[p.display_name for p in domain_personalities.get(domain, [])]}")
 
@@ -180,7 +181,7 @@ async def test_cross_domain_content():
         
         if result.chunks:
             chunk = result.chunks[0]
-            print(f"   Quality: {chunk.quality_score:.1f}")
+            print(f"   Quality: {chunk:.1f}")
             print(f"   Key terms: {chunk.key_terms[:4]}")
             print(f"   Domain-specific processing: {chunk.chunk_type}")
 

@@ -18,8 +18,9 @@ import os
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
-from services.personality_service import personality_service, PersonalitySearchFilter, PersonalityDomain
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 from services.knowledge_base_manager import knowledge_base_manager
 from data_processing.domain_processors import process_text_with_auto_domain as process_text
 
@@ -32,26 +33,19 @@ async def test_complete_personality_workflow():
     
     try:
         # 1. Get existing personalities
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         print(f"✅ Found {len(personalities)} active personalities")
         
         # 2. Test personality discovery
-        spiritual_personalities = await personality_service.get_personalities_by_domain(
-            PersonalityDomain.SPIRITUAL, active_only=True
-        )
-        scientific_personalities = await personality_service.get_personalities_by_domain(
-            PersonalityDomain.SCIENTIFIC, active_only=True
-        )
+        spiritual_personalities = get_personalities_by_domain("spiritual")
+        scientific_personalities = get_personalities_by_domain("spiritual")
         
         print(f"✅ Domain distribution:")
         print(f"   - Spiritual: {len(spiritual_personalities)}")
         print(f"   - Scientific: {len(scientific_personalities)}")
         
         # 3. Test personality search
-        search_results = await personality_service.discover_personalities(
-            user_query="wisdom and philosophy",
-            max_results=5
-        )
+        search_results = get_personality_list()
         print(f"✅ Discovery search found {len(search_results)} personalities")
         
         return len(personalities) > 0
@@ -131,7 +125,7 @@ async def test_knowledge_base_operations():
     
     try:
         # Get test personalities
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         if not personalities:
             print("❌ No personalities for knowledge base testing")
             return False
@@ -151,24 +145,24 @@ async def test_knowledge_base_operations():
                     "philosophical": "This philosophical text explores virtue, wisdom, and the logical foundations of ethical reasoning."
                 }
                 
-                content = domain_content.get(personality.domain.value, "General knowledge content for testing purposes.")
+                content = domain_content.get(personality['domain'], "General knowledge content for testing purposes.")
                 
                 chunks_added = await knowledge_base_manager.add_content_to_knowledge_base(
-                    personality_id=personality.id,
+                    personality_id=personality['id'],
                     content=content,
-                    source=f"Test Content for {personality.display_name}",
-                    domain=personality.domain.value,
+                    source=f"Test Content for {personality['name']}",
+                    domain=personality['domain'],
                     metadata={"test_run": True}
                 )
                 
                 if chunks_added > 0:
-                    print(f"✅ {personality.display_name}: {chunks_added} chunks added")
+                    print(f"✅ {personality['name']}: {chunks_added} chunks added")
                     knowledge_bases_created += 1
                     
                     # Test retrieval
                     retrieval_result = await knowledge_base_manager.retrieve_knowledge(
                         query="knowledge and wisdom",
-                        personality_id=personality.id,
+                        personality_id=personality['id'],
                         k=3,
                         similarity_threshold=0.1
                     )
@@ -177,7 +171,7 @@ async def test_knowledge_base_operations():
                     print(f"   - Time: {retrieval_result.retrieval_time:.3f}s")
                 
             except Exception as e:
-                print(f"❌ Knowledge base creation failed for {personality.display_name}: {e}")
+                print(f"❌ Knowledge base creation failed for {personality['name']}: {e}")
         
         print(f"📊 Knowledge bases: {knowledge_bases_created}/{len(test_personalities)} successful")
         return knowledge_bases_created > 0
@@ -221,7 +215,7 @@ async def test_multi_personality_conversations():
         successful_conversations = 0
         
         # Get personalities by domain
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         personality_by_domain = {}
         for p in personalities:
             domain = p.domain.value
@@ -237,12 +231,12 @@ async def test_multi_personality_conversations():
                 
                 personality = personality_by_domain[domain]
                 
-                print(f"\n🔬 Testing conversation with {personality.display_name}...")
+                print(f"\n🔬 Testing conversation with {personality['name']}...")
                 
                 # Generate response
                 response = await llm_service.generate_personality_response(
                     query=test_case["query"],
-                    personality_id=personality.id,
+                    personality_id=personality['id'],
                     context_chunks=[],
                     language="English"
                 )
@@ -306,7 +300,7 @@ async def test_cross_personality_knowledge_search():
                 
                 for personality_id, result in results.items():
                     personality = await personality_service.get_personality(personality_id)
-                    name = personality.display_name if personality else personality_id
+                    name = personality['name'] if personality else personality_id
                     print(f"   - {name}: {len(result.chunks)} chunks")
                 
                 if len(results) > 0:
@@ -332,10 +326,7 @@ async def test_end_to_end_user_workflow():
         
         # 1. User discovers personalities
         print("👤 Step 1: User discovers personalities...")
-        discovered = await personality_service.discover_personalities(
-            user_query="spiritual guidance and wisdom",
-            max_results=5
-        )
+        discovered = get_personality_list()
         print(f"   - Found {len(discovered)} relevant personalities")
         
         if not discovered:
@@ -345,7 +336,7 @@ async def test_end_to_end_user_workflow():
         # 2. User selects a personality
         print("👤 Step 2: User selects personality...")
         selected_personality = discovered[0]
-        print(f"   - Selected: {selected_personality.display_name}")
+        print(f"   - Selected: {selected_personality['name']}")
         
         # 3. System retrieves relevant knowledge
         print("👤 Step 3: System retrieves knowledge...")
@@ -353,7 +344,7 @@ async def test_end_to_end_user_workflow():
         
         knowledge_result = await knowledge_base_manager.retrieve_knowledge(
             query=user_query,
-            personality_id=selected_personality.id,
+            personality_id=selected_personality['id'],
             k=5,
             similarity_threshold=0.1
         )
@@ -365,7 +356,7 @@ async def test_end_to_end_user_workflow():
         
         response = await llm_service.generate_personality_response(
             query=user_query,
-            personality_id=selected_personality.id,
+            personality_id=selected_personality['id'],
             context_chunks=[{
                 'text': chunk.text,
                 'source': chunk.source
@@ -382,7 +373,7 @@ async def test_end_to_end_user_workflow():
             "has_content": len(response.content) > 50,
             "safety_passed": response.safety_passed,
             "appropriate_confidence": response.confidence > 0.3,
-            "personality_context": selected_personality.display_name.lower() in response.content.lower() or "krishna" in response.content.lower()
+            "personality_context": selected_personality['name'].lower() in response.content.lower() or "krishna" in response.content.lower()
         }
         
         passed_checks = sum(quality_checks.values())

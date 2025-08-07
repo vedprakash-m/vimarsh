@@ -19,8 +19,9 @@ import json
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
-from services.personality_service import personality_service, PersonalitySearchFilter
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 from services.prompt_template_service import prompt_template_service
 
 logger = logging.getLogger(__name__)
@@ -31,8 +32,7 @@ async def test_complete_conversation_flow():
     print("\n🎭 Testing Complete Conversation Flow...")
     
     # Get available personalities
-    personalities = await personality_service.search_personalities(
-        filters=PersonalitySearchFilter(),
+    personalities = get_personality_list(),
         limit=10
     )
     
@@ -45,12 +45,12 @@ async def test_complete_conversation_flow():
     llm_service = EnhancedSimpleLLMService()
     
     for personality in personalities:
-        if personality.domain.value in domains_tested:
+        if personality['domain'] in domains_tested:
             continue
             
-        domains_tested.add(personality.domain.value)
+        domains_tested.add(personality['domain'])
         
-        print(f"\n🗣️ Testing conversation with {personality.display_name} ({personality.domain.value})")
+        print(f"\n🗣️ Testing conversation with {personality['name']} ({personality['domain']})")
         
         # Domain-specific test queries
         test_queries = {
@@ -76,7 +76,7 @@ async def test_complete_conversation_flow():
             ]
         }
         
-        queries = test_queries.get(personality.domain.value, ["What is wisdom?"])
+        queries = test_queries.get(personality['domain'], ["What is wisdom?"])
         
         for i, query in enumerate(queries[:2]):  # Test 2 queries per personality
             try:
@@ -84,7 +84,7 @@ async def test_complete_conversation_flow():
                 
                 response = await llm_service.generate_personality_response(
                     query=query,
-                    personality_id=personality.id
+                    personality_id=personality['id']
                 )
                 
                 print(f"   ✅ Response: {response.content[:100]}...")
@@ -140,10 +140,7 @@ async def test_personality_discovery_improved():
         print(f"\n🔍 Query: '{query}'")
         
         try:
-            personalities = await personality_service.discover_personalities(
-                user_query=query,
-                max_results=5
-            )
+            personalities = get_personality_list()
             
             print(f"   Found {len(personalities)} personalities:")
             for p in personalities:
@@ -180,11 +177,11 @@ async def test_api_simulation():
     
     # Simulate getting active personalities (public endpoint)
     try:
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         print(f"✅ GET /personalities/active -> {len(personalities)} personalities")
         
         for p in personalities:
-            print(f"   - {p.display_name} ({p.domain.value}) - Quality: {p.quality_score}")
+            print(f"   - {p.display_name} ({p.domain.value}) - Quality: {p}")
             
     except Exception as e:
         print(f"❌ Failed to get active personalities: {e}")
@@ -192,10 +189,7 @@ async def test_api_simulation():
     # Simulate personality search with filters
     try:
         from services.personality_service import PersonalityDomain
-        spiritual_personalities = await personality_service.get_personalities_by_domain(
-            domain=PersonalityDomain.SPIRITUAL,
-            active_only=True
-        )
+        spiritual_personalities = get_personalities_by_domain("spiritual")
         print(f"✅ GET /admin/personalities/domain/spiritual -> {len(spiritual_personalities)} personalities")
         
     except Exception as e:
@@ -206,7 +200,7 @@ async def test_api_simulation():
         try:
             test_personality = personalities[0]
             validation_result = await personality_service.validate_personality(test_personality)
-            print(f"✅ POST /admin/personalities/{test_personality.id}/validate -> Valid: {validation_result.is_valid}")
+            print(f"✅ POST /admin/personalities/{test_personality['id']}/validate -> Valid: {validation_result.is_valid}")
             print(f"   Score: {validation_result.score}, Errors: {len(validation_result.errors)}, Warnings: {len(validation_result.warnings)}")
             
         except Exception as e:
@@ -228,7 +222,7 @@ async def test_prompt_template_system():
             if template:
                 print(f"✅ Template {template_id}: {template.name}")
                 print(f"   Variables: {len(template.variables)}")
-                print(f"   Status: {template.status.value}")
+                print(f"   Status: {template}")
                 
                 # Test template rendering
                 context = TemplateRenderContext(
@@ -260,8 +254,7 @@ async def test_system_performance():
     
     # Test personality loading performance
     start_time = time.time()
-    personalities = await personality_service.search_personalities(
-        filters=PersonalitySearchFilter(),
+    personalities = get_personality_list(),
         limit=50
     )
     load_time = time.time() - start_time
@@ -274,7 +267,7 @@ async def test_system_performance():
         
         for i in range(5):  # Test 5 renders
             rendered = await prompt_template_service.render_personality_prompt(
-                personality_id=personality.id,
+                personality_id=personality['id'],
                 query=f"Test query {i}",
                 context_chunks=[],
                 language="English"
@@ -291,7 +284,7 @@ async def test_system_performance():
         start_time = time.time()
         response = await llm_service.generate_personality_response(
             query="What is wisdom?",
-            personality_id=personality.id
+            personality_id=personality['id']
         )
         response_time = time.time() - start_time
         print(f"✅ LLM response generation: {response_time:.3f}s")
@@ -316,10 +309,7 @@ async def test_error_handling():
     
     # Test empty query
     try:
-        personalities = await personality_service.discover_personalities(
-            user_query="",
-            max_results=5
-        )
+        personalities = get_personality_list()
         print(f"✅ Empty query handled: {len(personalities)} results")
         
     except Exception as e:

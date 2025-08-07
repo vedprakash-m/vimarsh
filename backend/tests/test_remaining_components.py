@@ -107,13 +107,13 @@ async def test_knowledge_base_manager():
     
     try:
         # Get a test personality
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         if not personalities:
             print("❌ No active personalities found for testing")
             return False
         
         test_personality = personalities[0]
-        print(f"🎯 Testing with personality: {test_personality.display_name}")
+        print(f"🎯 Testing with personality: {test_personality['name']}")
         
         # Test content addition
         test_content = """This is a test content for knowledge base management. 
@@ -122,10 +122,10 @@ async def test_knowledge_base_manager():
         stored with appropriate metadata and embeddings."""
         
         chunks_added = await knowledge_base_manager.add_content_to_knowledge_base(
-            personality_id=test_personality.id,
+            personality_id=test_personality['id'],
             content=test_content,
             source="Test Content",
-            domain=test_personality.domain.value,
+            domain=test_personality['domain'],
             metadata={"test": True, "created_by": "test_script"}
         )
         
@@ -135,7 +135,7 @@ async def test_knowledge_base_manager():
         if chunks_added > 0:
             retrieval_result = await knowledge_base_manager.retrieve_knowledge(
                 query="test content management",
-                personality_id=test_personality.id,
+                personality_id=test_personality['id'],
                 k=5,
                 similarity_threshold=0.1  # Low threshold for testing
             )
@@ -149,7 +149,7 @@ async def test_knowledge_base_manager():
                 print(f"   - Best similarity: {max(retrieval_result.similarity_scores):.3f}")
         
         # Test knowledge base stats
-        stats = await knowledge_base_manager.get_knowledge_base_stats(test_personality.id)
+        stats = await knowledge_base_manager.get_knowledge_base_stats(test_personality['id'])
         if stats:
             print(f"✅ Knowledge base stats:")
             print(f"   - Total chunks: {stats.total_chunks}")
@@ -182,7 +182,7 @@ async def test_cross_personality_search():
         
         for personality_id, result in results.items():
             personality = await personality_service.get_personality(personality_id)
-            personality_name = personality.display_name if personality else personality_id
+            personality_name = personality['name'] if personality else personality_id
             print(f"   - {personality_name}: {len(result.chunks)} chunks")
         
         return len(results) > 0
@@ -225,7 +225,7 @@ async def test_integration():
     
     try:
         # Get personalities
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         if not personalities:
             print("❌ No personalities for integration test")
             return False
@@ -238,7 +238,7 @@ async def test_integration():
         
         processing_result = process_text(
             text=test_text,
-            domain=test_personality.domain.value,
+            domain=test_personality['domain'],
             source="Integration Test",
             metadata={"integration_test": True}
         )
@@ -247,10 +247,10 @@ async def test_integration():
         
         # 2. Add to knowledge base
         chunks_added = await knowledge_base_manager.add_content_to_knowledge_base(
-            personality_id=test_personality.id,
+            personality_id=test_personality['id'],
             content=test_text,
             source="Integration Test",
-            domain=test_personality.domain.value,
+            domain=test_personality['domain'],
             metadata={"integration_test": True}
         )
         
@@ -259,7 +259,7 @@ async def test_integration():
         # 3. Retrieve from knowledge base
         retrieval_result = await knowledge_base_manager.retrieve_knowledge(
             query="integration test content",
-            personality_id=test_personality.id,
+            personality_id=test_personality['id'],
             k=5,
             similarity_threshold=0.1
         )

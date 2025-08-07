@@ -17,13 +17,16 @@ import azure.functions as func
 
 # Import services
 try:
-    from services.personality_service import (
-        personality_service,
-        PersonalityProfile,
+    from services.personality_service import PersonalityService
+    from models.personality_models import (
+        PersonalityConfig,
         PersonalityDomain,
-        PersonalityStatus,
-        PersonalitySearchFilter,
-        PersonalityValidationResult
+        PersonalityResponse,
+        PersonalityValidationResult,
+        PERSONALITY_CONFIGS,
+        get_personality_config,
+        get_personalities_by_domain,
+        get_personality_list
     )
     from auth.unified_auth_service import require_auth, get_current_user
     from core.error_handling import handle_api_error, APIError
@@ -35,30 +38,18 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
-def create_personality_response(personality: PersonalityProfile) -> Dict[str, Any]:
+def create_personality_response(personality: PersonalityConfig) -> Dict[str, Any]:
     """Create API response for personality"""
     return {
         'id': personality.id,
         'name': personality.name,
-        'display_name': personality.display_name,
         'domain': personality.domain.value,
-        'time_period': personality.time_period,
         'description': personality.description,
-        'status': personality.status.value,
-        'is_active': personality.is_active,
-        'expertise_areas': personality.expertise_areas,
-        'cultural_context': personality.cultural_context,
-        'language_style': personality.language_style,
-        'knowledge_base_ids': personality.knowledge_base_ids,
-        'voice_settings': personality.voice_settings,
-        'usage_count': personality.usage_count,
-        'quality_score': personality.quality_score,
-        'expert_approved': personality.expert_approved,
-        'created_by': personality.created_by,
-        'created_at': personality.created_at,
-        'updated_at': personality.updated_at,
-        'version': personality.version,
-        'tags': personality.tags
+        'safety_level': personality.safety_level.value,
+        'max_response_length': personality.max_response_length,
+        'greeting_style': personality.greeting_style,
+        'tone_indicators': personality.tone_indicators
+    }
     }
 
 

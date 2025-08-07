@@ -11,7 +11,7 @@ import os
 # Add backend to path
 sys.path.append(os.path.dirname(__file__))
 
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

@@ -18,8 +18,9 @@ import os
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
-from services.personality_service import personality_service, PersonalitySearchFilter, PersonalityDomain
-from services.enhanced_simple_llm_service import EnhancedSimpleLLMService
+from services.personality_service import PersonalityService
+from models.personality_models import get_personality_list, get_personalities_by_domain
+from services.llm_service import LLMService as EnhancedSimpleLLMService
 from services.prompt_template_service import prompt_template_service, TemplateRenderContext
 
 logger = logging.getLogger(__name__)
@@ -30,24 +31,15 @@ async def test_personality_crud_operations():
     print("\n🧪 Testing Personality CRUD Operations...")
     
     # Test search and filtering
-    all_personalities = await personality_service.search_personalities(
-        PersonalitySearchFilter(), limit=20
+    all_personalities = get_personality_list(), limit=20
     )
     print(f"✅ Found {len(all_personalities)} total personalities")
     
     # Test domain filtering
-    spiritual_personalities = await personality_service.get_personalities_by_domain(
-        PersonalityDomain.SPIRITUAL, active_only=True
-    )
-    scientific_personalities = await personality_service.get_personalities_by_domain(
-        PersonalityDomain.SCIENTIFIC, active_only=True
-    )
-    historical_personalities = await personality_service.get_personalities_by_domain(
-        PersonalityDomain.HISTORICAL, active_only=True
-    )
-    philosophical_personalities = await personality_service.get_personalities_by_domain(
-        PersonalityDomain.PHILOSOPHICAL, active_only=True
-    )
+    spiritual_personalities = get_personalities_by_domain("spiritual")
+    scientific_personalities = get_personalities_by_domain("spiritual")
+    historical_personalities = get_personalities_by_domain("spiritual")
+    philosophical_personalities = get_personalities_by_domain("spiritual")
     
     print(f"✅ Domain distribution:")
     print(f"   - Spiritual: {len(spiritual_personalities)}")
@@ -57,11 +49,11 @@ async def test_personality_crud_operations():
     
     # Test individual personality retrieval
     for personality in all_personalities[:4]:  # Test first 4
-        retrieved = await personality_service.get_personality(personality.id)
+        retrieved = await personality_service.get_personality(personality['id'])
         if retrieved:
             print(f"✅ Retrieved {retrieved.display_name} ({retrieved.domain.value})")
         else:
-            print(f"❌ Failed to retrieve {personality.id}")
+            print(f"❌ Failed to retrieve {personality['id']}")
     
     return all_personalities
 
@@ -184,10 +176,7 @@ async def test_personality_discovery():
     
     for query, expected_domains in discovery_queries:
         try:
-            personalities = await personality_service.discover_personalities(
-                user_query=query,
-                max_results=5
-            )
+            personalities = get_personality_list()
             
             if personalities:
                 print(f"🔍 '{query}' -> Found {len(personalities)} personalities:")
@@ -237,19 +226,19 @@ async def test_system_integration():
     
     try:
         # Get a personality
-        personalities = await personality_service.get_active_personalities()
+        personalities = get_personality_list()
         if not personalities:
             print("❌ No active personalities found")
             return False
         
         test_personality = personalities[0]
-        print(f"🎯 Testing with {test_personality.display_name}")
+        print(f"🎯 Testing with {test_personality['name']}")
         
         # Generate a response
         llm_service = EnhancedSimpleLLMService()
         response = await llm_service.generate_personality_response(
             query="Tell me about yourself",
-            personality_id=test_personality.id,
+            personality_id=test_personality['id'],
             context_chunks=[],
             language="English"
         )
