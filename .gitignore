@@ -586,7 +586,9 @@ site/
 *.pkl
 *.joblib
 *.model
+# Exclude ML models directory but allow code models
 models/
+!backend/models/
 *.bin
 
 # Vector databases

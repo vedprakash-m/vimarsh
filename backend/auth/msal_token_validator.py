@@ -29,6 +29,9 @@ class MSALTokenValidator:
             User email if found, None otherwise
         """
         try:
+            # Log all available headers for debugging
+            self.logger.info(f"🔍 Available headers: {list(req.headers.keys())}")
+            
             # Try header first (for testing/development)
             user_email = req.headers.get('x-user-email') or req.headers.get('X-User-Email')
             if user_email:
@@ -37,8 +40,10 @@ class MSALTokenValidator:
             
             # Try to extract from Authorization Bearer token
             auth_header = req.headers.get('Authorization', '')
+            self.logger.info(f"🔍 Authorization header present: {bool(auth_header)}")
             if auth_header.startswith('Bearer '):
                 token = auth_header[7:]  # Remove 'Bearer ' prefix
+                self.logger.info(f"🔍 Bearer token found, length: {len(token)}")
                 email = self._extract_email_from_token(token)
                 if email:
                     self.logger.info(f"📧 User email from token: {email}")
@@ -70,28 +75,34 @@ class MSALTokenValidator:
             Email from token claims if found
         """
         try:
+            self.logger.info(f"🔍 Attempting to decode token (length: {len(token)})")
+            
             # Decode without verification for now (in production, should verify signature)
             # This is safe because we're only extracting email for role validation,
             # not granting access based on the token alone
             decoded = jwt.decode(token, options={"verify_signature": False})
             
-            # Try different email claim names
-            email = (decoded.get('email') or 
-                    decoded.get('upn') or 
-                    decoded.get('preferred_username') or
-                    decoded.get('unique_name'))
+            self.logger.info(f"✅ Token decoded successfully. Available claims: {list(decoded.keys())}")
             
-            if email:
-                self.logger.info(f"📧 Extracted email from token: {email}")
-                return email
-            else:
-                self.logger.warning("⚠️ No email claim found in token")
-                # Log token claims for debugging (remove in production)
-                self.logger.debug(f"Token claims: {list(decoded.keys())}")
-                return None
+            # Try different email claim names in order of preference
+            email_claims = ['email', 'upn', 'preferred_username', 'unique_name', 'mail', 'userPrincipalName']
+            
+            for claim in email_claims:
+                email = decoded.get(claim)
+                if email:
+                    self.logger.info(f"📧 Found email in '{claim}' claim: {email}")
+                    return email
+            
+            # Log all claims for debugging
+            self.logger.warning("⚠️ No email claim found in token")
+            self.logger.info(f"🔍 All token claims: {json.dumps(decoded, indent=2, default=str)}")
+            return None
                 
+        except jwt.DecodeError as e:
+            self.logger.error(f"❌ JWT decode error: {e}")
+            return None
         except Exception as e:
-            self.logger.error(f"❌ Error decoding token: {e}")
+            self.logger.error(f"❌ Unexpected error decoding token: {e}")
             return None
     
     def get_user_context(self, req: HttpRequest) -> Dict[str, Any]:
