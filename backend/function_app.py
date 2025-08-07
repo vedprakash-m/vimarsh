@@ -235,7 +235,13 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         from auth.unified_auth_service import UnifiedAuthService
         from services.admin_service import AdminService
         
+        # Add detailed logging for debugging
+        logger.info("🔐 Admin role endpoint called")
+        logger.info(f"🔍 Request headers: {dict(req.headers)}")
+        
         auth_service = UnifiedAuthService()
+        logger.info(f"🔧 UnifiedAuthService initialized - Mode: {auth_service.mode}, Enabled: {auth_service.is_enabled}")
+        
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -250,29 +256,65 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 headers=get_cors_headers()
             )
         
-        logger.info(f"🔐 Admin role check for user: {authenticated_user.email}")
+        logger.info(f"🔐 Admin role check for user: {authenticated_user.email} (ID: {authenticated_user.id})")
+        logger.info(f"🔍 User object: name={authenticated_user.name}, provider={getattr(authenticated_user, 'provider', 'unknown')}")
         
         # Use admin service if available, otherwise fallback to basic role check
         if admin_service:
-            response_data = admin_service.get_user_role(user_email=authenticated_user.email)
-            # Add service status information
-            response_data["service_status"] = {
-                "personality_models": personality_models_available,
-                "personality_service": personality_service_available,
-                "admin_service": True,
-                "architecture": "modular"
-            }
-            # Add authentication context
-            response_data["auth_context"] = {
-                "source": "unified_auth_service",
-                "email": authenticated_user.email,
-                "authenticated": True
-            }
+            try:
+                response_data = admin_service.get_user_role(user_email=authenticated_user.email)
+                logger.info(f"✅ AdminService returned: {response_data}")
+                # Add service status information
+                response_data["service_status"] = {
+                    "personality_models": personality_models_available,
+                    "personality_service": personality_service_available,
+                    "admin_service": True,
+                    "architecture": "modular"
+                }
+                # Add authentication context
+                response_data["auth_context"] = {
+                    "source": "unified_auth_service",
+                    "email": authenticated_user.email,
+                    "authenticated": True,
+                    "auth_mode": str(auth_service.mode),
+                    "auth_enabled": auth_service.is_enabled
+                }
+            except Exception as admin_error:
+                logger.error(f"❌ AdminService error: {admin_error}")
+                # Fall back to environment variable check
+                import os
+                admin_emails = os.getenv('ADMIN_EMAILS', 'vedprakash.m@outlook.com').split(',')
+                is_admin = authenticated_user.email.strip().lower() in [email.strip().lower() for email in admin_emails]
+                
+                response_data = {
+                    "role": "admin" if is_admin else "user",
+                    "permissions": ["read", "write", "admin"] if is_admin else ["read"],
+                    "user_email": authenticated_user.email,
+                    "user_id": authenticated_user.id,
+                    "service_status": {
+                        "personality_models": personality_models_available,
+                        "personality_service": personality_service_available,
+                        "admin_service": False,
+                        "architecture": "modular"
+                    },
+                    "auth_context": {
+                        "source": "unified_auth_service",
+                        "email": authenticated_user.email,
+                        "authenticated": True,
+                        "auth_mode": str(auth_service.mode),
+                        "auth_enabled": auth_service.is_enabled
+                    },
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "warning": f"AdminService error: {admin_error} - using environment variable check"
+                }
+                logger.info(f"🔄 Fallback admin check result: {response_data}")
         else:
             # Fallback without admin service - check environment variables directly
             import os
             admin_emails = os.getenv('ADMIN_EMAILS', 'vedprakash.m@outlook.com').split(',')
             is_admin = authenticated_user.email.strip().lower() in [email.strip().lower() for email in admin_emails]
+            
+            logger.info(f"🔍 Environment variable admin check: admin_emails={admin_emails}, user_email={authenticated_user.email}, is_admin={is_admin}")
             
             response_data = {
                 "role": "admin" if is_admin else "user",
@@ -288,11 +330,14 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "auth_context": {
                     "source": "unified_auth_service",
                     "email": authenticated_user.email,
-                    "authenticated": True
+                    "authenticated": True,
+                    "auth_mode": str(auth_service.mode),
+                    "auth_enabled": auth_service.is_enabled
                 },
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "warning": "Admin service unavailable - using environment variable check"
             }
+            logger.info(f"🔄 Environment variable admin check result: {response_data}")
         
         return func.HttpResponse(
             json.dumps(response_data),
@@ -301,8 +346,11 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         )
     except Exception as e:
         logger.error(f"❌ Admin role error: {e}")
+        logger.error(f"❌ Error details: {str(e)}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return func.HttpResponse(
-            json.dumps({"error": "Failed to get admin role"}),
+            json.dumps({"error": "Failed to get admin role", "details": str(e)}),
             status_code=500,
             headers=get_cors_headers()
         )
