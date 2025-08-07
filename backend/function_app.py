@@ -229,19 +229,19 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route(route="vimarsh-admin/role", methods=["GET"])
 async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced admin role endpoint with service status and proper authentication"""
+    """Optimized admin role endpoint with caching for faster response"""
     try:
         # Import working auth service (from backup version)
         from auth.unified_auth_service import UnifiedAuthService
         from services.admin_service import AdminService
         
-        # Add detailed logging for debugging
+        # Add cache for role responses (5 minute TTL)
+        cache_key = None
+        cached_response = None
+        
         logger.info("🔐 Admin role endpoint called")
-        logger.info(f"🔍 Request headers: {dict(req.headers)}")
         
         auth_service = UnifiedAuthService()
-        logger.info(f"🔧 UnifiedAuthService initialized - Mode: {auth_service.mode}, Enabled: {auth_service.is_enabled}")
-        
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -256,8 +256,28 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 headers=get_cors_headers()
             )
         
-        logger.info(f"🔐 Admin role check for user: {authenticated_user.email} (ID: {authenticated_user.id})")
-        logger.info(f"🔍 User object: name={authenticated_user.name}, provider={getattr(authenticated_user, 'provider', 'unknown')}")
+        # Check cache first for faster response
+        cache_key = f"admin_role_{authenticated_user.email}"
+        try:
+            import time
+            # Simple in-memory cache (would use Redis in production)
+            if not hasattr(admin_role_endpoint, '_cache'):
+                admin_role_endpoint._cache = {}
+            
+            if cache_key in admin_role_endpoint._cache:
+                cached_data, timestamp = admin_role_endpoint._cache[cache_key]
+                # Use cache if less than 3 minutes old
+                if time.time() - timestamp < 180:
+                    logger.info(f"⚡ Using cached admin role for {authenticated_user.email}")
+                    return func.HttpResponse(
+                        json.dumps(cached_data),
+                        status_code=200,
+                        headers=get_cors_headers()
+                    )
+        except Exception as cache_error:
+            logger.warning(f"Cache error: {cache_error}")
+        
+        logger.info(f"🔐 Admin role check for user: {authenticated_user.email}")
         
         # Use admin service if available, otherwise fallback to basic role check
         if admin_service:
@@ -279,6 +299,15 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     "auth_mode": str(auth_service.mode),
                     "auth_enabled": auth_service.is_enabled
                 }
+                
+                # Cache the successful response
+                if cache_key:
+                    try:
+                        admin_role_endpoint._cache[cache_key] = (response_data, time.time())
+                        logger.info(f"💾 Cached admin role for {authenticated_user.email}")
+                    except Exception as cache_error:
+                        logger.warning(f"Failed to cache: {cache_error}")
+                        
             except Exception as admin_error:
                 logger.error(f"❌ AdminService error: {admin_error}")
                 # Fall back to environment variable check
@@ -338,6 +367,15 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "warning": "Admin service unavailable - using environment variable check"
             }
             logger.info(f"🔄 Environment variable admin check result: {response_data}")
+        
+        # Cache the final response
+        if cache_key and response_data:
+            try:
+                import time
+                admin_role_endpoint._cache[cache_key] = (response_data, time.time())
+                logger.info(f"💾 Cached admin role for {authenticated_user.email}")
+            except Exception as cache_error:
+                logger.warning(f"Failed to cache: {cache_error}")
         
         return func.HttpResponse(
             json.dumps(response_data),

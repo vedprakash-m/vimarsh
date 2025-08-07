@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
 import { useAdmin } from '../contexts/AdminContext';
+import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environment';
 import { getAuthHeaders, authService } from '../auth/authService';
@@ -25,8 +26,12 @@ export default function GuidanceInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Admin context for conditional admin panel access
+  // Context hooks
   const { user } = useAdmin();
+  const { isInitializing, allReady } = useAppLoading();
+
+  // Don't show admin button until all contexts are ready to prevent layout shift
+  const showAdminButton = allReady && user?.isAdmin;
 
   // Logout functionality
   const handleLogout = async () => {
@@ -406,8 +411,8 @@ export default function GuidanceInterface() {
             <Users size={18} />
           </button>
           
-          {/* Admin Panel Button - Only visible to admin users */}
-          {user?.isAdmin && (
+          {/* Admin Panel Button - Only visible to admin users after full initialization */}
+          {showAdminButton && (
             <button 
               onClick={() => navigate('/admin')}
               style={{
@@ -422,6 +427,7 @@ export default function GuidanceInterface() {
                 transition: 'all 0.3s ease',
                 fontSize: '0.9rem',
                 fontWeight: '600',
+                gap: '0.5rem',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                 backdropFilter: 'blur(10px)'
               }}

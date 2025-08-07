@@ -19,6 +19,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
 import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminContext';
+import { AppLoadingProvider } from './contexts/AppLoadingContext';
 import AdminDashboard from './components/admin/AdminDashboard';
 
 // MSAL Configuration
@@ -89,19 +90,20 @@ function App() {
         <AuthProvider>
           <AdminProvider>
             <PersonalityProvider>
-              <LanguageProvider>
-              <DomainThemeManager />
-              <Router>
-                <Suspense fallback={<SpiritualLoadingSpinner />}>
-                  <Routes>
-                  {/* Landing Page - Public Route */}
-                  <Route path="/" element={<LandingPage />} />
-                  
-                  {/* Authentication Callback - Public Route */}
-                  <Route path="/auth/callback" element={<AuthCallback />} />
-                  
-                                    {/* Guidance Interface - Protected Route */}
-                  <Route 
+              <AppLoadingProvider>
+                <LanguageProvider>
+                <DomainThemeManager />
+                <Router>
+                  <Suspense fallback={<SpiritualLoadingSpinner />}>
+                    <Routes>
+                    {/* Landing Page - Public Route */}
+                    <Route path="/" element={<LandingPage />} />
+                    
+                    {/* Authentication Callback - Public Route */}
+                    <Route path="/auth/callback" element={<AuthCallback />} />
+                    
+                                      {/* Guidance Interface - Protected Route */}
+                    <Route 
                     path="/guidance" 
                     element={
                       <ProtectedRoute>
@@ -126,6 +128,7 @@ function App() {
               </Suspense>
             </Router>
           </LanguageProvider>
+        </AppLoadingProvider>
         </PersonalityProvider>
         </AdminProvider>
       </AuthProvider>
