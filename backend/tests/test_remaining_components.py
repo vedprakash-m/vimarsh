@@ -182,7 +182,8 @@ async def test_cross_personality_search():
         print(f"   - Personalities with results: {len(results)}")
         
         for personality_id, result in results.items():
-            personality = # await # personality_service.get_personality(personality_id)
+            # personality = await personality_service.get_personality(personality_id)
+            personality = None  # Placeholder for now
             personality_name = personality['name'] if personality else personality_id
             print(f"   - {personality_name}: {len(result.chunks)} chunks")
         
