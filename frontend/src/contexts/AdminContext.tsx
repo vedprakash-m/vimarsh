@@ -90,102 +90,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     }
   };
 
-  const refreshAdminStatusInBackground = async (userEmail: string, account: any) => {
-    try {
-      console.log('🔄 AdminContext: Background refresh of admin status');
-      const refreshedUser = await performFullAdminCheck(userEmail, account, false);
-      if (refreshedUser) {
-        setUser(refreshedUser);
-        cacheAdminStatus(userEmail, refreshedUser);
-      }
-    } catch (error) {
-      console.warn('⚠️ AdminContext: Background refresh failed:', error);
-      // Don't update UI state on background refresh failure
-    }
-  };
-
-  const performFullAdminCheck = async (userEmail: string, account: any, updateLoading = true): Promise<AdminUser | null> => {
-    try {
-      if (updateLoading) setLoading(true);
-
-      // Production mode - use MSAL with proper tokens
-      console.log('🔐 Checking admin status for:', userEmail);
-      
-      let accessToken: string | undefined;
-      
-      try {
-        console.log('🔄 Attempting silent token acquisition...');
-        const tokenResponse = await instance.acquireTokenSilent({
-          scopes: ['https://graph.microsoft.com/User.Read'],
-          account
-        });
-        accessToken = tokenResponse.accessToken;
-        console.log('✅ Successfully acquired access token silently');
-      } catch (silentError) {
-        console.warn('⚠️ Silent token acquisition failed, trying interactive:', silentError);
-        
-        try {
-          console.log('🔄 Attempting interactive token acquisition...');
-          const interactiveResponse = await instance.acquireTokenPopup({
-            scopes: ['https://graph.microsoft.com/User.Read'],
-            account
-          });
-          accessToken = interactiveResponse.accessToken;
-          console.log('✅ Successfully acquired access token interactively');
-        } catch (interactiveError) {
-          console.error('❌ Interactive token acquisition also failed:', interactiveError);
-          throw interactiveError;
-        }
-      }
-
-      // Check user role with backend using access token
-      console.log('🔄 Calling backend with access token...');
-      const roleResponse = await adminService.getUserRole(accessToken);
-      console.log('✅ Backend response received:', roleResponse);
-      
-      const adminUser: AdminUser = {
-        id: account.homeAccountId,
-        email: userEmail,
-        name: account.name || userEmail,
-        role: roleResponse.role as UserRole,
-        permissions: roleResponse.permissions,
-        isAdmin: (roleResponse.role as string) === 'ADMIN' || (roleResponse.role as string) === 'SUPER_ADMIN' || roleResponse.role === UserRole.ADMIN || roleResponse.role === UserRole.SUPER_ADMIN,
-        isSuperAdmin: (roleResponse.role as string) === 'SUPER_ADMIN' || roleResponse.role === UserRole.SUPER_ADMIN
-      };
-
-      console.log('🔐 Admin status checked:', {
-        email: adminUser.email,
-        role: adminUser.role,
-        isAdmin: adminUser.isAdmin
-      });
-
-      return adminUser;
-
-    } catch (tokenError) {
-      console.error('❌ Token acquisition failed:', tokenError);
-      
-      // Return non-admin user if token acquisition fails
-      return {
-        id: account.homeAccountId,
-        email: userEmail,
-        name: account.name || userEmail,
-        role: UserRole.USER,
-        permissions: {
-          can_view_cost_dashboard: false,
-          can_manage_users: false,
-          can_block_users: false,
-          can_view_system_costs: false,
-          can_configure_budgets: false,
-          can_access_admin_endpoints: false,
-          can_override_budget_limits: false,
-          can_manage_emergency_controls: false
-        },
-        isAdmin: false,
-        isSuperAdmin: false
-      };
-    }
-  };
-
   const checkAdminStatus = async () => {
     try {
       setLoading(true);
@@ -207,17 +111,74 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       if (cachedUser) {
         setUser(cachedUser);
         setLoading(false);
-        
-        // Background refresh without blocking UI
-        setTimeout(() => refreshAdminStatusInBackground(userEmail, account), 100);
         return;
       }
 
       // No cache, perform full check
-      const adminUser = await performFullAdminCheck(userEmail, account);
-      if (adminUser) {
+      try {
+        console.log('🔐 Checking admin status for:', userEmail);
+        
+        let accessToken: string | undefined;
+        
+        try {
+          console.log('🔄 Attempting silent token acquisition...');
+          const tokenResponse = await instance.acquireTokenSilent({
+            scopes: ['https://graph.microsoft.com/User.Read'],
+            account
+          });
+          accessToken = tokenResponse.accessToken;
+          console.log('✅ Successfully acquired access token silently');
+        } catch (silentError) {
+          console.warn('⚠️ Silent token acquisition failed:', silentError);
+          // For now, set as non-admin user to prevent build failure
+          setUser({
+            id: account.homeAccountId,
+            email: userEmail,
+            name: account.name || userEmail,
+            role: UserRole.USER,
+            permissions: {
+              can_view_cost_dashboard: false,
+              can_manage_users: false,
+              can_block_users: false,
+              can_view_system_costs: false,
+              can_configure_budgets: false,
+              can_access_admin_endpoints: false,
+              can_override_budget_limits: false,
+              can_manage_emergency_controls: false
+            },
+            isAdmin: false,
+            isSuperAdmin: false
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Check user role with backend using access token
+        const roleResponse = await adminService.getUserRole(accessToken);
+        
+        const adminUser: AdminUser = {
+          id: account.homeAccountId,
+          email: userEmail,
+          name: account.name || userEmail,
+          role: roleResponse.role as UserRole,
+          permissions: roleResponse.permissions,
+          isAdmin: (roleResponse.role as string) === 'admin' || roleResponse.role === UserRole.ADMIN,
+          isSuperAdmin: (roleResponse.role as string) === 'super_admin' || roleResponse.role === UserRole.SUPER_ADMIN
+        };
+
         setUser(adminUser);
         cacheAdminStatus(userEmail, adminUser);
+
+        console.log('🔐 Admin status checked:', {
+          email: adminUser.email,
+          role: adminUser.role,
+          isAdmin: adminUser.isAdmin
+        });
+
+      } catch (err) {
+        console.error('❌ Admin status check failed:', err);
+        setError('Failed to check admin status');
+        setUser(null);
       }
 
     } catch (err) {
@@ -238,17 +199,13 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    // Enhanced loading sequence: Check admin status immediately after authentication
-    const initializeAdminStatus = async () => {
-      if (accounts.length > 0) {
-        console.log('🚀 AdminContext: Starting immediate admin status check');
-        await checkAdminStatus();
-      } else {
-        setLoading(false);
-      }
-    };
-
-    initializeAdminStatus();
+    // Check admin status when accounts change
+    if (accounts.length > 0) {
+      console.log('🚀 AdminContext: Starting admin status check');
+      checkAdminStatus();
+    } else {
+      setLoading(false);
+    }
   }, [accounts]);
 
   const value: AdminContextType = {
