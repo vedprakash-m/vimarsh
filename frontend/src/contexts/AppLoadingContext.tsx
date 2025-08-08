@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAdmin } from './AdminContext';
+import { useAdmin } from './AdminProviderContext';
 import { usePersonality } from './PersonalityContext';
 
 interface AppLoadingContextType {

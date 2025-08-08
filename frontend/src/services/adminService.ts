@@ -1,4 +1,4 @@
-import { UserRole, UserPermissions } from '../contexts/AdminContext';
+import { UserRole, UserPermissions } from '../contexts/AdminProviderContext';
 
 export interface CostDashboardData {
   total_tokens: number;

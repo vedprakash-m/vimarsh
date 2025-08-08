@@ -5,7 +5,7 @@ import { Send, MessageSquare, Users, Settings, LogOut } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
-import { useAdmin } from '../contexts/AdminContext';
+import { useAdmin } from '../contexts/AdminProviderContext';
 import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environment';

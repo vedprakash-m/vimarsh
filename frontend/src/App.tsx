@@ -18,7 +18,7 @@ import { DomainThemeManager } from './components/DomainThemeManager';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
 import { AuthProvider } from './auth/AuthProvider';
-import { AdminProvider } from './contexts/AdminContext';
+import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
 import AdminDashboard from './components/admin/AdminDashboard';
 

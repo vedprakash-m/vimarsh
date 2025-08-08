@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAdmin } from '../../contexts/AdminContext';
+import { useAdmin } from '../../contexts/AdminProviderContext';
 import { getApiBaseUrl } from '../../config/environment';
 import { getAuthHeaders } from '../../auth/authService';
 import '../../styles/admin.css';
