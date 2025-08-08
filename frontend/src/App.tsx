@@ -112,11 +112,11 @@ function App() {
                     } 
                   />
                   
-                  {/* Admin Dashboard - Protected Route */}
+                  {/* Admin Dashboard - Protected Route with Admin Requirement */}
                   <Route 
                     path="/admin" 
                     element={
-                      <ProtectedRoute>
+                      <ProtectedRoute requireAdmin={true}>
                         <AdminDashboard />
                       </ProtectedRoute>
                     } 

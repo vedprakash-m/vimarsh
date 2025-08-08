@@ -128,13 +128,27 @@ const LandingPage: React.FC = () => {
   const { isAuthenticated, account, login } = useAuth();
   const navigate = useNavigate();
   const [selectedPersonality, setSelectedPersonality] = useState(personalities[0]);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
-  // Redirect authenticated users
+  // Redirect authenticated users - with protection against circular redirects
   useEffect(() => {
-    if (isAuthenticated && account) {
-      navigate('/guidance');
+    let timeoutId: NodeJS.Timeout;
+    
+    if (isAuthenticated && account && !hasRedirected) {
+      console.log('🔄 LandingPage: Authenticated user detected, scheduling redirect to guidance');
+      setHasRedirected(true);
+      // Add a small delay to prevent immediate redirects that might cause loops
+      timeoutId = setTimeout(() => {
+        navigate('/guidance', { replace: true });
+      }, 100);
     }
-  }, [isAuthenticated, account, navigate]);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isAuthenticated, account, navigate, hasRedirected]);
 
   const handleSignIn = async () => {
     try {

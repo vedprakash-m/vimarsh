@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { useAdmin } from '../contexts/AdminProviderContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -14,10 +15,11 @@ interface ProtectedRouteProps {
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isLoading, account } = useAuth();
+  const { user: adminUser, loading: adminLoading } = useAdmin();
   const location = useLocation();
 
   // Show loading while authentication state is being determined
-  if (isLoading) {
+  if (isLoading || (requireAdmin && adminLoading)) {
     return (
       <div style={{
         display: 'flex',
@@ -33,15 +35,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
 
   if (!isAuthenticated) {
     // Store the attempted location for post-login redirect
+    console.log('🔐 ProtectedRoute: User not authenticated, redirecting to landing page');
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  // Check admin requirements
+  // Check admin requirements using AdminProvider
   if (requireAdmin) {
-    const userEmail = account?.username || account?.name || '';
-    const isAdmin = userEmail.includes('admin') || userEmail.includes('vedprakash@outlook.com');
+    console.log('🔍 ProtectedRoute: Checking admin requirements', { adminUser: adminUser?.email, isAdmin: adminUser?.isAdmin });
     
-    if (!isAdmin) {
+    if (!adminUser || !adminUser.isAdmin) {
+      console.warn('⚠️ ProtectedRoute: Admin access denied for user:', account?.username);
       return (
         <div style={{
           display: 'flex',
@@ -55,6 +58,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
         }}>
           <h2>Access Denied</h2>
           <p>You need administrator privileges to access this page.</p>
+          <p>Contact support if you believe this is an error.</p>
           <button 
             onClick={() => window.history.back()}
             style={{
@@ -72,6 +76,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
         </div>
       );
     }
+    
+    console.log('✅ ProtectedRoute: Admin access granted for:', adminUser.email);
   }
   
   return <>{children}</>;

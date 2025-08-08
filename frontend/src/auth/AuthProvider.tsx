@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     }
 
-    // Validate MSAL state consistency
+    // Validate MSAL state consistency - only warn, don't fail validation to prevent circular redirects
     const hasValidAuth = accounts.length > 0 && activeAccount;
     if (hasValidAuth !== isAuthenticated) {
       console.warn('⚠️ MSAL/Provider authentication state mismatch', {
@@ -105,8 +105,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         accountsCount: accounts.length,
         hasActiveAccount: !!activeAccount
       });
-      // Don't return false immediately - this might be a timing issue during state updates
-      // Instead, log the warning and continue validation
+      // Don't return false - this is often a timing issue during authentication flow
+      // Let the state settle naturally to prevent circular redirects
     }
 
     return true;
@@ -135,7 +135,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Validate authentication state consistency
         if (!validateAuthenticationState()) {
           console.warn('⚠️ AuthProvider: Authentication state inconsistency detected');
-          setError('Authentication state synchronization issue. Please try signing in again.');
+          // Don't set error immediately to prevent redirect loops
+          // setError('Authentication state synchronization issue. Please try signing in again.');
         } else {
           setError(null);
         }

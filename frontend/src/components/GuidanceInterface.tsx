@@ -10,6 +10,7 @@ import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environment';
 import { getAuthHeaders, authService } from '../auth/authService';
+import DebugAuth from './DebugAuth';
 import '../styles/spiritual-theme.css';
 
 interface Message {
@@ -24,6 +25,7 @@ export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
   const navigate = useNavigate();
 
   // Context hooks
@@ -32,6 +34,19 @@ export default function GuidanceInterface() {
 
   // Don't show admin button until all contexts are ready to prevent layout shift
   const showAdminButton = allReady && user?.isAdmin;
+
+  // Debug toggle for production troubleshooting
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + Shift + D to toggle debug
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+        setShowDebug(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   // Logout functionality
   const handleLogout = async () => {
@@ -831,6 +846,9 @@ export default function GuidanceInterface() {
           </button>
         </form>
       </div>
+      
+      {/* Debug overlay for troubleshooting auth issues in production */}
+      {showDebug && <DebugAuth />}
     </div>
   );
 }

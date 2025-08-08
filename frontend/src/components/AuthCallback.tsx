@@ -74,9 +74,10 @@ const AuthCallback: React.FC = () => {
         setProcessing(false);
         
         // Navigate to guidance page after successful processing and validation
+        // Add a longer delay to ensure all contexts have time to initialize
         setTimeout(() => {
           navigate('/guidance', { replace: true });
-        }, 800);
+        }, 1200);
 
       } catch (error) {
         console.error('❌ Multi-domain authentication callback failed:', error);
