@@ -3,7 +3,6 @@ Personality service for generating responses.
 Enhanced with LLM integration for dynamic responses.
 """
 
-import asyncio
 import logging
 from datetime import datetime
 from typing import Dict, Any, List
@@ -30,6 +29,24 @@ class PersonalityService:
             self.logger.warning(f"⚠️ LLM service not available, using templates: {e}")
         except Exception as e:
             self.logger.warning(f"⚠️ LLM service initialization failed, using templates: {e}")
+    
+    def _run_async_llm_call(self, query: str, personality_id: str):
+        """Helper method to run async LLM call in a new event loop"""
+        if not self._llm_service:
+            return None
+            
+        import asyncio
+        loop = asyncio.new_event_loop()
+        try:
+            asyncio.set_event_loop(loop)
+            return loop.run_until_complete(
+                self._llm_service.generate_personality_response(
+                    query=query,
+                    personality_id=personality_id
+                )
+            )
+        finally:
+            loop.close()
     
     def _load_response_templates(self) -> Dict[str, str]:
         """Load personality-specific response templates"""
@@ -82,63 +99,60 @@ class PersonalityService:
             # Try LLM service first, fallback to templates
             if self._llm_service:
                 try:
-                    # Use asyncio to call the async LLM service
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
+                    # Use helper method to handle async call
+                    llm_response = self._run_async_llm_call(query, personality_id)
                     
-                    llm_response = loop.run_until_complete(
-                        self._llm_service.generate_personality_response(
-                            query=query,
-                            personality_id=personality_id
-                        )
-                    )
-                    
-                    loop.close()
-                    
-                    response = {
-                        "content": llm_response.content,
-                        "metadata": {
-                            "timestamp": datetime.now().isoformat(),
-                            "personality_id": personality_id,
-                            "query_length": len(query),
-                            "response_length": len(llm_response.content),
-                            "service_version": "llm_enhanced_v1.0",
-                            "response_source": "llm_service",
-                            "language": language,
-                            "character_count": llm_response.character_count,
-                            "max_allowed": llm_response.max_allowed
+                    if llm_response and hasattr(llm_response, 'content') and llm_response.content:
+                        self.logger.info(f"✅ LLM service generated response for {personality_id}")
+                        return {
+                            "content": llm_response.content,
+                            "metadata": {
+                                "timestamp": datetime.now().isoformat(),
+                                "personality_id": personality_id,
+                                "query_length": len(query),
+                                "response_length": len(llm_response.content),
+                                "service_version": "llm_enhanced_v1.0",
+                                "response_source": "llm_service",
+                                "language": language,
+                                "character_count": getattr(llm_response, 'character_count', 0),
+                                "max_allowed": getattr(llm_response, 'max_allowed', 0)
+                            }
                         }
-                    }
-                    
-                    self.logger.info(f"✅ {personality_id} LLM response generated successfully")
-                    return response
-                    
+                    else:
+                        self.logger.warning(f"⚠️ LLM service returned empty response for {personality_id}, using template")
+                        
                 except Exception as llm_error:
-                    self.logger.warning(f"⚠️ LLM service failed, falling back to template: {llm_error}")
+                    self.logger.warning(f"⚠️ LLM service failed for {personality_id}: {llm_error}, using template")
             
             # Fallback to template response
-            response_content = self._get_template_response(personality_id, query)
-            
-            # Build response
-            response = {
-                "content": response_content,
+            self.logger.info(f"📝 Using template response for {personality_id}")
+            template_response = self._get_template_response(personality_id, query)
+            return {
+                "content": template_response,
                 "metadata": {
                     "timestamp": datetime.now().isoformat(),
                     "personality_id": personality_id,
                     "query_length": len(query),
-                    "response_length": len(response_content),
-                    "service_version": "template_fallback_v1.0",
-                    "response_source": "template",
+                    "response_length": len(template_response),
+                    "service_version": "template_v1.0",
+                    "response_source": "template_fallback",
                     "language": language
                 }
             }
             
-            self.logger.info(f"✅ {personality_id} template response generated successfully")
-            return response
-            
         except Exception as e:
-            self.logger.error(f"❌ Error generating response for {personality_id}: {e}")
-            return self._get_fallback_response(personality_id, str(e))
+            self.logger.error(f"❌ Error generating response for {personality_id}: {str(e)}")
+            fallback_msg = f"I apologize, but I'm having difficulty responding right now. Please try again."
+            return {
+                "content": fallback_msg,
+                "metadata": {
+                    "timestamp": datetime.now().isoformat(),
+                    "personality_id": personality_id,
+                    "error": str(e),
+                    "response_source": "error_fallback",
+                    "service_version": "error_v1.0"
+                }
+            }
     
     def _get_template_response(self, personality_id: str, query: str) -> str:
         """Get template-based response for a personality"""
@@ -150,25 +164,10 @@ class PersonalityService:
         
         return template
     
-    def _get_fallback_response(self, personality_id: str, error: str) -> Dict[str, Any]:
-        """Generate fallback response when there's an error"""
-        fallback_content = "I apologize, but I'm having trouble responding right now. Please try again shortly."
-        
-        return {
-            "content": fallback_content,
-            "metadata": {
-                "timestamp": datetime.now().isoformat(),
-                "personality_id": personality_id,
-                "service_version": "optimized_v1.0",
-                "response_source": "fallback",
-                "error": error
-            }
-        }
+    def get_available_personalities(self) -> List[str]:
+        """Get list of available personality IDs"""
+        return list(self._response_templates.keys())
     
     def validate_personality(self, personality_id: str) -> bool:
         """Check if personality ID is valid"""
         return personality_id in self._response_templates
-    
-    def get_available_personalities(self) -> List[str]:
-        """Get list of available personality IDs"""
-        return list(self._response_templates.keys())
