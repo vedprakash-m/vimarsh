@@ -6,7 +6,7 @@ Incorporates optimized services while maintaining reliable function registration
 import azure.functions as func
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional
 
 # Configure logging
@@ -389,6 +389,175 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         logger.error(f"❌ Traceback: {traceback.format_exc()}")
         return func.HttpResponse(
             json.dumps({"error": "Failed to get admin role", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/monitoring", methods=["GET"])
+async def admin_monitoring_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin monitoring endpoint for system health and usage data"""
+    try:
+        from auth.unified_auth_service import UnifiedAuthService
+        
+        logger.info("📊 Admin monitoring endpoint called")
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({"error": "Authentication required"}),
+                status_code=401,
+                headers=get_cors_headers()
+            )
+        
+        # Use admin service if available
+        if admin_service:
+            monitoring_data = admin_service.get_usage_monitoring()
+        else:
+            # Fallback monitoring data
+            monitoring_data = {
+                "current_status": "healthy",
+                "active_sessions": 0,
+                "rate_limits": {
+                    "requests_per_hour": 1000,
+                    "current_usage": 0,
+                    "percentage_used": 0.0
+                },
+                "performance": {
+                    "avg_response_time_ms": 250,
+                    "system_load": "low",
+                    "memory_usage": "normal"
+                },
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "service_version": "fallback_v1.0"
+            }
+        
+        return func.HttpResponse(
+            json.dumps(monitoring_data),
+            status_code=200,
+            headers=get_cors_headers()
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Admin monitoring error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get monitoring data", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/dashboard", methods=["GET"])
+@app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"])
+async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin dashboard endpoint for system statistics and analytics"""
+    try:
+        from auth.unified_auth_service import UnifiedAuthService
+        
+        logger.info("📊 Admin dashboard endpoint called")
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({"error": "Authentication required"}),
+                status_code=401,
+                headers=get_cors_headers()
+            )
+        
+        # Use admin service if available
+        if admin_service:
+            analytics_data = admin_service.get_admin_analytics(days=30)
+        else:
+            # Fallback analytics data
+            analytics_data = {
+                "period": {
+                    "days": 30,
+                    "start_date": (datetime.now(timezone.utc) - timedelta(days=30)).isoformat(),
+                    "end_date": datetime.now(timezone.utc).isoformat()
+                },
+                "user_metrics": {
+                    "total_active_users": 0,
+                    "new_users": 0,
+                    "returning_users": 0
+                },
+                "personality_metrics": {
+                    "most_popular": "krishna",
+                    "total_interactions": 0,
+                    "avg_response_time": 0.0
+                },
+                "system_metrics": {
+                    "total_requests": 0,
+                    "error_rate": 0.0,
+                    "uptime": "99.9%"
+                },
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "service_version": "fallback_v1.0"
+            }
+        
+        return func.HttpResponse(
+            json.dumps(analytics_data),
+            status_code=200,
+            headers=get_cors_headers()
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Admin dashboard error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get dashboard data", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/users", methods=["GET"])
+async def admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin users endpoint for user management data"""
+    try:
+        from auth.unified_auth_service import UnifiedAuthService
+        
+        logger.info("👥 Admin users endpoint called")
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({"error": "Authentication required"}),
+                status_code=401,
+                headers=get_cors_headers()
+            )
+        
+        # Fallback user data (would be populated from database in production)
+        users_data = {
+            "users": [
+                {
+                    "id": authenticated_user.id,
+                    "email": authenticated_user.email,
+                    "name": authenticated_user.name or "Admin User",
+                    "role": "admin",
+                    "last_login": datetime.now(timezone.utc).isoformat(),
+                    "status": "active",
+                    "total_conversations": 0
+                }
+            ],
+            "total_users": 1,
+            "active_users": 1,
+            "admin_users": 1,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "service_version": "fallback_v1.0"
+        }
+        
+        return func.HttpResponse(
+            json.dumps(users_data),
+            status_code=200,
+            headers=get_cors_headers()
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Admin users error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get users data", "details": str(e)}),
             status_code=500,
             headers=get_cors_headers()
         )

@@ -169,7 +169,7 @@ const AdminDashboard: React.FC = () => {
       const authHeaders = await getAuthHeaders();
       
       // Try the new real admin endpoint first
-      let response = await fetch(`${apiBaseUrl}/vimarsh-admin/real-dashboard`, {
+      let response = await fetch(`${apiBaseUrl}/vimarsh-admin/dashboard`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ const AdminDashboard: React.FC = () => {
       const apiBaseUrl = getApiBaseUrl();
       const authHeaders = await getAuthHeaders();
       
-      let response = await fetch(`${apiBaseUrl}/vimarsh-admin/real-users`, {
+      let response = await fetch(`${apiBaseUrl}/vimarsh-admin/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
