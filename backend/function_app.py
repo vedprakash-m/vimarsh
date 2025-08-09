@@ -448,7 +448,6 @@ async def admin_monitoring_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 @app.route(route="vimarsh-admin/dashboard", methods=["GET"])
-@app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"])
 async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin dashboard endpoint for system statistics and analytics"""
     try:
@@ -506,6 +505,68 @@ async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         logger.error(f"❌ Admin dashboard error: {e}")
         return func.HttpResponse(
             json.dumps({"error": "Failed to get dashboard data", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/cost-dashboard", methods=["GET"])
+async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Admin cost dashboard endpoint (alias for dashboard with cost focus)"""
+    try:
+        from auth.unified_auth_service import UnifiedAuthService
+        
+        logger.info("💰 Admin cost dashboard endpoint called")
+        
+        auth_service = UnifiedAuthService()
+        authenticated_user = await auth_service.extract_user_from_request(req)
+        
+        if not authenticated_user:
+            return func.HttpResponse(
+                json.dumps({"error": "Authentication required"}),
+                status_code=401,
+                headers=get_cors_headers()
+            )
+        
+        # Use admin service if available
+        if admin_service:
+            analytics_data = admin_service.get_admin_analytics(days=30)
+        else:
+            # Fallback analytics data with cost focus
+            analytics_data = {
+                "period": {
+                    "days": 30,
+                    "start_date": (datetime.now(timezone.utc) - timedelta(days=30)).isoformat(),
+                    "end_date": datetime.now(timezone.utc).isoformat()
+                },
+                "cost_metrics": {
+                    "total_cost_usd": 0.0,
+                    "llm_cost_usd": 0.0,
+                    "infrastructure_cost_usd": 0.0,
+                    "cost_per_request": 0.0
+                },
+                "usage_metrics": {
+                    "total_requests": 0,
+                    "llm_requests": 0,
+                    "template_requests": 0
+                },
+                "efficiency_metrics": {
+                    "cost_efficiency": 100.0,
+                    "cache_hit_rate": 0.0
+                },
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "service_version": "fallback_v1.0"
+            }
+        
+        return func.HttpResponse(
+            json.dumps(analytics_data),
+            status_code=200,
+            headers=get_cors_headers()
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Admin cost dashboard error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get cost dashboard data", "details": str(e)}),
             status_code=500,
             headers=get_cors_headers()
         )
