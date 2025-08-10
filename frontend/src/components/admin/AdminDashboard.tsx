@@ -89,7 +89,7 @@ const AdminDashboard: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentUser, setCurrentUser] = useState({
     name: 'System Administrator',
-    email: 'admin@vimarsh.com',
+    email: 'vedprakash.m@outlook.com',
     role: 'Super Admin'
   });
   const [performanceMetrics, setPerformanceMetrics] = useState({
@@ -150,7 +150,7 @@ const AdminDashboard: React.FC = () => {
         const userData = await response.json();
         setCurrentUser({
           name: userData.user?.name || 'System Administrator',
-          email: userData.user?.email || 'admin@vimarsh.com',
+          email: userData.user?.email || 'vedprakash.m@outlook.com',
           role: userData.role === 'SUPER_ADMIN' ? 'Super Admin' : userData.role
         });
       }
@@ -259,7 +259,7 @@ const AdminDashboard: React.FC = () => {
           totalCost: apiData.system_usage?.total_cost_usd || 0,
           totalTokens: apiData.system_usage?.total_tokens || 0,
           totalTexts: apiData.system_usage?.total_texts || 0,
-          totalPersonalities: 8,
+          totalPersonalities: 12,
           systemHealth: 'healthy',
           lastUpdated: apiData.dashboard_generated || new Date().toISOString(),
           userAnalytics: {
@@ -293,7 +293,7 @@ const AdminDashboard: React.FC = () => {
         totalCost: 2847.50,
         totalTokens: 1205000,
         totalTexts: 343,  // Real number from migration
-        totalPersonalities: 8,
+        totalPersonalities: 12,
         systemHealth: 'healthy',
         lastUpdated: new Date().toISOString()
       };
@@ -917,14 +917,14 @@ const AdminDashboard: React.FC = () => {
         <div className="stat-card">
           <Bot size={20} />
           <div>
-            <span className="stat-value">{stats?.totalPersonalities || 8}</span>
+            <span className="stat-value">{stats?.totalPersonalities || 12}</span>
             <span className="stat-label">Total Personalities</span>
           </div>
         </div>
         <div className="stat-card">
           <Activity size={20} />
           <div>
-            <span className="stat-value">{stats?.totalPersonalities || 8}</span>
+            <span className="stat-value">{stats?.totalPersonalities || 12}</span>
             <span className="stat-label">Active</span>
           </div>
         </div>
