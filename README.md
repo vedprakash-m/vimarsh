@@ -1,6 +1,6 @@
-# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform with Production Database Integration
+# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
 
-**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **4 major domains** with **Phase 2 production enhancements**. Experience personalized conversations with **12 operational personalities** including Einstein, Feynman, Curie, Lincoln, Churchill, Mandela, Krishna, Buddha, Jesus, Rumi, Marcus Aurelius, and Lao Tzu - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
+**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **4 major domains** with **Phase 2 production enhancements**. Experience personalized conversations with **12 operational personalities** including Einstein, Newton, Tesla, Lincoln, Chanakya, Confucius, Krishna, Buddha, Jesus, Rumi, Marcus Aurelius, and Lao Tzu - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
 
 > *Bridging timeless wisdom across all domains of human knowledge with modern AI technology and persistent memory*
 
@@ -28,13 +28,13 @@
 
 **🧠 Rational Clarity Domain (3 personalities):**
 - **Albert Einstein** - Scientific inquiry, relativity, and philosophy of science
-- **Richard Feynman** - Quantum physics and scientific communication
-- **Marie Curie** - Scientific perseverance and pioneering research
+- **Isaac Newton** - Mathematical genius and natural philosophy
+- **Nikola Tesla** - Visionary inventor and electrical engineering
 
 **🏛️ Timeless Authority Domain (3 personalities):**
 - **Abraham Lincoln** - Leadership, governance, and national unity
-- **Winston Churchill** - Wartime leadership and resilient determination
-- **Nelson Mandela** - Justice, reconciliation, and moral courage
+- **Chanakya** - Ancient strategist, economist, and political advisor
+- **Confucius** - Chinese philosopher and educator emphasizing ethics and social harmony
 
 **💭 Contemplative Wisdom Domain (2 personalities):**
 - **Marcus Aurelius** - Stoic philosophy and practical wisdom
