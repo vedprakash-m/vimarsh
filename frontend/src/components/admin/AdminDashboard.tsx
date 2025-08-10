@@ -84,6 +84,7 @@ const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [content, setContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -108,6 +109,7 @@ const AdminDashboard: React.FC = () => {
     loadCurrentUser();
     loadSystemStats();
     loadUsers();
+    loadContent();
     loadMonitoringData();
   }, []);
 
@@ -357,6 +359,32 @@ const AdminDashboard: React.FC = () => {
       
       // Use empty array if API fails - this fixes the 0 users display issue
       setUsers([]);
+    }
+  };
+
+  const loadContent = async () => {
+    try {
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+      
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content-sources`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders
+        }
+      });
+      
+      if (response.ok) {
+        const contentData = await response.json();
+        setContent(contentData.content_sources || []);
+      } else {
+        console.warn('Content sources API not available, using empty list');
+        setContent([]);
+      }
+    } catch (err) {
+      console.error('Error loading content:', err);
+      setContent([]);
     }
   };
 
@@ -895,10 +923,55 @@ const AdminDashboard: React.FC = () => {
         <div className="card-header">
           <h3>Content Sources Overview</h3>
         </div>
-        <p style={{ color: '#6b7280', padding: '1rem' }}>
-          📚 Content management interface will load source metadata, processing status, and personality associations.
-          Upload functionality for books/papers with automatic chunking and embedding pipeline.
-        </p>
+        
+        {content.length > 0 ? (
+          <div className="content-sources-list" style={{ padding: '1rem' }}>
+            {content.map((source: any, index: number) => (
+              <div key={source.id || index} className="content-source-item" style={{
+                border: '1px solid #e5e5e5',
+                borderRadius: '8px',
+                padding: '1rem',
+                marginBottom: '1rem',
+                backgroundColor: '#f9f9f9'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>{source.name}</h4>
+                    <p style={{ margin: '0 0 0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
+                      {source.chunks} chunks • {source.size_mb}MB • Status: {source.status}
+                    </p>
+                    {source.personality_associations && source.personality_associations.length > 0 && (
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {source.personality_associations.map((personality: string) => (
+                          <span key={personality} style={{
+                            backgroundColor: '#4f46e5',
+                            color: 'white',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '4px',
+                            fontSize: '0.8rem'
+                          }}>
+                            {personality}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span style={{ 
+                    color: source.status === 'processed' ? '#059669' : '#dc2626',
+                    fontWeight: 'bold',
+                    fontSize: '0.8rem'
+                  }}>
+                    {source.status.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: '#6b7280', padding: '1rem' }}>
+            📚 Loading content sources... Metadata, processing status, and personality associations will appear here.
+          </p>
+        )}
       </div>
     </div>
   );

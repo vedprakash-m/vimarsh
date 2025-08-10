@@ -477,9 +477,15 @@ async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     "end_date": datetime.now(timezone.utc).isoformat()
                 },
                 "user_metrics": {
-                    "total_active_users": 0,
+                    "total_users": 0,  # Frontend expects total_users
+                    "active_users": 0,  # Frontend expects active_users
                     "new_users": 0,
                     "returning_users": 0
+                },
+                "usage_metrics": {
+                    "estimated_cost": 0.0,  # Frontend expects usage_metrics.estimated_cost
+                    "total_tokens": 0,       # Frontend expects usage_metrics.total_tokens
+                    "total_requests": 0      # Frontend expects usage_metrics.total_requests
                 },
                 "personality_metrics": {
                     "most_popular": "krishna",
@@ -497,6 +503,8 @@ async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     "spiritual_texts": 343,
                     "total_content_chunks": 789
                 },
+                "status": "operational",  # Frontend checks this for system health
+                "last_updated": datetime.now(timezone.utc).isoformat(),
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "service_version": "fallback_v1.0"
             }
