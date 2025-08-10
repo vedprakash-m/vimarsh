@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
+import { getApiBaseUrl } from '../config/environment';
+import { getAuthHeaders } from '../auth/authService';
 import '../styles/gap-remediation.css';
 
 interface SystemCapability {
@@ -54,7 +56,12 @@ const AdminServiceDashboard: React.FC = () => {
       setLoading(true);
       
       // Fetch service status
-      const statusResponse = await fetch('/api/health');
+      const apiBaseUrl = getApiBaseUrl();
+      const authHeaders = await getAuthHeaders();
+      
+      const statusResponse = await fetch(`${apiBaseUrl}/health`, {
+        headers: authHeaders
+      });
       if (statusResponse.ok) {
         const statusData = await statusResponse.json();
         setServiceStatus(statusData);
@@ -62,7 +69,9 @@ const AdminServiceDashboard: React.FC = () => {
       
       // Fetch metrics (this would be a separate endpoint)
       try {
-        const metricsResponse = await fetch('/api/admin/metrics');
+        const metricsResponse = await fetch(`${apiBaseUrl}/vimarsh-admin/monitoring`, {
+          headers: authHeaders
+        });
         if (metricsResponse.ok) {
           const metricsData = await metricsResponse.json();
           setMetrics(metricsData);

@@ -87,7 +87,7 @@ const ContentManagement: React.FC = () => {
       const apiBaseUrl = getApiBaseUrl();
       const authHeaders = await getAuthHeaders();
       
-      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content`, {
+      const response = await fetch(`${apiBaseUrl}/vimarsh-admin/content-sources`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

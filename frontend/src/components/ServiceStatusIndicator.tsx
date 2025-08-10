@@ -165,7 +165,7 @@ const ServiceStatusIndicator: React.FC<ServiceStatusIndicatorProps> = ({
               
               {/* Service Grid */}
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(systemStatus.capabilities).map(([serviceName, health]) => (
+                {systemStatus?.capabilities && Object.entries(systemStatus.capabilities).map(([serviceName, health]) => (
                   <div key={serviceName} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-xs">
                     <span>{getServiceIcon(serviceName, health)}</span>
                     <div className="flex-1 min-w-0">
@@ -274,7 +274,7 @@ const ServiceStatusIndicator: React.FC<ServiceStatusIndicatorProps> = ({
           <div className="space-y-3 pt-3 border-t border-gray-200">
             {/* Service Grid */}
             <div className="grid grid-cols-2 gap-3">
-              {Object.entries(systemStatus.capabilities).map(([serviceName, health]) => (
+              {systemStatus?.capabilities && Object.entries(systemStatus.capabilities).map(([serviceName, health]) => (
                 <div key={serviceName} className="flex items-center gap-2 p-2 bg-white rounded border">
                   <span className="text-lg">{getServiceIcon(serviceName, health)}</span>
                   <div className="flex-1 min-w-0">

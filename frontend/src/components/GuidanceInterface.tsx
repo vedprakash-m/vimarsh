@@ -648,10 +648,12 @@ export default function GuidanceInterface() {
         />
       )}
 
-      {/* System Status Indicator - Gap Remediation Feature */}
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1rem 2rem 0' }}>
-        <ServiceStatusIndicator compact={true} className="mb-4" />
-      </div>
+      {/* System Status Indicator - Admin Only */}
+      {user?.role === 'admin' && (
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1rem 2rem 0' }}>
+          <ServiceStatusIndicator compact={true} className="mb-4" />
+        </div>
+      )}
 
       {/* Main Content */}
       <div style={{
