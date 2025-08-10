@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getApiBaseUrl } from '../config/environment';
 import '../styles/gap-remediation.css';
 
 interface ServiceHealth {
@@ -59,7 +60,8 @@ const ServiceStatusIndicator: React.FC<ServiceStatusIndicatorProps> = ({
   const fetchSystemStatus = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/health');
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/health`);
       
       if (!response.ok) {
         throw new Error(`Health check failed: ${response.status}`);
@@ -137,22 +139,70 @@ const ServiceStatusIndicator: React.FC<ServiceStatusIndicatorProps> = ({
       <div className={`service-status-indicator compact ${className}`}>
         <button
           onClick={() => setExpanded(!expanded)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            statusColor === 'green' ? 'bg-green-100 hover:bg-green-200' :
-            statusColor === 'yellow' ? 'bg-yellow-100 hover:bg-yellow-200' :
-            'bg-red-100 hover:bg-red-200'
+          className={`flex items-center gap-2 px-2 py-1 rounded-md text-xs transition-colors border ${
+            statusColor === 'green' ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' :
+            statusColor === 'yellow' ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100' :
+            'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
           }`}
         >
-          <span className={`w-2 h-2 rounded-full ${
+          <span className={`w-1.5 h-1.5 rounded-full ${
             statusColor === 'green' ? 'bg-green-500' :
             statusColor === 'yellow' ? 'bg-yellow-500' :
             'bg-red-500'
           }`} />
-          <span className="text-sm font-medium">
+          <span className="font-medium">
             {currentLanguage === 'Hindi' ? 'सिस्टम' : 'System'}: {readinessPercentage}%
           </span>
-          <span className="text-xs">{expanded ? '▼' : '▶'}</span>
         </button>
+        
+        {/* Expanded details in compact mode */}
+        {expanded && (
+          <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3">
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-gray-900">
+                {currentLanguage === 'Hindi' ? 'सिस्टम विवरण' : 'System Details'}
+              </div>
+              
+              {/* Service Grid */}
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(systemStatus.capabilities).map(([serviceName, health]) => (
+                  <div key={serviceName} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-xs">
+                    <span>{getServiceIcon(serviceName, health)}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">
+                        {getServiceLabel(serviceName)}
+                      </div>
+                      <div className="text-gray-500">
+                        {health?.available ? (
+                          currentLanguage === 'Hindi' ? 'उपलब्ध' : 'Available'
+                        ) : (
+                          currentLanguage === 'Hindi' ? 'अनुपलब्ध' : 'Unavailable'
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* System Status Message */}
+              <div className="text-xs text-gray-600">
+                {systemStatus.deployment_readiness > 0.8 ? (
+                  <>✅ {currentLanguage === 'Hindi' 
+                    ? 'सभी सेवाएं उपलब्ध हैं' 
+                    : 'All services available'}</>
+                ) : systemStatus.deployment_readiness > 0.6 ? (
+                  <>⚠️ {currentLanguage === 'Hindi' 
+                    ? 'कुछ सेवाएं सीमित हैं' 
+                    : 'Some services limited'}</>
+                ) : (
+                  <>🔄 {currentLanguage === 'Hindi' 
+                    ? 'पारंपरिक मोड सक्रिय' 
+                    : 'Traditional mode active'}</>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

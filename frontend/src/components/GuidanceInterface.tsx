@@ -79,8 +79,8 @@ const MessageSourceBadge: React.FC<MessageSourceBadgeProps> = ({ metadata, compa
     }
     
     return {
-      icon: '⚡',
-      label: 'Guide',
+      icon: '🎭',
+      label: 'Wisdom',
       color: 'rgba(107, 114, 128, 0.7)',
       bgColor: 'rgba(107, 114, 128, 0.1)'
     };
