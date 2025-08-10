@@ -4,6 +4,7 @@ import { Send, MessageSquare, Users, Settings, LogOut } from 'lucide-react';
 // import { Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import PersonalitySelector from './PersonalitySelector';
+import ServiceStatusIndicator from './ServiceStatusIndicator';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
 import { useAdmin } from '../contexts/AdminProviderContext';
 import { useAppLoading } from '../contexts/AppLoadingContext';
@@ -19,7 +20,124 @@ interface Message {
   isUser: boolean;
   timestamp: Date;
   personality?: string;
+  metadata?: {
+    response_source?: 'gemini_ai' | 'template_fallback' | 'hardcoded_fallback' | 'hybrid_rag' | 'simple_rag';
+    ai_generated?: boolean;
+    service_mode?: 'enhanced' | 'standard' | 'fallback';
+    fallback_reason?: string;
+    circuit_breaker_status?: {
+      state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+      failure_count: number;
+      last_failure_time?: string;
+    };
+    reliability_stats?: {
+      success_rate: number;
+      total_attempts: number;
+      template_fallback_count: number;
+    };
+    generation_time_ms?: number;
+    memory_enhanced?: boolean;
+  };
 }
+
+// Compact Message Source Badge for chat interface
+interface MessageSourceBadgeProps {
+  metadata: NonNullable<Message['metadata']>;
+  compact?: boolean;
+}
+
+const MessageSourceBadge: React.FC<MessageSourceBadgeProps> = ({ metadata, compact = true }) => {
+  const getSourceInfo = () => {
+    const isAI = metadata.ai_generated === true;
+    const source = metadata.response_source;
+    
+    if (isAI && source === 'gemini_ai') {
+      return {
+        icon: '🤖',
+        label: 'AI',
+        color: 'rgba(59, 130, 246, 0.7)',
+        bgColor: 'rgba(59, 130, 246, 0.1)'
+      };
+    }
+    
+    if (source === 'template_fallback' || source === 'hardcoded_fallback') {
+      return {
+        icon: '📜',
+        label: 'Traditional',
+        color: 'rgba(245, 158, 11, 0.7)',
+        bgColor: 'rgba(245, 158, 11, 0.1)'
+      };
+    }
+    
+    if (source === 'hybrid_rag' || source === 'simple_rag') {
+      return {
+        icon: '📚',
+        label: 'Enhanced',
+        color: 'rgba(147, 51, 234, 0.7)',
+        bgColor: 'rgba(147, 51, 234, 0.1)'
+      };
+    }
+    
+    return {
+      icon: '⚡',
+      label: 'Guide',
+      color: 'rgba(107, 114, 128, 0.7)',
+      bgColor: 'rgba(107, 114, 128, 0.1)'
+    };
+  };
+  
+  const sourceInfo = getSourceInfo();
+  
+  if (compact) {
+    return (
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.25rem',
+        padding: '0.25rem 0.5rem',
+        backgroundColor: sourceInfo.bgColor,
+        border: `1px solid ${sourceInfo.color}`,
+        borderRadius: '0.5rem',
+        fontSize: '0.7rem',
+        color: sourceInfo.color
+      }}>
+        <span>{sourceInfo.icon}</span>
+        <span>{sourceInfo.label}</span>
+        {metadata.generation_time_ms && (
+          <span style={{ opacity: 0.7 }}>
+            {metadata.generation_time_ms}ms
+          </span>
+        )}
+      </div>
+    );
+  }
+  
+  return (
+    <div style={{
+      padding: '0.5rem',
+      backgroundColor: sourceInfo.bgColor,
+      border: `1px solid ${sourceInfo.color}`,
+      borderRadius: '0.5rem',
+      fontSize: '0.8rem',
+      color: sourceInfo.color
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <span>{sourceInfo.icon}</span>
+        <span>{sourceInfo.label} Response</span>
+        {metadata.generation_time_ms && (
+          <span style={{ opacity: 0.7 }}>
+            ({metadata.generation_time_ms}ms)
+          </span>
+        )}
+      </div>
+      {metadata.fallback_reason && (
+        <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '0.25rem' }}>
+          Reason: {metadata.fallback_reason}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -156,13 +274,14 @@ export default function GuidanceInterface() {
 
       const data = await response.json();
       
-      // Use the response as-is from the backend
-      // The backend should handle inline citations if needed
+      // Use the response with metadata from backend
       const apiResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: data.response,
         isUser: false,
-        timestamp: new Date()
+        timestamp: new Date(),
+        personality: selectedPersonality.id,
+        metadata: data.metadata // Include the gap remediation metadata
       };
       
       setMessages(prev => [...prev, apiResponse]);
@@ -529,6 +648,11 @@ export default function GuidanceInterface() {
         />
       )}
 
+      {/* System Status Indicator - Gap Remediation Feature */}
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1rem 2rem 0' }}>
+        <ServiceStatusIndicator compact={true} className="mb-4" />
+      </div>
+
       {/* Main Content */}
       <div style={{
         maxWidth: '1000px',
@@ -725,7 +849,18 @@ export default function GuidanceInterface() {
                   {message.isUser ? (
                     <div>{message.text}</div>
                   ) : (
-                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                    <div>
+                      <ReactMarkdown>{message.text}</ReactMarkdown>
+                      {/* Response Source Transparency for Assistant Messages */}
+                      {message.metadata && (
+                        <div style={{ marginTop: '0.75rem' }}>
+                          <MessageSourceBadge 
+                            metadata={message.metadata}
+                            compact={true}
+                          />
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div style={{

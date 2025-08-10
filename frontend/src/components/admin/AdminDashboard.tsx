@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, DollarSign, Activity, Database, Settings, Shield, BarChart3, MessageSquare, Home, AlertTriangle, TrendingUp, FileText, Bot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ContentManagement from './ContentManagement';
+import AdminServiceDashboard from '../AdminServiceDashboard';
 import { getApiBaseUrl } from '../../config/environment';
 import { getAuthHeaders } from '../../auth/authService';
 import '../../styles/admin.css';
@@ -641,9 +642,16 @@ const AdminDashboard: React.FC = () => {
   const renderMonitoring = () => (
     <div className="vimarsh-admin-dashboard">
       <div className="vimarsh-admin-header">
-        <h1>System Monitoring</h1>
+        <h1>System Monitoring & Service Health</h1>
+        <p className="text-gray-600">Real-time monitoring of service capabilities and response transparency</p>
       </div>
 
+      {/* Enhanced Service Dashboard - Gap Remediation Feature */}
+      <div className="mb-8">
+        <AdminServiceDashboard />
+      </div>
+
+      {/* Legacy Monitoring (Keeping for compatibility) */}
       <div className="vimarsh-admin-grid">
         <div className="vimarsh-admin-card">
           <div className="card-header">
