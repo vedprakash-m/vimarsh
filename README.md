@@ -1,8 +1,8 @@
-# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
+# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform with Production Database Integration
 
-**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **historical, philosophical, scientific, and spiritual domains**. Experience personalized conversations with **12 distinct personalities** including Abraham Lincoln, Albert Einstein, Buddha, Chanakya, Confucius, Isaac Newton, Jesus Christ, Krishna, Lao Tzu, Marcus Aurelius, Nikola Tesla, and Rumi - each grounded in their authentic works and teachings.
+**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **4 major domains** with **Phase 2 production enhancements**. Experience personalized conversations with **12 operational personalities** including Einstein, Feynman, Curie, Lincoln, Churchill, Mandela, Krishna, Buddha, Jesus, Rumi, Marcus Aurelius, and Lao Tzu - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
 
-> *Bridging timeless wisdom across all domains of human knowledge with modern AI technology*
+> *Bridging timeless wisdom across all domains of human knowledge with modern AI technology and persistent memory*
 
 [![CI/CD Pipeline](https://github.com/vedprakash-m/vimarsh/actions/workflows/unified-ci-cd.yml/badge.svg)](https://github.com/vedprakash-m/vimarsh/actions)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -18,66 +18,57 @@
 
 **🌐 Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
 
-### 🎭 Meet the 12 Personalities
+### 🎭 Meet the 12 Operational Personalities (Phase 2)
 
-**🏛️ Historical Domain:**
-- **Abraham Lincoln** - Leadership, governance, and national unity
-- **Chanakya** - Ancient Indian statecraft, economics, and strategic wisdom
-- **Confucius** - Chinese philosophy, ethics, and social harmony
-
-**💭 Philosophical Domain:**
-- **Lao Tzu** - Taoist principles and natural harmony
-- **Marcus Aurelius** - Stoic philosophy and practical wisdom
-
-**🔬 Scientific Domain:**  
-- **Albert Einstein** - Scientific inquiry, relativity, and philosophy of science
-- **Isaac Newton** - Classical mechanics, mathematics, and natural philosophy
-- **Nikola Tesla** - Electrical engineering, innovation, and technological vision
-
-**🕉️ Spiritual Domain:**
+**🕉️ Spiritual Domain (4 personalities):**
+- **Krishna** - Guidance from Bhagavad Gita and dharmic wisdom
 - **Buddha** - Buddhist teachings on enlightenment and the Middle Path  
 - **Jesus Christ** - Christian wisdom on love and transformation
-- **Krishna** - Guidance from Bhagavad Gita and Mahabharata
 - **Rumi** - Mystical poetry and spiritual insights
 
-### ✨ Platform Features
+**🧠 Rational Clarity Domain (3 personalities):**
+- **Albert Einstein** - Scientific inquiry, relativity, and philosophy of science
+- **Richard Feynman** - Quantum physics and scientific communication
+- **Marie Curie** - Scientific perseverance and pioneering research
+
+**🏛️ Timeless Authority Domain (3 personalities):**
+- **Abraham Lincoln** - Leadership, governance, and national unity
+- **Winston Churchill** - Wartime leadership and resilient determination
+- **Nelson Mandela** - Justice, reconciliation, and moral courage
+
+**💭 Contemplative Wisdom Domain (2 personalities):**
+- **Marcus Aurelius** - Stoic philosophy and practical wisdom
+- **Lao Tzu** - Taoist principles and natural harmony
+
+### ✨ Phase 2 Platform Features
 
 **🎯 For Learners & Seekers:**
-- **Authentic Multi-Personality Conversations**: Chat with 12 of history's greatest minds in their own voice
-- **Cross-Domain Insights**: Compare perspectives across spiritual, scientific, historical, and philosophical domains
-- **Template-Based Responses**: Fast, reliable responses with authentic personality characteristics
-- **Domain-Specific Expertise**: Each personality offers specialized knowledge in their field
-- **Dynamic Personality Selection**: Seamlessly switch between personalities based on your inquiry
-- **Intelligent Sample Questions**: Domain-specific prompts that match each personality's expertise
-- **Progressive Web App**: Accessible anywhere, works offline, mobile-optimized
-- **Production Ready**: Live deployment with 99.9% uptime and sub-second response times
-
-### ✨ Platform Capabilities
-
-**🎭 For Users:**
-- **12 Authentic Personalities**: Converse with history's greatest minds across 4 domains
-- **Enhanced Response System**: Template-based responses ensuring consistent personality authenticity
-- **Instant Access**: Fast loading with optimized modular architecture
-- **Cross-Domain Insights**: Compare perspectives across different fields of knowledge
-- **Progressive Web App**: Accessible anywhere, works offline, mobile-optimized
+- **Cross-Session Conversation Memory**: Conversations continue seamlessly across sessions with personality-specific memory isolation
+- **Wisdom Journal Integration**: Personal insights storage with semantic search for reflection and growth tracking
+- **Progressive Personalization**: UI and interaction patterns adapt based on user preferences and behavior patterns
+- **Enhanced RAG Pipeline**: Hybrid search fusion (BM25 + vector embeddings) with citation grounding for superior accuracy
+- **12 Operational Personalities**: Authentic conversations across 4 domains with consistent voice preservation
+- **Citation Grounding System**: Automated validation of response citations with source verification
+- **Domain-Specific Expertise**: Each personality offers specialized knowledge with authentic historical context
+- **Administrative Excellence**: Quality assurance tools and content management for enterprise-grade operation
+- **Progressive Web App**: Accessible anywhere, works offline, mobile-optimized with persistent data
 
 **💻 For Developers:**
-- **Modern Modular Architecture**: Clean, maintainable codebase with 89.4% code reduction
-- **Production-Ready Services**: Lightweight, optimized services with graceful fallbacks
-- **Type-Safe Implementation**: Full TypeScript + Python type safety across all components
-- **Azure Functions Backend**: Serverless Python 3.12 with reliable function registration
-- **Advanced Frontend**: React 18 + TypeScript with comprehensive error handling
-- **Cost-Optimized Infrastructure**: Serverless architecture with unified resource management
-- **Enterprise Security**: Microsoft Entra ID integration with role-based access control
-- **Comprehensive Testing**: End-to-end validation with production deployment verification
+- **Phase 2 Database Integration**: Complete Azure Cosmos DB implementation with 6 specialized containers
+- **Production Database Service**: 580+ line comprehensive database service with graceful fallback mechanisms
+- **Modern Modular Architecture**: Clean, maintainable codebase with type-safe implementation
+- **Enterprise Security**: Microsoft Entra ID integration with role-based access control and admin privileges
+- **Cost-Optimized Infrastructure**: Serverless architecture with unified resource management and pause-resume functionality
+- **Comprehensive Testing**: End-to-end validation with production deployment verification and Phase 2 service integration
 
 ## 🚀 Quick Start
 
 ### **For Users**
 1. Visit [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
-2. Choose from 12 distinct personalities across 4 domains
-3. Engage in authentic conversations with history's greatest minds
-4. Experience domain-specific guidance tailored to each personality's expertise
+2. Choose from 12 operational personalities across 4 domains
+3. Engage in conversations with persistent memory across sessions
+4. Build your wisdom journal with semantic search capabilities
+5. Experience progressive personalization that adapts to your preferences
 
 ### **For Developers**
 
@@ -93,12 +84,12 @@
 git clone https://github.com/user/vimarsh.git
 cd vimarsh
 
-# Backend setup - Modular Architecture
+# Backend setup - Phase 2 Database Integration
 cd backend
 pip install -r requirements.txt
 cp local.settings.json.example local.settings.json
-# Configure API keys and connection strings
-# Functions automatically registered: PersonalityService, AdminService, SafetyService
+# Configure API keys and connection strings for Phase 2 services
+# Automatic service registration: Phase2DatabaseService, ConversationMemoryService, WisdomJournalService
 func host start
 
 # Frontend setup (new terminal)

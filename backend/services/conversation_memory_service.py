@@ -12,53 +12,27 @@ from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 
+# Import proper conversation models
+try:
+    from models.conversation_models import (
+        ConversationMessage, ConversationSession, MessageType, ConversationStatus,
+        create_conversation_message, create_conversation_session
+    )
+    MODELS_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Conversation models not available: {e}")
+    MODELS_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
-class ConversationStatus(Enum):
-    """Status of a conversation"""
-    ACTIVE = "active"
-    PAUSED = "paused"
-    COMPLETED = "completed"
-    ARCHIVED = "archived"
-
-@dataclass
-class ConversationMessage:
-    """Individual message in a conversation"""
-    id: str
-    conversation_id: str
-    user_id: str
-    personality_id: str
-    message_type: str  # "user_query" or "personality_response"
-    content: str
-    timestamp: datetime
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for storage"""
-        return {
-            "id": self.id,
-            "conversation_id": self.conversation_id,
-            "user_id": self.user_id,
-            "personality_id": self.personality_id,
-            "message_type": self.message_type,
-            "content": self.content,
-            "timestamp": self.timestamp.isoformat(),
-            "metadata": self.metadata
-        }
-    
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'ConversationMessage':
-        """Create from dictionary"""
-        return cls(
-            id=data["id"],
-            conversation_id=data["conversation_id"],
-            user_id=data["user_id"],
-            personality_id=data["personality_id"],
-            message_type=data["message_type"],
-            content=data["content"],
-            timestamp=datetime.fromisoformat(data["timestamp"]),
-            metadata=data.get("metadata", {})
-        )
+# Keep the local ConversationStatus enum for backward compatibility if models not available
+if not MODELS_AVAILABLE:
+    class ConversationStatus(Enum):
+        """Status of a conversation"""
+        ACTIVE = "active"
+        PAUSED = "paused"
+        COMPLETED = "completed"
+        ARCHIVED = "archived"
 
 @dataclass
 class ConversationContext:
@@ -136,16 +110,37 @@ class ConversationMemoryService:
         
         message_id = f"msg_{conversation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
         
-        message = ConversationMessage(
-            id=message_id,
-            conversation_id=conversation_id,
-            user_id=user_id,
-            personality_id=personality_id,
-            message_type=message_type,
-            content=content,
-            timestamp=datetime.now(),
-            metadata=metadata or {}
-        )
+        # Convert message_type to MessageType enum if available
+        if MODELS_AVAILABLE:
+            if message_type == "user_query":
+                msg_type = MessageType.USER_QUERY
+            elif message_type == "personality_response":
+                msg_type = MessageType.PERSONALITY_RESPONSE
+            else:
+                msg_type = MessageType.USER_QUERY  # Default fallback
+                
+            message = ConversationMessage(
+                id=message_id,
+                session_id=conversation_id,  # Use session_id for models compatibility
+                user_id=user_id,
+                personality_id=personality_id,
+                message_type=msg_type,
+                content=content,
+                timestamp=datetime.now(),
+                metadata=metadata or {}
+            )
+        else:
+            # Fallback for when models not available - create simple dict
+            message = {
+                "id": message_id,
+                "conversation_id": conversation_id,
+                "user_id": user_id,
+                "personality_id": personality_id,
+                "message_type": message_type,
+                "content": content,
+                "timestamp": datetime.now(),
+                "metadata": metadata or {}
+            }
         
         # Update session cache
         if conversation_id in self.session_cache:
@@ -322,20 +317,24 @@ CURRENT QUERY: {current_query}"""
         
         try:
             # Extract user_id and personality_id from conversation_id
-            # conversation_id format: conv_{user_id}_{personality_id}_{timestamp}
+            # conversation_id format: conv_{user_id}_{personality_id}_{YYYYMMDD_HHMMSS}
+            # Note: user_id might contain underscores, and timestamp has 2 parts separated by _
             parts = conversation_id.split('_')
-            if len(parts) >= 3:
-                user_id = parts[1]
-                personality_id = parts[2]
+            if len(parts) >= 5 and conversation_id.startswith('conv_'):
+                # Last 2 parts are timestamp: YYYYMMDD_HHMMSS
+                # Second-to-last-to-last part is personality_id
+                # Everything between 'conv' and personality is user_id
+                personality_id = parts[-3]  # chanakya
+                user_id = '_'.join(parts[1:-3])  # test_user_001
                 
                 # Get recent messages from database
                 messages = await self.database_service.get_recent_messages(
                     user_id, personality_id, limit
                 )
-                logger.info(f"📨 Retrieved {len(messages)} recent messages from database")
+                logger.info(f"📨 Retrieved {len(messages)} recent messages from database for {user_id}/{personality_id}")
                 return messages
             else:
-                logger.warning(f"⚠️ Invalid conversation_id format: {conversation_id}")
+                logger.warning(f"⚠️ Invalid conversation_id format: {conversation_id} (expected conv_{{user}}_{{personality}}_{{timestamp}})")
                 return []
                 
         except Exception as e:

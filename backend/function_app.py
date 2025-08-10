@@ -20,8 +20,10 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 optimized_personality_service = None
 safety_service = None
 admin_service = None
+conversation_memory_service = None
 personality_models_available = False
 personality_service_available = False
+memory_service_available = False
 
 try:
     from models.personality_models import PERSONALITY_CONFIGS, PersonalityConfig
@@ -35,6 +37,14 @@ try:
     
 except ImportError as e:
     logger.warning(f"⚠️ Personality service not available: {e}")
+
+try:
+    from services.conversation_memory_service import ConversationMemoryService
+    conversation_memory_service = ConversationMemoryService()
+    memory_service_available = True
+    logger.info("✅ Conversation memory service initialized")
+except ImportError as e:
+    logger.warning(f"⚠️ Conversation memory service not available: {e}")
 
 try:
     from services.safety_service import SafetyService
@@ -856,6 +866,7 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         user_query = query_data.get('query', '').strip()
         personality_id = query_data.get('personality_id', 'krishna')
         language = query_data.get('language', 'English')
+        user_id = query_data.get('user_id', 'anonymous')  # Add user_id for memory
         
         if not user_query:
             return func.HttpResponse(
@@ -874,11 +885,60 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             logger.warning(f"Invalid personality: {personality_id}, defaulting to Krishna")
             personality_id = "krishna"
         
-        # Generate response using available service
+        # Enhanced response generation with conversation memory
+        conversation_context = ""
+        conversation_id = None
+        if memory_service_available:
+            try:
+                # Get or start conversation
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    conversation_id = loop.run_until_complete(
+                        conversation_memory_service.start_conversation(
+                            user_id=user_id,
+                            personality_id=personality_id
+                        )
+                    )
+                    
+                    # Get conversation context
+                    context_data = loop.run_until_complete(
+                        conversation_memory_service.get_conversation_context(
+                            conversation_id=conversation_id
+                        )
+                    )
+                    
+                    # Format recent messages as context
+                    if hasattr(context_data, 'recent_messages') and context_data.recent_messages:
+                        from models.conversation_models import MessageType
+                        recent_msgs = []
+                        for msg in context_data.recent_messages[-3:]:  # Last 3 messages for context
+                            if msg.message_type == MessageType.USER_QUERY:
+                                recent_msgs.append(f"Previous question: {msg.content}")
+                            elif msg.message_type == MessageType.PERSONALITY_RESPONSE:
+                                recent_msgs.append(f"My previous response: {msg.content[:200]}...")
+                        conversation_context = "\n".join(recent_msgs)
+                    
+                    logger.info(f"🧠 Retrieved conversation context: {len(conversation_context)} chars")
+                finally:
+                    loop.close()
+                    
+            except Exception as memory_error:
+                logger.warning(f"⚠️ Failed to retrieve conversation context: {memory_error}")
+        
+        # Generate response using available service with context
         if personality_service_available:
-            service_response = optimized_personality_service.generate_response(user_query, personality_id, language)
+            # Enhance the user query with conversation context for better follow-up responses
+            enhanced_query = user_query
+            if conversation_context:
+                enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
+                logger.info(f"🔍 Enhanced query with context for better follow-up response")
+            
+            service_response = optimized_personality_service.generate_response(enhanced_query, personality_id, language)
             response_text = service_response["content"]
             response_metadata = service_response["metadata"]
+            response_metadata["memory_enhanced"] = bool(conversation_context)
         else:
             # Fallback response generation
             fallback_responses = {
@@ -888,8 +948,43 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             response_metadata = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "service_version": "fallback_v1.0",
-                "response_source": "hardcoded_fallback"
+                "response_source": "hardcoded_fallback",
+                "memory_enhanced": False
             }
+        
+        # Store conversation in memory
+        if memory_service_available and conversation_id:
+            try:
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    # Store user message
+                    loop.run_until_complete(
+                        conversation_memory_service.add_message(
+                            conversation_id=conversation_id,
+                            user_id=user_id,
+                            personality_id=personality_id,
+                            message_type="user_query",
+                            content=user_query
+                        )
+                    )
+                    # Store personality response
+                    loop.run_until_complete(
+                        conversation_memory_service.add_message(
+                            conversation_id=conversation_id,
+                            user_id=user_id,
+                            personality_id=personality_id,
+                            message_type="personality_response",
+                            content=response_text
+                        )
+                    )
+                    logger.info(f"💾 Stored conversation exchange in memory")
+                finally:
+                    loop.close()
+                    
+            except Exception as store_error:
+                logger.warning(f"⚠️ Failed to store conversation: {store_error}")
         
         # Get personality info
         if personality_models_available:

@@ -119,10 +119,13 @@ class ConversationMessage:
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'ConversationMessage':
-        """Create from dictionary."""
+        """Create from dictionary with backward compatibility."""
+        # Handle backward compatibility: conversation_id -> session_id
+        session_id = data.get("session_id") or data.get("conversation_id", "")
+        
         return cls(
             id=data["id"],
-            session_id=data["session_id"],
+            session_id=session_id,
             user_id=data["user_id"],
             personality_id=data["personality_id"],
             message_type=MessageType(data["message_type"]),

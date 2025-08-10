@@ -4,9 +4,9 @@
 
 ## 1. Overview
 
-This document provides comprehensive technical specifications for implementing the Vimarsh AI-powered multi-personality conversational platform as defined in the Product Requirements Document (PRD). Vimarsh leverages Retrieval-Augmented Generation (RAG) with Google Gemini 2.5 Flash to enable authentic conversations with **8 distinct personalities** across **4 major domains** (spiritual, scientific, historical, philosophical), each grounded in their authentic works and teachings through personality-specific knowledge bases.
+This document provides comprehensive technical specifications for implementing the Vimarsh AI-powered multi-personality conversational platform as defined in the Product Requirements Document (PRD). Vimarsh leverages Retrieval-Augmented Generation (RAG) with Google Gemini 2.5 Flash to enable authentic conversations with **12 operational personalities** across **4 major domains** (spiritual, scientific, historical, philosophical), each grounded in their authentic works and teachings through personality-specific knowledge bases.
 
-**Architecture Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures while maintaining the same cost-optimized, scalable infrastructure.
+**Architecture Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures with **Phase 2 production database integration**, cross-session conversation memory, wisdom journal capabilities, and progressive personalization while maintaining the same cost-optimized, scalable infrastructure.
 
 ---
 
@@ -25,7 +25,7 @@ This document provides comprehensive technical specifications for implementing t
 **vimarsh-rg (Unified Resource Group):**
 * **Purpose**: Simplified management of all Vimarsh resources in a single location
 * **Resources**: 
-  - Cosmos DB (`vimarsh-db`) - Multi-personality knowledge base and user data
+  - Cosmos DB (`vimarsh-db`) - Multi-personality knowledge base, conversation memory, user preferences, wisdom journal, and analytics data with 6 specialized containers
   - Key Vault (`vimarsh-kv-*`) - API keys, secrets, and configuration
   - Storage Account (`vimarshstorage`) - Content, media files, and function storage
   - Function App (`vimarsh-backend-app-flex`) - Backend API server (Flex Consumption)
@@ -33,7 +33,7 @@ This document provides comprehensive technical specifications for implementing t
   - Application Insights (`vimarsh-backend-app-flex`) - Monitoring and telemetry
   - App Service Plan (`ASP-vimarshrg-84c5`) - Flex Consumption hosting (West US 2)
 * **Cost Behavior**: Optimized with serverless and consumption-based pricing
-* **Lifecycle**: Unified management and deployment cycles
+* **Lifecycle**: Unified management and deployment cycles with production database integration
 
 ### 2.3. Cost Optimization Strategy
 
@@ -67,28 +67,106 @@ This document provides comprehensive technical specifications for implementing t
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 │                      │                      │                 │
 ├─ React/TypeScript   ├─ Azure Functions    ├─ Google Gemini  │
-├─ PersonalitySelector├─ Multi-Domain RAG   │   2.5 Flash      │
-├─ Voice Interface    ├─ Personality Service├─ Google Cloud   │
-├─ Admin Dashboard    ├─ LLM Service        │   STT/TTS APIs   │
-└─ Domain Filtering   └─ Auth & Security    └─ Azure Services │
+├─ PersonalitySelector├─ Hybrid RAG System  │   2.5 Flash      │
+├─ Voice Interface    ├─ Memory Service     ├─ Google Cloud   │
+├─ Admin Dashboard    ├─ Wisdom Journal     │   STT/TTS APIs   │
+├─ Personalization   ├─ Phase2 Database    ├─ Azure Services │
+└─ Domain Filtering   └─ Auth & Security    └─ Citation System│
                                                               │
 ┌─────────────────────────────────────────────────────────────┐
-│                Multi-Personality Data Layer                 │
+│               Phase 2 Multi-Personality Data Layer         │
 ├─────────────────────────────────────────────────────────────┤
-│ Spiritual Domain: Krishna, Buddha, Jesus, Rumi             │
-│ Scientific Domain: Einstein                                 │
-│ Historical Domain: Lincoln                                  │
-│ Philosophical Domain: Marcus Aurelius, Lao Tzu             │
+│ Spiritual Domain: Krishna, Buddha, Jesus, Rumi (4)         │
+│ Rational Clarity: Einstein, Feynman, Curie (3)             │
+│ Timeless Authority: Lincoln, Churchill, Mandela (3)        │
+│ Contemplative Wisdom: Marcus Aurelius, Lao Tzu (2)         │
+│                                                             │
+│ Phase 2 Database Containers:                               │
+│ - conversations: Cross-session memory with isolation       │
+│ - user_preferences: Progressive personalization storage    │
+│ - wisdom_journal: Semantic search personal insights        │
+│ - personalities: 12 operational personality profiles       │
+│ - analytics: User engagement and conversation metrics      │
+│ - content_management: Admin panel content operations       │
 │                                                             │
 │ Each personality has:                                       │
 │ - Dedicated knowledge base with domain-specific content    │
 │ - Personality profile with tone and response patterns      │
 │ - Vector embeddings in personality-specific namespaces     │
 │ - Citation metadata linked to authentic source material    │
+│ - Cross-session conversation memory with user isolation    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2. Multi-Domain Processing Architecture
+### 3.2. Phase 2 Database Architecture
+
+**Production Database Integration:**
+The Phase 2 implementation includes comprehensive Azure Cosmos DB integration with six specialized containers for persistent storage and enhanced user experience.
+
+**Database Containers:**
+
+1. **conversations** Container:
+   - **Purpose**: Cross-session conversation memory with user-personality isolation
+   - **Key Features**: Message persistence, conversation threading, privacy safeguards
+   - **Schema**: user_id, personality_id, conversation_id, messages[], metadata
+
+2. **user_preferences** Container:
+   - **Purpose**: Progressive personalization and adaptive UI preferences
+   - **Key Features**: Learning user patterns, interface customization, behavioral adaptation
+   - **Schema**: user_id, ui_preferences, interaction_patterns, personalization_data
+
+3. **wisdom_journal** Container:
+   - **Purpose**: Semantic search-enabled personal insights storage
+   - **Key Features**: User reflection tracking, insight categorization, semantic search
+   - **Schema**: user_id, journal_entries[], tags[], semantic_vectors, insights
+
+4. **personalities** Container:
+   - **Purpose**: 12 operational personality profiles and configurations
+   - **Key Features**: Personality metadata, response patterns, domain expertise
+   - **Schema**: personality_id, profile_data, response_patterns, knowledge_base_refs
+
+5. **analytics** Container:
+   - **Purpose**: User engagement and conversation metrics
+   - **Key Features**: Usage tracking, engagement analytics, quality metrics
+   - **Schema**: user_id, session_data, engagement_metrics, conversation_analytics
+
+6. **content_management** Container:
+   - **Purpose**: Admin panel content operations and quality assurance
+   - **Key Features**: Content validation, admin workflows, quality control
+   - **Schema**: content_id, admin_actions[], quality_scores, validation_status
+
+**Database Service Architecture:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Phase2DatabaseService                         │
+├─────────────────────────────────────────────────────────────┤
+│ • Unified database operations for all containers           │
+│ • Graceful fallback mechanisms for service resilience      │
+│ • Health checks and connection monitoring                  │
+│ • CRUD operations with error handling and retries         │
+│ • Batch operations for performance optimization            │
+│ • Container-specific query methods and indexing           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3.3. Enhanced RAG Pipeline Architecture
+
+**Hybrid Search Implementation:**
+```
+Query Processing → BM25 + Vector Search → Citation Grounding → Response Generation
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Query Analysis  │───►│ Hybrid Retrieval│───►│ Citation        │
+│ & Preprocessing │    │ (BM25 + Vector) │    │ Validation      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+│                      │                      │                 │
+├─ Intent Detection   ├─ Keyword Matching   ├─ Source Lookup   │
+├─ Personality Context├─ Semantic Similarity├─ Quality Scoring │
+├─ Domain Classification─ Relevance Ranking ├─ Citation Format │
+└─ Query Expansion    └─ Result Fusion      └─ Authenticity    │
+```
+
+### 3.4. Multi-Domain Processing Architecture
 
 **Domain-Specific Processing Pipeline:**
 ```
@@ -106,27 +184,37 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
 └─ Philosophical      └─ Expertise Areas    └─ Relevance Score │
 ```
 
-### 3.3. Detailed Component Architecture
+### 3.5. Detailed Component Architecture
 
 **Frontend (Multi-Personality Interface):**
 - **Technology Stack:** React 18 with TypeScript for type safety across personality interactions
 - **Core Components:**
-  - `PersonalitySelector`: Browse and select from 8 personalities across 4 domains
-  - `CleanSpiritualInterface`: Main conversation interface with personality context
+  - `PersonalitySelector`: Browse and select from 12 personalities across 4 domains
+  - `CleanSpiritualInterface`: Main conversation interface with personality context and memory
   - `AdminDashboard`: Comprehensive personality and content management
   - `VoiceInterface`: Personality-specific voice characteristics and TTS settings
+  - `WisdomJournal`: Personal insights storage with semantic search capabilities
+  - `PersonalizationEngine`: Progressive UI adaptation based on user preferences
 - **Input Handling:**
-  - Text input with personality context awareness
+  - Text input with personality context awareness and conversation memory
   - Voice input using Web Speech API with domain-specific vocabulary optimization
   - Personality selection with domain filtering and search capabilities
 - **Output Rendering:**
   - Personality-specific response formatting and styling
-  - Domain-appropriate citation display (e.g., verse numbers for spiritual, paper citations for scientific)
+  - Domain-appropriate citation display with grounding validation
   - Audio playback for TTS-generated responses
+  - Cross-session conversation continuity
   - Responsive design for mobile and desktop
 
 **Backend (API Server):**
-* **Technology Stack:** Python with FastAPI or Flask framework
+* **Technology Stack:** Python with Azure Functions serverless architecture
+* **Core Services:**
+  - `Phase2DatabaseService`: Unified database operations across all containers
+  - `ConversationMemoryService`: Cross-session conversation persistence
+  - `WisdomJournalService`: Semantic search personal insights management
+  - `PersonalizationService`: Progressive user experience adaptation
+  - `CitationGroundingService`: Automated response validation and source verification
+  - `EnhancedSpiritualGuidanceService`: Multi-personality response generation
 * **Core Responsibilities:**
   - Request orchestration and routing
   - RAG pipeline coordination
