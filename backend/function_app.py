@@ -21,9 +21,11 @@ optimized_personality_service = None
 safety_service = None
 admin_service = None
 conversation_memory_service = None
+enhanced_llm_service = None
 personality_models_available = False
 personality_service_available = False
 memory_service_available = False
+enhanced_llm_available = False
 
 try:
     from models.personality_models import PERSONALITY_CONFIGS, PersonalityConfig
@@ -37,6 +39,13 @@ try:
     
 except ImportError as e:
     logger.warning(f"⚠️ Personality service not available: {e}")
+
+try:
+    from services.enhanced_llm_wrapper import enhanced_llm_service
+    enhanced_llm_available = True
+    logger.info("✅ Enhanced LLM service with reliability patterns loaded")
+except ImportError as e:
+    logger.warning(f"⚠️ Enhanced LLM service not available: {e}")
 
 try:
     from services.conversation_memory_service import ConversationMemoryService
@@ -122,9 +131,15 @@ def get_cors_headers() -> Dict[str, str]:
 
 @app.route(route="health", methods=["GET"])
 def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced health check endpoint with service status"""
+    """Enhanced health check endpoint with comprehensive service status"""
     try:
-        # Get personality data
+        # Import capability manifest service
+        from core.capability_manifest import capability_manifest_service
+        
+        # Generate comprehensive capability manifest
+        manifest = capability_manifest_service.generate_manifest()
+        
+        # Get personality data for compatibility
         if personality_models_available:
             personalities = get_personality_list()
             total_personalities = len(personalities)
@@ -133,19 +148,53 @@ def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             personality_ids = list(FALLBACK_PERSONALITIES.keys())
             total_personalities = len(personality_ids)
         
+        # Convert to dictionary for JSON response
         health_data = {
-            "status": "healthy",
+            "status": "healthy" if manifest.overall_status.value == "operational" else "degraded",
             "service": "vimarsh-enhanced",
-            "version": "2.0",
-            "architecture": "modular",
+            "version": "2.1-capability-aware",
+            "architecture": "modular-with-fallbacks",
+            "timestamp": manifest.timestamp,
+            "deployment_readiness": manifest.deployment_readiness,
+            "overall_status": manifest.overall_status.value,
+            
+            # Personality info for compatibility
             "personalities_available": total_personalities,
             "personalities": personality_ids,
+            
+            # Detailed service capabilities
             "services": {
+                name: {
+                    "available": cap.available,
+                    "status": cap.status.value,
+                    "fallback_mode": cap.fallback_mode.value,
+                    "error_message": cap.error_message,
+                    "failure_rate_24h": cap.failure_rate_24h,
+                    "response_time_ms": cap.response_time_ms,
+                    "health_details": cap.health_details or {}
+                }
+                for name, cap in manifest.capabilities.items()
+            },
+            
+            # Legacy service status for compatibility
+            "legacy_services": {
                 "personality_models": personality_models_available,
                 "personality_service": personality_service_available,
+                "memory_service": memory_service_available,
                 "fallback_mode": not (personality_models_available and personality_service_available)
             },
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            
+            # Transparency features
+            "active_fallbacks": manifest.active_fallbacks,
+            "recommendations": manifest.recommendations,
+            "user_impact": manifest.user_impact,
+            
+            # Service statistics
+            "service_counts": {
+                "operational": sum(1 for cap in manifest.capabilities.values() if cap.status.value == "operational"),
+                "degraded": sum(1 for cap in manifest.capabilities.values() if cap.status.value == "degraded"),
+                "unavailable": sum(1 for cap in manifest.capabilities.values() if cap.status.value == "unavailable")
+            }
         }
         
         return func.HttpResponse(
@@ -155,8 +204,17 @@ def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         )
     except Exception as e:
         logger.error(f"❌ Health check failed: {str(e)}")
+        # Fallback to simple health check
+        health_data = {
+            "status": "degraded",
+            "service": "vimarsh-enhanced",
+            "version": "2.1-fallback",
+            "error": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "fallback_reason": "Capability manifest service unavailable"
+        }
         return func.HttpResponse(
-            json.dumps({"status": "unhealthy", "error": str(e)}),
+            json.dumps(health_data),
             status_code=500,
             headers=get_cors_headers()
         )
@@ -841,6 +899,24 @@ async def admin_settings_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             headers=get_cors_headers()
         )
 
+def _get_template_fallback_response(personality_id: str):
+    """Get template fallback response with metadata"""
+    fallback_responses = {
+        "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏",
+        "buddha": "Dear friend, suffering arises from attachment and craving. Through mindful awareness and the Noble Eightfold Path, we can find liberation. Practice compassion for all beings and remember - the present moment is all we truly have. May you find peace and wisdom on your path.",
+        "default": "I apologize, but I'm currently unable to provide personalized guidance. Please try again in a moment."
+    }
+    
+    response_text = fallback_responses.get(personality_id, fallback_responses["default"])
+    response_metadata = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service_version": "fallback_v1.0",
+        "response_source": "template_fallback",
+        "memory_enhanced": False
+    }
+    
+    return response_text, response_metadata
+
 @app.route(route="guidance", methods=["POST"])
 def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced guidance endpoint with modular service integration"""
@@ -928,7 +1004,64 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 logger.warning(f"⚠️ Failed to retrieve conversation context: {memory_error}")
         
         # Generate response using available service with context
-        if personality_service_available:
+        response_source = "template_fallback"  # Default assumption
+        
+        if enhanced_llm_available:
+            # Try enhanced LLM service first with reliability patterns
+            try:
+                # Enhance the user query with conversation context for better follow-up responses
+                enhanced_query = user_query
+                if conversation_context:
+                    enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
+                    logger.info(f"🔍 Enhanced query with context for better follow-up response")
+                
+                # Use enhanced LLM with circuit breaker and retry patterns
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    llm_response = loop.run_until_complete(
+                        enhanced_llm_service.generate_response_with_monitoring(
+                            query=enhanced_query,
+                            personality_id=personality_id,
+                            language=language
+                        )
+                    )
+                finally:
+                    loop.close()
+                
+                if llm_response and llm_response.get("success", False):
+                    response_text = llm_response["content"]
+                    response_metadata = llm_response.get("metadata", {})
+                    response_metadata["memory_enhanced"] = bool(conversation_context)
+                    response_source = llm_response.get("source", "enhanced_llm")
+                    logger.info(f"✅ Enhanced LLM service provided response (source: {response_source})")
+                else:
+                    # Enhanced LLM failed, try standard personality service
+                    raise Exception("Enhanced LLM service returned no valid response")
+                    
+            except Exception as llm_error:
+                logger.warning(f"⚠️ Enhanced LLM service failed: {llm_error}, falling back to personality service")
+                # Fall through to personality service
+                if personality_service_available:
+                    # Enhance the user query with conversation context for better follow-up responses
+                    enhanced_query = user_query
+                    if conversation_context:
+                        enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
+                        logger.info(f"🔍 Enhanced query with context for better follow-up response")
+                    
+                    service_response = optimized_personality_service.generate_response(enhanced_query, personality_id, language)
+                    response_text = service_response["content"]
+                    response_metadata = service_response["metadata"]
+                    response_metadata["memory_enhanced"] = bool(conversation_context)
+                    response_source = "personality_service"
+                else:
+                    # Final fallback to templates
+                    response_text, response_metadata = _get_template_fallback_response(personality_id)
+                    response_source = "template_fallback"
+                    
+        elif personality_service_available:
+            # Standard personality service without enhanced LLM
             # Enhance the user query with conversation context for better follow-up responses
             enhanced_query = user_query
             if conversation_context:
@@ -939,18 +1072,11 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             response_text = service_response["content"]
             response_metadata = service_response["metadata"]
             response_metadata["memory_enhanced"] = bool(conversation_context)
+            response_source = "personality_service"
         else:
-            # Fallback response generation
-            fallback_responses = {
-                "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏"
-            }
-            response_text = fallback_responses.get(personality_id, fallback_responses["krishna"])
-            response_metadata = {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "service_version": "fallback_v1.0",
-                "response_source": "hardcoded_fallback",
-                "memory_enhanced": False
-            }
+            # Template fallback only
+            response_text, response_metadata = _get_template_fallback_response(personality_id)
+            response_source = "template_fallback"
         
         # Store conversation in memory
         if memory_service_available and conversation_id:
@@ -1004,7 +1130,7 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "description": fallback_info["description"]
             }
         
-        # Build final response
+        # Build final response with transparency about response source
         response = {
             "response": response_text,
             "personality": personality_info,
@@ -1013,7 +1139,9 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "language": language,
                 "query_length": len(user_query),
                 "response_length": len(response_text),
-                "service_mode": "enhanced" if personality_service_available else "fallback"
+                "service_mode": "enhanced" if enhanced_llm_available else ("standard" if personality_service_available else "fallback"),
+                "response_source": response_source,  # Key transparency feature
+                "ai_generated": response_source not in ["template_fallback", "hardcoded_fallback"]
             }
         }
         
