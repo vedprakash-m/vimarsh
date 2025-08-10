@@ -1,0 +1,32 @@
+[
+  {
+    "id": "msg_conv_test_memory_user_krishna_20250810_100507_20250810_100507_288319",
+    "conversation_id": "conv_test_memory_user_krishna_20250810_100507",
+    "user_id": "test_memory_user",
+    "personality_id": "krishna",
+    "message_type": "user",
+    "content": "What is the meaning of dharma?",
+    "timestamp": "2025-08-10T10:05:07.288324",
+    "metadata": {}
+  },
+  {
+    "id": "msg_conv_workflow_test_user_krishna_20250810_100507_20250810_100507_290381",
+    "conversation_id": "conv_workflow_test_user_krishna_20250810_100507",
+    "user_id": "workflow_test_user",
+    "personality_id": "krishna",
+    "message_type": "user",
+    "content": "Help me understand the balance between action and detachment",
+    "timestamp": "2025-08-10T10:05:07.290385",
+    "metadata": {}
+  },
+  {
+    "id": "msg_conv_workflow_test_user_krishna_20250810_100507_20250810_100507_290540",
+    "conversation_id": "conv_workflow_test_user_krishna_20250810_100507",
+    "user_id": "workflow_test_user",
+    "personality_id": "krishna",
+    "message_type": "assistant",
+    "content": "In the Bhagavad Gita, I teach that you should perform your duty (dharma) with full dedication, but without attachment to the fruits of your actions. This is karma yoga - the path of selfless action.",
+    "timestamp": "2025-08-10T10:05:07.290544",
+    "metadata": {}
+  }
+]

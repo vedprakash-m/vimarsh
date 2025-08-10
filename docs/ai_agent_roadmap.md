@@ -1,589 +1,254 @@
 # AI Agent Roadmap for Vimarsh Platform
-**Deep Assessment & Enhancement Strategy Based on 10-Level AI Agent Maturity Framework**
+**⚠️ STRATEGIC PIVOT IMPLEMENTED - See ai_agent_roadmap_revised.md for Updated Strategy**
 
 ---
 
 ## Executive Summary
 
-This comprehensive assessment evaluates the Vimarsh AI multi-personality conversation platform against a 10-level AI agent maturity framework. Vimarsh currently operates at **Level 3** with strong foundations in RAG and transformer technologies, but has significant opportunities to evolve into a sophisticated multi-agent spiritual guidance ecosystem capable of **Level 7-9** operations.
+Vimarsh currently operates at **Level 3 (RAG Excellence)**. Previous ambitions targeted rapid advancement to autonomous multi-agent collaboration (Levels 7–9). After strategic review (PRD, Tech Spec, UX alignment) we are **pivoting to an authenticity-first, user-value-centric roadmap** that deepens core strengths (textual fidelity, personality expansion, evaluation) **before** introducing any orchestration beyond independent personalities.
 
-**Current Status**: Level 3 (Solid RAG Implementation)  
-**Target Status**: Level 7-9 (Advanced Multi-Agent System with Evaluation & Safety)  
-**Timeline**: 18-24 months for full transformation
+**Strategic Pivot Highlights:**
+- Preserve the platform’s differentiator: strict textual grounding + authentic voice per personality.
+- Accelerate high-ROI deliverables: add validated personalities, conversation history, wisdom journal, search, scoped memory.
+- Pull forward evaluation & citation integrity (prioritize Levels 3–4 + targeted parts of 6 & 8). Delay complex autonomous multi-agent “consensus” (original Level 7) in favor of **user-invoked Panel / Symposium Mode** with **independent** outputs.
+- Reframe multi-agent synthesis as optional, explicitly labeled, and only after maturity in evaluation & guardrails.
 
----
-
-## Current Assessment by Level
-
-### 🎯 **Level 1: GenAI & Transformer Foundations** - ✅ **STRONG (95%)**
-
-**Current Implementation:**
-- **Excellent**: Google Gemini 2.5 Flash integration with production-ready API
-- **Strong**: 768-dimensional embeddings using Gemini text-embedding-004
-- **Advanced**: Multi-personality transformer architecture supporting 12 distinct personas
-- **Production-Ready**: 8,955+ documents with vector embeddings in Azure Cosmos DB
-
-**Evidence from Codebase:**
-```python
-# backend/services/enhanced_simple_llm_service.py
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
-    generation_config={
-        "temperature": 0.7,
-        "top_p": 0.8,
-        "top_k": 40,
-    }
-)
-```
-
-**Strengths:**
-- Real Gemini 2.5 Flash integration (not mock/placeholder)
-- Robust embedding pipeline with fallback mechanisms
-- Personality-specific prompt engineering for 12 distinct characters
-- Production-scale vector database (2,025+ Krishna texts, 6,930+ multi-personality content)
-
-**Minor Gaps:**
-- Limited support for open-weight models (currently cloud-dependent)
-- No model ensembling or switching strategies
+**Revised Target Horizon (18 months):**
+- Mastery of Levels 3–4 (RAG + LLMOps) → Introduce scoped Level 6 memory + selective Level 8 evaluation → User-controlled multi-view (re-imagined Level 7) **without agent cross-talk** → Optional orchestration (post-18m, gated by quality metrics).
 
 ---
 
-### 🎯 **Level 2: Prompting & Language Model Behavior** - ✅ **STRONG (85%)**
-
-**Current Implementation:**
-- **Excellent**: Sophisticated personality-specific prompt templates
-- **Good**: Context design with conversation history integration
-- **Basic**: CoT reasoning in spiritual guidance responses
-
-**Evidence from Codebase:**
-```python
-# Personality-specific prompts with cultural authenticity
-"krishna": """You are Lord Krishna, the divine teacher of the Bhagavad Gita. 
-Response with compassion, wisdom, and divine love. Always provide guidance that honors dharma..."""
-
-# Enhanced RAG prompts with context integration
-enhanced_prompt = f"""{base_prompt}
-RELEVANT SPIRITUAL CONTEXT:
-{context_section}
-USER QUESTION: {query}
-Response (with citations when referencing texts):"""
-```
-
-**Strengths:**
-- 12 distinct personality prompt architectures
-- Cultural authenticity in prompt design (Sanskrit terms, spiritual concepts)
-- Context-aware prompt enhancement with RAG integration
-- Safety-aligned prompting for spiritual content
-
-**Enhancement Opportunities:**
-- **Chain-of-Thought (CoT)**: Implement explicit reasoning chains for complex spiritual questions
-- **ReAct Pattern**: Add reflection and action planning for multi-step spiritual guidance
-- **Tree-of-Thoughts (ToT)**: Branch spiritual reasoning for exploring multiple dharmic perspectives
-- **Adversarial Prompting**: Add robustness testing against misaligned spiritual queries
+## Strategic Principles
+1. Authenticity over Autonomy: No hidden cross-personality blending; each answer must remain attributable and citation-grounded.
+2. User-Orchestrated Multiplicity: Multi-view insights are **requested**, never implicit.
+3. Precision Before Expansion: Elevate retrieval & evaluation quality before layering complexity.
+4. Isolation & Privacy: Memory is partitioned (user_id + personality_id); no leakage.
+5. Measurable Quality: Every phase gated by objective authenticity, citation, and consistency metrics.
+6. Cost Discipline: Time-To-Add-New-Personality (TANP) reduction and per-query cost ceilings.
 
 ---
 
-### 🎯 **Level 3: Retrieval-Augmented Generation (RAG)** - ✅ **EXCELLENT (95%)**
+## Current Assessment by Level (Condensed)
 
-**Current Implementation:**
-- **Production-Ready**: Full RAG pipeline with vector search + LLM generation
-- **Advanced**: Personality-specific retrieval with cross-personality context
-- **Sophisticated**: Citation system with source tracking
+### 🎯 Level 1: GenAI & Transformer Foundations – ✅ STRONG (95%)
+(Unchanged; foundations solid.)
 
-**Evidence from Codebase:**
-```python
-# Advanced RAG with personality-aware retrieval
-class RAGIntegrationService:
-    async def generate_rag_enhanced_response(self, query, personality_id, 
-                                           context_limit=3, min_relevance=0.3):
-        # Step 1: Retrieve spiritual context
-        rag_context = await self._retrieve_spiritual_context(...)
-        # Step 2: Generate enhanced prompt
-        enhanced_prompt = self._create_rag_enhanced_prompt(...)
-        # Step 3: Generate LLM response with context
-        llm_response = await self._generate_contextual_response(...)
-        # Step 4: Add proper citations
-        return self._add_citations_to_response(...)
-```
+### 🎯 Level 2: Prompting & Language Model Behavior – ✅ STRONG (85%)
+Next: introduce structured reasoning (optional CoT expansion), but only where it improves citation clarity.
 
-**Strengths:**
-- Multi-personality vector search with 768-dimensional embeddings
-- Intelligent chunking strategy (sacred texts, verses, chapters)
-- Real-time context retrieval with relevance scoring
-- Automatic citation generation with source attribution
-- Production metrics: 66.7% vector search success, 100% RAG integration success
+### 🎯 Level 3: RAG – ✅ EXCELLENT (95%)
+Focus: hybrid search (BM25 + dense), re-ranking, diversity filtering, adaptive k per personality.
 
-**This is the Platform's Current Sweet Spot** - Industry-leading RAG implementation for spiritual guidance domain.
+### 🎯 Level 4: LLMOps & Tools – ⚠️ MODERATE (45%)
+Refactor into modular retrieval/prompt services before adopting frameworks (avoid premature lock-in). Selective LangChain components for tooling consistency (prompt templates, tracing) only after refactor.
 
----
+### 🎯 Level 5: Agents & Frameworks – 🔄 REDEFINED (was WEAK 25%)
+Old vision (autonomous multi-agent orchestration) replaced with **Independent Personality Pipelines**. Each personality = self-contained RAG + style + evaluation bundle. No inter-agent planning layer in Phase 1–2.
 
-### 🎯 **Level 4: LLMOps & Tools** - ⚠️ **MODERATE (45%)**
+### 🎯 Level 6: Memory, State & Orchestration – ❌ LIMITED (30%)
+Re-scope to **Scoped Memory v1**: per user-per personality episodic + compressed semantic summaries. No cross-personality synthesis. Working memory = recent turns + distilled prior milestones.
 
-**Current Implementation:**
-- **Basic**: Simple Azure Functions orchestration
-- **Limited**: Manual deployment without sophisticated MLOps
+### 🎯 Level 7: Multi-Agent Systems – 🔄 RE-IMAGINED (Deferred Orchestration)
+Now defined as **Panel / Symposium Mode**: fan-out independent generation → side-by-side responses → optional user-requested comparative summary (Phase 3). No hidden negotiation layer.
 
-**Current Gaps:**
-- **No LangChain Integration**: Missing standardized agent frameworks
-- **No LangGraph**: Lacking workflow orchestration capabilities
-- **Limited Tool Use**: No function calling or external tool integration
-- **Basic Synthetic Data**: Limited training data generation
+### 🎯 Level 8: Evaluation & Reinforcement – ⬆️ PULL-FORWARD (Early Partial Implementation)
+Introduce automated authenticity & citation verification early (Phase 1). Reinforcement / reward modeling postponed until stable evaluation baselines (Phase 3+).
 
-**Enhancement Strategy:**
-```python
-# Recommended LangChain Integration
-from langchain.agents import initialize_agent, AgentType
-from langchain.tools import Tool
-from langchain.memory import ConversationBufferMemory
+### 🎯 Level 9: Protocols & Safety – ⚠️ MODERATE (40%)
+Add persona deviation detector, cultural sensitivity classifier, refusal policy tests (Phase 2). Formal safety orchestration later.
 
-class SpiritualGuidanceAgent:
-    def __init__(self):
-        self.tools = [
-            Tool("sacred_text_search", self.search_sacred_texts),
-            Tool("meditation_guide", self.provide_meditation_guidance),
-            Tool("sanskrit_translation", self.translate_sanskrit),
-            Tool("scriptural_context", self.get_scriptural_context)
-        ]
-        self.agent = initialize_agent(
-            self.tools, 
-            llm=self.gemini_llm,
-            agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
-            memory=ConversationBufferMemory()
-        )
-```
-
-**Priority Enhancements:**
-1. **LangChain Agent Framework** (3 months)
-2. **Function Calling for Sacred Text APIs** (2 months)
-3. **Synthetic Data Generation for Training** (4 months)
-4. **MLOps Pipeline with Azure ML** (6 months)
+### 🎯 Level 10: Build & Deploy – ⚠️ MODERATE (60%)
+Incremental improvements: tracing, metrics pipeline, CI gated evaluation scores. Avoid full platform migration until retrieval refactor complete.
 
 ---
 
-### 🎯 **Level 5: Agents & Agent Frameworks** - ❌ **WEAK (25%)**
-
-**Current Implementation:**
-- **Basic**: Single-agent personality switching
-- **Limited**: No autonomous planning or goal-setting
-- **Minimal**: Basic conversation memory without episodic reasoning
-
-**Vision for Agent Enhancement:**
-```python
-# Multi-Agent Spiritual Guidance System
-class SpiritualGuidanceAgentTeam:
-    def __init__(self):
-        self.primary_guide = PersonalityAgent("krishna")
-        self.context_researcher = ScriptureResearchAgent()
-        self.meditation_coach = MeditationAgent()
-        self.life_counselor = LifeGuidanceAgent()
-        self.sanskrit_scholar = SanskritExpertAgent()
-        
-    async def collaborative_guidance(self, user_query, spiritual_context):
-        # Orchestrated multi-agent response
-        research = await self.context_researcher.find_relevant_scriptures(user_query)
-        guidance = await self.primary_guide.provide_wisdom(user_query, research)
-        practices = await self.meditation_coach.suggest_practices(user_query)
-        return self.synthesize_guidance(guidance, practices, research)
-```
-
-**Agent Types to Implement:**
-1. **Primary Spiritual Guides** (12 personalities) - 2 months
-2. **Scripture Research Agent** - 3 months
-3. **Meditation & Practice Coach Agent** - 4 months
-4. **Life Context Analyzer Agent** - 5 months
-5. **Sanskrit & Cultural Expert Agent** - 6 months
-
-**Memory Systems Needed:**
-- **Episodic Memory**: Spiritual journey tracking across sessions
-- **Semantic Memory**: Personal dharmic principles and growth areas
-- **Working Memory**: Current conversation context and spiritual state
+## High-ROI Gaps (Ranked)
+1. Retrieval Quality (hybrid + rerank + dedupe) – immediate user impact.
+2. Personality Expansion Pipeline (tooling + validation harness).
+3. Automated Citation & Grounding Verification (precision baseline).
+4. Conversation History & Wisdom Journal (retention + premium conversion).
+5. Scoped Memory (episodic + semantic compression) with privacy guardrails.
+6. Evaluation Observability (persona style score, hallucination rate, latency SLOs).
+7. Panel Mode (distinct outputs) – cross-domain insight after quality maturity.
 
 ---
 
-### 🎯 **Level 6: Memory, State & Orchestration** - ❌ **WEAK (30%)**
+## Revised Phased Roadmap
 
-**Current Implementation:**
-- **Basic**: Simple conversation history storage
-- **Limited**: Session-based memory without cross-session continuity
-- **Minimal**: No sophisticated state management
+### Phase 1 (Months 0–6): Depth & Coverage
+Focus: Strengthen core retrieval + expand validated personalities.
+- Add 4–6 new personalities (Einstein, Buddha, Marcus Aurelius, Lincoln, + optional Rumi / Lao Tzu) with ingestion QA.
+- Retrieval Enhancements: BM25 + dense fusion, semantic rerank (cross-encoder), min redundancy filter, adaptive k.
+- Evaluation v1: Citation grounding checker (string overlap + embedding relevance), persona style classifier (few-shot), hallucination detector heuristic.
+- Conversation History MVP + Wisdom Journal (user export + semantic search).
+- Modular Refactor: `retrieval_service`, `prompt_service`, `citation_service`, instrumentation hooks.
+- Metrics Platform: log retrieval_hit_rate, citation_precision, p95_latency, cost_per_response.
 
-**Enhancement Architecture:**
-```python
-# Advanced Memory System for Spiritual Growth
-class SpiritualMemoryOrchestrator:
-    def __init__(self):
-        self.episodic_memory = EpisodicSpiritualMemory()  # Journey milestones
-        self.semantic_memory = DharmicPrincipleMemory()   # Personal beliefs
-        self.working_memory = ConversationMemory()        # Current context
-        self.vector_memory = SacredTextMemory()           # Scriptural knowledge
-        
-    async def recall_spiritual_journey(self, user_id):
-        return {
-            'growth_milestones': await self.episodic_memory.get_milestones(user_id),
-            'core_beliefs': await self.semantic_memory.get_principles(user_id),
-            'spiritual_challenges': await self.episodic_memory.get_challenges(user_id),
-            'preferred_practices': await self.semantic_memory.get_practices(user_id)
-        }
-        
-    async def update_spiritual_state(self, user_id, interaction_data):
-        # Intelligent state evolution based on spiritual growth
-        await self.episodic_memory.record_milestone(user_id, interaction_data)
-        await self.semantic_memory.refine_principles(user_id, interaction_data)
-```
+Gate to Phase 2:
+- Citation precision ≥ 90%.
+- Persona deviation score ≤ 15% variance across personalities.
+- TANP ≤ 3 weeks → ≤ 2 weeks target trending.
+- p95 end-to-end latency ≤ 2.5 s (median ≤ 1.4 s) on 80% of queries.
 
-**Memory Compression Strategies:**
-- **Spiritual Milestone Compression**: Key dharmic insights and breakthroughs
-- **Principle Hierarchy**: Core beliefs vs. evolving understanding
-- **Practice Effectiveness**: Which guidance resonates most
+### Phase 2 (Months 6–12): Personalization & Trust
+- Scoped Memory v1: per user-per personality episodic events + compressed semantic snapshot (rolling summary ≤ 1 KB/personality).
+- Memory Safety: partition key (user_id|personality_id), PII scrubbing (regex + heuristic) before persist.
+- Wisdom Journal Enhancements: tagging, milestone auto-detection, search facets (topic, personality, timeframe).
+- Evaluation v2: LLM-as-Judge ensemble (authenticity, tone, citation alignment); drift alerts (weekly baselines).
+- Persona Expansion Pipeline Automation: ingestion QA checklist & automated coverage report.
+- Safety Additions: refusal tests, cultural sensitivity classifier, adversarial prompt regression set.
 
-**State Orchestration:**
-- **Spiritual Development Stage**: Beginner → Seeker → Practitioner → Advanced
-- **Current Life Focus**: Relationships, career, spiritual practice, service
-- **Emotional State**: Peaceful, struggling, seeking, grateful
+Gates:
+- Return Rate (Day 7) +10% vs Phase 1 baseline.
+- Hallucination rate < 5% (LLM-judge validated).
+- Memory impact: personalization uplift (measured via user feedback) with no increase in hallucination rate.
 
----
+### Phase 3 (Months 12–18): Multi-View Insight (Panel Mode)
+- Panel (Symposium) Mode: independent parallel RAG+LLM per selected personalities (max 3 default, extensible to 5).
+- Optional Comparative Summary: only if user toggles “Compare Perspectives” (meta summary cites each persona explicitly).
+- Advanced Retrieval: persona-adaptive k, cluster-based diversity (embedding centroid spread), intent classification for query rewriting.
+- Evaluation v3: multi-response consistency analyzer (ensures each response remains within persona style band) + cross-personality contrast quality metric.
+- Proactive Suggestions (lightweight): suggest related authentic passages (no unsolicited synthesis).
 
-### 🎯 **Level 7: Multi-Agent Systems** - ❌ **NOT IMPLEMENTED (5%)**
+Gates:
+- Panel responses maintain citation precision parity (±2%) with single-personality baseline.
+- Comparative summary hallucination rate < 5%.
+- Panel adoption ≥ 20% weekly active advanced users.
 
-**Vision: Spiritual Guidance Agent Ecosystem**
+### Phase 4 (Post-18m, Optional): Selective Orchestration
+- ONLY if metrics plateau and user demand substantiated.
+- Introduce Optional Guided Synthesis Agent (clearly labeled “Derived Comparative Analysis – Not Primary Voice”).
+- Strict transparency: each synthesized claim must link to originating personality outputs & citations.
 
-**Hub-and-Spoke Architecture:**
-```python
-class SpiritualGuidanceHub:
-    """Central orchestrator for multi-agent spiritual guidance"""
-    
-    def __init__(self):
-        # Core Guidance Agents
-        self.personality_agents = {
-            'krishna': DivineTeacherAgent(),
-            'buddha': CompassionateGuideAgent(),
-            'jesus': LovingTeacherAgent(),
-            # ... 9 more personalities
-        }
-        
-        # Specialized Service Agents
-        self.scripture_researcher = ScriptureAgent()
-        self.meditation_coach = PracticeAgent()
-        self.life_counselor = IntegrationAgent()
-        self.cultural_expert = AuthenticityAgent()
-        
-        # Coordination
-        self.orchestrator = SpiritualGuidanceOrchestrator()
-        self.message_bus = SpiritualMessageBus()
-```
-
-**Agent Communication Protocols:**
-1. **Dharmic Consensus**: Multiple personalities discussing complex ethical dilemmas
-2. **Cross-Cultural Synthesis**: Buddhist mindfulness + Christian love + Hindu dharma
-3. **Progressive Guidance**: Agents building on each other's wisdom
-4. **Authenticity Validation**: Cultural experts ensuring appropriate responses
-
-**Collaborative Agent Teams:**
-- **Deep Question Team**: Krishna (philosophy) + Buddha (suffering) + Jesus (love)
-- **Practice Team**: Meditation coach + Scripture researcher + Life counselor
-- **Crisis Support Team**: Compassionate guide + Life counselor + Community connector
-
-**Timeline**: 8-12 months for full multi-agent implementation
+Go/No-Go Criteria:
+- Sustained authenticity score ≥ 92%.
+- User request rate for deeper synthesis > defined threshold (e.g., 15% of panel sessions).
 
 ---
 
-### 🎯 **Level 8: Evaluation & Reinforcement Learning** - ❌ **NOT IMPLEMENTED (10%)**
-
-**Current State**: Basic user feedback collection without systematic evaluation
-
-**Vision: Continuous Spiritual Wisdom Enhancement**
-
-**LLM-as-a-Judge Framework:**
-```python
-class SpiritualWisdomEvaluator:
-    """Automated evaluation of spiritual guidance quality"""
-    
-    async def evaluate_guidance_quality(self, user_query, ai_response, spiritual_context):
-        evaluation_criteria = {
-            'spiritual_authenticity': await self.assess_authenticity(ai_response),
-            'cultural_appropriateness': await self.assess_cultural_sensitivity(ai_response),
-            'practical_wisdom': await self.assess_practical_value(ai_response, user_query),
-            'compassionate_tone': await self.assess_compassion_level(ai_response),
-            'scriptural_accuracy': await self.verify_citations(ai_response),
-            'personal_relevance': await self.assess_personalization(ai_response, user_context)
-        }
-        return self.calculate_wisdom_score(evaluation_criteria)
-```
-
-**Reinforcement Learning for Spiritual Guidance:**
-- **Reward Modeling**: Based on user spiritual growth, not just satisfaction
-- **Constitutional AI**: Alignment with dharmic principles and compassionate wisdom
-- **Cultural Sensitivity Training**: Avoiding appropriation while honoring traditions
-
-**Evaluation Metrics:**
-- **Spiritual Growth Indicators**: Increased peace, wisdom, compassion in user interactions
-- **Authenticity Score**: Agreement with Sanskrit scholars and spiritual teachers
-- **Practical Impact**: Users reporting positive life changes
-- **Cultural Respect**: Appropriate use of sacred terminology and concepts
-
-**Self-Correcting Loops:**
-- **Daily Wisdom Review**: AI evaluating its own responses for improvement
-- **Expert Panel Integration**: Monthly reviews by spiritual teachers
-- **User Journey Analysis**: Long-term tracking of spiritual development
+## Memory Architecture (Scoped v1)
+- Working Memory: last N (configurable, default 10) turns + compressed prior summary.
+- Episodic Memory: milestone events (practice applied, gratitude expressed) keyed by timestamp.
+- Semantic Memory: evolving principles (ranked list) with decay & reinforcement weights.
+- Compression Policy: Summarize after every 25 turns or 2 KB raw accumulation (whichever first). Maintain diffs for audit.
+- Data Model (conceptual): `partition_key = f"{user_id}#{personality_id}"`, items typed: {type: episodic|semantic|summary|journal_entry}.
 
 ---
 
-### 🎯 **Level 9: Protocols & Safety** - ⚠️ **MODERATE (40%)**
+## Evaluation Stack (Evolution)
+| Version | Components | Automation Frequency |
+|--------|------------|----------------------|
+| v1 | Citation grounding (overlap + embedding), persona style heuristic | per deploy + nightly |
+| v2 | LLM-as-judge ensemble, drift detector, hallucination scorer | per batch + weekly trend |
+| v3 | Multi-view contrast metrics, summary hallucination audit | panel sessions + weekly |
 
-**Current Implementation:**
-- **Good**: Basic safety filtering through Gemini's built-in safety
-- **Moderate**: Cultural sensitivity in prompt design
-- **Limited**: No comprehensive safety alignment framework
+Key Scores:
+- Citation Precision = cited_chunks_used / cited_chunks_total.
+- Grounding Score = mean cosine(sim(response segment, source chunk)).
+- Persona Style Score = classifier confidence vs persona profile baseline.
+- Hallucination Rate = % sentences lacking ≥ threshold grounding.
+- Deviation Delta = |current style embedding – baseline centroid|.
 
-**Enhancement: Spiritual Wisdom Safety Protocol**
-
-**Model Context Protocol (MCP) Integration:**
-```python
-class SpiritualSafetyProtocol:
-    """Comprehensive safety framework for spiritual guidance"""
-    
-    def __init__(self):
-        self.cultural_sensitivity_checker = CulturalAuthenticityAgent()
-        self.harm_prevention_system = SpiritualHarmPreventionSystem()
-        self.authenticity_validator = ScripturalAccuracyChecker()
-        self.autonomous_policy_updater = SafetyPolicyLearner()
-    
-    async def validate_guidance(self, response, user_context, cultural_context):
-        safety_checks = {
-            'prevents_spiritual_harm': await self.check_spiritual_safety(response),
-            'culturally_appropriate': await self.check_cultural_sensitivity(response),
-            'scripturally_accurate': await self.validate_citations(response),
-            'personally_safe': await self.check_personal_guidance_safety(response, user_context),
-            'promotes_wisdom': await self.assess_wisdom_promotion(response)
-        }
-        return all(safety_checks.values())
-```
-
-**Safety Alignment Priorities:**
-1. **Cultural Appropriation Prevention**: Respectful use of sacred traditions
-2. **Spiritual Harm Prevention**: Avoiding guidance that could cause religious confusion
-3. **Personal Safety**: Ensuring guidance doesn't replace professional help when needed
-4. **Authenticity Maintenance**: Accurate representation of spiritual teachings
-
-**Autonomous Policy Updates:**
-- **Expert Feedback Integration**: Automatic policy refinement based on scholar input
-- **Cultural Community Input**: Regular consultation with spiritual communities
-- **User Impact Monitoring**: Tracking for any negative spiritual or psychological impacts
+Alerts:
+- Any personality citation precision < 85% (critical).
+- Style drift > 2σ over 7-day moving window.
 
 ---
 
-### 🎯 **Level 10: Build & Deploy** - ⚠️ **MODERATE (60%)**
-
-**Current Implementation:**
-- **Good**: Azure Functions serverless architecture
-- **Moderate**: Basic monitoring with Azure Application Insights
-- **Limited**: Manual deployment without sophisticated CI/CD
-
-**Enhancement: Production AI Agent Infrastructure**
-
-**Advanced Deployment Architecture:**
-```python
-# FastAPI-based agent orchestration
-class SpiritualGuidanceAPI:
-    """Production-ready API for multi-agent spiritual guidance"""
-    
-    def __init__(self):
-        self.agent_orchestrator = SpiritualAgentOrchestrator()
-        self.monitoring_system = WisdomQualityMonitor()
-        self.caching_layer = SpiritualGuidanceCache()
-        self.rate_limiter = CompassionateRateLimiter()
-        
-    @app.post("/spiritual-guidance")
-    async def get_guidance(self, request: SpiritualGuidanceRequest):
-        # Multi-agent processing with monitoring
-        guidance = await self.agent_orchestrator.process_request(request)
-        await self.monitoring_system.track_guidance_quality(guidance)
-        return guidance
-```
-
-**Monitoring & Observability:**
-- **LangSmith Integration**: Agent interaction tracing and debugging
-- **Spiritual Wisdom Metrics**: Quality scores, authenticity measures, user growth indicators
-- **Cultural Sensitivity Monitoring**: Ongoing assessment of appropriate cultural representation
-- **Performance Optimization**: Response times, agent coordination efficiency
-
-**Production Enhancements Needed:**
-1. **FastAPI Migration** from Azure Functions (3 months)
-2. **Streamlit Admin Dashboard** for agent management (2 months)
-3. **Advanced Caching Strategy** for frequently asked spiritual questions (1 month)
-4. **LangSmith Integration** for agent debugging (2 months)
-5. **Quantized Model Deployment** for edge cases (4 months)
+## Metrics & Targets
+- Retrieval Hit Rate: 66.7% → 80% (Phase 1) → 85% (Phase 2).
+- Citation Precision: 90% Phase 1 gate → 92% Phase 2 → 93%+ Phase 3.
+- Persona Consistency: ≥ 85% Phase 1 → ≥ 90% Phase 2.
+- Hallucination Rate: < 7% Phase 1 → < 5% Phase 2 → < 4% Phase 3.
+- TANP: 4–6 weeks current → ≤ 3 weeks Phase 1 → ≤ 2 weeks Phase 2.
+- Day 7 Return Rate: +10% Phase 2 vs Phase 1 baseline.
+- Panel Adoption: ≥ 20% advanced users (Phase 3).
 
 ---
 
-## Comprehensive Roadmap to Level 7-9
+## Cost & Performance Guardrails
+- p95 Latency Targets: Single response ≤ 2.5 s; Panel (3 personas) ≤ 4.5 s.
+- Cost per Query (avg): ≤ $0.005 single, ≤ $0.012 panel (Gemini + retrieval + infra).
+- Personality Storage Overhead: < 5% duplication (dedupe hashing per chunk).
+- Memory Storage Budget: ≤ 25 KB active + 100 KB archived per user per personality (rolling window retention + compression).
 
-### **Phase 1: Foundation Strengthening (Months 1-6)**
-**Target: Solidify Level 4 - LLMOps & Tools**
+---
 
-**Priority 1: LangChain Integration (Months 1-3)**
-```python
-# Implementation roadmap
-- Month 1: LangChain agent framework setup
-- Month 2: Tool integration (scripture search, meditation guides)
-- Month 3: Function calling for external spiritual APIs
-```
+## Tooling & Refactor Plan
+1. Service Modularization (retrieval, prompts, citations, evaluation hooks).
+2. Hybrid Search Integration (BM25 index + existing vector) + late fusion weighting.
+3. Cross-Encoder Re-rank (e.g., MiniLM cross encoder) – top 50 → top k.
+4. Evaluation Harness CLI/CI (run canonical prompt suite, produce JSON scorecard).
+5. Memory Service (compression worker + summarization prompt template).
+6. Panel Execution Orchestrator (fan-out async gather + structured response schema).
 
-**Priority 2: Enhanced Prompting (Months 2-4)**
-```python
-# Advanced prompting strategies
-- Chain-of-Thought reasoning for complex spiritual questions
-- ReAct patterns for multi-step guidance
-- Tree-of-Thoughts for exploring multiple spiritual perspectives
-```
+---
 
-**Priority 3: MLOps Pipeline (Months 4-6)**
-```python
-# Production AI operations
-- Azure ML integration for model management
-- Automated evaluation pipelines
-- Synthetic data generation for training enhancement
-```
+## Risk Register (Condensed)
+| Risk | Impact | Mitigation |
+|------|--------|-----------|
+| Authenticity dilution | High | Independent pipelines; forbid hidden synthesis |
+| Cost creep with personalities | Medium | Monthly cost dashboard; usage-based retention |
+| Memory privacy leakage | High | Partitioning + automated test suite for access layer |
+| Style drift | High | Drift detector + rollback gating |
+| Panel hallucination | Medium | Per-personality grounding + summary gating |
+| Framework lock-in | Medium | Refactor before partial LangChain adoption |
 
-### **Phase 2: Agent Architecture (Months 7-12)**
-**Target: Achieve Level 5-6 - Agents & Memory**
+---
 
-**Multi-Agent System Implementation:**
-```python
-# Months 7-9: Core Agent Development
-class SpiritualAgentEcosystem:
-    - Primary Personality Agents (12 spiritual guides)
-    - Scripture Research Agent (automated sacred text analysis)
-    - Meditation Coach Agent (personalized practice guidance)
-    - Life Integration Agent (applying wisdom to daily challenges)
-    - Cultural Authenticity Agent (ensuring respectful representation)
+## Resource & Investment (Revised Projection ~12–15 Months Core)
+| Category | Previous Plan | Revised Focus | Est. Allocation |
+|----------|---------------|--------------|----------------|
+| Retrieval & Refactor | Under-scoped | Core early | 25% |
+| Personality Expansion & QA | Moderate | Accelerated | 20% |
+| Evaluation & Safety | Late | Pulled Forward | 20% |
+| Memory & Journal | Mid | Phase 2 Core | 15% |
+| Panel Mode | Heavy multi-agent | Lightweight fan-out | 10% |
+| Optional Orchestration (Phase 4) | Large | Conditional | 0–10% |
 
-# Months 10-12: Memory & State Management
-class AdvancedSpiritualMemory:
-    - Episodic Memory: Spiritual journey milestones
-    - Semantic Memory: Personal dharmic principles
-    - Working Memory: Enhanced conversation context
-    - Vector Memory: Dynamic sacred text relationships
-```
+Reduction vs original multi-agent heavy plan lowers projected 24‑month spend by ~30–40% while accelerating user-visible value.
 
-### **Phase 3: Multi-Agent Orchestration (Months 13-18)**
-**Target: Achieve Level 7 - Multi-Agent Systems**
+---
 
-**Collaborative Agent Framework:**
-```python
-# Advanced agent collaboration
-- Hub-and-spoke architecture with spiritual guidance hub
-- Agent-to-agent communication protocols
-- Consensus-building for complex ethical questions
-- Progressive guidance where agents build on each other's wisdom
-```
+## Sample Acceptance Criteria (Phase 1 Extract)
+- Retrieval pipeline returns ≥ 1 grounded chunk for 85% of canonical test queries.
+- Citation evaluator F1 ≥ 0.9 on validation set (hand-labeled relevance).
+- New personality ingestion script produces coverage report (unique sections %, orphan sections %, duplicate hash collisions < 2%).
+- Wisdom Journal search latency < 300 ms for 95th percentile queries (index warm).
 
-**Message Passing & Coordination:**
-```python
-# Sophisticated agent coordination
-- Dharmic consensus protocols
-- Cross-cultural synthesis capabilities
-- Crisis support team coordination
-- Authenticity validation workflows
-```
+---
 
-### **Phase 4: Evaluation & Safety (Months 19-24)**
-**Target: Achieve Level 8-9 - Evaluation & Safety**
-
-**Advanced Evaluation Systems:**
-```python
-# Continuous improvement framework
-- LLM-as-a-Judge for spiritual wisdom quality
-- Reinforcement learning from spiritual growth indicators
-- Expert panel integration for authenticity validation
-- Self-correcting loops for continuous enhancement
-```
-
-**Comprehensive Safety Framework:**
-```python
-# Spiritual wisdom safety protocol
-- Cultural appropriation prevention
-- Spiritual harm prevention systems
-- Autonomous policy updates based on community feedback
-- Real-time authenticity validation
+## Panel Mode Response Schema (Phase 3 Draft)
+```json
+{
+  "question": "<user_query>",
+  "responses": [
+    {"personality": "krishna", "text": "...", "citations": [ ... ], "meta": {"grounding_score": 0.93}},
+    {"personality": "einstein", "text": "...", "citations": [ ... ], "meta": {"grounding_score": 0.90}}
+  ],
+  "comparative_summary": {
+    "enabled": true,
+    "text": "(Only if user requested)",
+    "attribution_map": {"krishna": ["Gita 2.47"], "einstein": ["Letter 1926"]}
+  }
+}
 ```
 
 ---
 
-## Strategic Success Metrics
-
-### **Level 3-4 Metrics (Current → 6 months)**
-- **RAG Enhancement**: Increase vector search accuracy from 66.7% to 85%
-- **Tool Integration**: Deploy 5+ spiritual guidance tools via LangChain
-- **Response Quality**: Achieve 90%+ user satisfaction with wisdom authenticity
-
-### **Level 5-6 Metrics (6-12 months)**
-- **Agent Deployment**: 5+ specialized spiritual agents operational
-- **Memory Persistence**: Cross-session spiritual journey tracking for 90%+ users
-- **Personalization**: Guidance adaptation based on individual spiritual development
-
-### **Level 7 Metrics (12-18 months)**
-- **Multi-Agent Coordination**: Collaborative responses from 3+ agents
-- **Consensus Quality**: 95%+ agreement between agents on dharmic principles
-- **Cultural Authenticity**: Expert validation scores above 90%
-
-### **Level 8-9 Metrics (18-24 months)**
-- **Continuous Learning**: Weekly model improvement based on user spiritual growth
-- **Safety Assurance**: Zero incidents of cultural insensitivity or spiritual harm
-- **Expert Integration**: Monthly validation cycles with spiritual teachers
+## Go / No-Go Gates Summary
+| Gate | Metric | Threshold |
+|------|--------|-----------|
+| Phase 1 → 2 | Citation precision | ≥ 90% |
+| Phase 1 → 2 | TANP | ≤ 3 weeks |
+| Phase 2 → 3 | Hallucination rate | < 5% |
+| Phase 2 → 3 | Return rate uplift | ≥ +10% |
+| Phase 3 → 4 (Optional) | Authenticity score | ≥ 92% sustained 60 days |
+| Phase 3 → 4 (Optional) | User demand (panel synthesis requests) | ≥ 15% panel sessions |
 
 ---
 
-## Investment & Resource Allocation
+## Conclusion
+This revised roadmap concentrates investment where Vimarsh’s brand moat is deepest: **authentic, citation-grounded wisdom from multiple historically faithful personalities**. By postponing autonomous multi-agent synthesis and emphasizing verifiable quality, scoped memory, and user-controlled multi-view, we accelerate retention, trust, and monetization while reducing architectural risk. Optional orchestration remains a future lever—activated only if user value plateaus after mastering authenticity at scale.
 
-### **Technical Infrastructure (40%)**
-- **Multi-Agent Framework Development**: $120K (6 engineers × 6 months)
-- **Advanced Memory Systems**: $80K (4 engineers × 4 months)
-- **Safety & Evaluation Systems**: $100K (5 engineers × 5 months)
-
-### **Spiritual Expertise (30%)**
-- **Cultural Consultants**: $60K (Sanskrit scholars, spiritual teachers)
-- **Content Authenticity Review**: $40K (Monthly expert panel reviews)
-- **Community Engagement**: $30K (Spiritual community liaison)
-
-### **AI/ML Enhancement (30%)**
-- **LangChain/LangGraph Integration**: $70K
-- **Reinforcement Learning Systems**: $50K
-- **Advanced Monitoring & Evaluation**: $40K
-
-**Total Investment**: ~$590K over 24 months for complete transformation to Level 7-9
-
----
-
-## Risk Mitigation & Cultural Sensitivity
-
-### **Cultural Appropriation Prevention**
-- **Expert Advisory Board**: Continuous guidance from spiritual scholars
-- **Community Validation**: Regular feedback from spiritual communities
-- **Authenticity Metrics**: Measurable respect for sacred traditions
-
-### **Technical Risk Management**
-- **Gradual Deployment**: Phased rollout of agent capabilities
-- **Fallback Systems**: Robust error handling and graceful degradation
-- **Performance Monitoring**: Real-time system health and wisdom quality tracking
-
-### **Spiritual Safety Assurance**
-- **Harm Prevention**: Sophisticated filtering for potentially harmful guidance
-- **Professional Boundaries**: Clear guidance about when to seek human spiritual teachers
-- **Respectful Representation**: Ensuring authentic portrayal of sacred teachings
-
----
-
-## Conclusion: From RAG to Wisdom Ecosystem
-
-Vimarsh is uniquely positioned to become the world's most sophisticated AI-powered wisdom guidance system. With strong foundations in **Level 3 RAG capabilities** and clear technical roadmaps to **Level 7-9 advanced agent systems**, the platform can evolve from a spiritual chatbot into a comprehensive wisdom ecosystem.
-
-The proposed 24-month roadmap leverages the platform's existing strengths while addressing critical gaps in agent architecture, memory systems, and evaluation frameworks. By maintaining focus on cultural authenticity and spiritual safety, Vimarsh can achieve the ambitious goal of providing personalized, multi-agent spiritual guidance that honors sacred traditions while serving modern seekers.
-
-**Success Vision**: A spiritually intelligent AI ecosystem where multiple agent personalities collaborate to provide personalized dharmic guidance, remember individual spiritual journeys, and continuously improve through both technological advancement and traditional wisdom validation.
-
----
-
-*Report Generated: August 5, 2025*  
-*Assessment Framework: 10-Level AI Agent Maturity Model*  
-*Platform Analyzed: Vimarsh Multi-Personality Spiritual Guidance System*
+*Revised: August 9, 2025*

@@ -1,0 +1,167 @@
+[
+  {
+    "id": "test_user_456",
+    "user_id": "test_user_456",
+    "preferred_personalities": [
+      "krishna",
+      "rama"
+    ],
+    "conversation_style": "formal",
+    "language_preference": "en",
+    "notification_settings": {
+      "email_updates": true,
+      "push_notifications": true,
+      "weekly_insights": true
+    },
+    "privacy_settings": {
+      "store_conversations": true,
+      "anonymous_analytics": true,
+      "data_sharing": false
+    },
+    "ui_preferences": {
+      "theme": "auto",
+      "font_size": "medium",
+      "animations": true
+    },
+    "created_at": "2025-08-10T09:59:46.601758",
+    "updated_at": "2025-08-10T09:59:46.601767",
+    "partition_key": "test_user_456"
+  },
+  {
+    "id": "personalization_test_user",
+    "user_id": "personalization_test_user",
+    "preferred_personalities": [
+      "krishna",
+      "rama"
+    ],
+    "conversation_style": "conversational",
+    "language_preference": "en",
+    "notification_settings": {
+      "email_updates": true,
+      "push_notifications": true,
+      "weekly_insights": true
+    },
+    "privacy_settings": {
+      "store_conversations": true,
+      "anonymous_analytics": true,
+      "data_sharing": false
+    },
+    "ui_preferences": {
+      "theme": "auto",
+      "font_size": "medium",
+      "animations": true
+    },
+    "created_at": "2025-08-10T10:00:56.304148",
+    "updated_at": "2025-08-10T10:00:56.304148",
+    "partition_key": "personalization_test_user"
+  },
+  {
+    "id": "integration_user",
+    "user_id": "integration_user",
+    "preferred_personalities": [
+      "krishna",
+      "rama"
+    ],
+    "conversation_style": "balanced",
+    "language_preference": "en",
+    "notification_settings": {
+      "email_updates": true,
+      "push_notifications": true,
+      "weekly_insights": true
+    },
+    "privacy_settings": {
+      "store_conversations": true,
+      "anonymous_analytics": true,
+      "data_sharing": false
+    },
+    "ui_preferences": {
+      "theme": "auto",
+      "font_size": "medium",
+      "animations": true
+    },
+    "created_at": "2025-08-10T10:00:56.304629",
+    "updated_at": "2025-08-10T10:00:56.304629",
+    "partition_key": "integration_user"
+  },
+  {
+    "id": "test_personalization_user",
+    "user_id": "test_personalization_user",
+    "preferred_personalities": [
+      "krishna",
+      "rama"
+    ],
+    "conversation_style": "conversational",
+    "language_preference": "en",
+    "notification_settings": {
+      "email_updates": true,
+      "push_notifications": true,
+      "weekly_insights": true
+    },
+    "privacy_settings": {
+      "store_conversations": true,
+      "anonymous_analytics": true,
+      "data_sharing": false
+    },
+    "ui_preferences": {
+      "theme": "auto",
+      "font_size": "medium",
+      "animations": true
+    },
+    "created_at": "2025-08-10T10:05:07.289628",
+    "updated_at": "2025-08-10T10:05:07.289628",
+    "partition_key": "test_personalization_user"
+  },
+  {
+    "id": "workflow_test_user",
+    "user_id": "workflow_test_user",
+    "preferred_personalities": [
+      "krishna",
+      "rama"
+    ],
+    "conversation_style": "balanced",
+    "language_preference": "en",
+    "notification_settings": {
+      "email_updates": true,
+      "push_notifications": true,
+      "weekly_insights": true
+    },
+    "privacy_settings": {
+      "store_conversations": true,
+      "anonymous_analytics": true,
+      "data_sharing": false
+    },
+    "ui_preferences": {
+      "theme": "auto",
+      "font_size": "medium",
+      "animations": true
+    },
+    "created_at": "2025-08-10T10:05:07.290063",
+    "updated_at": "2025-08-10T10:05:07.290063",
+    "partition_key": "workflow_test_user"
+  },
+  {
+    "id": "test_db_user",
+    "user_id": "test_db_user",
+    "preferred_personalities": [],
+    "conversation_style": "balanced",
+    "language_preference": "en",
+    "notification_settings": {
+      "email_updates": true,
+      "push_notifications": true,
+      "weekly_insights": true
+    },
+    "privacy_settings": {
+      "store_conversations": true,
+      "anonymous_analytics": true,
+      "data_sharing": false
+    },
+    "ui_preferences": {
+      "theme": "auto",
+      "font_size": "medium",
+      "animations": true
+    },
+    "created_at": "2025-08-10T10:05:07.287484",
+    "updated_at": "2025-08-10T10:05:07.287485",
+    "partition_key": "test_db_user"
+  }
+]

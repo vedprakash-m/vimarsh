@@ -16,7 +16,24 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 class PersonalityType(Enum):
-    """Supported personality types"""
+    """Supported person            # Get all documents for analysis
+            try:
+                items = list(self.container.query_items(
+                    query="SELECT * FROM c",
+                    enable_cross_partition_query=True
+                ))
+            except Exception as e:
+                logger.error(f"❌ Failed to fetch database stats: {e}")
+                # Return default stats
+                return VectorDatabaseStats(
+                    total_documents=0,
+                    documents_by_personality={},
+                    documents_by_content_type={},
+                    documents_by_source={},
+                    storage_size_mb=0.0,
+                    last_updated=datetime.utcnow().isoformat(),
+                    embedding_dimensions=768
+                ) types"""
     KRISHNA = "krishna"
     BUDDHA = "buddha"
     JESUS = "jesus"
@@ -296,20 +313,35 @@ class VectorDatabaseService:
             conditions = []
             
             if personality:
-                conditions.append(f"c.personality = '{personality.value}'")
+                # Handle both enum and string personalities safely
+                if isinstance(personality, PersonalityType):
+                    personality_value = personality.value
+                else:
+                    # If it's a string, use it directly
+                    personality_value = str(personality)
+                conditions.append(f"c.personality = '{personality_value}'")
             
             if content_types:
-                content_type_values = [f"'{ct.value}'" for ct in content_types]
+                content_type_values = []
+                for ct in content_types:
+                    if isinstance(ct, ContentType):
+                        content_type_values.append(f"'{ct.value}'")
+                    else:
+                        content_type_values.append(f"'{str(ct)}'")
                 conditions.append(f"c.content_type IN ({', '.join(content_type_values)})")
             
             if conditions:
                 sql_query += f" WHERE {' AND '.join(conditions)}"
             
             # Execute query
-            items = list(self.container.query_items(
-                query=sql_query,
-                enable_cross_partition_query=True
-            ))
+            try:
+                items = list(self.container.query_items(
+                    query=sql_query,
+                    enable_cross_partition_query=True
+                ))
+            except Exception as e:
+                logger.error(f"❌ Semantic search failed: {e}")
+                return []
             
             # Calculate similarities and rank results
             results = []
@@ -327,11 +359,22 @@ class VectorDatabaseService:
                 
                 if similarity >= min_relevance:
                     # Create vector document
+                    # Safely convert string values to enums
+                    try:
+                        personality = PersonalityType(item['personality']) if item.get('personality') else PersonalityType.KRISHNA
+                    except (ValueError, KeyError):
+                        personality = PersonalityType.KRISHNA
+                        
+                    try:
+                        content_type = ContentType(item['content_type']) if item.get('content_type') else ContentType.VERSE
+                    except (ValueError, KeyError):
+                        content_type = ContentType.VERSE
+                        
                     vector_doc = VectorDocument(
                         id=item['id'],
                         content=item['content'],
-                        personality=PersonalityType(item['personality']),
-                        content_type=ContentType(item['content_type']),
+                        personality=personality,
+                        content_type=content_type,
                         source=item['source'],
                         title=item.get('title'),
                         chapter=item.get('chapter'),
@@ -397,11 +440,15 @@ class VectorDatabaseService:
             ]
             
             # Execute optimized query
-            items = list(self.container.query_items(
-                query=sql_query,
-                parameters=parameters,
-                enable_cross_partition_query=False  # More efficient with partition key
-            ))
+            try:
+                items = list(self.container.query_items(
+                    query=sql_query,
+                    parameters=parameters,
+                    enable_cross_partition_query=False  # More efficient with partition key
+                ))
+            except Exception as e:
+                logger.error(f"❌ Semantic search failed: {e}")
+                return []
             
             # Process results
             results = []
@@ -418,11 +465,21 @@ class VectorDatabaseService:
                 )
                 
                 # Create search result with updated schema
+                try:
+                    personality = PersonalityType(personality_id) if personality_id in [p.value for p in PersonalityType] else PersonalityType.KRISHNA
+                except (ValueError, KeyError):
+                    personality = PersonalityType.KRISHNA
+                    
+                try:
+                    content_type = ContentType(item.get('content_type', 'verse'))
+                except (ValueError, KeyError):
+                    content_type = ContentType.VERSE
+                    
                 vector_doc = VectorDocument(
                     id=item['id'],
                     content=item.get('content', ''),
-                    personality=PersonalityType(personality_id) if personality_id in [p.value for p in PersonalityType] else PersonalityType.KRISHNA,
-                    content_type=ContentType(item.get('content_type', 'verse')),
+                    personality=personality,
+                    content_type=content_type,
                     source=item.get('source', ''),
                     title=item.get('title'),
                     chapter=item.get('chapter'),

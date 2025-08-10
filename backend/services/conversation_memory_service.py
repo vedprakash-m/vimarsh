@@ -77,7 +77,15 @@ class ConversationMemoryService:
     
     def __init__(self, database_service=None):
         """Initialize the conversation memory service"""
-        self.database_service = database_service
+        # Import Phase 2 database service
+        try:
+            from services.phase2_database_service import phase2_db_service
+            self.database_service = phase2_db_service
+            logger.info("✅ Using Phase 2 database service for conversation memory")
+        except ImportError:
+            self.database_service = database_service
+            logger.warning("🔶 Phase 2 database service not available, using provided service")
+        
         self.session_cache = {}  # In-memory session cache
         self.context_window_size = 10  # Number of recent messages to consider
         self.max_session_duration = timedelta(hours=4)  # Auto-archive after 4 hours
@@ -293,9 +301,12 @@ CURRENT QUERY: {current_query}"""
             return
         
         try:
-            # This would integrate with your Cosmos DB service
-            # await self.database_service.store_conversation_message(message.to_dict())
-            pass
+            # Store using Phase 2 database service
+            success = await self.database_service.store_conversation_message(message)
+            if success:
+                logger.info(f"💾 Message stored in database: {message.id}")
+            else:
+                logger.warning(f"⚠️ Failed to store message in database: {message.id}")
         except Exception as e:
             logger.error(f"❌ Failed to store message: {e}")
     
@@ -306,9 +317,30 @@ CURRENT QUERY: {current_query}"""
     ) -> List[ConversationMessage]:
         """Get recent messages from conversation"""
         
-        # This would retrieve from database in a real implementation
-        # For now, return empty list
-        return []
+        if not self.database_service:
+            return []
+        
+        try:
+            # Extract user_id and personality_id from conversation_id
+            # conversation_id format: conv_{user_id}_{personality_id}_{timestamp}
+            parts = conversation_id.split('_')
+            if len(parts) >= 3:
+                user_id = parts[1]
+                personality_id = parts[2]
+                
+                # Get recent messages from database
+                messages = await self.database_service.get_recent_messages(
+                    user_id, personality_id, limit
+                )
+                logger.info(f"📨 Retrieved {len(messages)} recent messages from database")
+                return messages
+            else:
+                logger.warning(f"⚠️ Invalid conversation_id format: {conversation_id}")
+                return []
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to retrieve recent messages: {e}")
+            return []
     
     def _extract_topics(self, content: str) -> List[str]:
         """Extract topics from user message"""
