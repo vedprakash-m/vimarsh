@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive Test Suite for Vector Database & Embedding Systems
+Comprehensive Test Suite for Vector Database Systems
 Priority 4: Vector Database & Embedding Testing
 
 Coverage Status:
@@ -72,16 +72,12 @@ class TestEnhancedEmbeddingsService:
     def embeddings_service(self):
         """Enhanced Embeddings Service instance"""
         try:
-            from services.enhanced_embeddings_service import EnhancedEmbeddingsService
-            return EnhancedEmbeddingsService()
+            from services.gemini_embedding_service import GeminiEmbeddingService
+            return GeminiEmbeddingService()
         except ImportError:
-            # Create mock if class doesn't exist
-            mock_service = Mock()
-            mock_service.generate_embedding = AsyncMock()
-            mock_service.batch_generate_embeddings = AsyncMock()
-            mock_service.calculate_similarity = Mock()
-            mock_service.search_similar_vectors = AsyncMock()
-            return mock_service
+            # Return a mock if the service is not available
+            from unittest.mock import Mock
+            return Mock()
     
     @pytest.fixture
     def sample_texts(self):
@@ -575,7 +571,7 @@ class TestVectorDatabaseIntegration:
     async def test_end_to_end_vector_workflow(self):
         """Test complete vector database workflow"""
         
-        with patch('services.enhanced_embeddings_service.EnhancedEmbeddingsService') as mock_embeddings:
+        with patch('services.gemini_embedding_service.GeminiEmbeddingService') as mock_embeddings:
             with patch('services.vector_storage_service.VectorStorageService') as mock_storage:
                 with patch('services.citation_service.CitationService') as mock_citation:
                     
@@ -633,7 +629,7 @@ class TestVectorDatabaseIntegration:
         large_batch_size = 100
         mock_texts = [f"Spiritual question {i}" for i in range(large_batch_size)]
         
-        with patch('services.enhanced_embeddings_service.EnhancedEmbeddingsService') as mock_embeddings:
+        with patch('services.gemini_embedding_service.GeminiEmbeddingService') as mock_embeddings:
             # Configure performance-optimized batch processing
             mock_embeddings.return_value.batch_generate_embeddings = AsyncMock(return_value={
                 'embeddings': [[0.1] * 300] * large_batch_size,
