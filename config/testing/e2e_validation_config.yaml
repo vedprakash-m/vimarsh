@@ -1,0 +1,48 @@
+# E2E Validation Configuration for Vimarsh
+environments:
+  production:
+    frontend_url: "https://vimarsh.vedprakash.net"
+    backend_url: "https://vimarsh-backend-app-flex.azurewebsites.net"
+    health_endpoint: "/api/health"
+    test_timeout: 30
+  staging:
+    frontend_url: "https://staging-vimarsh.vedprakash.net"
+    backend_url: "https://staging-vimarsh-backend.azurewebsites.net"
+    health_endpoint: "/api/health"
+    test_timeout: 30
+
+tests:
+  infrastructure:
+    timeout: 60
+    retries: 3
+    endpoints:
+      - path: "/api/health"
+        method: "GET"
+        expected_status: 200
+      - path: "/api/spiritual_guidance"
+        method: "POST"
+        expected_status: 200
+  
+  performance:
+    max_response_time: 5000  # milliseconds
+    concurrent_users: 10
+    test_duration: 30  # seconds
+  
+  security:
+    check_https: true
+    check_cors: true
+    check_headers: true
+    scan_secrets: true
+
+thresholds:
+  coverage_minimum: 80
+  performance_p95: 3000
+  security_score: 85
+  availability: 99.9
+
+# CI/CD Integration settings
+ci_integration:
+  fail_on_security_issues: true
+  fail_on_performance_issues: false
+  warn_on_dependency_issues: true
+  required_success_rate: 85

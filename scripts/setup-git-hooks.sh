@@ -64,9 +64,11 @@ def check_secrets_in_staged_files():
         if not os.path.exists(file_path):
             continue
             
-        # Skip binary files and certain extensions
+        # Skip binary files, certain extensions, and validation scripts
         if any(file_path.endswith(ext) for ext in ['.pyc', '.jpg', '.png', '.gif', '.pdf', '.zip']):
             continue
+        if any(pattern in file_path for pattern in ['setup-git-hooks', 'git-hooks', 'e2e_validator', 'enhanced_e2e_validator']):
+            continue  # Skip git hook setup scripts and E2E validators that contain regex patterns
             
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
