@@ -9,11 +9,13 @@ import azure.cosmos.cosmos_client as cosmos_client
 def check_field_structure():
     """Check the field structure of documents in the database"""
     
-    # Get connection details from local.settings.json environment
-    cosmos_connection_string = os.getenv(
-        'COSMOSDB_CONNECTION_STRING', 
-        'AccountEndpoint=https://vimarsh-db.documents.azure.com:443/;AccountKey=dFPfklJEMgzjimnjmN9v4m3Yh9UWSKzQUDGNm7MhRBL7c3q0NZiUuqFLQB3mI32Um5NLDDlzaX9dACDbWHkZ2w==;'
-    )
+    # Get connection details from environment variables only
+    cosmos_connection_string = os.getenv('COSMOSDB_CONNECTION_STRING')
+    
+    if not cosmos_connection_string:
+        print("❌ Error: COSMOSDB_CONNECTION_STRING environment variable not set")
+        print("💡 Please set your Cosmos DB connection string as an environment variable")
+        return
     
     # Initialize Cosmos client
     client = cosmos_client.CosmosClient.from_connection_string(cosmos_connection_string)
