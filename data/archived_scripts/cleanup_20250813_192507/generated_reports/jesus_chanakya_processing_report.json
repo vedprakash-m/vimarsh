@@ -1,0 +1,46 @@
+{
+  "processing_metadata": {
+    "timestamp": "2025-08-13T18:24:45.428310",
+    "processor": "JesusChanakyaProcessor",
+    "version": "1.0.0",
+    "target_personalities": [
+      "Jesus Christ",
+      "Chanakya"
+    ]
+  },
+  "statistics": {
+    "files_processed": 2,
+    "total_chunks": 1369,
+    "total_vectors": 0,
+    "personalities_processed": [
+      "Jesus Christ",
+      "Chanakya"
+    ],
+    "processing_errors": [
+      "Embedding generation issues: Traceback (most recent call last):\n  File \"/Users/ved/Apps/vimarsh/data/generate_embeddings.py\", line 214, in <module>\n    success = main()\n  File \"/Users/ved/Apps/vimarsh/data/generate_embeddings.py\", line 187, in main\n    if not SERVICES_AVAILABLE:\nNameError: name 'SERVICES_AVAILABLE' is not defined\n"
+    ],
+    "cosmos_uploaded": 1369,
+    "cosmos_failed": 0
+  },
+  "processed_files": {
+    "jesus_christ": {
+      "file": "KingJamesBible.pdf",
+      "chunks": 759,
+      "source": "King James Bible",
+      "repository": "Project Gutenberg / Bible Gateway"
+    },
+    "chanakya": {
+      "file": "Arthashastra_of_Chanakya_-_English.pdf",
+      "chunks": 610,
+      "source": "Arthashastra",
+      "repository": "Sanskrit Texts / Indian Philosophy Archive"
+    }
+  },
+  "deployment_status": {
+    "content_ready": true,
+    "cosmos_db_uploaded": true,
+    "embeddings_pending": true,
+    "rag_testing_needed": true,
+    "expected_outcome": "25/25 personalities operational"
+  }
+}

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+  <html lang="en" dir="ltr" prefix="og: https://ogp.me/ns#" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-33CTWK62H3"></script>
+<script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments)};gtag("js", new Date());gtag("set", "developer_id.dMDhkMT", true);gtag("config", "G-33CTWK62H3", {"groups":"default","page_placeholder":"PLACEHOLDER_page_location","allow_ad_personalization_signals":false,"cookie_domain":"kinginstitute.stanford.edu","cookie_prefix":"su","cookie_expires":15552000});</script>
+<link rel="canonical" href="https://kinginstitute.stanford.edu/" />
+<link rel="shortlink" href="https://kinginstitute.stanford.edu/" />
+<meta property="og:site_name" content="The Martin Luther King, Jr. Research and Education Institute" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://kinginstitute.stanford.edu/" />
+<meta property="og:title" content="The Martin Luther King, Jr. Research and Education Institute" />
+<meta property="og:image" content="https://kinginstitute.stanford.edu/sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/kingmarch_0.png?h=df0cd450&amp;itok=qfMeo9bI" />
+<meta property="og:image:url" content="https://kinginstitute.stanford.edu/sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/kingmarch_0.png?h=df0cd450&amp;itok=qfMeo9bI" />
+<meta property="og:image:alt" content="Photo of King marching in Philadelphia, Mississippi, June 1966, courtesy of the Bob Fitch Photography Archive, Stanford University Libraries." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="The Martin Luther King, Jr. Research and Education Institute" />
+<meta name="twitter:image" content="https://kinginstitute.stanford.edu/sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/kingmarch_0.png?h=df0cd450&amp;itok=qfMeo9bI" />
+<meta name="twitter:image:alt" content="Photo of King marching in Philadelphia, Mississippi, June 1966, courtesy of the Bob Fitch Photography Archive, Stanford University Libraries." />
+<meta name="Generator" content="Drupal 10 (https://www.drupal.org)" />
+<meta name="MobileOptimized" content="width" />
+<meta name="HandheldFriendly" content="true" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="/profiles/custom/stanford_profile/themes/stanford_basic/favicon.ico" type="image/vnd.microsoft.icon" />
+
+
+              <link rel="apple-touch-icon" sizes="60x60" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-60x60.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-72x72.png" />
+        <link rel="apple-touch-icon" sizes="76x76" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-76x76.png" />
+        <link rel="apple-touch-icon" sizes="114x114" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-114x114.png" />
+        <link rel="apple-touch-icon" sizes="120x120" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-120x120.png" />
+        <link rel="apple-touch-icon" sizes="144x144" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-144x144.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-152x152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="https://www-media.stanford.edu/assets/favicon/apple-touch-icon-180x180.png" />
+
+        <link rel="icon" type="image/png" href="https://www-media.stanford.edu/assets/favicon/favicon-196x196.png" sizes="196x196" />
+        <link rel="icon" type="image/png" href="https://www-media.stanford.edu/assets/favicon/favicon-192x192.png" sizes="192x192" />
+        <link rel="icon" type="image/png" href="https://www-media.stanford.edu/assets/favicon/favicon-128.png" sizes="128x128" />
+        <link rel="icon" type="image/png" href="https://www-media.stanford.edu/assets/favicon/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/png" href="https://www-media.stanford.edu/assets/favicon/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="https://www-media.stanford.edu/assets/favicon/favicon-16x16.png" sizes="16x16" />
+      
+    <link rel="mask-icon" href="https://www-media.stanford.edu/assets/favicon/safari-pinned-tab.svg" color="#ffffff">
+    <meta name="application-name" content="Stanford University"/>
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+    <meta name="msapplication-TileImage" content="https://www-media.stanford.edu/assets/favicon/mstile-144x144.png" />
+    <meta name="msapplication-square70x70logo" content="https://www-media.stanford.edu/assets/favicon/mstile-70x70.png" />
+    <meta name="msapplication-square150x150logo" content="https://www-media.stanford.edu/assets/favicon/mstile-150x150.png" />
+    <meta name="msapplication-square310x310logo" content="https://www-media.stanford.edu/assets/favicon/mstile-310x310.png" />
+
+    <title>The Martin Luther King, Jr. Research and Education Institute</title>
+    <link rel="stylesheet" media="all" href="/sites/g/files/sbiybj27721/files/css/css_R-ZcPxg2HGv1LtsUjYhMoh5r7MG3ytbWwff9AJLjbC4.css?delta=0&amp;language=en&amp;theme=stanford_basic&amp;include=eJyNUtF2wyAI_SFrPslDlDRuKh7F2fz9NG3XZDtZ88IB7kW4oKaEg0klgpPwATeBN3Y2fD5zj1BMFBgqZvI4bHxZcexhfkuQebZefBQfM0NiVeygyUcK2EENyRyCMybag9tgjzhYqLCIkOCaIM75KeSVkSXEMjqbZzSiFYaJklEjZKuH1f5KqghXVLxEzEMgg_IJXzrwIt9bq03rNr_S5IoP_7F4TniKV-kPK2BtQzWjmh5-5WOiyTpUmRfXxn5s5QjeqVJ7VW-p8v64nIpzl2oNz4fFP2LkCCFgOkFcP8Z7WlefT_ASgt4u9URJXbKty_WQeZAXecmMvv8oFMW2nsyYQrsFaXATUYvkxt9x-kUvXZPs3nraL9tPvVrpyRSH3-jlfwU" />
+<link rel="stylesheet" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+<link rel="stylesheet" media="all" href="https://use.fontawesome.com/releases/v5.13.1/css/v4-shims.css" />
+<link rel="stylesheet" media="all" href="/sites/g/files/sbiybj27721/files/css/css_auhBBa52LBYFwD0CKbr64ddmhnAEuKQoo7dz8pXT7us.css?delta=3&amp;language=en&amp;theme=stanford_basic&amp;include=eJyNUtF2wyAI_SFrPslDlDRuKh7F2fz9NG3XZDtZ88IB7kW4oKaEg0klgpPwATeBN3Y2fD5zj1BMFBgqZvI4bHxZcexhfkuQebZefBQfM0NiVeygyUcK2EENyRyCMybag9tgjzhYqLCIkOCaIM75KeSVkSXEMjqbZzSiFYaJklEjZKuH1f5KqghXVLxEzEMgg_IJXzrwIt9bq03rNr_S5IoP_7F4TniKV-kPK2BtQzWjmh5-5WOiyTpUmRfXxn5s5QjeqVJ7VW-p8v64nIpzl2oNz4fFP2LkCCFgOkFcP8Z7WlefT_ASgt4u9URJXbKty_WQeZAXecmMvv8oFMW2nsyYQrsFaXATUYvkxt9x-kUvXZPs3nraL9tPvVrpyRSH3-jlfwU" />
+<link rel="stylesheet" media="all" href="/sites/g/files/sbiybj27721/files/css/css_sXZeLxLSGHzOzUmEoOfUbQcBSBCCvLr_yAO403S7YAw.css?delta=4&amp;language=en&amp;theme=stanford_basic&amp;include=eJyNUtF2wyAI_SFrPslDlDRuKh7F2fz9NG3XZDtZ88IB7kW4oKaEg0klgpPwATeBN3Y2fD5zj1BMFBgqZvI4bHxZcexhfkuQebZefBQfM0NiVeygyUcK2EENyRyCMybag9tgjzhYqLCIkOCaIM75KeSVkSXEMjqbZzSiFYaJklEjZKuH1f5KqghXVLxEzEMgg_IJXzrwIt9bq03rNr_S5IoP_7F4TniKV-kPK2BtQzWjmh5-5WOiyTpUmRfXxn5s5QjeqVJ7VW-p8v64nIpzl2oNz4fFP2LkCCFgOkFcP8Z7WlefT_ASgt4u9URJXbKty_WQeZAXecmMvv8oFMW2nsyYQrsFaXATUYvkxt9x-kUvXZPs3nraL9tPvVrpyRSH3-jlfwU" />
+<link rel="stylesheet" media="print" href="/sites/g/files/sbiybj27721/files/css/css_tZIeCIS4JRnKB8x0OJTwtLZhWUKWR1Oqr30fHU961WI.css?delta=5&amp;language=en&amp;theme=stanford_basic&amp;include=eJyNUtF2wyAI_SFrPslDlDRuKh7F2fz9NG3XZDtZ88IB7kW4oKaEg0klgpPwATeBN3Y2fD5zj1BMFBgqZvI4bHxZcexhfkuQebZefBQfM0NiVeygyUcK2EENyRyCMybag9tgjzhYqLCIkOCaIM75KeSVkSXEMjqbZzSiFYaJklEjZKuH1f5KqghXVLxEzEMgg_IJXzrwIt9bq03rNr_S5IoP_7F4TniKV-kPK2BtQzWjmh5-5WOiyTpUmRfXxn5s5QjeqVJ7VW-p8v64nIpzl2oNz4fFP2LkCCFgOkFcP8Z7WlefT_ASgt4u9URJXbKty_WQeZAXecmMvv8oFMW2nsyYQrsFaXATUYvkxt9x-kUvXZPs3nraL9tPvVrpyRSH3-jlfwU" />
+
+    <script src="/core/assets/vendor/modernizr/modernizr.min.js?v=3.11.7"></script>
+
+
+                      <script>
+          gtag('config', 'G-BECJQXLNCY', {cookie_domain: window.location.host, cookie_prefix: "sws", "ga-expire": 15552000});
+        </script>
+                </head>
+            <body class="sws-acsf front role--anonymous">
+    
+      <div class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
+    
+
+<header class="su-masthead su-masthead--right" data-nosnippet>
+
+              <a href="#main-content" class="visually-hidden focusable su-skipnav su-skipnav--content">
+          Skip to main content
+        </a>
+        <a href="#secondary-navigation" class="visually-hidden focusable su-skipnav su-skipnav--secondary">
+          Skip to secondary navigation
+        </a>
+      
+      
+<div class="su-brand-bar su-brand-bar--default">
+  <div class="su-brand-bar__container"><a  class="su-brand-bar__logo" href="https://www.stanford.edu">Stanford University<span class="su-brand-bar__link--a11y"> (link is external)</span>
+  </a></div>
+</div>
+
+<section class="su-masthead--inner" aria-label="Page logo, menu and search">
+                  <div class="region region-header">
+            <div  id="block-stanford-basic-branding" class="su-lockup su-lockup--option-a">
+    <a href="https://kinginstitute.stanford.edu/" >
+  <div class="su-lockup__cell1">
+          <div class="su-lockup__wordmark-wrapper">
+      <span class="su-lockup__wordmark">Stanford</span>
+          </div>
+    </div>          <div class="su-lockup__cell2">
+            <span class="su-lockup__line1" >The Martin Luther King, Jr. Research and Education Institute</span>
+      
+      
+          </div>
+            </a>
+  </div>
+
+
+          </div>
+                          <div class="region region-search">
+            <div id="block-stanford-basic-header-links" class="config-pages-block block-config-pages block-stanford-basic-header-links">
+  
+    
+      <div class="config_pages config_pages--type--stanford-basic-site-settings config_pages--view-mode--site-settings-header config_pages--stanford-basic-site-settings--site-settings-header">
+  
+</div>
+
+  </div>
+
+<div  class="su-site-search su-site-search" role="search">
+ <form action="/search" method="get" accept-charset="UTF-8">
+  <label class="su-site-search__sr-label" for="key">Search this site</label>
+  <input  type="text" id="key" name="key" class="su-site-search__input" placeholder="Search this site" maxlength="128">
+  <button  type="submit" name="search" class="su-site-search__submit su-sr-only-text">Submit Search</button></form>
+</div>
+
+
+          </div>
+                          <div class="region region-menu">
+            <div id="block-stanford-basic-main-navigation" class="system-menu-block main">
+      <nav class="su-multi-menu--dropdowns su-multi-menu su-multi-menu--buttons su-multi-menu--right no-js" aria-label="main menu">
+    <button class="su-multi-menu__nav-toggle su-multi-menu__nav-toggle--right " aria-expanded="false">Menu</button>
+    <ul class="su-multi-menu__menu su-multi-menu__menu-lv1"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/"><span class="su-multi-menu__link-text-wrapper">Home</span></a></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/king-papers/about-papers-project"><span class="su-multi-menu__link-text-wrapper">King Papers</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv2"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-papers/about-papers-project"><span class="su-multi-menu__link-text-wrapper">About the King Papers</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-papers/about-papers-project/king-papers-publications"><span class="su-multi-menu__link-text-wrapper">Volumes</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-papers/about-papers-project/research-and-editorial-process"><span class="su-multi-menu__link-text-wrapper">Research and Editorial Process</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-papers/about-papers-project/documents"><span class="su-multi-menu__link-text-wrapper">Documents</span></a></li></ul></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/king-resources"><span class="su-multi-menu__link-text-wrapper">King Resources</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv2"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources"><span class="su-multi-menu__link-text-wrapper">Overview</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/freedoms-ring-i-have-dream-speech"><span class="su-multi-menu__link-text-wrapper">Freedom&#039;s Ring &quot;I Have a Dream&quot; Speech</span></a></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia"><span class="su-multi-menu__link-text-wrapper">King Encyclopedia</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv3"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/chronology"><span class="su-multi-menu__link-text-wrapper">Chronology</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/king-encyclopedia"><span class="su-multi-menu__link-text-wrapper">A</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/b"><span class="su-multi-menu__link-text-wrapper">B</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/c"><span class="su-multi-menu__link-text-wrapper">C</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/d"><span class="su-multi-menu__link-text-wrapper">D</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/e"><span class="su-multi-menu__link-text-wrapper">E</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/f"><span class="su-multi-menu__link-text-wrapper">F</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/g"><span class="su-multi-menu__link-text-wrapper">G</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/h"><span class="su-multi-menu__link-text-wrapper">H</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/i"><span class="su-multi-menu__link-text-wrapper">I</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/j"><span class="su-multi-menu__link-text-wrapper">J</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/k"><span class="su-multi-menu__link-text-wrapper">K</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/l"><span class="su-multi-menu__link-text-wrapper">L</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/m"><span class="su-multi-menu__link-text-wrapper">M</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/n"><span class="su-multi-menu__link-text-wrapper">N</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/o"><span class="su-multi-menu__link-text-wrapper">O</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/p"><span class="su-multi-menu__link-text-wrapper">P</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/q"><span class="su-multi-menu__link-text-wrapper">Q</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/r"><span class="su-multi-menu__link-text-wrapper">R</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/s"><span class="su-multi-menu__link-text-wrapper">S</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/t"><span class="su-multi-menu__link-text-wrapper">T</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/u"><span class="su-multi-menu__link-text-wrapper">U</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/v"><span class="su-multi-menu__link-text-wrapper">V</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/w"><span class="su-multi-menu__link-text-wrapper">W</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/king-encyclopedia/y"><span class="su-multi-menu__link-text-wrapper">Y</span></a></li></ul></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/major-king-events-chronology-1929-1968"><span class="su-multi-menu__link-text-wrapper">Major King Events Chronology: 1929-1968</span></a></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/king-papers/about-papers-project/king-papers-publications"><span class="su-multi-menu__link-text-wrapper">King Institute Publications</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv3"><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr"><span class="su-multi-menu__link-text-wrapper">Autobiography of Martin Luther King Jr.</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv4"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-1-early-years"><span class="su-multi-menu__link-text-wrapper">Chapter 1: Early Years</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-2-morehouse-college"><span class="su-multi-menu__link-text-wrapper">Chapter 2: Morehouse College</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-3-crozer-seminary"><span class="su-multi-menu__link-text-wrapper">Chapter 3: Crozer Seminary</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-4-boston-university"><span class="su-multi-menu__link-text-wrapper">Chapter 4: Boston University</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-5-coretta"><span class="su-multi-menu__link-text-wrapper">Chapter 5: Coretta</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-6-dexter-avenue-baptist-church"><span class="su-multi-menu__link-text-wrapper">Chapter 6: Dexter Avenue Baptist Church</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-7-montgomery-movement-begins"><span class="su-multi-menu__link-text-wrapper">Chapter 7: Montgomery Movement Begins</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-8-violence-desperate-men"><span class="su-multi-menu__link-text-wrapper">Chapter 8: The Violence of Desperate Men</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-10-expanding-struggle"><span class="su-multi-menu__link-text-wrapper">Chapter 10: The Expanding Struggle</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-11-birth-new-nation"><span class="su-multi-menu__link-text-wrapper">Chapter 11: Birth of a New Nation</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-12-brush-death"><span class="su-multi-menu__link-text-wrapper">Chapter 12: Brush with Death</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-13-pilgrimage-nonviolence"><span class="su-multi-menu__link-text-wrapper">Chapter 13: Pilgrimage to Nonviolence</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-14-sit-movement"><span class="su-multi-menu__link-text-wrapper">Chapter 14: The Sit-In Movement</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-15-atlanta-arrest-and-presidential"><span class="su-multi-menu__link-text-wrapper">Chapter 15: Atlanta Arrest and Presidential Politics</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-16-albany-movement"><span class="su-multi-menu__link-text-wrapper">Chapter 16: The Albany Movement</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-18-birmingham-campaign"><span class="su-multi-menu__link-text-wrapper">Chapter 18: The Birmingham Campaign</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-19-freedom-now"><span class="su-multi-menu__link-text-wrapper">Chapter 19: Freedom Now!</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-20-march-washington"><span class="su-multi-menu__link-text-wrapper">Chapter 20: March on Washington</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-21-death-illusions"><span class="su-multi-menu__link-text-wrapper">Chapter 21: Death of Illusions</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-22-st-augustine"><span class="su-multi-menu__link-text-wrapper">Chapter 22: St. Augustine</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-23-mississippi-challenge"><span class="su-multi-menu__link-text-wrapper">Chapter 23: The Mississippi Challenge</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-24-nobel-peace-prize"><span class="su-multi-menu__link-text-wrapper">Chapter 24: The Nobel Peace Prize</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-25-malcolm-x"><span class="su-multi-menu__link-text-wrapper">Chapter 25: Malcolm X</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-26-selma"><span class="su-multi-menu__link-text-wrapper">Chapter 26: Selma</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-27-watts"><span class="su-multi-menu__link-text-wrapper">Chapter 27: Watts</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-28-chicago-campaign"><span class="su-multi-menu__link-text-wrapper">Chapter 28: Chicago Campaign</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/publications/autobiography-martin-luther-king-jr/chapter-31-poor-peoples-campaign"><span class="su-multi-menu__link-text-wrapper">Chapter 31: The Poor People&#039;s Campaign</span></a></li></ul></li></ul></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/king-resources/recommended-readings"><span class="su-multi-menu__link-text-wrapper">Recommended Readings</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv3"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/recommended-readings/recommended-readings-kids"><span class="su-multi-menu__link-text-wrapper">Recommended Readings for Kids</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/king-resources/recommended-readings/recommended-readings-young-adults"><span class="su-multi-menu__link-text-wrapper">Recommended Readings for Young Adults</span></a></li></ul></li></ul></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/institute/king-institute"><span class="su-multi-menu__link-text-wrapper">The Institute</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv2"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/institute/king-institute"><span class="su-multi-menu__link-text-wrapper">About the King Institute</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/institute/king-institute/visit-institute"><span class="su-multi-menu__link-text-wrapper">Visit the Institute</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/institute/our-supporters"><span class="su-multi-menu__link-text-wrapper">Our Supporters</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/our-staff" data-toggle="tooltip" title="A listing of people types"><span class="su-multi-menu__link-text-wrapper">Our Staff</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/institute/king-institute/join-march"><span class="su-multi-menu__link-text-wrapper">Make a Gift</span></a></li></ul></li><li class="su-multi-menu__item su-multi-menu__item--parent"><a class="su-multi-menu__link" href="/node/16/news/news/news/news/news"><span class="su-multi-menu__link-text-wrapper">News &amp; Events</span></a><ul class="su-multi-menu__menu su-multi-menu__menu-lv2"><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/node/16/news/news/news/news/news" data-toggle="tooltip" title="News"><span class="su-multi-menu__link-text-wrapper">News</span></a></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/events"><span class="su-multi-menu__link-text-wrapper">Events</span></a></li></ul></li><li class="su-multi-menu__item"><a class="su-multi-menu__link" href="/lerone-martin"><span class="su-multi-menu__link-text-wrapper">Lerone Martin</span></a></li></ul></nav>
+
+  </div>
+
+
+          </div>
+              </section>
+    </header><main class="page-content" id="page-content"><h1 class='visually-hidden'>
+     The Martin Luther King, Jr. Research and Education Institute
+    </h1>
+    <div data-drupal-messages-fallback class="hidden"></div>
+<div id="block-stanford-basic-content" class="system-main-block block-system block-stanford-basic-content">
+  
+    
+      
+
+<section class="node--stanford-page node-page--stanford-page node basic-page node--layout-full">
+      <div class="content">
+    
+
+
+
+
+<div class="jumpstart-ui--one-column">
+    <div  class="main-region">
+      
+
+<div class="field-block node-stanford-page-su-page-banner block-layout-builder">
+  
+    
+      
+
+
+
+
+            <div class="node stanford-page su-page-banner entity-reference-revisions label-hidden"><div class="ptype-stanford-banner">
+<div class="overlay-left ds-entity--paragraph ds-entity--stanford-banner">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=36:changed=1669915575&amp;ds_bundle=stanford_banner&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="4nCym-qH43wqn2DNv3RR53Yvrd8-WrrSjvR7jW_h_5I" data-drupal-ajax-container=""></div>
+<div class="su-hero overlay-left">
+
+        <div class="su-hero__media">
+            <div class="media-entity-wrapper image">
+  
+  
+
+
+
+
+            <div class="media image field-media-image label-hidden">    <picture>
+                  <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/kingmarch_0.png.webp?itok=Ws8gKpA4 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/kingmarch_0.png.webp?itok=oTHq2SPK 2x" media="screen and (min-width: 1500px)" type="image/webp" width="1500" height="474"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/kingmarch_0.png.webp?itok=Ws8gKpA4 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/kingmarch_0.png.webp?itok=oTHq2SPK 2x" media="screen and (min-width: 1200px)" type="image/webp" width="1500" height="474"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_xl_1x/public/media/image/kingmarch_0.png.webp?itok=5Rua4VQz 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_xl_2x/public/media/image/kingmarch_0.png.webp?itok=rcLlrvS4 2x" media="screen and (min-width: 992px)" type="image/webp" width="1200" height="379"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_lg_1x/public/media/image/kingmarch_0.png.webp?itok=FEyvCMVd 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_lg_2x/public/media/image/kingmarch_0.png.webp?itok=PlGeIce3 2x" media="screen and (min-width: 768px)" type="image/webp" width="992" height="314"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_md_1x/public/media/image/kingmarch_0.png.webp?itok=vQwwkfBb 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_md_2x/public/media/image/kingmarch_0.png.webp?itok=kKOdNnFZ 2x" media="screen and (min-width: 576px)" type="image/webp" width="768" height="243"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_sm_1x/public/media/image/kingmarch_0.png.webp?itok=KZVapSYK 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_sm_2x/public/media/image/kingmarch_0.png.webp?itok=e6GBshkg 2x" media="(min-width: 0em)" type="image/webp" width="576" height="182"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/kingmarch_0.png?itok=Ws8gKpA4 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/kingmarch_0.png?itok=oTHq2SPK 2x" media="screen and (min-width: 1500px)" type="image/png" width="1500" height="474"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/kingmarch_0.png?itok=Ws8gKpA4 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/kingmarch_0.png?itok=oTHq2SPK 2x" media="screen and (min-width: 1200px)" type="image/png" width="1500" height="474"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_xl_1x/public/media/image/kingmarch_0.png?itok=5Rua4VQz 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_xl_2x/public/media/image/kingmarch_0.png?itok=rcLlrvS4 2x" media="screen and (min-width: 992px)" type="image/png" width="1200" height="379"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_lg_1x/public/media/image/kingmarch_0.png?itok=FEyvCMVd 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_lg_2x/public/media/image/kingmarch_0.png?itok=PlGeIce3 2x" media="screen and (min-width: 768px)" type="image/png" width="992" height="314"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_md_1x/public/media/image/kingmarch_0.png?itok=vQwwkfBb 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_md_2x/public/media/image/kingmarch_0.png?itok=kKOdNnFZ 2x" media="screen and (min-width: 576px)" type="image/png" width="768" height="243"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_sm_1x/public/media/image/kingmarch_0.png?itok=KZVapSYK 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_sm_2x/public/media/image/kingmarch_0.png?itok=e6GBshkg 2x" media="(min-width: 0em)" type="image/png" width="576" height="182"/>
+                  <img loading="lazy" width="2340" height="740" src="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/kingmarch_0.png?itok=oTHq2SPK" alt="Photo of King marching in Philadelphia, Mississippi, June 1966, courtesy of the Bob Fitch Photography Archive, Stanford University Libraries." />
+
+  </picture>
+
+</div>
+      
+</div>
+
+      </div>
+    
+      <article  class="su-card su-hero__card">
+    
+  
+<div class="su-card__contents">
+                  <h2>To Save the Soul of America</h2>
+                  <p>“Somewhere I read of the freedom of assembly. Somewhere I read of the freedom of speech. Somewhere I read of the freedom of press. Somewhere I read that the greatness of America is the right to protest for right. And so just as I say we aren’t going to let any dogs or water hoses turn us around, we aren’t going to let any injunction turn us around. We are going on.”<br>
+<a href="https://kinginstitute.stanford.edu/king-papers/documents/ive-been-mountaintop-address-delivered-bishop-charles-mason-temple">—“I’ve Been to the Mountaintop,” Address Delivered at Bishop Charles Mason Temple, 3 April 1968.</a><br>
+<em>Photo of King and Andrew Young marching in Philadelphia, Mississippi, June 1966, courtesy of the Bob Fitch Photography Archive, Stanford University Libraries.&nbsp;</em></p>
+          </div></article>
+</div>
+
+</div>
+</div>
+</div>
+      
+  </div>
+
+    </div>
+</div>
+
+
+
+  
+
+<div class="jumpstart-ui--one-column centered-container">
+    <div  class="main-region flex-12-of-12">
+      
+
+<div class="field-block node-stanford-page-title block-layout-builder">
+  
+    
+      
+  </div>
+
+    </div>
+</div>
+
+
+
+
+
+<div class="jumpstart-ui--one-column">
+    <div  class="main-region">
+      <div class="jumpstart-ui-skipnav-main-anchor block-jumpstart-ui">
+  
+    
+      <div id="main-content" tabindex="-1" class="visually-hidden focusable">Main content start</div>
+
+  </div>
+
+
+<div class="field-block node-stanford-page-su-page-components block-layout-builder">
+  
+    
+      
+
+
+
+
+      <div class="node stanford-page su-page-components entity-reference-revisions label-hidden">
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout--layout-paragraphs-one-column">
+
+              <div  class="layout__region layout__region--main">
+            <div class="ptype-stanford-wysiwyg paragraph paragraph--type--stanford-wysiwyg paragraph--view-mode--default">
+          
+
+
+
+
+            <div class="su-wysiwyg-text paragraph stanford-wysiwyg text-long label-hidden"><h2 class="text-align-center">Welcome to the Martin Luther King, Jr. Research &amp; Education Institute</h2><p class="text-align-center">Building upon the achievements of Stanford University's Martin Luther King, Jr. Papers Project, the King Institute supports a broad range of educational activities illuminating Dr. King's life and the movements he inspired.</p><p class="text-align-center su-callout-text">&nbsp;</p></div>
+      
+      </div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout-paragraphs-two-column layout-paragraphs-two-column--50-50 layout--layout-paragraphs-two-column">
+
+              <div  class="layout__region layout__region--main">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=46:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="cnOaFRC1-LXGwQhSDCkmC6V9exKQ-6v-W0cgu5Eo5VI" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2> The King Papers</h2>
+                  <p>A comprehensive collection of Dr. King's most significant correspondence, sermons, speeches, published writings, and unpublished manuscripts.</p>
+                  <a href="/king-papers/about-papers-project" class="su-link su-card__link su-link--action">
+          Discover the King Papers
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--sidebar">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=66:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="4510_7EVHi-fOyi0kk9Ysa40DXL_sBrQF1Mybe1CsC4" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>King Resources</h2>
+                  <p>Database with the archival locations of King-related documents, ancillary Institute publications, and recommended readings.&nbsp;</p>
+                  <a content="[]" href="/king-resources" class="su-link su-card__link su-link--action">
+          Search the Resources
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout-paragraphs-two-column layout-paragraphs-two-column--50-50 layout--layout-paragraphs-two-column">
+
+              <div  class="layout__region layout__region--main">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=71:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="khFBZDoI-aik6KlOG-scPN3KerOjYI3i4GF4QMM5Zz8" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>The Institute</h2>
+                  <p>News, events, and information about the staff of the King Papers Project.</p>
+                  <a content="[]" href="/institute/king-institute" class="su-link su-card__link su-link--action">
+          About the Institute
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--sidebar">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=76:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="qlXGfc7hxpxU8if7M7zjsn5Qcomnp3r3abHUu57wzB8" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>King Encyclopedia</h2>
+                  <p>The&nbsp;<em>Encyclopedia</em>, based on the extensive historical research originally conducted for&nbsp;<em>The Papers</em>, has over 280 articles on civil rights movement figures, events, and organizations.</p>
+                  <a href="/publications/martin-luther-king-jr-encyclopedia" class="su-link su-card__link su-link--action">
+          Browse the Encyclopedia
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout--layout-paragraphs-one-column">
+
+              <div  class="layout__region layout__region--main">
+            <div class="ptype-stanford-wysiwyg paragraph paragraph--type--stanford-wysiwyg paragraph--view-mode--default">
+          
+
+
+
+
+            <div class="su-wysiwyg-text paragraph stanford-wysiwyg text-long label-hidden"><h2 class="text-align-center">Explore the King Institute</h2></div>
+      
+      </div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout--layout-paragraphs-three-column">
+
+              <div  class="layout__region layout__region--sidebar">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=81:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="XOHzb3bKI9wCmbyP5NsotJe7g9i60yo3vGpLz1aioYg" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>National History Day</h2>
+                  <p>We are always excited to hear from students engaged in historical research about Dr. King. Unfortunately, we do not have the capacity to respond to all the research requests we receive. Our website offers some of the best primary and secondary sources available and we hope you enjoy the process of discovering new information and ideas about the past and present.</p>
+                  <a href="/national-history-day" class="su-link su-card__link su-link--action">
+          Suggested starting resources
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--main">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=86:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="5OPhKc0qJR4skSfHIVzTd0efR_SIDEeItslHTnybiKs" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>Copyright Notice</h2>
+                  <p>The Institute cannot give permission to use or reproduce any of the writings, statements, or images of Martin Luther King, Jr. Please do not contact us for this purpose. To obtain proper authorization for use of Dr. King's works and intellectual property, please contact Intellectual Properties Management (IPM), the exclusive licensor of the Estate of Martin Luther King, Jr., Inc. at&nbsp;<a href="mailto:licensing@i-p-m.com">licensing@i-p-m.com</a>&nbsp;or 404 526-8968. Screenshots are considered by the King Estate a violation of this notice.&nbsp;</p>
+          </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--sidebar">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=91:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="UgXRJ9fWkw-8dnp3De3NaTMDlhA2iHrMVczvONG4t0M" data-drupal-ajax-container=""></div><article  class="su-card ">
+    <div class="media-entity-wrapper image">
+  
+  
+
+
+
+
+            <div class="media image field-media-image label-hidden">    <picture>
+                  <source srcset="/sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=VhN7_Yjs 1x, /sites/g/files/sbiybj27721/files/styles/card_1900x950/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=NxnX3vwA 2x" media="screen and (min-width: 992px)" type="image/webp" width="1192" height="596"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_956x478/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=tnFRHArs 1x, /sites/g/files/sbiybj27721/files/styles/card_1900x950/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=NxnX3vwA 2x" media="screen and (min-width: 768px)" type="image/webp" width="956" height="478"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_956x478/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=tnFRHArs 1x, /sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=VhN7_Yjs 2x" media="screen and (min-width: 576px)" type="image/webp" width="956" height="478"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_478x239/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=eEXiC56w 1x, /sites/g/files/sbiybj27721/files/styles/card_956x478/public/media/image/martinbanner_0.png.webp?h=93ced445&amp;itok=tnFRHArs 2x" media="(min-width: 0em)" type="image/webp" width="478" height="239"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=VhN7_Yjs 1x, /sites/g/files/sbiybj27721/files/styles/card_1900x950/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=NxnX3vwA 2x" media="screen and (min-width: 992px)" type="image/png" width="1192" height="596"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_956x478/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=tnFRHArs 1x, /sites/g/files/sbiybj27721/files/styles/card_1900x950/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=NxnX3vwA 2x" media="screen and (min-width: 768px)" type="image/png" width="956" height="478"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_956x478/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=tnFRHArs 1x, /sites/g/files/sbiybj27721/files/styles/card_1192x596/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=VhN7_Yjs 2x" media="screen and (min-width: 576px)" type="image/png" width="956" height="478"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/card_478x239/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=eEXiC56w 1x, /sites/g/files/sbiybj27721/files/styles/card_956x478/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=tnFRHArs 2x" media="(min-width: 0em)" type="image/png" width="478" height="239"/>
+                  <img loading="lazy" width="1900" height="950" src="/sites/g/files/sbiybj27721/files/styles/card_1900x950/public/media/image/martinbanner_0.png?h=93ced445&amp;itok=NxnX3vwA" alt="Dr. Lerone A. Martin" />
+
+  </picture>
+
+</div>
+      
+</div>
+
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>Dr. Lerone A. Martin</h2>
+                  <p>The second faculty director of the King Institute, Dr. Martin is Associate Professor of Religious Studies at Stanford University. Previously, he was a member of the faculty at the John C. Danforth Center on Religion and Politics at Washington University in Saint Louis.</p>
+                  <div class="su-card__button">
+          <a content="[]" href="/lerone-martin" class="su-link su-button">
+            Read more about Dr. Martin
+          </a>
+        </div>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+          </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout-paragraphs-two-column layout-paragraphs-two-column--50-50 layout--layout-paragraphs-two-column">
+
+              <div  class="layout__region layout__region--main">
+            <div class="ptype-stanford-lists paragraph paragraph--type--stanford-lists paragraph--view-mode--default">
+          
+
+
+
+
+            <div class="su-margin-bottom paragraph stanford-lists su-list-headline string label-hidden"><h2>Recent News</h2>
+</div>
+      
+<div class="field field--name-su-list-view field--type-viewfield field--label-hidden">
+  
+    
+        
+<div class="field__item field__item-label-hidden">
+  
+    
+      <div class="views-element-container"><div class="view stanford-news block-1 js-view-dom-id-ddb40fe5bc3f92b1d2513c5e3ebfd03a8ff1723e0ce0bf4f56116f40f8919f5d">
+  
+  
+  
+
+  
+  
+  
+
+  <div>
+  
+  <ul class="su-list-unstyled">
+
+          <li class="su-news-list">
+
+  
+
+<article class="su-news-article su-news-list-image__empty" aria-labelledby="statement-by-king-institute-on-the-release-of-fbi-and-cia-documents-related-to-martin-luther-king-jr">
+
+          <header class="su-news-list__header">
+      <div class="su-news-list__headline-dek">
+        <a  href="/news/statement-king-institute-release-fbi-and-cia-documents-related-martin-luther-king-jr">          <h3 id="statement-by-king-institute-on-the-release-of-fbi-and-cia-documents-related-to-martin-luther-king-jr">
+Statement by King Institute on the release of FBI and CIA documents related to Martin Luther King, Jr.</h3>
+        </a>              </div>
+
+                    <div class="su-news-list__item-date">
+                  <p>July 29, 2025</p>
+        </div>
+    </header>
+  </article>
+
+</li>
+          <li class="su-news-list">
+
+  
+
+<article class="su-news-article su-news-external su-news-list-image__empty" aria-labelledby="easing-the-jump-from-high-school-to-college-how-teaching-fellows-support-a-stanford-course">
+
+          <header class="su-news-list__header">
+      <div class="su-news-list__headline-dek">
+        <a  href="https://news.stanford.edu/stories/2025/01/easing-the-jump-from-high-school-to-college?utm_source=feedotter&amp;amp;utm_medium=email&amp;amp;utm_campaign=int-01-16-2025&amp;amp;utm_content=httpsnewsstanfordedustories202501easingthejumpfromhighschooltocollege&amp;amp;mkt_tok=NjYwLVRKQy05ODQAAAGYE4sEJJWwv5EMMep6ZhM6o2QKR9g_KuMYOYVJ3cSoeOIT4Ig39psbSiYFkwBN7PBEaj-7hzsQcz6bal4OO-GkzvhyBxIjBDtujeby6Go">          <h3 id="easing-the-jump-from-high-school-to-college-how-teaching-fellows-support-a-stanford-course">
+Easing the ‘jump’ from high school to college: how teaching fellows support a Stanford course</h3>
+        </a>              </div>
+
+                    <div class="su-news-list__item-date">
+                  <p>January 17, 2025</p>
+        </div>
+    </header>
+        <div class="su-news-list__topics">
+<ul><li><a href="/news/announcement" hreflang="en">Announcement</a></li></ul></div>
+    </article>
+
+</li>
+    
+  </ul>
+
+</div>
+
+    
+
+  
+  
+
+  
+  
+</div>
+</div>
+
+  </div>
+
+    </div>
+
+
+
+
+
+            <div class="paragraph stanford-lists su-list-button link label-hidden"><a href="/node/16/news/news/news/news/news" class="su-button su-margin-top-5">See all King Institute News</a></div>
+      
+      </div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--sidebar">
+            <div class="ptype-stanford-wysiwyg paragraph paragraph--type--stanford-wysiwyg paragraph--view-mode--default">
+          
+
+
+
+
+            <div class="su-wysiwyg-text paragraph stanford-wysiwyg text-long label-hidden"><h2>Find</h2>
+
+<p><a href="http://okra.stanford.edu/">Online King Records Access (OKRA)</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="60dd4999-948c-4fdc-8a81-e10bb03a4920" href="/document-research-requests">Document Research Requests</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="7d5e83c7-178d-452e-a423-2f5c09b6078d" href="/king-papers/about-papers-project/king-papers-publications">King Papers Publications</a></p></div>
+      
+      </div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout--layout-paragraphs-one-column">
+
+              <div  class="layout__region layout__region--main">
+            <div class="ptype-stanford-wysiwyg paragraph paragraph--type--stanford-wysiwyg paragraph--view-mode--default">
+          
+
+
+
+
+            <div class="su-wysiwyg-text paragraph stanford-wysiwyg text-long label-hidden"><h2 class="text-align-center">Information for</h2></div>
+      
+      </div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout-paragraphs-two-column layout-paragraphs-two-column--50-50 layout--layout-paragraphs-two-column">
+
+              <div  class="layout__region layout__region--main">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=106:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="vznhJQATfLTiANmgu-cFMWMzh0LqRxsnpFaSVPG2Mug" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>Kids</h2>
+                  <p>Suggested readings about the Civil Rights Movement, fun facts, and audio-visual resources.&nbsp;</p>
+                  <a content="[]" href="/king-kids" class="su-link su-card__link su-link--action">
+          Explore Content for Kids
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--sidebar">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=111:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="1cplY7-G6PY4e46xz4Y-x1xFQsHTmKInCFwvsppsQ6I" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>Teachers</h2>
+                  <p>Primary and secondary sources about the modern African American Freedom Struggle.</p>
+                  <a content="[]" href="/information-teachers" class="su-link su-card__link su-link--action">
+          See Content for Teachers
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout-paragraphs-two-column layout-paragraphs-two-column--50-50 layout--layout-paragraphs-two-column">
+
+              <div  class="layout__region layout__region--main">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=116:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="7JQ_nKc1keCo18qySlIr183iitSubmGxmGtBjZ9Vo1c" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>Students</h2>
+                  <p>King-related primary and secondary sources and a guide for History Day research.</p>
+                  <a content="[]" href="/information-students" class="su-link su-card__link su-link--action">
+          Search Content for Students
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+              <div  class="layout__region layout__region--sidebar">
+          <div class="ptype-stanford-card">
+<div class="ds-entity--paragraph ds-entity--stanford-card">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=121:changed=1669915575&amp;ds_bundle=stanford_card&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="pbTCIKb8dilQ8Pew_E1RGszr2Z1NQR69rRUqrG1zM0U" data-drupal-ajax-container=""></div><article  class="su-card ">
+    
+  
+<div class="su-card__contents">
+                  <div class="su-card__superhead"></div>
+              <h2>Researchers</h2>
+                  <p>A database of King-related primary documents and recommended scholarly sources.&nbsp;</p>
+                  <a content="[]" href="/information-researchers" class="su-link su-card__link su-link--action">
+          See Content for Researchers
+        </a>
+      </div></article>
+
+</div>
+</div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+              <div class="paragraph-item ptype-stanford-layout">  <div class="ptype-stanford-layout paragraph paragraph--type--stanford-layout paragraph--view-mode--default">
+          
+
+
+
+
+
+  <div class="layout-background">
+    <div class="layout layout--layout-paragraphs-one-column">
+
+              <div  class="layout__region layout__region--main">
+          <div class="ptype-stanford-banner">
+<div class="overlay-left ds-entity--paragraph ds-entity--stanford-banner">
+  <div data-contextual-id="paragraph:root_parent_type=node&amp;root_parent=51&amp;paragraph=131:changed=1669915575&amp;ds_bundle=stanford_banner&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="2AeOYubos3GyDQWmsYFlnZi9EwPIBiIoZT-0K7BwVVw" data-drupal-ajax-container=""></div>
+<div class="su-hero overlay-left">
+
+        <div class="su-hero__media">
+            <div class="media-entity-wrapper image">
+  
+  
+
+
+
+
+            <div class="media image field-media-image label-hidden">    <picture>
+                  <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=fXsUol9W 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=h9_VWwE5 2x" media="screen and (min-width: 1500px)" type="image/webp" width="1500" height="281"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=fXsUol9W 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=h9_VWwE5 2x" media="screen and (min-width: 1200px)" type="image/webp" width="1500" height="281"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_xl_1x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=U0-UQpRX 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=uwPvpGVa 2x" media="screen and (min-width: 992px)" type="image/webp" width="1200" height="225"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_lg_1x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=eDgv1SVd 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_lg_2x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=NH4wGfM4 2x" media="screen and (min-width: 768px)" type="image/webp" width="992" height="186"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_md_1x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=RVnjzPGM 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_md_2x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=QnNu392z 2x" media="screen and (min-width: 576px)" type="image/webp" width="768" height="144"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_sm_1x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=E1oZQ_Rf 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_sm_2x/public/media/image/15243448715_c662573bfe_o_0.jpg.webp?itok=dymZOalz 2x" media="(min-width: 0em)" type="image/webp" width="576" height="108"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=fXsUol9W 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=h9_VWwE5 2x" media="screen and (min-width: 1500px)" type="image/jpeg" width="1500" height="281"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_1x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=fXsUol9W 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=h9_VWwE5 2x" media="screen and (min-width: 1200px)" type="image/jpeg" width="1500" height="281"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_xl_1x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=U0-UQpRX 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=uwPvpGVa 2x" media="screen and (min-width: 992px)" type="image/jpeg" width="1200" height="225"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_lg_1x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=eDgv1SVd 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_lg_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=NH4wGfM4 2x" media="screen and (min-width: 768px)" type="image/jpeg" width="992" height="186"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_md_1x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=RVnjzPGM 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_md_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=QnNu392z 2x" media="screen and (min-width: 576px)" type="image/jpeg" width="768" height="144"/>
+              <source srcset="/sites/g/files/sbiybj27721/files/styles/breakpoint_sm_1x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=E1oZQ_Rf 1x, /sites/g/files/sbiybj27721/files/styles/breakpoint_sm_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=dymZOalz 2x" media="(min-width: 0em)" type="image/jpeg" width="576" height="108"/>
+                  <img loading="lazy" width="1600" height="300" src="/sites/g/files/sbiybj27721/files/styles/breakpoint_2xl_2x/public/media/image/15243448715_c662573bfe_o_0.jpg?itok=h9_VWwE5" alt="Dr. Martin Luther King, Jr. about to shake someone&#039;s hand in a crowd of smiling people" />
+
+  </picture>
+
+</div>
+      
+</div>
+
+      </div>
+    
+      <article  class="su-card su-hero__card">
+    
+  
+<div class="su-card__contents">
+                  <h2>Join the March</h2>
+                  
+                  <div class="su-card__button">
+          <a content="[]" href="https://makeagift.stanford.edu/get/page/makeagift?pgnTPC=399&amp;stp=52&amp;olc=07547&amp;cturl=close" class="su-link su-button">
+            Make a Gift
+          </a>
+        </div>
+      </div></article>
+</div>
+
+</div>
+</div>
+
+        </div>
+      
+    </div>
+  </div>
+
+
+      </div>
+</div>
+          </div>
+  
+  </div>
+
+    </div>
+</div>
+
+  </div><!-- /.content --></section><!-- /.node as page -->
+
+  </div>
+
+<button id="back-to-top">
+    <span class="fas fa-chevron-up"></span>
+    Back to Top
+  </button>
+</main>
+
+<footer id="footer" data-nosnippet>
+    <div id="block-config-pages" class="config-pages-block block-config-pages">
+  
+    
+      
+<div class="ds-entity--config-pages ds-entity--stanford-local-footer">
+  <div data-contextual-id="config_pages:config_pages=1:changed=1669875241&amp;ds_bundle=stanford_local_footer&amp;ds_view_mode=default&amp;langcode=en" data-contextual-token="1mMAjaMiAQqUq5ASsm-AiZBMZsUrJe_RnZVVp-rXZxs" data-drupal-ajax-container=""></div><div  class="su-local-footer ">
+      <div class="su-local-footer__header">
+              <div  class="su-lockup su-lockup--option-a">
+  <div class="su-lockup__cell1">
+          <div class="su-lockup__wordmark-wrapper">
+        <span class="su-lockup__wordmark">Stanford</span>
+              </div>
+      </div>    <div class="su-lockup__cell2">
+        <span class="su-lockup__line1" >The Martin Luther King, Jr. Research and Education Institute</span>
+    
+    
+      </div>
+      </div>
+                <a href="/saml/login?destination=/%3Fauthor%3D1" class="su-link su-link--internal" rel="nofollow">
+        Web Login
+      </a>
+            
+  </div>
+      <div class="su-local-footer__columns">
+        <div class="su-local-footer__cell1">
+                              <h2 class="su-sr-only-element">Address</h2>
+      <address class="su-local-footer__address">
+        
+
+
+
+
+            <div class="config-pages stanford-local-footer su-local-foot-address address label-hidden"><p class="address" translate="no"><span class="organization">Cypress Hall D</span><br>
+<span class="address-line1">466 Via Ortega</span><br>
+<span class="locality">Stanford</span>, <span class="administrative-area">CA</span> <span class="postal-code">94305-4146</span><br>
+<span class="country">United States</span></p></div>
+      
+      </address>
+                                    <ul class="su-local-footer__social-links">
+                    
+        
+                            <li >
+      <a href="https://www.facebook.com/KingInstitute" class="su-local-footer__social-facebook" >
+        <i aria-hidden='true'></i>
+        <span>Facebook</span>
+      </a>
+    </li>
+                            <li >
+      <a href="https://www.twitter.com/mlk_institute" class="su-local-footer__social-twitter" >
+        <i aria-hidden='true'></i>
+        <span>Twitter</span>
+      </a>
+    </li>
+  
+  
+              </ul>
+                        
+
+
+
+
+            <div class="su-wysiwyg-text config-pages stanford-local-footer su-local-foot-pr-co text-long label-hidden"><p>P: (650) 723-2092<br>
+F: (650) 723-2093<br>
+<a href="mailto:kinginstitute@stanford.edu">kinginstitute@stanford.edu</a><br>
+<a href="http://campus-map.stanford.edu/">Campus Map</a></p>
+
+<p>The Institute cannot give permission to use or reproduce any of the writings, statements, or images of Martin Luther King, Jr. Please contact Intellectual Properties Management (IPM), the exclusive licensor of the Estate of Martin Luther King, Jr., Inc. at&nbsp;<a href="mailto:licensing@i-p-m.com">licensing@i-p-m.com</a>&nbsp;or 404 526-8968. Screenshots are considered by the King Estate a violation of this notice.&nbsp;</p></div>
+      
+    </div>
+        <div class="su-local-footer__cell2">
+                                                      <div class="flex-container"><div class="flex-md-6-of-12 su-margin-bottom-1">
+
+
+
+
+            <div class="su-wysiwyg-text config-pages stanford-local-footer su-local-foot-se-co text-long label-hidden"><h2>King Papers</h2>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="96895b6f-ace7-4c76-8657-4dfa9fefe998" href="/king-papers/about-papers-project" title="Martin Luther King, Jr. Papers Project">About the Papers Project</a></p></div>
+      </div>
+<div class="flex-md-6-of-12">
+
+
+
+
+            <div class="su-wysiwyg-text config-pages stanford-local-footer su-local-foot-tr2-co text-long label-hidden"><h2>Resources</h2>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="a7e43945-b5dc-499f-9ebe-a533f71ee523" href="/king-papers/about-papers-project/documents">Documents</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="60dd4999-948c-4fdc-8a81-e10bb03a4920" href="/document-research-requests">Document Research Requests</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="ca1895b2-e91a-4a82-969e-d019fca082b0" href="/king-resources/freedoms-ring-i-have-dream-speech" title="Freedom's Ring &quot;I Have a Dream&quot; Speech">Freedom's Ring</a></p>
+
+<p><a href="http://okra.stanford.edu/">Online King Records Access</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="ce9cb7ca-6c59-4eea-9934-0a33057a7ff2" href="/publications">King Institute Publications</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="85ea1e0b-12fe-4558-95bd-5b37682646dc" href="/king-resources/recommended-readings">Recommended Readings</a></p></div>
+      </div>
+</div>
+
+    </div>
+        <div class="su-local-footer__cell3">
+                                          
+
+
+
+
+            <div class="su-wysiwyg-text config-pages stanford-local-footer su-local-foot-tr-co text-long label-hidden"><h2>The Institute</h2>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="d4a9bb89-9d13-4d1a-a5c3-9934bf2205ca" href="/institute/king-institute" title="About the King Institute">About the Institute</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="9478ce5e-01ca-4400-929d-bb7c3d256b94" href="/institute/king-institute/visit-institute">Visit the Institute</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="3f326158-ca0c-4155-858b-d9693a42a9d1" href="/institute/our-supporters">Our Supporters</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="673a8fb8-39ac-49df-94c2-ed8d04db16a7" href="/our-staff">Our Staff</a></p>
+
+<p><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="8597e5eb-89cb-4263-9b8f-fc24fc57006a" href="/institute/king-institute/join-march" title="Join the March">Make a Gift</a></p></div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+  </div>
+
+
+<div class="su-global-footer ">
+  <div class="su-global-footer__container">
+    <div class="su-global-footer__brand">
+<a  id="su-logo" class="su-logo " aria-hidden="true" tabindex="-1" href="https://www.stanford.edu">Stanford<br>University<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a>
+</div>
+    <div class="su-global-footer__content">
+      <nav aria-label="global footer menu">
+        <ul class="su-global-footer__menu su-global-footer__menu--global">
+          <li><a href="https://www.stanford.edu" rel="nofollow">Stanford Home<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://visit.stanford.edu/basics/" rel="nofollow">Maps &amp; Directions<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://www.stanford.edu/search/" rel="nofollow">Search Stanford<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://emergency.stanford.edu" rel="nofollow">Emergency Info<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+        </ul>
+        <ul class="su-global-footer__menu su-global-footer__menu--policy">
+          <li><a href="https://www.stanford.edu/site/terms/" rel="nofollow"
+                 title="Terms of use for sites">Terms of Use<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://www.stanford.edu/site/privacy/" rel="nofollow"
+                 title="Privacy and cookie policy">Privacy<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://uit.stanford.edu/security/copyright-infringement" rel="nofollow"
+                 title="Report alleged copyright infringement">Copyright<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://adminguide.stanford.edu/chapter-1/subchapter-5/policy-1-5-4" rel="nofollow"
+                 title="Ownership and use of Stanford trademarks and images">Trademarks<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://non-discrimination.stanford.edu/" rel="nofollow"
+                 title="Non-discrimination policy">Non-Discrimination<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+          <li><a href="https://www.stanford.edu/site/accessibility" rel="nofollow"
+                 title="Report web accessibility issues">Accessibility<span class="su-global-footer__link-a11y"> (link is external)</span>
+  </a></li>
+        </ul>
+      </nav>
+      <div class="su-global-footer__copyright">
+        <span>&copy; Stanford University.</span>
+        <span>&nbsp; Stanford, California 94305.</span>
+      </div>
+    </div>
+  </div>
+</div> <!-- su-global-footer end -->
+</footer>
+  </div>
+
+    
+    <script type="application/json" data-drupal-selector="drupal-settings-json">{"path":{"baseUrl":"\/","pathPrefix":"","currentPath":"node\/51","currentPathIsAdmin":false,"isFront":true,"currentLanguage":"en"},"pluralDelimiter":"\u0003","suppressDeprecationErrors":true,"ajaxPageState":{"libraries":"eJyNk-uSgyAMhV_IwiMxUaPSImFIqPXtF3W3Xjpu_ZNJDh-SExBf4qx_6DqmAE7hUhYNeYEBmXrUm1wNWE4lfwUUd7YvWqLWoQEPbhRbsT4KxT31gQWimGR1CYx7ZVvsVxyMlKQIEKGNEDr-s7AqKvmQSme5w7rIG31DsTb5EFvpOR7FKneOXtRbDtDiAZo1I2NA1p5qfMO3Pbz0Zzb9kUdTkUu9_4-SLuIlbqAPyuOQm8rBZNOy6iFSY_PYO3QBo2YraPssPlGtN_FBs4wum_wd9NnybgaHgX1F1fJx1STnboOtpTvd_LauSvAe4wWwglhfwL4Y3IB5qOdzWrmIUG3v6sKWYWQ7jO0peaIXPLJgv_w4yeYzRTB61pP1xf9W7TCSmsJOdVSBa4hypTb5jpke1W3yr6Zsfl1PO722OSq4w2sn9FQnhz8ax7-G","theme":"stanford_basic","theme_token":null},"ajaxTrustedUrl":[],"google_analytics":{"account":"G-33CTWK62H3","trackOutbound":true,"trackMailto":true,"trackTel":true,"trackDownload":true,"trackDownloadExtensions":"7z|aac|arc|arj|asf|asx|avi|bin|csv|doc(x|m)?|dot(x|m)?|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt(x|m)?|pot(x|m)?|pps(x|m)?|ppam|sld(x|m)?|thmx|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls(x|m|b)?|xlt(x|m)|xlam|xml|z|zip","trackColorbox":true},"data":{"extlink":{"extTarget":false,"extTargetAppendNewWindowLabel":"(opens in a new window)","extTargetNoOverride":false,"extNofollow":false,"extTitleNoOverride":false,"extNoreferrer":false,"extFollowNoOverride":false,"extClass":"0","extLabel":" (link is external)","extImgClass":false,"extSubdomains":false,"extExclude":"","extInclude":"","extCssExclude":".localist-widget, #lclst_widget_footer, .oembed-lazyload__button, .su-news-vertical-teaser","extCssInclude":"","extCssExplicit":"#page-content, .su-local-footer","extAlert":false,"extAlertText":"This link will take you to an external web site. We are not responsible for their content.","extHideIcons":false,"mailtoClass":"mailto","telClass":"0","mailtoLabel":" (link sends email)","telLabel":"(link is a phone number)","extUseFontAwesome":false,"extIconPlacement":"append","extPreventOrphan":false,"extFaLinkClasses":"fa fa-external-link","extFaMailtoClasses":"fa fa-envelope-o","extAdditionalLinkClasses":"su-link--external","extAdditionalMailtoClasses":"","extAdditionalTelClasses":"","extFaTelClasses":"fa fa-phone","whitelistedDomains":[],"extExcludeNoreferrer":""}},"stanford_basic":{"nav_dropdown_enabled":true},"views":{"ajax_path":"\/views\/ajax","ajaxViews":{"views_dom_id:ddb40fe5bc3f92b1d2513c5e3ebfd03a8ff1723e0ce0bf4f56116f40f8919f5d":{"view_name":"stanford_news","view_display_id":"block_1","view_args":"","view_path":"\/node\/51","view_base_path":"news\/rss","view_dom_id":"ddb40fe5bc3f92b1d2513c5e3ebfd03a8ff1723e0ce0bf4f56116f40f8919f5d","pager_element":0}}},"user":{"uid":0,"permissionsHash":"ef6217b5e96da1da61c3ecde8e3ee97dde2f15143af9b1546c13dfd59411496c"}}</script>
+<script src="/sites/g/files/sbiybj27721/files/js/js_pzmOhED6Cbj1Q00NYeRmV5kmNuXnWq_ODKhBmpntcJQ.js?scope=footer&amp;delta=0&amp;language=en&amp;theme=stanford_basic&amp;include=eJxdjUEOgzAMBD8UxU-KXDBgapIodoD-vgEOqXoZ7Y60WjpNOL5hLDWjeHqqm1OahQJGlI_xoPAv3Fq3rIbFQmX4La6FOKUyhhcqD3Czy0iHwoUgrNZ9Lmni9rCQZCqgbMRbkzv5frrztb7pccXzC3MoTCA"></script>
+
+      </body>
+</html>

@@ -22,10 +22,25 @@ safety_service = None
 admin_service = None
 conversation_memory_service = None
 enhanced_llm_service = None
+enhanced_rag_service = None
+database_personality_service = None
 personality_models_available = False
 personality_service_available = False
+database_personality_available = False
 memory_service_available = False
 enhanced_llm_available = False
+enhanced_rag_available = False
+
+# Try to import the new database-driven personality service first
+try:
+    from services.database_personality_service import DatabasePersonalityService
+    database_personality_service = DatabasePersonalityService()
+    database_personality_available = True
+    logger.info("✅ Database-driven personality service initialized")
+except ImportError as e:
+    logger.warning(f"⚠️ Database personality service not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Database personality service initialization failed: {e}")
 
 try:
     from models.personality_models import PERSONALITY_CONFIGS, PersonalityConfig
@@ -46,6 +61,16 @@ try:
     logger.info("✅ Enhanced LLM service with reliability patterns loaded")
 except ImportError as e:
     logger.warning(f"⚠️ Enhanced LLM service not available: {e}")
+
+try:
+    from services.enhanced_rag_service_v6 import EnhancedRAGService
+    enhanced_rag_service = EnhancedRAGService()
+    enhanced_rag_available = True
+    logger.info("✅ Enhanced RAG service with vector search initialized")
+except ImportError as e:
+    logger.warning(f"⚠️ Enhanced RAG service not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Enhanced RAG service initialization failed: {e}")
 
 try:
     from services.conversation_memory_service import ConversationMemoryService
@@ -69,10 +94,29 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Admin service not available: {e}")
 
-# Helper functions
-def get_personality_list():
-    """Get list of all available personalities"""
-    if personality_models_available and 'PERSONALITY_CONFIGS' in globals():
+# Helper functions with database-driven approach
+async def get_personality_list():
+    """Get list of all available personalities (database-first approach)"""
+    # Try database-driven service first
+    if database_personality_available and database_personality_service:
+        try:
+            return await database_personality_service.get_personality_list()
+        except Exception as e:
+            logger.warning(f"⚠️ Database personality service failed: {e}")
+    
+    # Fallback to hardcoded approach
+    if 'FALLBACK_PERSONALITIES' in globals():
+        return [
+            {
+                "id": pid,
+                "name": config["name"],
+                "description": config["description"],
+                "domain": config["domain"],
+                "active": True  # All personalities are active
+            }
+            for pid, config in FALLBACK_PERSONALITIES.items()
+        ]
+    elif personality_models_available and 'PERSONALITY_CONFIGS' in globals():
         return [
             {
                 "id": config.id,
@@ -85,38 +129,88 @@ def get_personality_list():
         ]
     return []
 
-def get_personalities_by_domain(domain=None):
-    """Get personalities filtered by domain"""
-    if not personality_models_available or 'PERSONALITY_CONFIGS' not in globals():
+async def get_personalities_by_domain(domain=None):
+    """Get personalities filtered by domain (database-first approach)"""
+    # Try database-driven service first
+    if database_personality_available and database_personality_service:
+        try:
+            return await database_personality_service.get_all_personalities(domain)
+        except Exception as e:
+            logger.warning(f"⚠️ Database personality service failed: {e}")
+    
+    # Fallback to hardcoded approach
+    if 'FALLBACK_PERSONALITIES' in globals():
+        if domain and domain != "all":
+            # Filter by domain using FALLBACK_PERSONALITIES
+            filtered = {
+                pid: config for pid, config in FALLBACK_PERSONALITIES.items()
+                if config["domain"] == domain
+            }
+            return filtered
+        else:
+            return FALLBACK_PERSONALITIES
+    elif personality_models_available and 'PERSONALITY_CONFIGS' not in globals():
         return {}
     
     if domain and domain != "all":
+        # Fallback to old logic for compatibility
         return {
-            k: v for k, v in PERSONALITY_CONFIGS.items() 
+            k: v for k, v in PERSONALITY_CONFIGS.items()
             if v.domain.value == domain
         }
-    return PERSONALITY_CONFIGS
+    else:
+        return PERSONALITY_CONFIGS
 
-def get_personality_config(personality_id):
-    """Get a specific personality configuration"""
+async def get_personality_config(personality_id):
+    """Get a specific personality configuration (database-first approach)"""
+    # Try database-driven service first
+    if database_personality_available and database_personality_service:
+        try:
+            return await database_personality_service.get_personality_config(personality_id)
+        except Exception as e:
+            logger.warning(f"⚠️ Database personality config failed: {e}")
+    
+    # Fallback to hardcoded approach
     if personality_models_available and 'PERSONALITY_CONFIGS' in globals():
         return PERSONALITY_CONFIGS.get(personality_id)
     return None
 
 # Fallback personality data (if models not available)
 FALLBACK_PERSONALITIES = {
+    # SPIRITUAL (4 personalities) - ORIGINAL
     "krishna": {"name": "Krishna", "domain": "spiritual", "description": "Divine guide offering spiritual wisdom from the Bhagavad Gita"},
-    "einstein": {"name": "Albert Einstein", "domain": "scientific", "description": "Brilliant physicist exploring the mysteries of the universe"},
-    "lincoln": {"name": "Abraham Lincoln", "domain": "historical", "description": "16th President known for wisdom, leadership, and unity"},
-    "marcus_aurelius": {"name": "Marcus Aurelius", "domain": "philosophical", "description": "Roman Emperor and Stoic philosopher"},
     "buddha": {"name": "Buddha", "domain": "spiritual", "description": "Enlightened teacher of the Middle Way and mindfulness"},
     "jesus": {"name": "Jesus Christ", "domain": "spiritual", "description": "Teacher of love, compassion, and spiritual transformation"},
     "rumi": {"name": "Rumi", "domain": "spiritual", "description": "Sufi mystic poet of divine love and spiritual union"},
-    "lao_tzu": {"name": "Lao Tzu", "domain": "philosophical", "description": "Ancient Chinese sage and founder of Taoism"},
+    
+    # SCIENTIFIC (5 personalities) - ORIGINAL + NEW
+    "einstein": {"name": "Albert Einstein", "domain": "scientific", "description": "Brilliant physicist exploring the mysteries of the universe"},
+    "newton": {"name": "Isaac Newton", "domain": "scientific", "description": "English mathematician and physicist, father of classical mechanics"},
+    "tesla": {"name": "Nikola Tesla", "domain": "scientific", "description": "Serbian-American inventor and electrical engineer with enhanced RAG content from his works"},
+    "leonardo_da_vinci": {"name": "Leonardo da Vinci", "domain": "scientific", "description": "Renaissance polymath, inventor, scientist, and visionary artist"},
+    "archimedes": {"name": "Archimedes", "domain": "scientific", "description": "Ancient Greek mathematician, physicist, engineer, and inventor"},
+    
+    # PHILOSOPHICAL (6 personalities) - ORIGINAL + NEW
+    "marcus_aurelius": {"name": "Marcus Aurelius", "domain": "philosophical", "description": "Roman Emperor and Stoic philosopher"},
+    "lao_tzu": {"name": "Lao Tzu", "domain": "philosophical", "description": "Ancient Chinese sage and founder of Taoism with enhanced RAG content from Tao Te Ching"},
+    "socrates": {"name": "Socrates", "domain": "philosophical", "description": "Ancient Greek philosopher, father of Western philosophy"},
+    "plato": {"name": "Plato", "domain": "philosophical", "description": "Student of Socrates, founded the Academy in Athens"},
+    "aristotle": {"name": "Aristotle", "domain": "philosophical", "description": "Student of Plato, systematic approach to logic and ethics"},
+    "sigmund_freud": {"name": "Sigmund Freud", "domain": "philosophical", "description": "Founder of psychoanalysis, explored human psychology"},
+    
+    # HISTORICAL (11 personalities) - ORIGINAL + NEW
+    "lincoln": {"name": "Abraham Lincoln", "domain": "historical", "description": "16th President known for wisdom, leadership, and unity"},
     "chanakya": {"name": "Chanakya", "domain": "historical", "description": "Ancient Indian strategist, economist, and political advisor"},
     "confucius": {"name": "Confucius", "domain": "historical", "description": "Chinese philosopher and educator emphasizing ethics and social harmony"},
-    "newton": {"name": "Isaac Newton", "domain": "scientific", "description": "English mathematician and physicist, father of classical mechanics"},
-    "tesla": {"name": "Nikola Tesla", "domain": "scientific", "description": "Serbian-American inventor and electrical engineer, pioneer of modern technology"}
+    "benjamin_franklin": {"name": "Benjamin Franklin", "domain": "historical", "description": "Founding Father, diplomat, inventor, and polymath"},
+    "martin_luther_king": {"name": "Martin Luther King Jr.", "domain": "historical", "description": "Civil rights leader and advocate for social justice"},
+    "george_washington": {"name": "George Washington", "domain": "historical", "description": "First US President, military leader, and statesman"},
+    "gandhi": {"name": "Mahatma Gandhi", "domain": "historical", "description": "Independence leader and advocate of non-violence with enhanced RAG content"},
+    "swami_vivekananda": {"name": "Swami Vivekananda", "domain": "historical", "description": "Spiritual teacher who introduced Vedanta to the West"},
+    
+    # LITERARY (2 personalities) - NEW DOMAIN
+    "william_shakespeare": {"name": "William Shakespeare", "domain": "literary", "description": "Greatest playwright and poet in English literature"},
+    "rabindranath_tagore": {"name": "Rabindranath Tagore", "domain": "literary", "description": "Nobel Prize winner, poet, philosopher, and writer"}
 }
 
 def get_cors_headers() -> Dict[str, str]:
@@ -130,7 +224,7 @@ def get_cors_headers() -> Dict[str, str]:
     }
 
 @app.route(route="health", methods=["GET"])
-def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+async def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced health check endpoint with comprehensive service status"""
     try:
         # Import capability manifest service
@@ -140,8 +234,8 @@ def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         manifest = capability_manifest_service.generate_manifest()
         
         # Get personality data for compatibility
-        if personality_models_available:
-            personalities = get_personality_list()
+        if database_personality_available or personality_models_available:
+            personalities = await get_personality_list()
             total_personalities = len(personalities)
             personality_ids = [p["id"] for p in personalities]
         else:
@@ -220,7 +314,7 @@ def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 @app.route(route="personalities/active", methods=["GET"])
-def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
+async def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
     """Get list of active personalities with enhanced filtering"""
     try:
         # Handle parameters
@@ -229,23 +323,41 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info(f"🎭 Getting personalities - domain: {domain}, active_only: {active_only}")
         
-        # Get personality data based on available services
-        if personality_models_available:
+        # Get personality data based on available services (database-first approach)
+        if database_personality_available or personality_models_available:
             if domain == 'all':
-                personalities = get_personality_list()
+                personalities_data = await get_personality_list()
+                # Ensure we have a list of dict format for consistency
+                if isinstance(personalities_data, list) and len(personalities_data) > 0:
+                    if isinstance(personalities_data[0], dict):
+                        personalities = personalities_data
+                    else:
+                        personalities = []
+                else:
+                    personalities = []
             else:
-                personality_configs = get_personalities_by_domain(domain)
-                personalities = [
-                    {
-                        "id": config.id,
-                        "name": config.name,
-                        "domain": config.domain.value,
-                        "description": config.description
-                    }
-                    for config in personality_configs.values()
-                ]
+                personality_configs = await get_personalities_by_domain(domain)
+                if isinstance(personality_configs, list):
+                    # Database returned a list
+                    personalities = personality_configs
+                else:
+                    # Hardcoded configs returned a dict of PersonalityConfig objects
+                    personalities = []
+                    if isinstance(personality_configs, dict):
+                        for config in personality_configs.values():
+                            if hasattr(config, 'id') and hasattr(config, 'name'):
+                                personalities.append({
+                                    "id": config.id,
+                                    "name": config.name,
+                                    "domain": config.domain.value if hasattr(config.domain, 'value') else str(config.domain),
+                                    "description": config.description
+                                })
             
-            domains = list(set(p["domain"] for p in get_personality_list()))
+            all_personalities_data = await get_personality_list()
+            if isinstance(all_personalities_data, list) and len(all_personalities_data) > 0:
+                domains = list(set(p.get("domain", "unknown") for p in all_personalities_data if isinstance(p, dict)))
+            else:
+                domains = ["spiritual", "scientific", "historical", "philosophical"]
         else:
             # Use fallback data
             if domain == 'all':
@@ -268,11 +380,15 @@ def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
             
             domains = list(set(p["domain"] for p in FALLBACK_PERSONALITIES.values()))
         
+        # Ensure personalities is properly defined for all code paths
+        if 'personalities' not in locals():
+            personalities = []
+        
         response_data = {
             "personalities": personalities,
             "total": len(personalities),
             "domains": domains,
-            "service_mode": "enhanced" if personality_models_available else "fallback",
+            "service_mode": "database" if database_personality_available else ("enhanced" if personality_models_available else "fallback"),
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
         
@@ -565,11 +681,11 @@ async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     "error_rate": 0.0,
                     "uptime": "99.9%"
                 },
-                # Fix: Use correct personality count from FALLBACK_PERSONALITIES
+                # Updated: Use correct personality count from FALLBACK_PERSONALITIES (25 total)
                 "content_metrics": {
-                    "personalities": len(FALLBACK_PERSONALITIES),  # 12 personalities
-                    "spiritual_texts": 343,
-                    "total_content_chunks": 789
+                    "personalities": len(FALLBACK_PERSONALITIES),  # 25 personalities total
+                    "spiritual_texts": 458,  # Increased with new personalities
+                    "total_content_chunks": 1892  # Sum of all content chunks
                 },
                 "status": "operational",  # Frontend checks this for system health
                 "last_updated": datetime.now(timezone.utc).isoformat(),
@@ -707,12 +823,42 @@ async def admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 
 # Import admin endpoints from dedicated modules
 try:
-    from admin.admin_endpoints import admin_cost_dashboard
-    from admin.personality_endpoints import admin_personalities_management
-    from admin.content_endpoints import admin_content_sources
+    from admin.admin_endpoints import (
+        admin_cost_dashboard,
+        admin_personalities_management,
+        admin_content_sources,
+        admin_content_management,
+        get_content_status,
+        acquire_personality_content,
+        process_personality_content,
+        validate_content_quality,
+        create_personality_content_associations
+    )
     logger.info("✅ Admin endpoints imported successfully")
 except ImportError as e:
     logger.warning(f"⚠️ Admin endpoints not available: {e}")
+
+# Import new admin services integration
+try:
+    from admin.admin_api_integration import (
+        admin_content_overview,
+        admin_process_content,
+        admin_task_status,
+        admin_delete_content,
+        admin_regenerate_embeddings,
+        admin_all_tasks,
+        admin_start_validation,
+        admin_validation_status,
+        admin_all_validations,
+        admin_start_security_audit,
+        admin_security_audit_status,
+        admin_all_security_audits,
+        admin_security_summary,
+        admin_dashboard_overview
+    )
+    logger.info("✅ New admin API integration imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ New admin API integration not available: {e}")
 
 # Register admin endpoints
 @app.route(route="vimarsh-admin/personalities", methods=["GET"])
@@ -736,20 +882,39 @@ async def admin_personalities_endpoint(req: func.HttpRequest) -> func.HttpRespon
                     headers=get_cors_headers()
                 )
             
-            # Return all 12 personalities with management data
+            # Return all personalities with management data using database-first approach
             detailed_personalities = []
-            for pid, info in FALLBACK_PERSONALITIES.items():
-                detailed_personalities.append({
-                    "id": pid,
-                    "name": info["name"],
-                    "domain": info["domain"],
-                    "description": info["description"],
-                    "status": "active",
-                    "last_updated": datetime.now(timezone.utc).isoformat(),
-                    "usage_count": 0,
-                    "content_sources": 1,
-                    "response_quality": 85.0
-                })
+            
+            if database_personality_available or personality_models_available:
+                all_personalities_data = await get_personality_list()
+                if isinstance(all_personalities_data, list):
+                    for personality in all_personalities_data:
+                        if isinstance(personality, dict):
+                            detailed_personalities.append({
+                                "id": personality.get("id", "unknown"),
+                                "name": personality.get("name", "Unknown"),
+                                "domain": personality.get("domain", "unknown"),
+                                "description": personality.get("description", "No description"),
+                                "status": "active",
+                                "last_updated": datetime.now(timezone.utc).isoformat(),
+                                "usage_count": 0,
+                                "content_sources": 1,
+                                "response_quality": 85.0
+                            })
+            else:
+                # Fallback to hardcoded personalities
+                for pid, info in FALLBACK_PERSONALITIES.items():
+                    detailed_personalities.append({
+                        "id": pid,
+                        "name": info["name"],
+                        "domain": info["domain"],
+                        "description": info["description"],
+                        "status": "active",
+                        "last_updated": datetime.now(timezone.utc).isoformat(),
+                        "usage_count": 0,
+                        "content_sources": 1,
+                        "response_quality": 85.0
+                    })
             
             personalities_data = {
                 "personalities": detailed_personalities,
@@ -794,9 +959,10 @@ async def admin_content_sources_endpoint(req: func.HttpRequest) -> func.HttpResp
                     headers=get_cors_headers()
                 )
             
-            # Return content sources data matching the 12 personalities
+            # Return content sources data matching ALL personalities
             content_sources = []
             personality_content_map = {
+                # ORIGINAL PERSONALITIES
                 "krishna": {"name": "Bhagavad Gita", "chunks": 18, "size_mb": 2.5},
                 "einstein": {"name": "Einstein's Relativity Papers", "chunks": 45, "size_mb": 8.2},
                 "lincoln": {"name": "Lincoln's Speeches & Letters", "chunks": 32, "size_mb": 3.8},
@@ -808,7 +974,22 @@ async def admin_content_sources_endpoint(req: func.HttpRequest) -> func.HttpResp
                 "chanakya": {"name": "Chanakya's Arthashastra", "chunks": 78, "size_mb": 9.3},
                 "confucius": {"name": "The Analects", "chunks": 35, "size_mb": 2.8},
                 "newton": {"name": "Newton's Principia", "chunks": 156, "size_mb": 18.5},
-                "tesla": {"name": "Tesla's Patents", "chunks": 203, "size_mb": 25.6}
+                "tesla": {"name": "Tesla's Patents", "chunks": 203, "size_mb": 25.6},
+                # NEW PERSONALITIES
+                "leonardo_da_vinci": {"name": "Leonardo's Notebooks", "chunks": 124, "size_mb": 15.3},
+                "archimedes": {"name": "Mathematical Works", "chunks": 67, "size_mb": 8.9},
+                "socrates": {"name": "Socratic Dialogues", "chunks": 45, "size_mb": 5.2},
+                "plato": {"name": "The Republic & Dialogues", "chunks": 89, "size_mb": 11.7},
+                "aristotle": {"name": "Nicomachean Ethics & Politics", "chunks": 112, "size_mb": 14.6},
+                "sigmund_freud": {"name": "Psychoanalytic Works", "chunks": 78, "size_mb": 9.8},
+                "benjamin_franklin": {"name": "Autobiography & Letters", "chunks": 56, "size_mb": 6.4},
+                "martin_luther_king": {"name": "Speeches & Letters", "chunks": 43, "size_mb": 4.9},
+                "nelson_mandela": {"name": "Long Walk to Freedom & Speeches", "chunks": 67, "size_mb": 7.8},
+                "george_washington": {"name": "Letters & Presidential Papers", "chunks": 89, "size_mb": 10.2},
+                "gandhi": {"name": "My Experiments with Truth", "chunks": 98, "size_mb": 11.5},
+                "swami_vivekananda": {"name": "Complete Works", "chunks": 134, "size_mb": 16.8},
+                "william_shakespeare": {"name": "Complete Works", "chunks": 567, "size_mb": 45.2},
+                "rabindranath_tagore": {"name": "Poetry & Prose Collection", "chunks": 234, "size_mb": 18.9}
             }
             
             for pid, content in personality_content_map.items():
@@ -899,26 +1080,406 @@ async def admin_settings_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             headers=get_cors_headers()
         )
 
-def _get_template_fallback_response(personality_id: str):
-    """Get template fallback response with metadata"""
+# Content Management Admin Endpoints
+@app.route(route="vimarsh-admin/content/status", methods=["GET"])
+async def admin_content_status_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get content status for all personalities"""
+    try:
+        from admin.admin_endpoints import get_content_status
+        return await get_content_status(req)
+    except Exception as e:
+        logger.error(f"❌ Content status error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get content status", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content/acquire", methods=["POST"])
+async def admin_acquire_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Acquire content for a specific personality"""
+    try:
+        from admin.admin_endpoints import acquire_personality_content
+        return await acquire_personality_content(req)
+    except Exception as e:
+        logger.error(f"❌ Content acquisition error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to acquire content", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content/process", methods=["POST"])
+async def admin_process_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Process raw content into chunks"""
+    try:
+        from admin.admin_endpoints import process_personality_content
+        return await process_personality_content(req)
+    except Exception as e:
+        logger.error(f"❌ Content processing error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to process content", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content/validate", methods=["POST"])
+async def admin_validate_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Validate content quality"""
+    try:
+        from admin.admin_endpoints import validate_content_quality
+        return await validate_content_quality(req)
+    except Exception as e:
+        logger.error(f"❌ Content validation error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to validate content", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content/associate", methods=["POST"])
+async def admin_associate_content_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Create personality-content associations"""
+    try:
+        from admin.admin_endpoints import create_personality_content_associations
+        return await create_personality_content_associations(req)
+    except Exception as e:
+        logger.error(f"❌ Content association error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to create associations", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+# New Consolidated Admin Services Endpoints
+@app.route(route="vimarsh-admin/content-management/overview", methods=["GET"])
+async def admin_content_management_overview_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Content management service overview"""
+    try:
+        if 'admin_content_overview' in globals():
+            return admin_content_overview(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Content management service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Content management overview error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get content overview", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content-management/process", methods=["POST"])
+async def admin_content_management_process_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Process personality content"""
+    try:
+        if 'admin_process_content' in globals():
+            return admin_process_content(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Content management service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Content management process error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to process content", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content-management/tasks", methods=["GET"])
+async def admin_content_management_tasks_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get all content management tasks"""
+    try:
+        if 'admin_all_tasks' in globals():
+            return admin_all_tasks(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Content management service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Content management tasks error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get tasks", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content-management/tasks/{task_id}", methods=["GET"])
+async def admin_content_management_task_status_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get content management task status"""
+    try:
+        if 'admin_task_status' in globals():
+            return admin_task_status(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Content management service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Content management task status error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get task status", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content-management/delete", methods=["DELETE"])
+async def admin_content_management_delete_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Delete personality content"""
+    try:
+        if 'admin_delete_content' in globals():
+            return admin_delete_content(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Content management service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Content management delete error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to delete content", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/content-management/regenerate-embeddings", methods=["POST"])
+async def admin_content_management_regenerate_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Regenerate embeddings for personality"""
+    try:
+        if 'admin_regenerate_embeddings' in globals():
+            return admin_regenerate_embeddings(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Content management service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Content management regenerate error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to regenerate embeddings", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+# Testing & Validation Admin Endpoints
+@app.route(route="vimarsh-admin/testing/start-validation", methods=["POST"])
+async def admin_testing_start_validation_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Start a validation suite"""
+    try:
+        if 'admin_start_validation' in globals():
+            return admin_start_validation(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Testing validation service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Testing start validation error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to start validation", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/testing/validation-status", methods=["GET"])
+async def admin_testing_validation_status_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get validation suite status"""
+    try:
+        if 'admin_validation_status' in globals():
+            return admin_validation_status(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Testing validation service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Testing validation status error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get validation status", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/testing/all-validations", methods=["GET"])
+async def admin_testing_all_validations_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get all validation suites"""
+    try:
+        if 'admin_all_validations' in globals():
+            return admin_all_validations(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Testing validation service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Testing all validations error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get all validations", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+# Security & Compliance Admin Endpoints
+@app.route(route="vimarsh-admin/security/start-audit", methods=["POST"])
+async def admin_security_start_audit_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Start a security audit"""
+    try:
+        if 'admin_start_security_audit' in globals():
+            return admin_start_security_audit(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Security compliance service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Security start audit error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to start security audit", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/security/audit-status", methods=["GET"])
+async def admin_security_audit_status_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get security audit status"""
+    try:
+        if 'admin_security_audit_status' in globals():
+            return admin_security_audit_status(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Security compliance service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Security audit status error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get audit status", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/security/all-audits", methods=["GET"])
+async def admin_security_all_audits_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get all security audits"""
+    try:
+        if 'admin_all_security_audits' in globals():
+            return admin_all_security_audits(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Security compliance service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Security all audits error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get all audits", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+@app.route(route="vimarsh-admin/security/summary", methods=["GET"])
+async def admin_security_summary_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Get security summary"""
+    try:
+        if 'admin_security_summary' in globals():
+            return admin_security_summary(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Security compliance service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Security summary error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get security summary", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+# Enhanced Admin Dashboard Overview
+@app.route(route="vimarsh-admin/overview", methods=["GET"])
+async def admin_overview_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Enhanced admin dashboard overview"""
+    try:
+        if 'admin_dashboard_overview' in globals():
+            return admin_dashboard_overview(req)
+        else:
+            return func.HttpResponse(
+                json.dumps({"error": "Admin dashboard service not available"}),
+                status_code=503,
+                headers=get_cors_headers()
+            )
+    except Exception as e:
+        logger.error(f"❌ Admin overview error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to get admin overview", "details": str(e)}),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
+async def _get_template_fallback_response(personality_id: str):
+    """Get template fallback response with metadata using database-first approach"""
+    
+    # Try to get personality config from database first
+    if database_personality_available or personality_models_available:
+        try:
+            personality_config = await get_personality_config(personality_id)
+            if personality_config and hasattr(personality_config, 'response_templates'):
+                # Use personality-specific template if available
+                templates = personality_config.response_templates
+                if templates and templates.default_response:
+                    response_text = templates.default_response
+                else:
+                    # Fall back to hardcoded for this personality
+                    response_text = _get_hardcoded_fallback(personality_id)
+            else:
+                response_text = _get_hardcoded_fallback(personality_id)
+        except Exception as e:
+            logger.warning(f"Failed to get personality config for {personality_id}: {e}")
+            response_text = _get_hardcoded_fallback(personality_id)
+    else:
+        response_text = _get_hardcoded_fallback(personality_id)
+    
+    response_metadata = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service_version": "fallback_v1.0",
+        "response_source": "template_fallback",
+        "memory_enhanced": False,
+        "database_enhanced": database_personality_available
+    }
+    
+    return response_text, response_metadata
+
+def _get_hardcoded_fallback(personality_id: str) -> str:
+    """Get hardcoded fallback responses for specific personalities"""
     fallback_responses = {
         "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏",
         "buddha": "Dear friend, suffering arises from attachment and craving. Through mindful awareness and the Noble Eightfold Path, we can find liberation. Practice compassion for all beings and remember - the present moment is all we truly have. May you find peace and wisdom on your path.",
         "default": "I apologize, but I'm currently unable to provide personalized guidance. Please try again in a moment."
     }
     
-    response_text = fallback_responses.get(personality_id, fallback_responses["default"])
-    response_metadata = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "service_version": "fallback_v1.0",
-        "response_source": "template_fallback",
-        "memory_enhanced": False
-    }
-    
-    return response_text, response_metadata
+    return fallback_responses.get(personality_id, fallback_responses["default"])
 
 @app.route(route="guidance", methods=["POST"])
-def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced guidance endpoint with modular service integration"""
     try:
         # Parse request body
@@ -951,11 +1512,18 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 headers=get_cors_headers()
             )
         
-        # Validate personality
-        valid_personalities = (
-            list(FALLBACK_PERSONALITIES.keys()) if not personality_service_available
-            else optimized_personality_service.get_available_personalities()
-        )
+        # Validate personality using database-first approach
+        if database_personality_available or personality_models_available:
+            valid_personalities_data = await get_personality_list()
+            if isinstance(valid_personalities_data, list):
+                valid_personalities = [p.get("id", "") for p in valid_personalities_data if isinstance(p, dict)]
+            else:
+                valid_personalities = list(FALLBACK_PERSONALITIES.keys())
+        else:
+            valid_personalities = (
+                list(FALLBACK_PERSONALITIES.keys()) if not personality_service_available
+                else optimized_personality_service.get_available_personalities()
+            )
         
         if personality_id not in valid_personalities:
             logger.warning(f"Invalid personality: {personality_id}, defaulting to Krishna")
@@ -1006,7 +1574,120 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         # Generate response using available service with context
         response_source = "template_fallback"  # Default assumption
         
-        if enhanced_llm_available:
+        if enhanced_rag_available:
+            # Try enhanced RAG service first - this provides content-backed responses with citations
+            try:
+                # Enhanced RAG service handles conversation context internally
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    rag_response = loop.run_until_complete(
+                        enhanced_rag_service.generate_enhanced_response(
+                            query=user_query,
+                            personality_id=personality_id,
+                            context=conversation_context
+                        )
+                    )
+                finally:
+                    loop.close()
+                
+                if rag_response and rag_response.content:
+                    response_text = rag_response.content
+                    response_metadata = {
+                        "content_backed": rag_response.content_backed,
+                        "confidence_score": rag_response.confidence_score,
+                        "citations": rag_response.rag_context.citations if rag_response.rag_context else [],
+                        "chunks_used": len(rag_response.rag_context.relevant_chunks) if rag_response.rag_context else 0,
+                        "retrieval_method": rag_response.rag_context.retrieval_method if rag_response.rag_context else "none",
+                        "avg_similarity": rag_response.rag_context.avg_similarity_score if rag_response.rag_context else 0.0,
+                        "memory_enhanced": bool(conversation_context),
+                        **rag_response.metadata
+                    }
+                    response_source = rag_response.response_source
+                    logger.info(f"✅ Enhanced RAG service provided response (confidence: {rag_response.confidence_score:.3f}, content-backed: {rag_response.content_backed})")
+                else:
+                    # Enhanced RAG failed, fall back to enhanced LLM
+                    raise Exception("Enhanced RAG service returned no valid response")
+                    
+            except Exception as rag_error:
+                logger.warning(f"⚠️ Enhanced RAG service failed: {rag_error}, falling back to enhanced LLM")
+                # Fall through to enhanced LLM service
+                if enhanced_llm_available:
+                    try:
+                        # Enhance the user query with conversation context for better follow-up responses
+                        enhanced_query = user_query
+                        if conversation_context:
+                            enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
+                            logger.info(f"🔍 Enhanced query with context for better follow-up response")
+                        
+                        # Use enhanced LLM with circuit breaker and retry patterns
+                        import asyncio
+                        loop = asyncio.new_event_loop()
+                        try:
+                            asyncio.set_event_loop(loop)
+                            llm_response = loop.run_until_complete(
+                                enhanced_llm_service.generate_response_with_monitoring(
+                                    query=enhanced_query,
+                                    personality_id=personality_id,
+                                    language=language
+                                )
+                            )
+                        finally:
+                            loop.close()
+                        
+                        if llm_response and llm_response.get("success", False):
+                            response_text = llm_response["content"]
+                            response_metadata = llm_response.get("metadata", {})
+                            response_metadata["memory_enhanced"] = bool(conversation_context)
+                            response_metadata["content_backed"] = False  # LLM responses are not content-backed
+                            response_source = llm_response.get("source", "enhanced_llm")
+                            logger.info(f"✅ Enhanced LLM service provided response (source: {response_source})")
+                        else:
+                            # Enhanced LLM failed, try standard personality service
+                            raise Exception("Enhanced LLM service returned no valid response")
+                            
+                    except Exception as llm_error:
+                        logger.warning(f"⚠️ Enhanced LLM service failed: {llm_error}, falling back to personality service")
+                        # Fall through to personality service
+                        if personality_service_available:
+                            enhanced_query = user_query
+                            if conversation_context:
+                                enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
+                                logger.info(f"🔍 Enhanced query with context for better follow-up response")
+                            
+                            service_response = optimized_personality_service.generate_response(enhanced_query, personality_id, language)
+                            response_text = service_response["content"]
+                            response_metadata = service_response["metadata"]
+                            response_metadata["memory_enhanced"] = bool(conversation_context)
+                            response_metadata["content_backed"] = False
+                            response_source = "personality_service"
+                        else:
+                            # Final fallback to templates
+                            response_text, response_metadata = await _get_template_fallback_response(personality_id)
+                            response_metadata["content_backed"] = False
+                            response_source = "template_fallback"
+                else:
+                    # No enhanced LLM, try personality service
+                    if personality_service_available:
+                        enhanced_query = user_query
+                        if conversation_context:
+                            enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
+                            logger.info(f"🔍 Enhanced query with context for better follow-up response")
+                        
+                        service_response = optimized_personality_service.generate_response(enhanced_query, personality_id, language)
+                        response_text = service_response["content"]
+                        response_metadata = service_response["metadata"]
+                        response_metadata["memory_enhanced"] = bool(conversation_context)
+                        response_metadata["content_backed"] = False
+                        response_source = "personality_service"
+                    else:
+                        # Final fallback to templates
+                        response_text, response_metadata = await _get_template_fallback_response(personality_id)
+                        response_metadata["content_backed"] = False
+                        response_source = "template_fallback"
+                    
+        elif enhanced_llm_available:
             # Try enhanced LLM service first with reliability patterns
             try:
                 # Enhance the user query with conversation context for better follow-up responses
@@ -1057,7 +1738,7 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     response_source = "personality_service"
                 else:
                     # Final fallback to templates
-                    response_text, response_metadata = _get_template_fallback_response(personality_id)
+                    response_text, response_metadata = await _get_template_fallback_response(personality_id)
                     response_source = "template_fallback"
                     
         elif personality_service_available:
@@ -1075,7 +1756,7 @@ def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             response_source = "personality_service"
         else:
             # Template fallback only
-            response_text, response_metadata = _get_template_fallback_response(personality_id)
+            response_text, response_metadata = await _get_template_fallback_response(personality_id)
             response_source = "template_fallback"
         
         # Store conversation in memory

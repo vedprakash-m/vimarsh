@@ -13,7 +13,16 @@ from .admin_endpoints import (
     admin_metrics_dashboard,
     admin_performance_report,
     admin_real_time_metrics,
-    admin_alerts_dashboard
+    admin_alerts_dashboard,
+    # Consolidated functions from refactoring
+    admin_personalities_management,
+    admin_content_sources,
+    admin_content_management,
+    get_content_status,
+    acquire_personality_content,
+    process_personality_content,
+    validate_content_quality,
+    create_personality_content_associations
 )
 
 __all__ = [
@@ -26,5 +35,14 @@ __all__ = [
     'admin_metrics_dashboard',
     'admin_performance_report',
     'admin_real_time_metrics',
-    'admin_alerts_dashboard'
+    'admin_alerts_dashboard',
+    # Consolidated functions
+    'admin_personalities_management',
+    'admin_content_sources', 
+    'admin_content_management',
+    'get_content_status',
+    'acquire_personality_content',
+    'process_personality_content',
+    'validate_content_quality',
+    'create_personality_content_associations'
 ]

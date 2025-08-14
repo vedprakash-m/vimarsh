@@ -4,6 +4,7 @@ LLM Service - Production service for language model operations
 
 This combines reliability with multi-personality architecture, 
 incorporating optimization learnings for production deployment.
+Enhanced with database-driven personality configuration support.
 """
 
 import os
@@ -55,6 +56,11 @@ class LLMService:
         self.api_key = os.environ.get('GEMINI_API_KEY')
         self.is_configured = bool(self.api_key)  # Check if API key is available
         
+        # Initialize database personality service
+        self.database_personality_service = None
+        self.database_available = False
+        self._initialize_database_service()
+        
         # Initialize Gemini model if configured
         if self.is_configured:
             genai.configure(api_key=self.api_key)
@@ -64,9 +70,92 @@ class LLMService:
             
         self._initialize_personalities()
     
+    def _initialize_database_service(self):
+        """Initialize database personality service"""
+        try:
+            from services.database_personality_service import DatabasePersonalityService
+            self.database_personality_service = DatabasePersonalityService()
+            self.database_available = True
+            self.logger.info("✅ Database personality service initialized in LLM service")
+        except ImportError as e:
+            self.logger.warning(f"⚠️ Database personality service not available in LLM service: {e}")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Database personality service initialization failed in LLM service: {e}")
+
     def _initialize_personalities(self):
+        """Initialize personality configurations (database-first approach)"""
+        if self.database_available and self.database_personality_service:
+            try:
+                # Try to get personalities from database using async in sync context
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    database_personalities = loop.run_until_complete(
+                        self.database_personality_service.get_all_personalities()
+                    )
+                finally:
+                    loop.close()
+                
+                if database_personalities:
+                    # Convert database personalities to LLM service format
+                    self.personalities = {}
+                    for db_personality in database_personalities:
+                        if isinstance(db_personality, dict) and 'id' in db_personality:
+                            self.personalities[db_personality['id']] = self._convert_db_to_llm_config(db_personality)
+                    
+                    self.logger.info(f"✅ Loaded {len(self.personalities)} personalities from database")
+                    return
+                    
+            except Exception as e:
+                self.logger.warning(f"⚠️ Failed to load personalities from database: {e}")
+        
+        # Fallback to hardcoded personalities
+        self.logger.info("📋 Using hardcoded personality configurations")
+        self.personalities = self._get_hardcoded_personalities()
+    
+    def _convert_db_to_llm_config(self, db_personality: Dict[str, Any]) -> PersonalityConfig:
+        """Convert database personality to LLM service format"""
+        try:
+            # Extract domain
+            domain_str = db_personality.get('domain', 'spiritual')
+            domain = PersonalityDomain.SPIRITUAL  # Default
+            for pd in PersonalityDomain:
+                if pd.value == domain_str:
+                    domain = pd
+                    break
+            
+            # Get LLM config if available
+            llm_config = db_personality.get('llm_config', {})
+            
+            return PersonalityConfig(
+                id=db_personality.get('id', ''),
+                name=db_personality.get('name', 'Unknown'),
+                domain=domain,
+                max_chars=llm_config.get('max_tokens', 500),
+                prompt_template=llm_config.get('prompt_template', 
+                    f"You are {db_personality.get('name', 'a wise teacher')} providing spiritual guidance. "
+                    f"{db_personality.get('description', 'Share wisdom with compassion.')}"),
+                greeting_style=db_personality.get('greeting_style', 'dear friend'),
+                requires_citations=llm_config.get('requires_citations', True),
+                timeout_seconds=llm_config.get('timeout_seconds', 30),
+                max_retries=llm_config.get('max_retries', 2)
+            )
+        except Exception as e:
+            self.logger.warning(f"⚠️ Failed to convert database personality {db_personality.get('id', 'unknown')}: {e}")
+            # Return a default configuration
+            return PersonalityConfig(
+                id=db_personality.get('id', 'unknown'),
+                name=db_personality.get('name', 'Unknown'),
+                domain=PersonalityDomain.SPIRITUAL,
+                max_chars=500,
+                prompt_template="I am here to provide spiritual guidance.",
+                greeting_style="dear friend"
+            )
+
+    def _get_hardcoded_personalities(self) -> Dict[str, PersonalityConfig]:
         """Initialize all personality configurations with standardized 500 character limit"""
-        self.personalities = {
+        return {
             "krishna": PersonalityConfig(
                 id="krishna",
                 name="Lord Krishna",  

@@ -15,9 +15,30 @@ class PersonalityService:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
+        
+        # Initialize database personality service
+        self.database_personality_service = None
+        self.database_available = False
+        self._initialize_database_service()
+        
+        # Load response templates (database-first approach)
         self._response_templates = self._load_response_templates()
+        
+        # Initialize LLM service
         self._llm_service = None
         self._initialize_llm_service()
+    
+    def _initialize_database_service(self):
+        """Initialize database personality service"""
+        try:
+            from services.database_personality_service import DatabasePersonalityService
+            self.database_personality_service = DatabasePersonalityService()
+            self.database_available = True
+            self.logger.info("✅ Database personality service initialized in PersonalityService")
+        except ImportError as e:
+            self.logger.warning(f"⚠️ Database personality service not available in PersonalityService: {e}")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Database personality service initialization failed in PersonalityService: {e}")
     
     def _initialize_llm_service(self):
         """Initialize LLM service if available"""
@@ -49,6 +70,53 @@ class PersonalityService:
             loop.close()
     
     def _load_response_templates(self) -> Dict[str, str]:
+        """Load personality-specific response templates from database or fallback to hardcoded"""
+        if self.database_available and self.database_personality_service:
+            try:
+                # Try to get templates from database
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    database_personalities = loop.run_until_complete(
+                        self.database_personality_service.get_all_personalities()
+                    )
+                finally:
+                    loop.close()
+                
+                if database_personalities:
+                    templates = {}
+                    for personality in database_personalities:
+                        if isinstance(personality, dict) and 'id' in personality:
+                            # Try to get response templates from personality config
+                            response_templates = personality.get('response_templates', {})
+                            default_response = response_templates.get('default_response', '')
+                            
+                            if default_response:
+                                templates[personality['id']] = default_response
+                            else:
+                                # Use fallback responses if available
+                                fallback_responses = personality.get('fallback_responses', [])
+                                if fallback_responses:
+                                    templates[personality['id']] = fallback_responses[0]
+                                else:
+                                    # Create a basic template from personality description
+                                    name = personality.get('name', 'Unknown')
+                                    description = personality.get('description', 'I am here to provide guidance.')
+                                    templates[personality['id']] = f"Dear friend, I am {name}. {description[:150]}..."
+                    
+                    if templates:
+                        self.logger.info(f"✅ Loaded {len(templates)} response templates from database")
+                        return templates
+                        
+            except Exception as e:
+                self.logger.warning(f"⚠️ Failed to load response templates from database: {e}")
+        
+        # Fallback to hardcoded templates
+        self.logger.info("📋 Using hardcoded response templates")
+        return self._get_hardcoded_templates()
+    
+    def _get_hardcoded_templates(self) -> Dict[str, str]:
         """Load personality-specific response templates"""
         return {
             "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" This timeless wisdom guides us to act with devotion while surrendering attachment to outcomes. Focus on righteous action with love and dedication. May you find peace in dharmic living. 🙏",

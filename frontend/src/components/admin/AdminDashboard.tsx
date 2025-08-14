@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Users, DollarSign, Activity, Database, Settings, Shield, BarChart3, MessageSquare, Home, AlertTriangle, TrendingUp, FileText, Bot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ContentManagement from './ContentManagement';
+import PersonalityManagement from './PersonalityManagement';
+import TestingMonitoring from './TestingMonitoring';
+import SecurityCompliance from './SecurityCompliance';
 import AdminServiceDashboard from '../AdminServiceDashboard';
 import { getApiBaseUrl } from '../../config/environment';
 import { getAuthHeaders } from '../../auth/authService';
@@ -78,7 +81,7 @@ interface SystemStats {
   };
 }
 
-type AdminTab = 'overview' | 'users' | 'analytics' | 'abuse' | 'content' | 'personalities' | 'monitoring' | 'settings';
+type AdminTab = 'overview' | 'users' | 'analytics' | 'abuse' | 'content' | 'personalities' | 'monitoring' | 'security' | 'settings';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -449,6 +452,13 @@ const AdminDashboard: React.FC = () => {
         {!sidebarCollapsed && <span>Monitoring</span>}
       </button>
       <button
+        onClick={() => setActiveTab('security')}
+        className={`admin-nav-item ${activeTab === 'security' ? 'active' : ''}`}
+      >
+        <Shield size={18} />
+        {!sidebarCollapsed && <span>Security</span>}
+      </button>
+      <button
         onClick={() => setActiveTab('settings')}
         className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
       >
@@ -639,60 +649,9 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
-  const renderMonitoring = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
-        <h1>System Monitoring & Service Health</h1>
-        <p className="text-gray-600">Real-time monitoring of service capabilities and response transparency</p>
-      </div>
+  const renderMonitoring = () => <TestingMonitoring />;
 
-      {/* Enhanced Service Dashboard - Gap Remediation Feature */}
-      <div className="mb-8">
-        <AdminServiceDashboard />
-      </div>
-
-      {/* Legacy Monitoring (Keeping for compatibility) */}
-      <div className="vimarsh-admin-grid">
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
-            <h3>System Alerts</h3>
-          </div>
-          <div className="system-alerts">
-            {monitoringData.system_alerts?.map((alert: any, index: number) => (
-              <div key={index} className={`alert alert-${alert.type}`}>
-                <Activity size={16} />
-                <span>{alert.message}</span>
-              </div>
-            )) || (
-              <div className="alert alert-success">
-                <Activity size={16} />
-                <span>All systems operational</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
-            <h3>Recent Activity</h3>
-          </div>
-          <div className="system-alerts">
-            {monitoringData.recent_activity?.map((activity: any, index: number) => (
-              <div key={index} className={`alert alert-${activity.type}`}>
-                <Users size={16} />
-                <span>{activity.message}</span>
-              </div>
-            )) || (
-              <div className="alert alert-success">
-                <Users size={16} />
-                <span>System active</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const renderSecurity = () => <SecurityCompliance />;
 
   const renderSettings = () => (
     <div className="vimarsh-admin-dashboard">
@@ -984,44 +943,7 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
-  const renderPersonalityManagement = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
-        <h1>Personality Management</h1>
-        <button className="vimarsh-btn-primary">
-          <Bot size={16} />
-          Add Personality
-        </button>
-      </div>
-
-      <div className="vimarsh-admin-stats">
-        <div className="stat-card">
-          <Bot size={20} />
-          <div>
-            <span className="stat-value">{stats?.totalPersonalities || 12}</span>
-            <span className="stat-label">Total Personalities</span>
-          </div>
-        </div>
-        <div className="stat-card">
-          <Activity size={20} />
-          <div>
-            <span className="stat-value">{stats?.totalPersonalities || 12}</span>
-            <span className="stat-label">Active</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="vimarsh-admin-card">
-        <div className="card-header">
-          <h3>Personality Configuration</h3>
-        </div>
-        <p style={{ color: '#6b7280', padding: '1rem' }}>
-          🤖 Personality management interface will show configuration details, associated content, performance metrics,
-          and provide controls for adding, modifying, or removing personalities.
-        </p>
-      </div>
-    </div>
-  );
+  const renderPersonalityManagement = () => <PersonalityManagement />;
 
   const renderTabContent = () => {
     if (loading) {
@@ -1082,6 +1004,8 @@ const AdminDashboard: React.FC = () => {
         return renderPersonalityManagement();
       case 'monitoring':
         return renderMonitoring();
+      case 'security':
+        return renderSecurity();
       case 'settings':
         return renderSettings();
       default:

@@ -1,0 +1,28 @@
+{
+  "personality_id": "nelson_mandela",
+  "total_chunks": 1,
+  "processed_at": "2025-08-11T05:05:03.805316+00:00",
+  "chunks": [
+    {
+      "id": "e6948d8f4595ca6b",
+      "personality_id": "nelson_mandela",
+      "source_id": "mandela_long_walk",
+      "chunk_text": "# Long Walk to Freedom (Excerpts) Author: Nelson Mandela Type: autobiography Domain: historical [PLACEHOLDER CONTENT] This is a placeholder for content that needs to be manually acquired. Source Information: - Authority Level: primary - Authenticity Score: 100.0 - Copyright Status: public_domain Acquisition Notes: Use public domain speeches and statements Publication Info: {} TODO: 1. Manually acquire content from authorized sources 2. Verify copyright compliance 3. Process and chunk content 4. Generate embeddings",
+      "chunk_index": 0,
+      "metadata": {
+        "source_title": "Long Walk to Freedom (Excerpts)",
+        "source_author": "Nelson Mandela",
+        "source_type": "autobiography",
+        "domain": "historical",
+        "file_path": "/Users/ved/Apps/vimarsh/data/sources/personalities/nelson_mandela/mandela_long_walk_placeholder.txt",
+        "content_type": "historical_event",
+        "dates_mentioned": [],
+        "has_chronological_markers": false
+      },
+      "quality_score": 0.9591522157996146,
+      "relevance_score": 0.0,
+      "token_count": 93,
+      "created_at": "2025-08-11T05:05:03.805105+00:00"
+    }
+  ]
+}

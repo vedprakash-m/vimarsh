@@ -432,11 +432,17 @@ $RECYCLE.BIN/
 .archive/
 
 # Foundational texts and data (large files, will be handled separately)
-data/sources/
+data/intake/
+data/sources/processed_chunks/
+data/sources/raw-*/
 data/processed/
+data/processed_manual_downloads/
+data/processed_new_intake/
+data/vimarsh_content_integration/
 data/vectors/
 data/embeddings/
 data/cache/
+data/backups/
 data/cost_tracking/
 data/demo_analytics/
 data/real_time_monitoring/
@@ -446,6 +452,22 @@ data/spiritual_validation_test/
 data/test_vector_storage/
 data/rag_llm_test_storage/
 data/vector_storage/
+data/test_*/
+data/metadata_storage/
+data/phase2-storage/
+
+# Generated reports and status files
+data/*_report.json
+data/*_status.json
+data/*_results.json
+data/multi_source_test_results.json
+data/production_integration_report.json
+data/jesus_chanakya_processing_report.json
+data/vimarsh_rag_*_status.json
+data/content_statistics.json
+data/test_results.json
+
+# Data processing artifacts
 data/*.jsonl
 data/*/*.jsonl
 data/**/*.jsonl

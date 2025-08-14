@@ -1,6 +1,8 @@
-# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
+# � Vimarsh - AI-Powered Multi-Personality Conversational Platform
 
-**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **4 major domains** with **Phase 2 production enhancements**. Experience personalized conversations with **12 operational personalities** including Einstein, Newton, Tesla, Lincoln, Chanakya, Confucius, Krishna, Buddha, Jesus, Rumi, Marcus Aurelius, and Lao Tzu - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
+**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **6 major domains** with **Enhanced RAG Service V6 and Phase 2 production enhancements**. Experience personalized conversations with **25 operational personalities** including spiritual guides, scientific innovators, literary masters, philosophical thinkers, historical leaders, and psychological pioneers - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
+
+**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **5 major domains** with **Enhanced RAG Service V6 and Phase 2 production enhancements**. Experience personalized conversations with **25 operational personalities** including spiritual guides, scientific innovators, historical leaders, philosophers, and revolutionary changemakers - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
 
 > *Bridging timeless wisdom across all domains of human knowledge with modern AI technology and persistent memory*
 
@@ -18,36 +20,53 @@
 
 **🌐 Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
 
-### 🎭 Meet the 12 Operational Personalities (Phase 2)
+### 🎭 Meet the 25 Operational Personalities (Enhanced RAG Service V6)
 
-**🕉️ Spiritual Domain (4 personalities):**
+**🕉️ Spiritual Domain (6 personalities):**
 - **Krishna** - Guidance from Bhagavad Gita and dharmic wisdom
-- **Buddha** - Buddhist teachings on enlightenment and the Middle Path  
 - **Jesus Christ** - Christian wisdom on love and transformation
+- **Buddha** - Buddhist teachings on enlightenment and the Middle Path  
 - **Rumi** - Mystical poetry and spiritual insights
+- **Swami Vivekananda** - Vedantic spiritual teacher
+- **Mahatma Gandhi** - Non-violent resistance and spiritual practice
 
-**🧠 Rational Clarity Domain (3 personalities):**
+**🧠 Scientific & Innovation Domain (5 personalities):**
 - **Albert Einstein** - Scientific inquiry, relativity, and philosophy of science
 - **Isaac Newton** - Mathematical genius and natural philosophy
 - **Nikola Tesla** - Visionary inventor and electrical engineering
+- **Leonardo da Vinci** - Renaissance polymath and inventor
+- **Archimedes** - Ancient mathematician and physicist
 
-**🏛️ Timeless Authority Domain (3 personalities):**
-- **Abraham Lincoln** - Leadership, governance, and national unity
-- **Chanakya** - Ancient strategist, economist, and political advisor
-- **Confucius** - Chinese philosopher and educator emphasizing ethics and social harmony
-
-**💭 Contemplative Wisdom Domain (2 personalities):**
-- **Marcus Aurelius** - Stoic philosophy and practical wisdom
+**💭 Philosophy & Wisdom Domain (5 personalities):**
+- **Socrates** - Classical Greek philosopher and founder of Western philosophy
+- **Plato** - Greek philosopher and student of Socrates
+- **Aristotle** - Greek philosopher and polymath
+- **Confucius** - Chinese philosopher emphasizing ethics and social harmony
 - **Lao Tzu** - Taoist principles and natural harmony
 
-### ✨ Phase 2 Platform Features
+**🏛️ Leadership & Statesmanship Domain (4 personalities):**
+- **Abraham Lincoln** - Leadership, governance, and national unity
+- **George Washington** - First President and founding father
+- **Chanakya** - Ancient strategist and political advisor
+- **Martin Luther King Jr.** - Civil rights leader and orator
+
+**📚 Literature & Arts Domain (3 personalities):**
+- **William Shakespeare** - Greatest playwright and poet in English literature
+- **Rabindranath Tagore** - Bengali polymath, poet, and Nobel laureate
+- **Benjamin Franklin** - Polymath, author, and founding father
+
+**🧠 Psychology & Human Nature Domain (2 personalities):**
+- **Marcus Aurelius** - Stoic philosophy and practical wisdom
+- **Sigmund Freud** - Founder of psychoanalysis
+
+### ✨ Enhanced RAG Service V6 Platform Features
 
 **🎯 For Learners & Seekers:**
 - **Cross-Session Conversation Memory**: Conversations continue seamlessly across sessions with personality-specific memory isolation
 - **Wisdom Journal Integration**: Personal insights storage with semantic search for reflection and growth tracking
 - **Progressive Personalization**: UI and interaction patterns adapt based on user preferences and behavior patterns
-- **Enhanced RAG Pipeline**: Hybrid search fusion (BM25 + vector embeddings) with citation grounding for superior accuracy
-- **12 Operational Personalities**: Authentic conversations across 4 domains with consistent voice preservation
+- **Enhanced RAG Service V6**: Advanced vector search with 32,000+ document embeddings and hybrid search fusion for superior accuracy
+- **25 Operational Personalities**: Authentic conversations across 6 domains with consistent voice preservation
 - **Citation Grounding System**: Automated validation of response citations with source verification
 - **Domain-Specific Expertise**: Each personality offers specialized knowledge with authentic historical context
 - **Administrative Excellence**: Quality assurance tools and content management for enterprise-grade operation

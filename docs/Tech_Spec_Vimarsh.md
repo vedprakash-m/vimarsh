@@ -4,9 +4,9 @@
 
 ## 1. Overview
 
-This document provides comprehensive technical specifications for implementing the Vimarsh AI-powered multi-personality conversational platform as defined in the Product Requirements Document (PRD). Vimarsh leverages Retrieval-Augmented Generation (RAG) with Google Gemini 2.5 Flash to enable authentic conversations with **12 operational personalities** across **4 major domains** (spiritual, scientific, historical, philosophical), each grounded in their authentic works and teachings through personality-specific knowledge bases.
+This document provides comprehensive technical specifications for implementing the Vimarsh AI-powered multi-personality conversational platform as defined in the Product Requirements Document (PRD). Vimarsh leverages Retrieval-Augmented Generation (RAG) with Google Gemini 2.5 Flash to enable authentic conversations with **25 operational personalities** across **5 major domains** (spiritual, scientific, literary, historical, philosophical), each grounded in their authentic works and teachings through personality-specific knowledge bases with **32,000+ documents**.
 
-**Architecture Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures with **Phase 2 production database integration**, cross-session conversation memory, wisdom journal capabilities, and progressive personalization while maintaining the same cost-optimized, scalable infrastructure.
+**Architecture Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures with **Enhanced RAG Service V6**, complete database integration with 25 personalities, cross-session conversation memory, wisdom journal capabilities, and progressive personalization while maintaining the same cost-optimized, scalable infrastructure.
 
 ---
 
@@ -67,41 +67,46 @@ This document provides comprehensive technical specifications for implementing t
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 │                      │                      │                 │
 ├─ React/TypeScript   ├─ Azure Functions    ├─ Google Gemini  │
-├─ PersonalitySelector├─ Hybrid RAG System  │   2.5 Flash      │
+├─ PersonalitySelector├─ Enhanced RAG V6    │   2.5 Flash      │
 ├─ Voice Interface    ├─ Memory Service     ├─ Google Cloud   │
 ├─ Admin Dashboard    ├─ Wisdom Journal     │   STT/TTS APIs   │
-├─ Personalization   ├─ Phase2 Database    ├─ Azure Services │
+├─ Personalization   ├─ Database Service   ├─ Azure Services │
 └─ Domain Filtering   └─ Auth & Security    └─ Citation System│
                                                               │
 ┌─────────────────────────────────────────────────────────────┐
-│               Phase 2 Multi-Personality Data Layer         │
+│           25-Personality Multi-Domain Data Layer           │
 ├─────────────────────────────────────────────────────────────┤
-│ Spiritual Domain: Krishna, Buddha, Jesus, Rumi (4)         │
-│ Rational Clarity: Einstein, Feynman, Curie (3)             │
-│ Timeless Authority: Lincoln, Churchill, Mandela (3)        │
-│ Contemplative Wisdom: Marcus Aurelius, Lao Tzu (2)         │
+│ Spiritual Domain: Krishna, Buddha, Jesus, Rumi,            │
+│                  Muhammad, Vivekananda (6)                 │
+│ Scientific Domain: Einstein, Newton, Tesla, Da Vinci,      │
+│                   Archimedes, Franklin (6)                 │
+│ Literary Domain: Shakespeare, Tagore, Plato, Socrates (4)  │
+│ Historical Domain: Lincoln, Chanakya, Gandhi, Washington,  │
+│                   Marcus Aurelius, Confucius (6)           │
+│ Philosophical Domain: Aristotle, Lao Tzu (3)              │
 │                                                             │
-│ Phase 2 Database Containers:                               │
+│ Production Database Architecture:                           │
+│ - personality_vectors: 32,000+ documents with embeddings   │
 │ - conversations: Cross-session memory with isolation       │
 │ - user_preferences: Progressive personalization storage    │
 │ - wisdom_journal: Semantic search personal insights        │
-│ - personalities: 12 operational personality profiles       │
+│ - personalities: 25 operational personality profiles       │
 │ - analytics: User engagement and conversation metrics      │
-│ - content_management: Admin panel content operations       │
 │                                                             │
-│ Each personality has:                                       │
+│ Each personality features:                                  │
 │ - Dedicated knowledge base with domain-specific content    │
 │ - Personality profile with tone and response patterns      │
-│ - Vector embeddings in personality-specific namespaces     │
+│ - Vector embeddings with Google Gemini text-embedding-004  │
 │ - Citation metadata linked to authentic source material    │
 │ - Cross-session conversation memory with user isolation    │
+│ - Enhanced RAG Service V6 integration                      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.2. Phase 2 Database Architecture
 
 **Production Database Integration:**
-The Phase 2 implementation includes comprehensive Azure Cosmos DB integration with six specialized containers for persistent storage and enhanced user experience.
+The Phase 2 implementation includes comprehensive Azure Cosmos DB integration with six specialized containers for persistent storage and enhanced user experience, supporting 25 operational personalities across 6 domains.
 
 **Database Containers:**
 
@@ -121,7 +126,7 @@ The Phase 2 implementation includes comprehensive Azure Cosmos DB integration wi
    - **Schema**: user_id, journal_entries[], tags[], semantic_vectors, insights
 
 4. **personalities** Container:
-   - **Purpose**: 12 operational personality profiles and configurations
+   - **Purpose**: 25 operational personality profiles and configurations
    - **Key Features**: Personality metadata, response patterns, domain expertise
    - **Schema**: personality_id, profile_data, response_patterns, knowledge_base_refs
 

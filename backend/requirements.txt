@@ -38,6 +38,8 @@ structlog==23.2.0
 
 # Text Processing (lightweight)
 beautifulsoup4==4.12.2
+nltk==3.8.1
+tiktoken==0.5.2
 
 # Testing (for CI)
 pytest==7.4.3

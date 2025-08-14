@@ -1,0 +1,25 @@
+# Long Walk to Freedom (Excerpts)
+Author: Nelson Mandela
+Type: autobiography
+Domain: historical
+
+[PLACEHOLDER CONTENT]
+
+This is a placeholder for content that needs to be manually acquired.
+
+Source Information:
+- Authority Level: primary
+- Authenticity Score: 100.0
+- Copyright Status: public_domain
+
+Acquisition Notes:
+Use public domain speeches and statements
+
+Publication Info:
+{}
+
+TODO: 
+1. Manually acquire content from authorized sources
+2. Verify copyright compliance
+3. Process and chunk content
+4. Generate embeddings

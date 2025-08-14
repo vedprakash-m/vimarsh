@@ -6,14 +6,14 @@
 
 ## 1. Executive Summary
 
-**Vimarsh** is a revolutionary AI-powered multi-personality conversational platform that enables authentic dialogues with history's greatest minds, thinkers, and spiritual leaders through their own curated knowledge bases. Leveraging **Retrieval-Augmented Generation (RAG)** with Google Gemini 2.5 Flash, the platform transforms how users access and interact with profound wisdom across **multiple domains: spiritual, scientific, historical, and philosophical**.
+**Vimarsh** is a revolutionary AI-powered multi-personality conversational platform that enables authentic dialogues with history's greatest minds, thinkers, and spiritual leaders through their own curated knowledge bases. Leveraging **Retrieval-Augmented Generation (RAG)** with Google Gemini 2.5 Flash, the platform transforms how users access and interact with profound wisdom across **multiple domains: spiritual, scientific, historical, literary, and philosophical**.
 
 **Sanskrit**: *विमर्श (Vimarsh)* - "conversation," "dialogue," or "thoughtful discourse"
 
-**Current Achievement**: Complete multi-personality platform with 12 operational personalities, advanced RAG pipeline, and comprehensive personalization (Live at https://vimarsh.vedprakash.net)  
+**Current Achievement**: Complete multi-personality platform with **25 operational personalities**, advanced Enhanced RAG Service V6, and comprehensive personalization with 32,000+ document knowledge base (Live at https://vimarsh.vedprakash.net)  
 **Vision**: Industry-leading AI wisdom platform with cross-session memory, citation grounding, hybrid search, and adaptive personalization across all domains of human knowledge
 
-The platform democratizes access to timeless wisdom by allowing users to engage in authentic conversations with **12 distinct personalities** including **Lord Krishna** (spiritual guidance), **Albert Einstein** (scientific inquiry), **Abraham Lincoln** (leadership and governance), **Marcus Aurelius** (Stoic philosophy), **Buddha** (Buddhist teachings), **Rumi** (mystical poetry), **Jesus Christ** (Christian wisdom), **Lao Tzu** (Taoist philosophy), **Chanakya** (strategic wisdom), **Confucius** (ethical philosophy), **Isaac Newton** (natural philosophy), and **Nikola Tesla** (innovation). Each personality maintains their authentic voice, expertise, and cultural context, enhanced by advanced memory systems and citation grounding.
+The platform democratizes access to timeless wisdom by allowing users to engage in authentic conversations with **25 distinct personalities** spanning **6 major domains** including spiritual guides like **Krishna** and **Jesus Christ**, scientific pioneers like **Albert Einstein** and **Isaac Newton**, literary masters like **William Shakespeare** and **Rabindranath Tagore**, historical leaders like **Abraham Lincoln** and **George Washington**, philosophical thinkers like **Marcus Aurelius** and **Confucius**, and psychological pioneers like **Sigmund Freud**. Each personality maintains their authentic voice, expertise, and cultural context, enhanced by RAG-powered content retrieval from their authentic works and teachings.
 
 The core principle remains ensuring the **highest possible standard for authentic, respectful, and textually faithful responses** across all personality domains, doing full justice to each historical figure's legacy and wisdom. Users can interact through text or voice interfaces in multiple languages, with each personality offering domain-specific expertise while maintaining their characteristic tone and perspective.
 
@@ -50,29 +50,44 @@ The consequence is reliance on less grounded advice, superficial interpretations
 
 ### Core Personality Roster:
 
-**🕉️ Spiritual Domain (4 personalities):**
-- **Lord Krishna** - Divine guidance from Bhagavad Gita, Mahabharata, and Srimad Bhagavatam
+**🕉️ Spiritual Domain (6 personalities):**
+- **Krishna** - Divine guidance from Bhagavad Gita, Mahabharata, and Srimad Bhagavatam
 - **Buddha** - Buddhist teachings on suffering, enlightenment, and the Middle Path
-- **Jesus Christ** - Christian wisdom on love, compassion, and spiritual transformation
+- **Jesus Christ** - Christian wisdom from King James Bible on love, compassion, and spiritual transformation
 - **Rumi** - Mystical poetry and Sufi spiritual insights
+- **Muhammad** - Prophetic guidance and Islamic wisdom
+- **Swami Vivekananda** - Vedantic philosophy and spiritual awakening
 
-**🔬 Rational Clarity Domain (3 personalities):**
+**🧠 Scientific/Rational Domain (6 personalities):**
 - **Albert Einstein** - Scientific inquiry, relativity theory, and philosophy of science
-- **Isaac Newton** - Mathematical genius and natural philosophy
-- **Nikola Tesla** - Visionary inventor and electrical engineering
+- **Isaac Newton** - Mathematical genius, natural philosophy, and laws of motion
+- **Nikola Tesla** - Visionary inventor, electrical engineering, and innovation
+- **Leonardo da Vinci** - Renaissance genius, scientific observation, and artistic innovation
+- **Archimedes** - Mathematical principles, physics, and engineering solutions
+- **Benjamin Franklin** - Scientific experimentation, practical wisdom, and invention
 
-**🏛️ Timeless Authority Domain (3 personalities):**  
+**📚 Literary Domain (4 personalities):**
+- **William Shakespeare** - Literary genius, human nature, and dramatic wisdom
+- **Rabindranath Tagore** - Poetry, literature, and cultural renaissance
+- **Plato** - Philosophical dialogues and ideal forms
+- **Socrates** - Socratic method and philosophical inquiry
+
+**🏛️ Historical/Leadership Domain (6 personalities):**
 - **Abraham Lincoln** - Leadership, governance, civil rights, and national unity
-- **Chanakya** - Ancient strategist and political philosophy
-- **Muhammad** - Prophet and spiritual guide
-
-**💭 Contemplative Wisdom Domain (2 personalities):**
-- **Marcus Aurelius** - Stoic philosophy, virtue ethics, and practical wisdom
+- **Chanakya** - Ancient strategist, political philosophy from Arthashastra
+- **Mahatma Gandhi** - Non-violence, civil rights, and moral leadership
+- **George Washington** - Founding principles and early American leadership
+- **Marcus Aurelius** - Stoic philosophy, virtue ethics, and imperial leadership
 - **Confucius** - Chinese philosophy, ethics, and social harmony
+
+**💭 Philosophical Domain (3 personalities):**
+- **Aristotle** - Logic, ethics, and systematic philosophy
+- **Lao Tzu** - Taoist principles and natural harmony
 
 ### Key User Interactions (Multi-Personality Experience):
 
-* **Personality Selection:** Users can browse and select from 12 personalities across 4 domains based on their interests, questions, or life situations (e.g., spiritual guidance with Krishna, scientific inquiry with Einstein, strategic wisdom with Chanakya).
+* **Personality Selection:** Users can browse and select from 25 personalities across 5 domains based on their interests, questions, or life situations (e.g., spiritual guidance with Krishna or Jesus Christ, scientific inquiry with Einstein or Newton, literary insights with Shakespeare or Tagore, strategic wisdom with Chanakya or Lincoln, philosophical discussion with Aristotle or Confucius).
+* **RAG-Powered Conversations:** Enhanced RAG Service V6 provides content-backed responses from 32,000+ authentic documents, ensuring historically accurate and contextually relevant dialogues.
 * **Cross-Session Memory:** Platform remembers individual user conversations with each personality, creating personalized journeys and continuing relationships with each historical figure.
 * **Wisdom Journal Integration:** Personal insights tracking with semantic search capabilities, allowing users to record and revisit spiritual milestones.
 * **Progressive Personalization:** Adaptive user experience that learns preferences and suggests relevant personalities and content based on interaction patterns.

@@ -1,0 +1,81 @@
+{
+  "thresholds": [
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 0.5,
+      "alert_level": "info",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [
+        "console"
+      ],
+      "spiritual_message": "\ud83c\udf31 Resources are being used - awareness is the first step to wisdom",
+      "cooldown_minutes": 1,
+      "enabled": true
+    },
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 1.0,
+      "alert_level": "warning",
+      "actions": [
+        "notify_admin",
+        "enable_caching"
+      ],
+      "notification_channels": [
+        "console",
+        "application_insights"
+      ],
+      "spiritual_message": "\u26a0\ufe0f The wise sage monitors resources like a caring gardener",
+      "cooldown_minutes": 2,
+      "enabled": true
+    },
+    {
+      "metric_type": "total_cost",
+      "threshold_value": 2.0,
+      "alert_level": "critical",
+      "actions": [
+        "notify_admin",
+        "switch_model",
+        "throttle_requests"
+      ],
+      "notification_channels": [
+        "console",
+        "application_insights",
+        "email"
+      ],
+      "spiritual_message": "\ud83d\udd25 Even Lord Krishna teaches balance - moderation in all things",
+      "cooldown_minutes": 1,
+      "enabled": true
+    },
+    {
+      "metric_type": "hourly_rate",
+      "threshold_value": 0.25,
+      "alert_level": "warning",
+      "actions": [
+        "log_only",
+        "notify_admin"
+      ],
+      "notification_channels": [
+        "console"
+      ],
+      "spiritual_message": "\u23f0 Time flows like the Ganges - observe its passage mindfully",
+      "cooldown_minutes": 5,
+      "enabled": true
+    },
+    {
+      "metric_type": "user_cost",
+      "threshold_value": 0.75,
+      "alert_level": "warning",
+      "actions": [
+        "log_only"
+      ],
+      "notification_channels": [
+        "console"
+      ],
+      "spiritual_message": "\ud83d\udc64 Each soul's journey has its own pace - monitor with compassion",
+      "cooldown_minutes": 3,
+      "enabled": true
+    }
+  ]
+}

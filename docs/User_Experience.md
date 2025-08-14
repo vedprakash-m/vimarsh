@@ -4,11 +4,11 @@
 
 ## 1. Executive Summary
 
-This document serves as the **authoritative source of truth** for all UX/UI design decisions, user journeys, and interface specifications for the Vimarsh AI-powered multi-personality conversational platform. It defines comprehensive user experiences across **12 operational personalities** spanning **4 major domains** (spiritual, rational clarity, timeless authority, contemplative wisdom), supporting multiple roles, devices, and interaction patterns while maintaining cultural authenticity and historical accuracy.
+This document serves as the **authoritative source of truth** for all UX/UI design decisions, user journeys, and interface specifications for the Vimarsh AI-powered multi-personality conversational platform. It defines comprehensive user experiences across **25 operational personalities** spanning **6 major domains** (spiritual, scientific & innovation, philosophy & wisdom, leadership & statesmanship, literature & arts, psychology & human nature), supporting multiple roles, devices, and interaction patterns while maintaining cultural authenticity and historical accuracy.
 
 **Design Philosophy:** "Authentic Wisdom Through Intuitive Design" - Creating interfaces that honor each personality's unique voice and historical context while remaining accessible to modern users across all technical proficiency levels and cultural backgrounds.
 
-**Platform Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures with **Phase 2 enhancements** including cross-session conversation memory, wisdom journal integration, progressive personalization, and admin panel capabilities while maintaining the same cost-optimized deployment strategy.
+**Platform Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a comprehensive multi-personality system supporting diverse historical figures with **Enhanced RAG Service V6** and **Phase 2 enhancements** including cross-session conversation memory, wisdom journal integration, progressive personalization, and admin panel capabilities while maintaining the same cost-optimized deployment strategy.
 
 ---
 
@@ -161,6 +161,18 @@ Color Palette:
 
 Typography: Libre Baskerville for philosophical texts, Inter for interface
 Iconography: Classical columns, yin-yang symbols, philosophical diagrams
+```
+
+**🔥 Revolutionary Leadership Domain Design ("Transformative Action"):**
+```
+Color Palette:
+- Freedom Orange: #EA580C (Gandhi, liberation movements)
+- Justice Red: #DC2626 (Martin Luther King Jr., moral urgency)
+- Hope Green: #059669 (Environmental and social progress)
+- Unity Gold: #D97706 (Collective action and solidarity)
+
+Typography: Montserrat for strong headers, Open Sans for accessible body text
+Iconography: Peace symbols, justice scales, protest imagery, unity symbols
 ```
 
 ---

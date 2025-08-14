@@ -18,8 +18,8 @@ class TestPhase1Completion:
     def test_imports_working(self):
         """Test that critical imports work"""
         # Test LLM service import
-        from services.llm_service import llm_service
-        assert llm_service is not None
+        from services.llm_service import LLMService
+        assert LLMService is not None
         
         # Test error handling import
         from core.error_handling import error_handler, ErrorCategory

@@ -29,10 +29,69 @@ class EnhancedLLMService:
         self.logger = logger
         self.retry_policy = ExponentialBackoffRetry(max_attempts=3)
         self.base_service = None
+        
+        # Initialize database personality service
+        self.database_personality_service = None
+        self.database_available = False
+        self._initialize_database_service()
+        
         self._initialize_base_service()
         
-        # Template responses for fallback
-        self.fallback_templates = {
+        # Template responses for fallback (will be updated from database if available)
+        self.fallback_templates = self._get_fallback_templates()
+    
+    def _initialize_database_service(self):
+        """Initialize database personality service"""
+        try:
+            from services.database_personality_service import DatabasePersonalityService
+            self.database_personality_service = DatabasePersonalityService()
+            self.database_available = True
+            self.logger.info("✅ Database personality service initialized in Enhanced LLM wrapper")
+        except ImportError as e:
+            self.logger.warning(f"⚠️ Database personality service not available in Enhanced LLM wrapper: {e}")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Database personality service initialization failed in Enhanced LLM wrapper: {e}")
+    
+    def _get_fallback_templates(self) -> Dict[str, str]:
+        """Get fallback templates from database or use hardcoded ones"""
+        if self.database_available and self.database_personality_service:
+            try:
+                # Try to get templates from database
+                import asyncio
+                loop = asyncio.new_event_loop()
+                try:
+                    asyncio.set_event_loop(loop)
+                    database_personalities = loop.run_until_complete(
+                        self.database_personality_service.get_all_personalities()
+                    )
+                finally:
+                    loop.close()
+                
+                if database_personalities:
+                    templates = {}
+                    for personality in database_personalities:
+                        if isinstance(personality, dict) and 'id' in personality:
+                            # Try to get default response from personality config
+                            response_templates = personality.get('response_templates', {})
+                            default_response = response_templates.get('default_response', '')
+                            
+                            if default_response:
+                                templates[personality['id']] = default_response
+                            else:
+                                # Use description as fallback template
+                                description = personality.get('description', 'I am here to provide guidance.')
+                                templates[personality['id']] = f"{description[:200]}..."
+                    
+                    if templates:
+                        self.logger.info(f"✅ Loaded {len(templates)} fallback templates from database")
+                        return templates
+                        
+            except Exception as e:
+                self.logger.warning(f"⚠️ Failed to load fallback templates from database: {e}")
+        
+        # Use hardcoded fallback templates
+        self.logger.info("📋 Using hardcoded fallback templates")
+        return {
             "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" Focus on righteous action with love and dedication. 🙏",
             "buddha": "Dear friend, suffering arises from attachment. Practice mindfulness and compassion. The Middle Way leads to peace and liberation from all forms of suffering.",
             "jesus": "Beloved child, love is the greatest commandment. \"Love your neighbor as yourself\" (Matthew 22:39). Let God's love guide your heart and actions.",

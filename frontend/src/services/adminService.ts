@@ -206,6 +206,63 @@ class AdminService {
   async getSpiritualGuidance(accessToken: string, query: string, language: string = 'English'): Promise<any> {
     return this.makeRequest('/guidance', 'POST', { query, language }, accessToken);
   }
+
+  // NEW ADMIN CONTENT MANAGEMENT ENDPOINTS - Phase 2 Integration
+  
+  async getContentOverview(accessToken?: string): Promise<any> {
+    return this.makeRequest('/admin-content-management-overview', 'GET', null, accessToken);
+  }
+
+  async processPersonalityContent(personalityId: string, forceReprocess: boolean = false, accessToken?: string): Promise<any> {
+    return this.makeRequest('/admin-content-management-process', 'POST', { 
+      personality_id: personalityId, 
+      force_reprocess: forceReprocess 
+    }, accessToken);
+  }
+
+  async getTaskStatus(taskId: string, accessToken?: string): Promise<any> {
+    return this.makeRequest(`/admin-content-management-task-status?task_id=${taskId}`, 'GET', null, accessToken);
+  }
+
+  async getAllTasks(status?: string, accessToken?: string): Promise<any> {
+    const statusParam = status ? `?status=${status}` : '';
+    return this.makeRequest(`/admin-content-management-tasks${statusParam}`, 'GET', null, accessToken);
+  }
+
+  async deletePersonalityContent(personalityId: string, accessToken?: string): Promise<any> {
+    return this.makeRequest(`/admin-content-management-delete?personality_id=${personalityId}`, 'DELETE', null, accessToken);
+  }
+
+  async regenerateEmbeddings(personalityId: string, accessToken?: string): Promise<any> {
+    return this.makeRequest('/admin-content-management-regenerate', 'POST', { 
+      personality_id: personalityId 
+    }, accessToken);
+  }
+
+  // ADMIN TESTING & VALIDATION ENDPOINTS
+  
+  async startValidationSuite(suiteName: string, environment: string, categories?: string[], options?: any, accessToken?: string): Promise<any> {
+    return this.makeRequest('/admin-validation-start', 'POST', {
+      suite_name: suiteName,
+      environment,
+      categories,
+      options
+    }, accessToken);
+  }
+
+  async getValidationResults(suiteId: string, accessToken?: string): Promise<any> {
+    return this.makeRequest(`/admin-validation-results?suite_id=${suiteId}`, 'GET', null, accessToken);
+  }
+
+  // ADMIN SECURITY & COMPLIANCE ENDPOINTS
+  
+  async runSecurityAudit(accessToken?: string): Promise<any> {
+    return this.makeRequest('/admin-security-audit', 'POST', null, accessToken);
+  }
+
+  async getComplianceReport(accessToken?: string): Promise<any> {
+    return this.makeRequest('/admin-compliance-report', 'GET', null, accessToken);
+  }
 }
 
 export const adminService = new AdminService();
