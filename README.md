@@ -1,8 +1,6 @@
-# � Vimarsh - AI-Powered Multi-Personality Conversational Platform
+# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
 
-**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **6 major domains** with **Enhanced RAG Service V6 and Phase 2 production enhancements**. Experience personalized conversations with **25 operational personalities** including spiritual guides, scientific innovators, literary masters, philosophical thinkers, historical leaders, and psychological pioneers - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
-
-**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **5 major domains** with **Enhanced RAG Service V6 and Phase 2 production enhancements**. Experience personalized conversations with **25 operational personalities** including spiritual guides, scientific innovators, historical leaders, philosophers, and revolutionary changemakers - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
+**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **6 major domains** with **Enhanced RAG Service V6 and Phase 2 production enhancements**. Experience personalized conversations with **25 operational personalities** including spiritual guides, scientific innovators, literary masters, philosophical thinkers, historical leaders, and psychological pioneers - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
 
 > *Bridging timeless wisdom across all domains of human knowledge with modern AI technology and persistent memory*
 
@@ -22,13 +20,12 @@
 
 ### 🎭 Meet the 25 Operational Personalities (Enhanced RAG Service V6)
 
-**🕉️ Spiritual Domain (6 personalities):**
+**🕉️ Spiritual Domain (5 personalities):**
 - **Krishna** - Guidance from Bhagavad Gita and dharmic wisdom
 - **Jesus Christ** - Christian wisdom on love and transformation
 - **Buddha** - Buddhist teachings on enlightenment and the Middle Path  
 - **Rumi** - Mystical poetry and spiritual insights
 - **Swami Vivekananda** - Vedantic spiritual teacher
-- **Mahatma Gandhi** - Non-violent resistance and spiritual practice
 
 **🧠 Scientific & Innovation Domain (5 personalities):**
 - **Albert Einstein** - Scientific inquiry, relativity, and philosophy of science
@@ -37,26 +34,27 @@
 - **Leonardo da Vinci** - Renaissance polymath and inventor
 - **Archimedes** - Ancient mathematician and physicist
 
-**💭 Philosophy & Wisdom Domain (5 personalities):**
+**💭 Philosophy & Wisdom Domain (6 personalities):**
 - **Socrates** - Classical Greek philosopher and founder of Western philosophy
 - **Plato** - Greek philosopher and student of Socrates
 - **Aristotle** - Greek philosopher and polymath
 - **Confucius** - Chinese philosopher emphasizing ethics and social harmony
 - **Lao Tzu** - Taoist principles and natural harmony
+- **Marcus Aurelius** - Stoic philosophy and practical wisdom
 
-**🏛️ Leadership & Statesmanship Domain (4 personalities):**
+**🏛️ Leadership & Statesmanship Domain (6 personalities):**
 - **Abraham Lincoln** - Leadership, governance, and national unity
 - **George Washington** - First President and founding father
 - **Chanakya** - Ancient strategist and political advisor
 - **Martin Luther King Jr.** - Civil rights leader and orator
+- **Mahatma Gandhi** - Non-violent resistance and political independence movement
+- **Benjamin Franklin** - Founding father, diplomat, and statesman
 
-**📚 Literature & Arts Domain (3 personalities):**
+**📚 Literature & Arts Domain (2 personalities):**
 - **William Shakespeare** - Greatest playwright and poet in English literature
 - **Rabindranath Tagore** - Bengali polymath, poet, and Nobel laureate
-- **Benjamin Franklin** - Polymath, author, and founding father
 
-**🧠 Psychology & Human Nature Domain (2 personalities):**
-- **Marcus Aurelius** - Stoic philosophy and practical wisdom
+**🧠 Psychology & Human Nature Domain (1 personality):**
 - **Sigmund Freud** - Founder of psychoanalysis
 
 ### ✨ Enhanced RAG Service V6 Platform Features
@@ -84,7 +82,7 @@
 
 ### **For Users**
 1. Visit [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
-2. Choose from 12 operational personalities across 4 domains
+2. Choose from 25 operational personalities across 6 domains
 3. Engage in conversations with persistent memory across sessions
 4. Build your wisdom journal with semantic search capabilities
 5. Experience progressive personalization that adapts to your preferences
@@ -115,7 +113,7 @@ func host start
 cd frontend
 npm install
 cp .env.example .env.local
-# Configure environment variables for 12-personality interface
+# Configure environment variables for 25-personality interface
 npm start
 ```
 
@@ -133,22 +131,22 @@ python scripts/setup_production.py
 ### Core Components
 ```
 🎭 Frontend Layer (React 18 + TypeScript)
-├── PersonalitySelector - Choose from 12 distinct personalities
-├── MultiDomainInterface - Unified conversation experience across 4 domains
+├── PersonalitySelector - Choose from 25 distinct personalities
+├── MultiDomainInterface - Unified conversation experience across 6 domains
 ├── DomainSpecificUI - Tailored interfaces for each domain
 └── IntelligentPrompts - Context-aware sample questions for each personality
 
 🧠 AI Processing Layer (Python 3.12 + Azure Functions) - Modular Architecture
-├── PersonalityService - Template-based authentic responses for all 12 personalities
+├── PersonalityService - Template-based authentic responses for all 25 personalities
 ├── AdminService - Lightweight administrative functions and monitoring
 ├── SafetyService - Content validation and safety filtering framework
 ├── LLMService - Google Gemini 2.5 Flash integration for advanced responses
 └── RAGService - Vector search and retrieval (future enhancement)
 
 📚 Knowledge Layer (Template-Based + Future RAG)
-├── PersonalityModels - 12 distinct personality configurations with authentic traits
+├── PersonalityModels - 25 distinct personality configurations with authentic traits
 ├── ResponseTemplates - Curated authentic responses based on historical works
-├── DomainClassification - Spiritual, Scientific, Historical, Philosophical domains
+├── DomainClassification - Spiritual, Scientific, Philosophical, Leadership, Literary, Psychology domains
 └── FutureRAG - Vector database integration planned for enhanced authenticity
 
 🔧 Infrastructure Layer (Azure Cloud)
@@ -200,22 +198,22 @@ python scripts/setup_production.py
 ## 🧪 Testing & Quality
 
 ### **Multi-Personality Test Coverage**
-- **Integration Tests**: 100% of testable components across all 12 personalities
-- **Performance Tests**: All benchmarks exceeded for 4-domain processing
+- **Integration Tests**: 100% of testable components across all 25 personalities
+- **Performance Tests**: All benchmarks exceeded for 6-domain processing
 - **Security Tests**: Comprehensive safety validation for each personality domain
-- **End-to-End Tests**: Complete user journey validation across all 12 personalities
+- **End-to-End Tests**: Complete user journey validation across all 25 personalities
 
 ### **Cross-Domain Quality Metrics**
-- **Code Quality**: TypeScript + Python type safety across all 12 personality services
-- **Performance**: Memory-optimized with LRU caching for 12-personality operations
+- **Code Quality**: TypeScript + Python type safety across all 25 personality services
+- **Performance**: Memory-optimized with LRU caching for 25-personality operations
 - **Reliability**: Atomic database transactions for all personality data
-- **Maintainability**: Unified configuration system supporting all 12 personalities
+- **Maintainability**: Unified configuration system supporting all 25 personalities
 - **Safety**: Comprehensive validation system with personality-specific filters
 
 ## 📈 Platform Achievements
 
 ### **Current Capabilities**
-- **12 Personalities**: Complete roster across 4 knowledge domains
+- **25 Personalities**: Complete roster across 6 knowledge domains
 - **Production Deployment**: Full platform live on Azure infrastructure  
 - **Performance Optimized**: Sub-second response times across all personalities
 - **Enterprise Ready**: Comprehensive security, monitoring, and admin tools
@@ -224,7 +222,7 @@ python scripts/setup_production.py
 ### **Performance Benchmarks**
 - **Personality Switching**: 150ms average response time
 - **Cross-Domain Search**: 300ms average search time  
-- **Multi-Personality Cache**: 25ms cache hit time
+- **25-Personality Cache**: 25ms cache hit time
 - **Safety Validation**: 75ms validation time
 - **Uptime**: 99.9% availability target
 
@@ -257,7 +255,7 @@ Vimarsh serves as a bridge between humanity's greatest minds and modern learners
 
 ### **Wisdom Across Domains**
 
-**🏛️ Historical**: *"A house divided against itself cannot stand."* - Abraham Lincoln
+**🏛️ Leadership**: *"A house divided against itself cannot stand."* - Abraham Lincoln
 
 **💭 Philosophical**: *"You have power over your mind - not outside events. Realize this, and you will find strength."* - Marcus Aurelius
 
@@ -271,7 +269,7 @@ Vimarsh serves as a bridge between humanity's greatest minds and modern learners
 
 **🌐 Visit**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
 
-Experience authentic conversations with 12 distinct personalities across historical, philosophical, scientific, and spiritual domains - powered by AI, grounded in authentic wisdom, and delivered with modern excellence.
+Experience authentic conversations with 25 distinct personalities across spiritual, scientific, philosophical, leadership, literary, and psychology domains - powered by AI, grounded in authentic wisdom, and delivered with modern excellence.
 
 ---
 
