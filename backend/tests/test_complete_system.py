@@ -17,12 +17,13 @@ import os
 
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__)))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 
 from services.personality_service import PersonalityService
 from models.personality_models import get_personality_list, get_personalities_by_domain
 from services.llm_service import LLMService as EnhancedSimpleLLMService
 from services.knowledge_base_manager import knowledge_base_manager
-from data_processing.domain_processors import process_text_with_auto_domain as process_text
+from data.domain_processors import process_text_with_auto_domain as process_text
 
 logger = logging.getLogger(__name__)
 

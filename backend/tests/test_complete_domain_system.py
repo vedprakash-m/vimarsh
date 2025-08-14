@@ -14,8 +14,9 @@ import os
 
 # Add backend to path
 sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 
-from data_processing.text_processor import create_text_processor
+from data.text_processor import create_text_processor
 from services.personality_service import PersonalityService
 from models.personality_models import get_personality_list, get_personalities_by_domain
 from services.llm_service import LLMService as EnhancedSimpleLLMService
