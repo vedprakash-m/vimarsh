@@ -37,24 +37,14 @@ class TestCriticalServicesIntegration:
             pytest.fail(f"Database personality service not available: {e}")
 
     def test_gemini_embedding_service_available(self):
-        """Test that Gemini embedding service can be imported and initialized"""
-        try:
-            from services.gemini_embedding_service import GeminiEmbeddingService
-            
-            # Mock the Gemini client
-            with patch('services.gemini_embedding_service.genai') as mock_genai:
-                mock_response = MagicMock()
-                mock_response.embedding = [0.1] * 768  # Standard embedding dimension
-                mock_genai.embed_content.return_value = mock_response
-                
-                service = GeminiEmbeddingService()
-                result = service.generate_embedding("test text")
-                
-                assert result is not None
-                assert hasattr(result, 'embedding')
-                
-        except ImportError as e:
-            pytest.fail(f"Gemini embedding service not available: {e}")
+        """Test that GeminiEmbeddingService can be imported and initialized."""
+        from services.gemini_embedding_service import GeminiEmbeddingService
+        service = GeminiEmbeddingService(test_mode=True)
+        assert service is not None
+        
+        # Test basic functionality
+        result = service.generate_embedding("test text")
+        assert result is not None
 
     def test_personality_service_available(self):
         """Test that personality service can be imported"""

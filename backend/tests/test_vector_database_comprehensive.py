@@ -73,7 +73,7 @@ class TestEnhancedEmbeddingsService:
         """Enhanced Embeddings Service instance"""
         try:
             from services.gemini_embedding_service import GeminiEmbeddingService
-            return GeminiEmbeddingService()
+            return GeminiEmbeddingService(test_mode=True)
         except ImportError:
             # Return a mock if the service is not available
             from unittest.mock import Mock

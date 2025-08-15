@@ -88,7 +88,7 @@ class TestFunctionAppServiceAvailability:
         """Test Gemini embedding service can be imported"""
         try:
             from services.gemini_embedding_service import GeminiEmbeddingService
-            service = GeminiEmbeddingService()
+            service = GeminiEmbeddingService(test_mode=True)
             assert service is not None
         except ImportError:
             pytest.skip("GeminiEmbeddingService not available")

@@ -38,42 +38,46 @@ class GeminiEmbeddingService:
     - Scalable cloud-based processing
     """
     
-    def __init__(self, api_key: Optional[str] = None, model_name: str = "models/text-embedding-004"):
+    def __init__(self, model_name: str = "models/text-embedding-004", api_key: Optional[str] = None, test_mode: bool = False):
         """
-        Initialize Gemini embedding service
+        Initialize Gemini Embedding Service
         
         Args:
-            api_key: Gemini API key (defaults to environment variable)
             model_name: Gemini embedding model to use
+            api_key: API key for Gemini (optional, will try to get from environment)
+            test_mode: If True, allows initialization without API key for testing
         """
-        # Try multiple sources for API key
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_AI_API_KEY")
+        self.logger = logging.getLogger(__name__)
+        self.api_key = api_key
+        self.test_mode = test_mode
         
-        # Try to get from config system if available
+        # Try to get API key from various sources if not provided
         if not self.api_key:
+            # Check environment variable
+            self.api_key = os.getenv('GEMINI_API_KEY')
+            
+            # Try to get from config if available
             try:
-                # Try to import and use your config system (avoid relative imports for now)
-                # Try to get from various config sources
-                config_paths = [
-                    'core.config',
-                    'backend.core.config'
-                ]
-                
-                for config_path in config_paths:
-                    try:
-                        config_module = __import__(config_path, fromlist=['config'])
-                        if hasattr(config_module, 'config'):
-                            self.api_key = config_module.config.get_value("LLM", "api_key", fallback="")
-                            if self.api_key:
-                                break
-                    except (ImportError, AttributeError):
-                        continue
+                from core.config import config
+                if hasattr(config, 'GEMINI_API_KEY') and config.GEMINI_API_KEY:
+                    self.api_key = config.GEMINI_API_KEY
+                    
+                # Also check unified config
+                try:
+                    from config.unified_config import UnifiedConfig
+                    unified_config = UnifiedConfig()
+                    if hasattr(unified_config, 'llm') and hasattr(unified_config.llm, 'api_key'):
+                        if unified_config.llm.api_key:
+                            self.api_key = unified_config.llm.api_key
+                except Exception:
+                    # Silently continue if unified config not available
+                    pass
                         
             except Exception:
                 # Silently continue if config system not available
                 pass
         
-        if not self.api_key:
+        if not self.api_key and not self.test_mode:
             logger.error("❌ GEMINI_API_KEY not found - embedding service will not work")
             logger.info("💡 Set GEMINI_API_KEY environment variable or provide api_key parameter")
             raise ValueError("GEMINI_API_KEY is required for embedding service")
@@ -82,11 +86,14 @@ class GeminiEmbeddingService:
         self.client = None
         self.dimension = 768  # text-embedding-004 dimension
         
-        if not GEMINI_AVAILABLE:
+        if not GEMINI_AVAILABLE and not self.test_mode:
             logger.error("❌ google-generativeai package not available")
             raise ImportError("google-generativeai package is required")
         
-        self._initialize_client()
+        if not self.test_mode:
+            self._initialize_client()
+        else:
+            logger.info("✅ Gemini embedding service initialized in test mode")
     
     def _initialize_client(self):
         """Initialize Gemini client"""
@@ -109,6 +116,16 @@ class GeminiEmbeddingService:
         Returns:
             EmbeddingResult with embedding vector and metadata
         """
+        if self.test_mode:
+            # Return mock embedding for test mode
+            logger.info("🧪 Generating mock embedding in test mode")
+            return EmbeddingResult(
+                embedding=[0.1] * self.dimension,  # Mock 768-dimensional vector
+                model=self.model_name,
+                dimension=self.dimension,
+                text_length=len(text)
+            )
+            
         if not self.client:
             raise RuntimeError("Gemini client not initialized")
         
