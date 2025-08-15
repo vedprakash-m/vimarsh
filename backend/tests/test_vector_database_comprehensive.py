@@ -420,8 +420,8 @@ class TestCitationSystem:
     def citation_service(self):
         """Citation Service instance"""
         try:
-            from services.citation_service import CitationService
-            return CitationService()
+            from services.citation_grounding_checker import CitationGroundingChecker
+            return CitationGroundingChecker()
         except ImportError:
             # Create mock if class doesn't exist
             mock_citation = Mock()
@@ -572,8 +572,8 @@ class TestVectorDatabaseIntegration:
         """Test complete vector database workflow"""
         
         with patch('services.gemini_embedding_service.GeminiEmbeddingService') as mock_embeddings:
-            with patch('services.vector_storage_service.VectorStorageService') as mock_storage:
-                with patch('services.citation_service.CitationService') as mock_citation:
+            with patch('services.vector_database_service.VectorDatabaseService') as mock_storage:
+                with patch('services.citation_grounding_checker.CitationGroundingChecker') as mock_citation:
                     
                     # Configure complete workflow mocks
                     query = "What is the meaning of dharma?"
