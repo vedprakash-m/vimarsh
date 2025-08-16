@@ -1587,25 +1587,34 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                         enhanced_rag_service = EnhancedRAGService()
                         logger.info("✅ Enhanced RAG service initialized successfully")
                     except Exception as init_error:
-                        logger.error(f"❌ Enhanced RAG service initialization failed: {init_error}")
-                        # Set flag to prevent retrying initialization
+                        logger.warning(f"⚠️ Enhanced RAG service initialization failed: {init_error}")
+                        logger.info("🔄 Falling back to other services...")
+                        # Set flag to prevent retrying initialization and fall back gracefully
                         enhanced_rag_available = False
-                        raise Exception(f"RAG service initialization failed: {init_error}")
+                        enhanced_rag_service = "failed"  # Mark as failed to avoid retrying
+                        # Don't raise - fall through to other services
+                        pass
                 
-                # Enhanced RAG service handles conversation context internally
-                import asyncio
-                loop = asyncio.new_event_loop()
-                try:
-                    asyncio.set_event_loop(loop)
-                    rag_response = loop.run_until_complete(
-                        enhanced_rag_service.generate_enhanced_response(
-                            query=user_query,
-                            personality_id=personality_id,
-                            context=conversation_context
+                # Only proceed if service was successfully initialized
+                if enhanced_rag_service != "failed":
+                    # Enhanced RAG service handles conversation context internally
+                    import asyncio
+                    loop = asyncio.new_event_loop()
+                    try:
+                        asyncio.set_event_loop(loop)
+                        rag_response = loop.run_until_complete(
+                            enhanced_rag_service.generate_enhanced_response(
+                                query=user_query,
+                                personality_id=personality_id,
+                                context=conversation_context
+                            )
                         )
-                    )
-                finally:
-                    loop.close()
+                    finally:
+                        loop.close()
+                else:
+                    # Service failed to initialize, skip to fallback
+                    logger.info("🔄 Enhanced RAG service not available, skipping to fallback...")
+                    raise Exception("Enhanced RAG service not available")
                 
                 if rag_response and rag_response.content:
                     response_text = rag_response.content
