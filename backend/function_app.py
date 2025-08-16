@@ -1617,38 +1617,28 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         if memory_service_available:
             try:
                 # Get or start conversation
-                import asyncio
-                loop = asyncio.new_event_loop()
-                try:
-                    asyncio.set_event_loop(loop)
-                    conversation_id = loop.run_until_complete(
-                        conversation_memory_service.start_conversation(
-                            user_id=user_id,
-                            personality_id=personality_id
-                        )
-                    )
-                    
-                    # Get conversation context
-                    context_data = loop.run_until_complete(
-                        conversation_memory_service.get_conversation_context(
-                            conversation_id=conversation_id
-                        )
-                    )
-                    
-                    # Format recent messages as context
-                    if hasattr(context_data, 'recent_messages') and context_data.recent_messages:
-                        from models.conversation_models import MessageType
-                        recent_msgs = []
-                        for msg in context_data.recent_messages[-3:]:  # Last 3 messages for context
-                            if msg.message_type == MessageType.USER_QUERY:
-                                recent_msgs.append(f"Previous question: {msg.content}")
-                            elif msg.message_type == MessageType.PERSONALITY_RESPONSE:
-                                recent_msgs.append(f"My previous response: {msg.content[:200]}...")
-                        conversation_context = "\n".join(recent_msgs)
-                    
-                    logger.info(f"🧠 Retrieved conversation context: {len(conversation_context)} chars")
-                finally:
-                    loop.close()
+                conversation_id = await conversation_memory_service.start_conversation(
+                    user_id=user_id,
+                    personality_id=personality_id
+                )
+                
+                # Get conversation context
+                context_data = await conversation_memory_service.get_conversation_context(
+                    conversation_id=conversation_id
+                )
+                
+                # Format recent messages as context
+                if hasattr(context_data, 'recent_messages') and context_data.recent_messages:
+                    from models.conversation_models import MessageType
+                    recent_msgs = []
+                    for msg in context_data.recent_messages[-3:]:  # Last 3 messages for context
+                        if msg.message_type == MessageType.USER_QUERY:
+                            recent_msgs.append(f"Previous question: {msg.content}")
+                        elif msg.message_type == MessageType.PERSONALITY_RESPONSE:
+                            recent_msgs.append(f"My previous response: {msg.content[:200]}...")
+                    conversation_context = "\n".join(recent_msgs)
+                
+                logger.info(f"🧠 Retrieved conversation context: {len(conversation_context)} chars")
                     
             except Exception as memory_error:
                 logger.warning(f"⚠️ Failed to retrieve conversation context: {memory_error}")
@@ -1673,24 +1663,15 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                         enhanced_rag_available = False
                         enhanced_rag_service = "failed"  # Mark as failed to avoid retrying
                         # Don't raise - fall through to other services
-                        pass
                 
                 # Only proceed if service was successfully initialized
                 if enhanced_rag_service != "failed":
                     # Enhanced RAG service handles conversation context internally
-                    import asyncio
-                    loop = asyncio.new_event_loop()
-                    try:
-                        asyncio.set_event_loop(loop)
-                        rag_response = loop.run_until_complete(
-                            enhanced_rag_service.generate_enhanced_response(
-                                query=user_query,
-                                personality_id=personality_id,
-                                context=conversation_context
-                            )
-                        )
-                    finally:
-                        loop.close()
+                    rag_response = await enhanced_rag_service.generate_enhanced_response(
+                        query=user_query,
+                        personality_id=personality_id,
+                        context=conversation_context
+                    )
                 else:
                     # Service failed to initialize, skip to fallback
                     logger.info("🔄 Enhanced RAG service not available, skipping to fallback...")
@@ -1726,19 +1707,11 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                             logger.info(f"🔍 Enhanced query with context for better follow-up response")
                         
                         # Use enhanced LLM with circuit breaker and retry patterns
-                        import asyncio
-                        loop = asyncio.new_event_loop()
-                        try:
-                            asyncio.set_event_loop(loop)
-                            llm_response = loop.run_until_complete(
-                                enhanced_llm_service.generate_response_with_monitoring(
-                                    query=enhanced_query,
-                                    personality_id=personality_id,
-                                    language=language
-                                )
-                            )
-                        finally:
-                            loop.close()
+                        llm_response = await enhanced_llm_service.generate_response_with_monitoring(
+                            query=enhanced_query,
+                            personality_id=personality_id,
+                            language=language
+                        )
                         
                         if llm_response and llm_response.get("success", False):
                             response_text = llm_response["content"]
@@ -1801,19 +1774,11 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     logger.info(f"🔍 Enhanced query with context for better follow-up response")
                 
                 # Use enhanced LLM with circuit breaker and retry patterns
-                import asyncio
-                loop = asyncio.new_event_loop()
-                try:
-                    asyncio.set_event_loop(loop)
-                    llm_response = loop.run_until_complete(
-                        enhanced_llm_service.generate_response_with_monitoring(
-                            query=enhanced_query,
-                            personality_id=personality_id,
-                            language=language
-                        )
-                    )
-                finally:
-                    loop.close()
+                llm_response = await enhanced_llm_service.generate_response_with_monitoring(
+                    query=enhanced_query,
+                    personality_id=personality_id,
+                    language=language
+                )
                 
                 if llm_response and llm_response.get("success", False):
                     response_text = llm_response["content"]
@@ -1866,46 +1831,45 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         # Store conversation in memory
         if memory_service_available and conversation_memory_service is not None and conversation_id:
             try:
-                import asyncio
-                loop = asyncio.new_event_loop()
-                try:
-                    asyncio.set_event_loop(loop)
-                    # Store user message
-                    loop.run_until_complete(
-                        conversation_memory_service.add_message(
-                            conversation_id=conversation_id,
-                            user_id=user_id,
-                            personality_id=personality_id,
-                            message_type="user_query",
-                            content=user_query
-                        )
-                    )
-                    # Store personality response
-                    loop.run_until_complete(
-                        conversation_memory_service.add_message(
-                            conversation_id=conversation_id,
-                            user_id=user_id,
-                            personality_id=personality_id,
-                            message_type="personality_response",
-                            content=response_text
-                        )
-                    )
-                    logger.info(f"💾 Stored conversation exchange in memory")
-                finally:
-                    loop.close()
+                # Store user message
+                await conversation_memory_service.add_message(
+                    conversation_id=conversation_id,
+                    user_id=user_id,
+                    personality_id=personality_id,
+                    message_type="user_query",
+                    content=user_query
+                )
+                # Store personality response
+                await conversation_memory_service.add_message(
+                    conversation_id=conversation_id,
+                    user_id=user_id,
+                    personality_id=personality_id,
+                    message_type="personality_response",
+                    content=response_text
+                )
+                logger.info(f"💾 Stored conversation exchange in memory")
                     
             except Exception as store_error:
                 logger.warning(f"⚠️ Failed to store conversation: {store_error}")
         
         # Get personality info
         if personality_models_available:
-            config = get_personality_config(personality_id)
-            personality_info = {
-                "id": config.id,
-                "name": config.name,
-                "domain": config.domain.value,
-                "description": config.description
-            }
+            config = await get_personality_config(personality_id)
+            if config and hasattr(config, 'id'):
+                personality_info = {
+                    "id": config.id,
+                    "name": config.name,
+                    "domain": config.domain.value,
+                    "description": config.description
+                }
+            else:
+                fallback_info = FALLBACK_PERSONALITIES[personality_id]
+                personality_info = {
+                    "id": personality_id,
+                    "name": fallback_info["name"],
+                    "domain": fallback_info["domain"],
+                    "description": fallback_info["description"]
+                }
         else:
             fallback_info = FALLBACK_PERSONALITIES[personality_id]
             personality_info = {
