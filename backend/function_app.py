@@ -54,6 +54,12 @@ try:
     
 except ImportError as e:
     logger.warning(f"⚠️ Personality service not available: {e}")
+    optimized_personality_service = None
+    personality_service_available = False
+except Exception as e:
+    logger.warning(f"⚠️ Personality service failed to initialize: {e}")
+    optimized_personality_service = None
+    personality_service_available = False
 
 try:
     from services.enhanced_llm_wrapper import enhanced_llm_service
@@ -61,6 +67,12 @@ try:
     logger.info("✅ Enhanced LLM service with reliability patterns loaded")
 except ImportError as e:
     logger.warning(f"⚠️ Enhanced LLM service not available: {e}")
+    enhanced_llm_service = None
+    enhanced_llm_available = False
+except Exception as e:
+    logger.warning(f"⚠️ Enhanced LLM service failed to initialize: {e}")
+    enhanced_llm_service = None
+    enhanced_llm_available = False
 
 try:
     from services.enhanced_rag_service_v6 import EnhancedRAGService
@@ -80,6 +92,12 @@ try:
     logger.info("✅ Conversation memory service initialized")
 except ImportError as e:
     logger.warning(f"⚠️ Conversation memory service not available: {e}")
+    conversation_memory_service = None
+    memory_service_available = False
+except Exception as e:
+    logger.warning(f"⚠️ Conversation memory service failed to initialize: {e}")
+    conversation_memory_service = None
+    memory_service_available = False
 
 try:
     from services.safety_service import SafetyService
@@ -1637,7 +1655,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             except Exception as rag_error:
                 logger.warning(f"⚠️ Enhanced RAG service failed: {rag_error}, falling back to enhanced LLM")
                 # Fall through to enhanced LLM service
-                if enhanced_llm_available:
+                if enhanced_llm_available and enhanced_llm_service is not None:
                     try:
                         # Enhance the user query with conversation context for better follow-up responses
                         enhanced_query = user_query
@@ -1674,7 +1692,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     except Exception as llm_error:
                         logger.warning(f"⚠️ Enhanced LLM service failed: {llm_error}, falling back to personality service")
                         # Fall through to personality service
-                        if personality_service_available:
+                        if personality_service_available and optimized_personality_service is not None:
                             enhanced_query = user_query
                             if conversation_context:
                                 enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
@@ -1693,7 +1711,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                             response_source = "template_fallback"
                 else:
                     # No enhanced LLM, try personality service
-                    if personality_service_available:
+                    if personality_service_available and optimized_personality_service is not None:
                         enhanced_query = user_query
                         if conversation_context:
                             enhanced_query = f"Previous conversation context:\n{conversation_context}\n\nCurrent question: {user_query}"
@@ -1711,7 +1729,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                         response_metadata["content_backed"] = False
                         response_source = "template_fallback"
                     
-        elif enhanced_llm_available:
+        elif enhanced_llm_available and enhanced_llm_service is not None:
             # Try enhanced LLM service first with reliability patterns
             try:
                 # Enhance the user query with conversation context for better follow-up responses
@@ -1748,7 +1766,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             except Exception as llm_error:
                 logger.warning(f"⚠️ Enhanced LLM service failed: {llm_error}, falling back to personality service")
                 # Fall through to personality service
-                if personality_service_available:
+                if personality_service_available and optimized_personality_service is not None:
                     # Enhance the user query with conversation context for better follow-up responses
                     enhanced_query = user_query
                     if conversation_context:
@@ -1765,7 +1783,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     response_text, response_metadata = await _get_template_fallback_response(personality_id)
                     response_source = "template_fallback"
                     
-        elif personality_service_available:
+        elif personality_service_available and optimized_personality_service is not None:
             # Standard personality service without enhanced LLM
             # Enhance the user query with conversation context for better follow-up responses
             enhanced_query = user_query
@@ -1784,7 +1802,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             response_source = "template_fallback"
         
         # Store conversation in memory
-        if memory_service_available and conversation_id:
+        if memory_service_available and conversation_memory_service is not None and conversation_id:
             try:
                 import asyncio
                 loop = asyncio.new_event_loop()
