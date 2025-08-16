@@ -53,23 +53,19 @@ class CosmosChunkUploader:
     """Service for uploading processed chunks to Cosmos DB"""
     
     def __init__(self):
-        self.cosmos_endpoint = os.getenv("COSMOS_ENDPOINT")
-        self.cosmos_key = os.getenv("COSMOS_KEY") 
-        self.database_name = "vimarsh-multi-personality"
+        # Use standardized connection string approach
+        self.cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING")
+        self.database_name = os.getenv("AZURE_COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
         self.container_name = "personality_vectors"
         
-        if not self.cosmos_endpoint or not self.cosmos_key:
-            raise ValueError("COSMOS_ENDPOINT and COSMOS_KEY environment variables must be set")
+        if not self.cosmos_connection_string:
+            raise ValueError("AZURE_COSMOS_CONNECTION_STRING environment variable must be set")
         
         # Initialize Cosmos client
-        self.client = cosmos_client.CosmosClient(
-            self.cosmos_endpoint, 
-            self.cosmos_key
-        )
-        self.database = self.client.get_database_client(self.database_name)
-        
-        # Ensure container exists
-        self._ensure_container_exists()
+        self.cosmos_client = CosmosClient.from_connection_string(cosmos_connection_string)
+        self.database_name = database_name
+        self.container_name = "personality-vectors"  # Fixed: use hyphen like production
+        self.database = self.cosmos_client.get_database_client(database_name)
         self.container = self.database.get_container_client(self.container_name)
         
         # Processing stats

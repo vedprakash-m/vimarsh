@@ -163,32 +163,19 @@ class UserProfileService:
             return
         
         try:
-            # Try to get Cosmos DB configuration - support both formats
-            cosmos_endpoint = os.getenv("COSMOS_DB_ENDPOINT")
-            cosmos_key = os.getenv("COSMOS_DB_KEY")
-            cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING") or os.getenv("COSMOS_CONNECTION_STRING")
-            database_name = os.getenv("AZURE_COSMOS_DATABASE_NAME") or os.getenv("COSMOS_DB_NAME") or os.getenv("COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
+            # Use standardized connection string approach only
+            cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING")
+            database_name = os.getenv("AZURE_COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
             
-            if not cosmos_endpoint and not cosmos_connection_string:
+            if not cosmos_connection_string:
                 logger.warning("📁 No Cosmos DB configuration found - using local storage")
-                logger.info("   Expected: AZURE_COSMOS_CONNECTION_STRING or COSMOS_DB_ENDPOINT")
+                logger.info("   Expected: AZURE_COSMOS_CONNECTION_STRING")
                 self._ensure_local_directories()
                 return
             
             # Initialize Cosmos client
-            if cosmos_connection_string:
-                # Use connection string (production format)
-                self.cosmos_client = CosmosClient.from_connection_string(cosmos_connection_string)
-                logger.info("🔑 Connected to Cosmos DB with connection string")
-            elif cosmos_key:
-                # Use endpoint + key format
-                self.cosmos_client = CosmosClient(cosmos_endpoint, cosmos_key)
-                logger.info("🔑 Connected to Cosmos DB with endpoint + key")
-            else:
-                # Use managed identity for Azure-hosted environments
-                credential = DefaultAzureCredential()
-                self.cosmos_client = CosmosClient(cosmos_endpoint, credential)
-                logger.info("🔐 Connected to Cosmos DB with managed identity")
+            self.cosmos_client = CosmosClient.from_connection_string(cosmos_connection_string)
+            logger.info("🔑 Connected to Cosmos DB with connection string")
             
             # Get database and containers - Updated for new 11-container architecture
             self.database = self.cosmos_client.get_database_client(database_name)

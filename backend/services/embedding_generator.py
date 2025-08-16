@@ -34,30 +34,27 @@ class EmbeddingGenerator:
     """Service for generating embeddings for personality chunks"""
     
     def __init__(self):
-        # Initialize environment variables - support both connection string and endpoint+key
+        # Initialize environment variables - use standardized connection string only
         self.cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING")
-        self.cosmos_endpoint = os.getenv("COSMOS_ENDPOINT")
-        self.cosmos_key = os.getenv("COSMOS_KEY")
         self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         
         if not self.gemini_api_key:
             raise ValueError("Required environment variable not set: GEMINI_API_KEY")
             
-        # Check Cosmos DB credentials - support both methods
-        if not (self.cosmos_connection_string or (self.cosmos_endpoint and self.cosmos_key)):
-            raise ValueError("Cosmos DB credentials not set. Please set either AZURE_COSMOS_CONNECTION_STRING or both COSMOS_ENDPOINT and COSMOS_KEY")
+        # Check Cosmos DB credentials
+        if not self.cosmos_connection_string:
+            raise ValueError("Cosmos DB credentials not set. Please set AZURE_COSMOS_CONNECTION_STRING")
         
         # Configure Gemini AI
         genai.configure(api_key=self.gemini_api_key)
         self.embedding_model = "models/text-embedding-004"
         
-        # Initialize Cosmos DB client using preferred method
-        if self.cosmos_connection_string:
-            self.client = cosmos_client.CosmosClient.from_connection_string(self.cosmos_connection_string)
-        else:
-            self.client = cosmos_client.CosmosClient(self.cosmos_endpoint, self.cosmos_key)
-        self.database = self.client.get_database_client("vimarsh-multi-personality")
-        self.container = self.database.get_container_client("personality_vectors")
+        # Initialize Cosmos DB client
+        self.cosmos_client = CosmosClient.from_connection_string(cosmos_connection_string)
+        self.database_name = database_name
+        self.container_name = os.getenv("AZURE_COSMOS_CONTAINER_NAME", "personality-vectors")  # Fixed: use hyphen like production
+        self.database = self.cosmos_client.get_database_client(database_name)
+        self.container = self.database.get_container_client(self.container_name)
         
         # Processing configuration
         self.batch_size = 10  # Process 10 chunks at a time

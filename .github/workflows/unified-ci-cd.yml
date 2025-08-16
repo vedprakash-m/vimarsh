@@ -238,7 +238,7 @@ jobs:
       run: |
         cd backend
         pip install -r requirements.txt
-        pip install pytest pytest-cov pytest-asyncio
+        pip install pytest pytest-cov pytest-asyncio pytest-timeout
 
     - name: 🔍 Validate Configuration Files
       run: |
@@ -362,7 +362,7 @@ jobs:
         GITHUB_ACTIONS: true
       run: |
         # Install required packages for comprehensive validation
-        pip install aiohttp pyyaml
+        pip install aiohttp pyyaml pytest-timeout
         
         # Run enhanced E2E validation with CI mode
         python scripts/enhanced_e2e_validator.py --level comprehensive --ci --output validation_report.json

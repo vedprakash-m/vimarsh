@@ -91,24 +91,44 @@ class EnhancedRAGService:
     
     def __init__(self):
         """Initialize the enhanced RAG service"""
-        # Environment setup
-        self.cosmos_endpoint = os.getenv('COSMOS_ENDPOINT', '')
-        self.cosmos_key = os.getenv('COSMOS_KEY', '') 
+        # Environment setup - use standardized connection string
+        self.cosmos_connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING', '')
         self.gemini_api_key = os.getenv('GEMINI_API_KEY', '')
         
-        if not all([self.cosmos_endpoint, self.cosmos_key, self.gemini_api_key]):
-            raise ValueError("Required environment variables not set: COSMOS_ENDPOINT, COSMOS_KEY, GEMINI_API_KEY")
+        # More graceful error handling for environment variables
+        if not self.cosmos_connection_string:
+            logger.error("❌ AZURE_COSMOS_CONNECTION_STRING not set")
+            raise ValueError("AZURE_COSMOS_CONNECTION_STRING is required")
         
-        # Cosmos DB setup
-        self.client = cosmos_client.CosmosClient(self.cosmos_endpoint, self.cosmos_key)
-        self.database = self.client.get_database_client('vimarsh-multi-personality')
-        self.container = self.database.get_container_client('personality_vectors')
+        if not self.gemini_api_key:
+            logger.error("❌ GEMINI_API_KEY not set")
+            raise ValueError("GEMINI_API_KEY is required")
         
-        # Configure Gemini AI
-        if genai:
-            genai.configure(api_key=self.gemini_api_key)
-        else:
-            logger.warning("⚠️ Google Generative AI not available, using fallback responses")
+        logger.info("✅ Environment variables loaded successfully")
+        
+        # Cosmos DB setup with error handling
+        try:
+            self.client = cosmos_client.CosmosClient.from_connection_string(self.cosmos_connection_string)
+            self.database_name = os.getenv('AZURE_COSMOS_DATABASE_NAME', 'vimarsh-multi-personality')
+            self.container_name = os.getenv('AZURE_COSMOS_CONTAINER_NAME', 'personality_vectors')  # Correct: underscore
+            self.database = self.client.get_database_client(self.database_name)
+            self.container = self.database.get_container_client(self.container_name)
+            logger.info(f"✅ Cosmos DB connected: {self.database_name}/{self.container_name}")
+        except Exception as e:
+            logger.error(f"❌ Cosmos DB connection failed: {str(e)}")
+            raise ValueError(f"Cosmos DB initialization failed: {str(e)}")
+        
+        # Configure Gemini AI with error handling
+        try:
+            if genai:
+                genai.configure(api_key=self.gemini_api_key)
+                logger.info("✅ Gemini AI configured successfully")
+            else:
+                logger.warning("⚠️ Google Generative AI not available, using fallback responses")
+                raise ValueError("Google Generative AI package not available")
+        except Exception as e:
+            logger.error(f"❌ Gemini AI configuration failed: {str(e)}")
+            raise ValueError(f"Gemini AI initialization failed: {str(e)}")
         self.embedding_model = "models/text-embedding-004"
         self.generation_model = "models/gemini-2.0-flash-exp"
         

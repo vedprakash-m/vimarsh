@@ -24,10 +24,12 @@ class UserService:
     """Manages user data in Cosmos DB with hybrid auth support"""
     
     def __init__(self):
-        # Cosmos DB connection
-        cosmos_endpoint = os.getenv("COSMOS_DB_ENDPOINT")
-        cosmos_key = os.getenv("COSMOS_DB_KEY")
-        self.cosmos_client = CosmosClient(cosmos_endpoint, credential=cosmos_key)
+                # Initialize Cosmos DB client
+        cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING")
+        if cosmos_connection_string:
+            self.cosmos_client = CosmosClient.from_connection_string(cosmos_connection_string)
+        else:
+            logger.warning("No Cosmos DB connection string found")
         self.database = self.cosmos_client.get_database_client("vimarsh_db")
         self.users_container = self.database.get_container_client("users")
     

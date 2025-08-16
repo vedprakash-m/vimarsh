@@ -160,11 +160,12 @@ class CapabilityManifestService:
             vector_service = VectorDatabaseService()
             response_time = (time.time() - start_time) * 1000
             
-            # Basic import and initialization test
-            cosmos_endpoint = os.getenv('COSMOS_ENDPOINT')
-            cosmos_key = os.getenv('COSMOS_KEY')
+            # Check the same environment variables that VectorDatabaseService actually uses
+            connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
+            database_name = os.getenv('AZURE_COSMOS_DATABASE_NAME', 'vimarsh-multi-personality')
+            container_name = os.getenv('AZURE_COSMOS_CONTAINER_NAME', 'personality_vectors')  # Fixed default
             
-            if not cosmos_endpoint or not cosmos_key:
+            if not connection_string:
                 return ServiceCapability(
                     name="vector_search",
                     status=ServiceStatus.UNAVAILABLE,
@@ -172,8 +173,9 @@ class CapabilityManifestService:
                     fallback_mode=FallbackMode.SIMPLIFIED,
                     error_message="Cosmos DB credentials not configured",
                     health_details={
-                        "cosmos_endpoint_configured": bool(cosmos_endpoint),
-                        "cosmos_key_configured": bool(cosmos_key),
+                        "cosmos_connection_string_configured": bool(connection_string),
+                        "cosmos_database_name": database_name,
+                        "cosmos_container_name": container_name,
                         "service_imported": True
                     }
                 )
@@ -187,8 +189,9 @@ class CapabilityManifestService:
                 response_time_ms=response_time,
                 fallback_mode=FallbackMode.NONE,
                 health_details={
-                    "cosmos_endpoint_configured": True,
-                    "cosmos_key_configured": True,
+                    "cosmos_connection_string_configured": True,
+                    "cosmos_database_name": database_name,
+                    "cosmos_container_name": container_name,
                     "service_imported": True,
                     "basic_initialization": True
                 }

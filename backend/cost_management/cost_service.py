@@ -78,16 +78,13 @@ class CostManagementService:
     def _initialize_cosmos(self):
         """Initialize Cosmos DB client"""
         try:
-            cosmos_url = os.getenv('COSMOS_DB_URL')
-            cosmos_key = os.getenv('COSMOS_DB_KEY')
-            
-            if not cosmos_url or not cosmos_key:
-                logger.error("🚨 Cosmos DB credentials not configured")
+            # Use standardized connection string approach
+            cosmos_connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
+            if not cosmos_connection_string:
+                logger.warning("❌ No Cosmos DB configuration found")
                 return None
             
-            client = CosmosClient(cosmos_url, cosmos_key)
-            logger.info("🔐 Cosmos DB client initialized for cost tracking")
-            return client
+            client = CosmosClient.from_connection_string(cosmos_connection_string)
             
         except Exception as e:
             logger.error(f"🚨 Failed to initialize Cosmos DB: {str(e)}")

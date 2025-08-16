@@ -64,13 +64,14 @@ except ImportError as e:
 
 try:
     from services.enhanced_rag_service_v6 import EnhancedRAGService
-    enhanced_rag_service = EnhancedRAGService()
+    # Don't initialize at import time - do it lazily
     enhanced_rag_available = True
-    logger.info("✅ Enhanced RAG service with vector search initialized")
+    enhanced_rag_service = None  # Will be initialized on first use
+    logger.info("✅ Enhanced RAG service imported successfully (will initialize on first use)")
 except ImportError as e:
     logger.warning(f"⚠️ Enhanced RAG service not available: {e}")
 except Exception as e:
-    logger.warning(f"⚠️ Enhanced RAG service initialization failed: {e}")
+    logger.warning(f"⚠️ Enhanced RAG service import failed: {e}")
 
 try:
     from services.conversation_memory_service import ConversationMemoryService
@@ -1577,6 +1578,20 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         if enhanced_rag_available:
             # Try enhanced RAG service first - this provides content-backed responses with citations
             try:
+                # Initialize enhanced RAG service lazily if not already done
+                global enhanced_rag_service, enhanced_rag_available
+                if enhanced_rag_service is None:
+                    logger.info("🔄 Initializing Enhanced RAG service on first use...")
+                    try:
+                        from services.enhanced_rag_service_v6 import EnhancedRAGService
+                        enhanced_rag_service = EnhancedRAGService()
+                        logger.info("✅ Enhanced RAG service initialized successfully")
+                    except Exception as init_error:
+                        logger.error(f"❌ Enhanced RAG service initialization failed: {init_error}")
+                        # Set flag to prevent retrying initialization
+                        enhanced_rag_available = False
+                        raise Exception(f"RAG service initialization failed: {init_error}")
+                
                 # Enhanced RAG service handles conversation context internally
                 import asyncio
                 loop = asyncio.new_event_loop()

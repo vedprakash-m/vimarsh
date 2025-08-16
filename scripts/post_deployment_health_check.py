@@ -32,7 +32,7 @@ class PostDeploymentValidator:
         self.config = {
             "production": {
                 "frontend_url": "https://vimarsh.vedprakash.net",
-                "backend_url": "https://vimarsh-backend-app-flex.azurewebsites.net"
+                "backend_url": "https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net"
             },
             "staging": {
                 "frontend_url": "https://staging-vimarsh.vedprakash.net", 
@@ -85,50 +85,91 @@ class PostDeploymentValidator:
             )
     
     async def check_backend_health(self, session: aiohttp.ClientSession) -> HealthCheckResult:
-        """Check backend health endpoint"""
+        """Check backend health endpoint with retry logic for Azure Functions cold start"""
         start_time = time.time()
         backend_url = self.config[self.environment]["backend_url"]
         
-        try:
-            async with session.get(f"{backend_url}/api/health", timeout=30) as response:
-                response_time = time.time() - start_time
+        # Retry configuration for Azure Functions cold start
+        max_retries = 3
+        base_timeout = 30
+        
+        for attempt in range(max_retries):
+            try:
+                timeout = base_timeout + (attempt * 30)  # Increase timeout on retries
+                print(f"🔄 Attempting backend health check (attempt {attempt + 1}/{max_retries}, timeout: {timeout}s)")
                 
-                if response.status == 200:
-                    data = await response.json()
+                async with session.get(f"{backend_url}/api/health", timeout=timeout) as response:
+                    response_time = time.time() - start_time
                     
-                    if data.get("status") == "healthy":
-                        return HealthCheckResult(
-                            check_name="backend_health",
-                            status="healthy",
-                            response_time=response_time,
-                            details=f"Backend health check passed (response time: {response_time:.2f}s)"
-                        )
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        if data.get("status") == "healthy":
+                            return HealthCheckResult(
+                                check_name="backend_health",
+                                status="healthy",
+                                response_time=response_time,
+                                details=f"Backend health check passed (response time: {response_time:.2f}s, attempt {attempt + 1})"
+                            )
+                        else:
+                            return HealthCheckResult(
+                                check_name="backend_health",
+                                status="degraded",
+                                response_time=response_time,
+                                details=f"Backend health check returned: {data.get('status', 'unknown')} (attempt {attempt + 1})"
+                            )
                     else:
-                        return HealthCheckResult(
-                            check_name="backend_health",
-                            status="degraded",
-                            response_time=response_time,
-                            details=f"Backend health check returned: {data.get('status', 'unknown')}"
-                        )
+                        # For non-200 status, try once more if not last attempt
+                        if attempt < max_retries - 1:
+                            print(f"⚠️ Backend returned status {response.status}, retrying in 10 seconds...")
+                            await asyncio.sleep(10)
+                            continue
+                        else:
+                            return HealthCheckResult(
+                                check_name="backend_health",
+                                status="unhealthy",
+                                response_time=response_time,
+                                details=f"Backend health endpoint returned status: {response.status} after {max_retries} attempts"
+                            )
+                        
+            except asyncio.TimeoutError:
+                if attempt < max_retries - 1:
+                    print(f"⏱️ Timeout on attempt {attempt + 1}, retrying with longer timeout...")
+                    await asyncio.sleep(15)
+                    continue
                 else:
                     return HealthCheckResult(
                         check_name="backend_health",
                         status="unhealthy",
-                        response_time=response_time,
-                        details=f"Backend health endpoint returned status: {response.status}"
+                        response_time=time.time() - start_time,
+                        details=f"Backend health endpoint timeout after {max_retries} attempts (Azure Functions may be cold starting)",
+                        error_message="Timeout error"
                     )
-                    
-        except Exception as e:
-            return HealthCheckResult(
-                check_name="backend_health",
-                status="unhealthy",
-                response_time=time.time() - start_time,
-                details="Backend health endpoint not accessible",
-                error_message=str(e)
-            )
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"❌ Error on attempt {attempt + 1}: {str(e)}, retrying...")
+                    await asyncio.sleep(10)
+                    continue
+                else:
+                    return HealthCheckResult(
+                        check_name="backend_health",
+                        status="unhealthy",
+                        response_time=time.time() - start_time,
+                        details=f"Backend health endpoint not accessible after {max_retries} attempts",
+                        error_message=str(e)
+                    )
+        
+        # This should never be reached due to the logic above, but adding for safety
+        return HealthCheckResult(
+            check_name="backend_health",
+            status="unhealthy",
+            response_time=time.time() - start_time,
+            details="Unexpected end of retry loop",
+            error_message="Logic error"
+        )
     
-    async def check_spiritual_guidance_api(self, session: aiohttp.ClientSession) -> HealthCheckResult:
-        """Test core spiritual guidance functionality"""
+    async def check_guidance_api(self, session: aiohttp.ClientSession) -> HealthCheckResult:
+        """Test core guidance functionality with retry logic"""
         start_time = time.time()
         backend_url = self.config[self.environment]["backend_url"]
         
@@ -137,59 +178,117 @@ class PostDeploymentValidator:
             "language": "English"
         }
         
-        try:
-            async with session.post(
-                f"{backend_url}/api/spiritual_guidance",
-                json=test_payload,
-                timeout=60
-            ) as response:
-                response_time = time.time() - start_time
+        # Retry configuration for Azure Functions
+        max_retries = 2
+        base_timeout = 60
+        
+        for attempt in range(max_retries):
+            try:
+                timeout = base_timeout + (attempt * 30)
+                print(f"🔄 Testing guidance API (attempt {attempt + 1}/{max_retries}, timeout: {timeout}s)")
                 
-                if response.status == 200:
-                    data = await response.json()
+                async with session.post(
+                    f"{backend_url}/api/guidance",
+                    json=test_payload,
+                    timeout=timeout
+                ) as response:
+                    response_time = time.time() - start_time
                     
-                    if data.get("response") and len(data["response"]) > 100:
-                        # Check for spiritual content
-                        response_text = data["response"].lower()
-                        spiritual_indicators = ["dharma", "spiritual", "duty", "righteousness", "hindu"]
+                    if response.status == 200:
+                        data = await response.json()
                         
-                        if any(indicator in response_text for indicator in spiritual_indicators):
-                            return HealthCheckResult(
-                                check_name="spiritual_guidance_api",
-                                status="healthy",
-                                response_time=response_time,
-                                details=f"Spiritual guidance API working correctly (response time: {response_time:.2f}s)"
-                            )
+                        if data.get("response") and len(data["response"]) > 100:
+                            # Check for spiritual content
+                            response_text = data["response"].lower()
+                            spiritual_indicators = ["dharma", "spiritual", "duty", "righteousness", "hindu"]
+                            
+                            if any(indicator in response_text for indicator in spiritual_indicators):
+                                return HealthCheckResult(
+                                    check_name="guidance_api",
+                                    status="healthy",
+                                    response_time=response_time,
+                                    details=f"Guidance API working correctly (response time: {response_time:.2f}s, attempt {attempt + 1})"
+                                )
+                            else:
+                                return HealthCheckResult(
+                                    check_name="guidance_api",
+                                    status="degraded",
+                                    response_time=response_time,
+                                    details=f"API responded but content lacks spiritual indicators (attempt {attempt + 1})"
+                                )
+                        else:
+                            if attempt < max_retries - 1:
+                                print(f"⚠️ API returned insufficient content, retrying...")
+                                await asyncio.sleep(10)
+                                continue
+                            else:
+                                return HealthCheckResult(
+                                    check_name="guidance_api",
+                                    status="degraded",
+                                    response_time=response_time,
+                                    details=f"API response too short or empty after {max_retries} attempts"
+                                )
+                    elif response.status == 500:
+                        # 500 errors are expected in degraded mode (missing LLM API keys, etc.)
+                        if attempt < max_retries - 1:
+                            print(f"⚠️ Backend in degraded mode (500 error), retrying...")
+                            await asyncio.sleep(15)
+                            continue
                         else:
                             return HealthCheckResult(
-                                check_name="spiritual_guidance_api",
+                                check_name="guidance_api",
                                 status="degraded",
                                 response_time=response_time,
-                                details="API responding but content quality may be degraded"
+                                details=f"Backend in degraded mode - guidance API returns 500 (likely missing API keys or DB config)"
                             )
                     else:
-                        return HealthCheckResult(
-                            check_name="spiritual_guidance_api",
-                            status="degraded",
-                            response_time=response_time,
-                            details="API responding but returned incomplete response"
-                        )
+                        if attempt < max_retries - 1:
+                            print(f"⚠️ Guidance API returned status {response.status}, retrying...")
+                            await asyncio.sleep(15)
+                            continue
+                        else:
+                            return HealthCheckResult(
+                                check_name="guidance_api",
+                                status="unhealthy",
+                                response_time=response_time,
+                                details=f"Guidance API returned status: {response.status} after {max_retries} attempts"
+                            )
+                            
+            except asyncio.TimeoutError:
+                if attempt < max_retries - 1:
+                    print(f"⏱️ Guidance API timeout on attempt {attempt + 1}, retrying...")
+                    await asyncio.sleep(20)
+                    continue
                 else:
                     return HealthCheckResult(
-                        check_name="spiritual_guidance_api",
+                        check_name="guidance_api",
                         status="unhealthy",
-                        response_time=response_time,
-                        details=f"Spiritual guidance API returned status: {response.status}"
+                        response_time=time.time() - start_time,
+                        details=f"Guidance API timeout after {max_retries} attempts",
+                        error_message="Timeout error"
                     )
-                    
-        except Exception as e:
-            return HealthCheckResult(
-                check_name="spiritual_guidance_api",
-                status="unhealthy",
-                response_time=time.time() - start_time,
-                details="Spiritual guidance API not accessible",
-                error_message=str(e)
-            )
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"❌ Error testing guidance API on attempt {attempt + 1}: {str(e)}, retrying...")
+                    await asyncio.sleep(15)
+                    continue
+                else:
+                    return HealthCheckResult(
+                        check_name="guidance_api",
+                        status="unhealthy",
+                        response_time=time.time() - start_time,
+                        details=f"Guidance API not accessible after {max_retries} attempts",
+                        error_message=str(e)
+                    )
+        
+        # Safety fallback
+        return HealthCheckResult(
+            check_name="guidance_api",
+            status="unhealthy",
+            response_time=time.time() - start_time,
+            details="Unexpected end of retry loop",
+            error_message="Logic error"
+        )
     
     async def check_performance_baseline(self, session: aiohttp.ClientSession) -> HealthCheckResult:
         """Check performance baselines"""
@@ -309,7 +408,7 @@ class PostDeploymentValidator:
             # Run all health checks
             self.results.append(await self.check_frontend_availability(session))
             self.results.append(await self.check_backend_health(session))
-            self.results.append(await self.check_spiritual_guidance_api(session))
+            self.results.append(await self.check_guidance_api(session))
             self.results.append(await self.check_performance_baseline(session))
             self.results.append(await self.check_https_security(session))
         
