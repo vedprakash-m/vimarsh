@@ -206,6 +206,36 @@ class EnhancedRAGService:
             logger.error(f"❌ Error calculating cosine similarity: {e}")
             return 0.0
     
+    def _get_personality_context(self, personality_id: str) -> str:
+        """Get personality-specific context and voice for prompting"""
+        personality_contexts = {
+            "krishna": "You are Lord Krishna, divine teacher of the Bhagavad Gita. Respond with divine wisdom, compassion, and practical spiritual guidance. Use loving terms like 'beloved devotee' or 'dear soul'.",
+            
+            "abraham_lincoln": "You are Abraham Lincoln, 16th President of the United States. Respond with wisdom about leadership, democracy, unity, and moral courage. Use dignified language and address as 'my fellow citizen' or 'friend'.",
+            
+            "buddha": "You are Buddha, the enlightened teacher. Respond with compassion and wisdom about ending suffering, mindfulness, and the Middle Way. Use peaceful terms like 'dear friend' or 'noble seeker'.",
+            
+            "jesus_christ": "You are Jesus Christ, teacher of love and compassion. Respond with divine love, forgiveness, and spiritual guidance. Use loving terms like 'beloved child' or 'my dear child'.",
+            
+            "albert_einstein": "You are Albert Einstein, the renowned physicist. Respond with scientific curiosity, wonder about the universe, and intellectual humility. Use thoughtful terms like 'my friend' or 'curious mind'.",
+            
+            "marcus_aurelius": "You are Marcus Aurelius, Roman Emperor and Stoic philosopher. Respond with Stoic wisdom about virtue, reason, and what we can control. Use respectful terms like 'fellow seeker' or 'student of wisdom'.",
+            
+            "rumi": "You are Rumi, the Sufi mystic poet. Respond with mystical wisdom about divine love, spiritual union, and the beauty of the heart. Use passionate terms like 'beloved' or 'dear seeker of love'.",
+            
+            "confucius": "You are Confucius, the great Chinese philosopher. Respond with wisdom about virtue, education, and social harmony. Use respectful terms like 'honorable student' or 'seeker of wisdom'.",
+            
+            "lao_tzu": "You are Lao Tzu, ancient Chinese sage. Respond with Taoist wisdom about harmony, balance, and the natural way. Use gentle terms like 'dear friend' or 'fellow traveler'.",
+            
+            "nikola_tesla": "You are Nikola Tesla, brilliant inventor and electrical engineer. Respond with visionary insight about innovation, electricity, and future possibilities. Use inspiring terms like 'curious mind' or 'seeker of innovation'.",
+            
+            "isaac_newton": "You are Isaac Newton, father of modern physics. Respond with scientific precision about natural laws, mathematics, and discovery. Use respectful terms like 'my friend' or 'fellow scholar'.",
+            
+            "chanakya": "You are Chanakya, ancient strategist and political advisor. Respond with practical wisdom about leadership, strategy, and governance. Use respectful terms like 'student' or 'seeker of wisdom'."
+        }
+        
+        return personality_contexts.get(personality_id, f"You are {personality_id} providing thoughtful guidance and wisdom.")
+
     async def vector_search(self, query: str, personality_id: str, top_k: int = 5) -> List[ContentChunk]:
         """Perform vector similarity search"""
         try:
@@ -421,8 +451,11 @@ class EnhancedRAGService:
                     for chunk in rag_context.relevant_chunks[:3]  # Top 3 chunks
                 ]
             
-            # Step 3: Create enhanced prompt with context
-            personality_context = f"You are {personality_id} providing spiritual guidance."
+            # Step 3: Create enhanced prompt with context and personality-specific instructions
+            personality_context = self._get_personality_context(personality_id)
+            max_chars = 500  # Default limit
+            if personality_id in personality_configs:
+                max_chars = personality_configs[personality_id].max_chars
             
             if context_passages:
                 context_text = "\n\n".join(context_passages)
@@ -433,19 +466,34 @@ Based on the following relevant spiritual content:
 
 {context_text}
 
-Please respond to this question in character as {personality_id}:
-{query}
+Question: {query}
 
-Provide a thoughtful response that draws from the relevant content while maintaining your unique personality and perspective. Include relevant citations if you reference specific sources.
+RESPONSE REQUIREMENTS:
+- Provide a complete, thoughtful response in {max_chars} characters or less
+- Be concise while capturing all essential wisdom
+- Maintain your authentic voice and perspective
+- Include practical guidance that directly addresses the question
+- Reference specific sources when drawing from the content above
+- End with a complete thought or sentence
+
+Respond now in character:
 """
             else:
                 enhanced_prompt = f"""
 {personality_context}
 
-Please respond to this question in character as {personality_id}:
-{query}
+Question: {query}
 
 {context if context else ""}
+
+RESPONSE REQUIREMENTS:
+- Provide a complete, thoughtful response in {max_chars} characters or less
+- Be concise while capturing all essential wisdom
+- Maintain your authentic voice and perspective
+- Include practical guidance that directly addresses the question
+- End with a complete thought or sentence
+
+Respond now in character:
 """
             
             # Step 4: Generate response using Gemini
@@ -456,14 +504,13 @@ Please respond to this question in character as {personality_id}:
                 if response and response.text:
                     content = response.text.strip()
                     
-                    # Enforce character limit based on personality configuration
+                    # Log response length for monitoring
                     max_chars = 500  # Default limit
                     if personality_id in personality_configs:
                         max_chars = personality_configs[personality_id].max_chars
                     
                     if len(content) > max_chars:
-                        content = content[:max_chars-3] + "..."
-                        logger.info(f"✂️ Truncated response for {personality_id} from {len(response.text)} to {len(content)} chars (limit: {max_chars})")
+                        logger.warning(f"⚠️ Response for {personality_id} is {len(content)} chars (target: {max_chars}). Consider improving prompt engineering.")
                     
                     content_backed = len(rag_context.relevant_chunks) > 0
                     
@@ -503,14 +550,6 @@ Please respond to this question in character as {personality_id}:
                 else:
                     fallback_content = f"I apologize, but I'm having difficulty accessing my knowledge base right now. As {personality_id}, I'd be happy to help once the connection is restored."
                     error_type = "generation_failed"
-                
-                # Enforce character limit on fallback content too
-                max_chars = 500  # Default limit
-                if personality_id in personality_configs:
-                    max_chars = personality_configs[personality_id].max_chars
-                
-                if len(fallback_content) > max_chars:
-                    fallback_content = fallback_content[:max_chars-3] + "..."
                 
                 return EnhancedRAGResponse(
                     content=fallback_content,
