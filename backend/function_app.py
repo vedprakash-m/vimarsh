@@ -1482,6 +1482,7 @@ def _get_hardcoded_fallback(personality_id: str) -> str:
 @app.route(route="guidance", methods=["POST"])
 async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced guidance endpoint with modular service integration"""
+    global enhanced_rag_service, enhanced_rag_available
     try:
         # Parse request body
         try:
@@ -1579,7 +1580,6 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             # Try enhanced RAG service first - this provides content-backed responses with citations
             try:
                 # Initialize enhanced RAG service lazily if not already done
-                global enhanced_rag_service, enhanced_rag_available
                 if enhanced_rag_service is None:
                     logger.info("🔄 Initializing Enhanced RAG service on first use...")
                     try:
