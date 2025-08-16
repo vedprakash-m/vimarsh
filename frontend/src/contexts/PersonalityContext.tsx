@@ -12,7 +12,7 @@ export interface Personality {
   id: string;
   name: string;
   display_name: string;
-  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary';
+  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'leadership' | 'psychology';
   time_period: string;
   description: string;
   expertise_areas: string[];
@@ -171,7 +171,7 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
           id: p.id,
           name: p.name,
           display_name: p.name, // Use name as display_name since API doesn't have display_name
-          domain: p.domain as 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary',
+          domain: p.domain as 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'leadership' | 'psychology',
           time_period: 'Ancient/Historical', // Default since API doesn't provide this
           description: p.description,
           expertise_areas: [], // Default since API doesn't provide this

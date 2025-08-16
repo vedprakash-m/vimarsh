@@ -287,6 +287,8 @@ const ContentManagement = (): JSX.Element => {
                 <option value="philosophical">Philosophical</option>
                 <option value="historical">Historical</option>
                 <option value="literary">Literary</option>
+                <option value="leadership">Leadership</option>
+                <option value="psychology">Psychology</option>
               </select>
               <select
                 value={filter.status}

@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 interface Personality {
   id: string;
   name: string;
-  domain: 'spiritual' | 'historical' | 'scientific' | 'philosophical';
+  domain: 'spiritual' | 'historical' | 'scientific' | 'philosophical' | 'literary' | 'leadership' | 'psychology';
   voice_settings: {
     language: string;
     voice_name?: string;
@@ -56,6 +56,9 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
       case 'scientific': return '🔬';
       case 'historical': return '🏛️';
       case 'philosophical': return '🤔';
+      case 'literary': return '📚';
+      case 'leadership': return '👑';
+      case 'psychology': return '🧠';
       default: return '🎭';
     }
   };
@@ -66,6 +69,9 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
       case 'scientific': return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'historical': return 'bg-green-100 text-green-800 border-green-200';
       case 'philosophical': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'literary': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'leadership': return 'bg-red-100 text-red-800 border-red-200';
+      case 'psychology': return 'bg-violet-100 text-violet-800 border-violet-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
@@ -90,8 +96,8 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
   const getPreviewText = (personality: Personality) => {
     const sampleTexts = {
       krishna: "Namaste, dear child. I am here to guide you on the path of dharma and self-realization.",
-      einstein: "Hello, my friend. Let us explore the mysteries of the universe together through the lens of science.",
-      lincoln: "Greetings, fellow citizen. I am here to discuss the principles of democracy and freedom.",
+      albert_einstein: "Hello, my friend. Let us explore the mysteries of the universe together through the lens of science.",
+      abraham_lincoln: "Greetings, fellow citizen. I am here to discuss the principles of democracy and freedom.",
       marcus_aurelius: "Welcome, seeker of wisdom. Let us contemplate the virtues of stoic philosophy together."
     };
     return sampleTexts[personality.id as keyof typeof sampleTexts] || 

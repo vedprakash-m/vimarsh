@@ -101,8 +101,8 @@ const PERSONALITY_VOICES: Record<string, Personality> = {
       'Kurukshetra': { phonetic: 'ku-ruk-SHET-ra', language: 'sanskrit' }
     }
   },
-  einstein: {
-    id: 'einstein',
+  albert_einstein: {
+    id: 'albert_einstein',
     name: 'Albert Einstein',
     domain: 'scientific',
     voice_settings: {
@@ -127,8 +127,8 @@ const PERSONALITY_VOICES: Record<string, Personality> = {
       'Minkowski': { phonetic: 'min-KOV-skee', language: 'german' }
     }
   },
-  lincoln: {
-    id: 'lincoln',
+  abraham_lincoln: {
+    id: 'abraham_lincoln',
     name: 'Abraham Lincoln',
     domain: 'historical',
     voice_settings: {

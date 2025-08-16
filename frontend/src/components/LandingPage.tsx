@@ -33,7 +33,7 @@ const personalities: Personality[] = [
     darkColor: '#D97706'
   },
   {
-    id: 'einstein',
+    id: 'albert_einstein',
     name: 'Albert Einstein',
     domain: 'Scientific',
     description: 'Revolutionary insights into the universe',
@@ -42,7 +42,7 @@ const personalities: Personality[] = [
     darkColor: '#059669'
   },
   {
-    id: 'lincoln',
+    id: 'abraham_lincoln',
     name: 'Abraham Lincoln',
     domain: 'Historical',
     description: 'Leadership through moral conviction',
@@ -60,7 +60,7 @@ const personalities: Personality[] = [
     darkColor: '#7C3AED'
   },
   {
-    id: 'jesus',
+    id: 'jesus_christ',
     name: 'Jesus Christ',
     domain: 'Spiritual',
     description: 'Love, compassion, and spiritual guidance',
@@ -105,7 +105,7 @@ const personalities: Personality[] = [
     darkColor: '#4F46E5'
   },
   {
-    id: 'newton',
+    id: 'isaac_newton',
     name: 'Isaac Newton',
     domain: 'Scientific',
     description: 'Father of classical mechanics',
@@ -114,7 +114,7 @@ const personalities: Personality[] = [
     darkColor: '#7C3AED'
   },
   {
-    id: 'tesla',
+    id: 'nikola_tesla',
     name: 'Nikola Tesla',
     domain: 'Scientific',
     description: 'Pioneer of modern electrical technology',
@@ -463,7 +463,7 @@ const LandingPage: React.FC = () => {
                       </div>
                     </>
                   }
-                  {selectedPersonality.id === 'einstein' && 
+                  {selectedPersonality.id === 'albert_einstein' && 
                     <>
                       <div style={{ marginBottom: '0.75rem' }}>
                         "In times of difficulty, I find solace in the eternal laws of nature. The universe operates on principles of harmony and order. When we align our understanding with these cosmic truths, we find a peace that transcends temporary troubles."
@@ -479,7 +479,7 @@ const LandingPage: React.FC = () => {
                       </div>
                     </>
                   }
-                  {selectedPersonality.id === 'lincoln' && 
+                  {selectedPersonality.id === 'abraham_lincoln' && 
                     <>
                       <div style={{ marginBottom: '0.75rem' }}>
                         "I have learned that in our darkest hours, we must hold fast to the better angels of our nature. A house divided cannot stand, and neither can the human spirit when it wars against itself. Seek unity within, and peace will follow."

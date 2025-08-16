@@ -5,7 +5,7 @@ import { adminService } from '../../services/adminService';
 interface Personality {
   id: string;
   name: string;
-  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary';
+  domain: 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'leadership' | 'psychology';
   description: string;
   isActive: boolean;
   contentSources?: number;
@@ -117,7 +117,9 @@ const PersonalityManagement: React.FC = () => {
       scientific: '#059669', 
       historical: '#DC2626',
       philosophical: '#2563EB',
-      literary: '#7C2D12'
+      literary: '#7C2D12',
+      leadership: '#DC2626',
+      psychology: '#8b5cf6'
     };
     return colors[domain as keyof typeof colors] || '#6B7280';
   };
@@ -129,6 +131,8 @@ const PersonalityManagement: React.FC = () => {
       case 'historical': return '📜';
       case 'philosophical': return '🤔';
       case 'literary': return '📚';
+      case 'leadership': return '👑';
+      case 'psychology': return '🧠';
       default: return '🤖';
     }
   };
@@ -293,6 +297,8 @@ const PersonalityManagement: React.FC = () => {
               <option value="philosophical">Philosophical</option>
               <option value="historical">Historical</option>
               <option value="literary">Literary</option>
+              <option value="leadership">Leadership</option>
+              <option value="psychology">Psychology</option>
             </select>
           </div>
         </div>

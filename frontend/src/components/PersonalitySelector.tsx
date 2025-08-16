@@ -48,7 +48,9 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
       scientific: { icon: '🔬', color: '#2563eb', label: 'Scientific' },
       historical: { icon: '📜', color: '#dc2626', label: 'Historical' },
       philosophical: { icon: '🤔', color: '#ea580c', label: 'Philosophical' },
-      literary: { icon: '📚', color: '#059669', label: 'Literary' }
+      literary: { icon: '📚', color: '#059669', label: 'Literary' },
+      leadership: { icon: '👑', color: '#dc2626', label: 'Leadership' },
+      psychology: { icon: '🧠', color: '#8b5cf6', label: 'Psychology' }
     };
     return styles[domain as keyof typeof styles] || styles.spiritual;
   };

@@ -523,6 +523,8 @@ export default function GuidanceInterface() {
                selectedPersonality?.domain === 'historical' ? 'HISTORICAL' :
                selectedPersonality?.domain === 'philosophical' ? 'PHILOSOPHICAL' :
                selectedPersonality?.domain === 'literary' ? 'LITERARY' :
+               selectedPersonality?.domain === 'leadership' ? 'LEADERSHIP' :
+               selectedPersonality?.domain === 'psychology' ? 'PSYCHOLOGY' :
                'SPIRITUAL'}
             </span>
           </div>
@@ -734,6 +736,8 @@ export default function GuidanceInterface() {
                   selectedPersonality.domain === 'historical' ? 'Historical' :
                   selectedPersonality.domain === 'philosophical' ? 'Philosophical' :
                   selectedPersonality.domain === 'literary' ? 'Literary' :
+                  selectedPersonality.domain === 'leadership' ? 'Leadership' :
+                  selectedPersonality.domain === 'psychology' ? 'Psychology' :
                   'Spiritual'} Journey</h2>
                 <p style={{
                   fontSize: '1.25rem',
@@ -753,6 +757,10 @@ export default function GuidanceInterface() {
                     ? 'Contemplate life\'s deepest questions and philosophical insights with'
                     : selectedPersonality.domain === 'literary'
                     ? 'Discover the beauty and wisdom found in great literature with'
+                    : selectedPersonality.domain === 'leadership'
+                    ? 'Learn about leadership, governance, and strategic thinking with'
+                    : selectedPersonality.domain === 'psychology'
+                    ? 'Explore the human mind, behavior, and psychological insights with'
                     : 'Ask questions about spirituality, philosophy, and find wisdom from ancient teachings with'}{' '}
                   <strong>{selectedPersonality.name}</strong>.
                 </p>
