@@ -42,6 +42,16 @@ except ImportError:
         gemini_embedding_model: str = "models/text-embedding-004"
     global_ai_config = FallbackConfig()
 
+# Import personality configurations for character limits
+try:
+    from services.llm_service import LLMService
+    _temp_personality_service = LLMService()
+    personality_configs = _temp_personality_service._get_hardcoded_personalities()
+except ImportError:
+    personality_configs = {}
+except Exception:
+    personality_configs = {}
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -445,6 +455,16 @@ Please respond to this question in character as {personality_id}:
                 
                 if response and response.text:
                     content = response.text.strip()
+                    
+                    # Enforce character limit based on personality configuration
+                    max_chars = 500  # Default limit
+                    if personality_id in personality_configs:
+                        max_chars = personality_configs[personality_id].max_chars
+                    
+                    if len(content) > max_chars:
+                        content = content[:max_chars-3] + "..."
+                        logger.info(f"✂️ Truncated response for {personality_id} from {len(response.text)} to {len(content)} chars (limit: {max_chars})")
+                    
                     content_backed = len(rag_context.relevant_chunks) > 0
                     
                     # Calculate confidence score based on context quality
@@ -483,6 +503,14 @@ Please respond to this question in character as {personality_id}:
                 else:
                     fallback_content = f"I apologize, but I'm having difficulty accessing my knowledge base right now. As {personality_id}, I'd be happy to help once the connection is restored."
                     error_type = "generation_failed"
+                
+                # Enforce character limit on fallback content too
+                max_chars = 500  # Default limit
+                if personality_id in personality_configs:
+                    max_chars = personality_configs[personality_id].max_chars
+                
+                if len(fallback_content) > max_chars:
+                    fallback_content = fallback_content[:max_chars-3] + "..."
                 
                 return EnhancedRAGResponse(
                     content=fallback_content,

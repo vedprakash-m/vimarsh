@@ -373,6 +373,7 @@ export default function GuidanceInterface() {
       
       case 'lincoln':
       case 'abraham lincoln':
+      case 'abraham_lincoln':
         return [
           "What lessons can we learn from leadership during times of crisis?",
           "How do we build unity and preserve democracy in challenging times?",
