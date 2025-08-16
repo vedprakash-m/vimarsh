@@ -36,16 +36,16 @@ class PersonalityType(Enum):
                 ) types"""
     KRISHNA = "krishna"
     BUDDHA = "buddha"
-    JESUS = "jesus"
-    EINSTEIN = "einstein"
-    LINCOLN = "lincoln"
+    JESUS_CHRIST = "jesus_christ"
+    ALBERT_EINSTEIN = "albert_einstein"
+    ABRAHAM_LINCOLN = "abraham_lincoln"
     MARCUS_AURELIUS = "marcus_aurelius"
     RUMI = "rumi"
     LAO_TZU = "lao_tzu"
-    NEWTON = "newton"
+    ISAAC_NEWTON = "isaac_newton"
     CHANAKYA = "chanakya"
     CONFUCIUS = "confucius"
-    TESLA = "tesla"
+    NIKOLA_TESLA = "nikola_tesla"
 
 class ContentType(Enum):
     """Types of spiritual content"""
@@ -231,9 +231,9 @@ class VectorDatabaseService:
         elif 'buddha' in source or 'dhammapada' in source:
             return PersonalityType.BUDDHA
         elif 'jesus' in source or 'christ' in source or 'bible' in source:
-            return PersonalityType.JESUS
+            return PersonalityType.JESUS_CHRIST
         elif 'einstein' in source:
-            return PersonalityType.EINSTEIN
+            return PersonalityType.ALBERT_EINSTEIN
         
         # Content-based determination
         if any(term in content for term in ['arjuna', 'dharma', 'karma', 'om']):
@@ -241,9 +241,9 @@ class VectorDatabaseService:
         elif any(term in content for term in ['suffering', 'meditation', 'mindfulness']):
             return PersonalityType.BUDDHA
         elif any(term in content for term in ['love', 'forgiveness', 'salvation']):
-            return PersonalityType.JESUS
+            return PersonalityType.JESUS_CHRIST
         elif any(term in content for term in ['relativity', 'physics', 'science']):
-            return PersonalityType.EINSTEIN
+            return PersonalityType.ALBERT_EINSTEIN
         
         # Default to Krishna for spiritual content
         return PersonalityType.KRISHNA

@@ -199,13 +199,13 @@ FALLBACK_PERSONALITIES = {
     # SPIRITUAL (4 personalities) - ORIGINAL
     "krishna": {"name": "Krishna", "domain": "spiritual", "description": "Divine guide offering spiritual wisdom from the Bhagavad Gita"},
     "buddha": {"name": "Buddha", "domain": "spiritual", "description": "Enlightened teacher of the Middle Way and mindfulness"},
-    "jesus": {"name": "Jesus Christ", "domain": "spiritual", "description": "Teacher of love, compassion, and spiritual transformation"},
+    "jesus_christ": {"name": "Jesus Christ", "domain": "spiritual", "description": "Teacher of love, compassion, and spiritual transformation"},
     "rumi": {"name": "Rumi", "domain": "spiritual", "description": "Sufi mystic poet of divine love and spiritual union"},
     
     # SCIENTIFIC (5 personalities) - ORIGINAL + NEW
-    "einstein": {"name": "Albert Einstein", "domain": "scientific", "description": "Brilliant physicist exploring the mysteries of the universe"},
-    "newton": {"name": "Isaac Newton", "domain": "scientific", "description": "English mathematician and physicist, father of classical mechanics"},
-    "tesla": {"name": "Nikola Tesla", "domain": "scientific", "description": "Serbian-American inventor and electrical engineer with enhanced RAG content from his works"},
+    "albert_einstein": {"name": "Albert Einstein", "domain": "scientific", "description": "Brilliant physicist exploring the mysteries of the universe"},
+    "isaac_newton": {"name": "Isaac Newton", "domain": "scientific", "description": "English mathematician and physicist, father of classical mechanics"},
+    "nikola_tesla": {"name": "Nikola Tesla", "domain": "scientific", "description": "Serbian-American inventor and electrical engineer with enhanced RAG content from his works"},
     "leonardo_da_vinci": {"name": "Leonardo da Vinci", "domain": "scientific", "description": "Renaissance polymath, inventor, scientist, and visionary artist"},
     "archimedes": {"name": "Archimedes", "domain": "scientific", "description": "Ancient Greek mathematician, physicist, engineer, and inventor"},
     
@@ -218,13 +218,13 @@ FALLBACK_PERSONALITIES = {
     "sigmund_freud": {"name": "Sigmund Freud", "domain": "philosophical", "description": "Founder of psychoanalysis, explored human psychology"},
     
     # HISTORICAL (11 personalities) - ORIGINAL + NEW
-    "lincoln": {"name": "Abraham Lincoln", "domain": "historical", "description": "16th President known for wisdom, leadership, and unity"},
+    "abraham_lincoln": {"name": "Abraham Lincoln", "domain": "leadership", "description": "16th President known for wisdom, leadership, and unity"},
     "chanakya": {"name": "Chanakya", "domain": "historical", "description": "Ancient Indian strategist, economist, and political advisor"},
     "confucius": {"name": "Confucius", "domain": "historical", "description": "Chinese philosopher and educator emphasizing ethics and social harmony"},
     "benjamin_franklin": {"name": "Benjamin Franklin", "domain": "historical", "description": "Founding Father, diplomat, inventor, and polymath"},
-    "martin_luther_king": {"name": "Martin Luther King Jr.", "domain": "historical", "description": "Civil rights leader and advocate for social justice"},
+    "martin_luther_king_jr": {"name": "Martin Luther King Jr.", "domain": "leadership", "description": "Civil rights leader and advocate for social justice"},
     "george_washington": {"name": "George Washington", "domain": "historical", "description": "First US President, military leader, and statesman"},
-    "gandhi": {"name": "Mahatma Gandhi", "domain": "historical", "description": "Independence leader and advocate of non-violence with enhanced RAG content"},
+    "mahatma_gandhi": {"name": "Mahatma Gandhi", "domain": "leadership", "description": "Independence leader and advocate of non-violence with enhanced RAG content"},
     "swami_vivekananda": {"name": "Swami Vivekananda", "domain": "historical", "description": "Spiritual teacher who introduced Vedanta to the West"},
     
     # LITERARY (2 personalities) - NEW DOMAIN

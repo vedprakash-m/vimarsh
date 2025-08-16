@@ -197,10 +197,10 @@ class EnhancedLLMService:
         return [
             {"id": "krishna", "name": "Krishna", "domain": "spiritual"},
             {"id": "buddha", "name": "Buddha", "domain": "spiritual"},
-            {"id": "jesus", "name": "Jesus Christ", "domain": "spiritual"},
+            {"id": "jesus_christ", "name": "Jesus Christ", "domain": "spiritual"},
             {"id": "rumi", "name": "Rumi", "domain": "spiritual"},
-            {"id": "einstein", "name": "Albert Einstein", "domain": "scientific"},
-            {"id": "lincoln", "name": "Abraham Lincoln", "domain": "historical"},
+            {"id": "albert_einstein", "name": "Albert Einstein", "domain": "scientific"},
+            {"id": "abraham_lincoln", "name": "Abraham Lincoln", "domain": "leadership"},
             {"id": "marcus_aurelius", "name": "Marcus Aurelius", "domain": "philosophical"},
             {"id": "confucius", "name": "Confucius", "domain": "philosophical"}
         ]
