@@ -242,6 +242,68 @@ def get_cors_headers() -> Dict[str, str]:
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
     }
 
+@app.route(route="test", methods=["GET", "POST"])
+def test_simple(req: func.HttpRequest) -> func.HttpResponse:
+    """Simple test endpoint to verify basic functionality"""
+    try:
+        logger.info('🧪 Simple test endpoint triggered.')
+        
+        # Basic request parsing
+        try:
+            req_body = req.get_json()
+            if not req_body:
+                req_body = {}
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to parse request body: {e}")
+            req_body = {}
+        
+        # Simple response
+        response_data = {
+            "status": "success",
+            "message": "Simple test endpoint working",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "received_data": req_body,
+            "services_status": {
+                "personality_service_available": personality_service_available,
+                "enhanced_llm_available": enhanced_llm_available,
+                "enhanced_rag_available": enhanced_rag_available,
+                "memory_service_available": memory_service_available
+            }
+        }
+        
+        return func.HttpResponse(
+            json.dumps(response_data, indent=2),
+            status_code=200,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Simple test endpoint error: {str(e)}")
+        error_response = {
+            "error": "Simple test error",
+            "message": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        return func.HttpResponse(
+            json.dumps(error_response),
+            status_code=500,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
+
+
 @app.route(route="health", methods=["GET"])
 async def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Enhanced health check endpoint with comprehensive service status"""
