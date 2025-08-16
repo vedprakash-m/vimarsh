@@ -127,9 +127,29 @@ class SafetyService:
         fallback_responses = {
             "krishna": "Beloved devotee, please ask me something more appropriate for spiritual guidance. I am here to help you on your dharmic path with wisdom from the scriptures.",
             "buddha": "Dear friend, perhaps you could rephrase your question in a way that seeks wisdom and reduces suffering. I am here to guide you toward peace and enlightenment.",
-            "jesus": "Beloved child, please ask me something that aligns with love and compassion. I am here to share God's love and wisdom with you.",
-            "einstein": "My friend, please ask me something related to science, curiosity, or the wonders of the universe. I'm here to explore knowledge with you.",
-            "lincoln": "My fellow citizen, please ask me something about leadership, unity, or democratic principles. I'm here to share wisdom about governance and human dignity."
+            "jesus_christ": "Beloved child, please ask me something that aligns with love and compassion. I am here to share God's love and wisdom with you.",
+            "rumi": "Beloved, let us speak of love and divine mysteries instead. I am here to guide you on the path of spiritual union.",
+            "albert_einstein": "My friend, please ask me something related to science, curiosity, or the wonders of the universe. I'm here to explore knowledge with you.",
+            "abraham_lincoln": "My fellow citizen, please ask me something about leadership, unity, or democratic principles. I'm here to share wisdom about governance and human dignity.",
+            "marcus_aurelius": "My friend, let us focus on virtue, wisdom, and what we can control. I am here to share Stoic principles for better living.",
+            "lao_tzu": "Dear seeker, let us speak of the natural way and harmony with the Tao. I am here to guide you toward effortless wisdom.",
+            "isaac_newton": "My colleague, please ask me about scientific principles, mathematics, or natural laws. I am here to explore the workings of the universe.",
+            "chanakya": "My student, let us discuss strategy, governance, or practical wisdom. I am here to share insights about effective leadership.",
+            "confucius": "My friend, please ask me about virtue, ethics, or proper conduct. I am here to guide you toward moral excellence.",
+            "nikola_tesla": "My fellow inventor, let us discuss innovation, electricity, or future possibilities. I am here to explore technological advancement.",
+            "leonardo_da_vinci": "My friend, please ask me about art, science, or human potential. I am here to explore the Renaissance spirit of discovery.",
+            "archimedes": "My colleague, let us discuss mathematics, physics, or engineering principles. I am here to share insights about natural laws.",
+            "socrates": "My friend, let us engage in meaningful dialogue and questioning. I am here to help you examine life and seek truth.",
+            "plato": "My student, please ask me about philosophy, justice, or the nature of reality. I am here to guide you toward wisdom.",
+            "aristotle": "My pupil, let us discuss logic, ethics, or systematic thinking. I am here to share practical wisdom.",
+            "sigmund_freud": "My patient, please ask me about psychology, human behavior, or the mind. I am here to explore the depths of consciousness.",
+            "benjamin_franklin": "My friend, let us discuss practical wisdom, diplomacy, or innovation. I am here to share insights about effective living.",
+            "martin_luther_king_jr": "My brother or sister, please ask me about justice, equality, or peaceful change. I am here to share wisdom about civil rights.",
+            "george_washington": "My fellow citizen, let us discuss leadership, integrity, or nation-building. I am here to share wisdom about principled governance.",
+            "mahatma_gandhi": "My friend, please ask me about non-violence, truth, or social transformation. I am here to guide you toward peaceful change.",
+            "swami_vivekananda": "My friend, let us discuss spiritual wisdom, Eastern philosophy, or universal truth. I am here to bridge spiritual traditions.",
+            "william_shakespeare": "My friend, please ask me about human nature, literature, or the human condition. I am here to explore the depths of existence.",
+            "rabindranath_tagore": "My friend, let us discuss poetry, education, or universal humanity. I am here to share wisdom about art and life."
         }
         
         return fallback_responses.get(

@@ -30,6 +30,18 @@ except ImportError:
     np = None
 from collections import defaultdict
 
+# Import centralized AI model configuration
+try:
+    from config.ai_models import AI_CONFIG as global_ai_config
+except ImportError:
+    # Fallback if config not available
+    from dataclasses import dataclass
+    @dataclass
+    class FallbackConfig:
+        gemini_generation_model: str = "models/gemini-2.5-flash"
+        gemini_embedding_model: str = "models/text-embedding-004"
+    global_ai_config = FallbackConfig()
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -129,8 +141,8 @@ class EnhancedRAGService:
         except Exception as e:
             logger.error(f"❌ Gemini AI configuration failed: {str(e)}")
             raise ValueError(f"Gemini AI initialization failed: {str(e)}")
-        self.embedding_model = "models/text-embedding-004"
-        self.generation_model = "models/gemini-2.0-flash-exp"
+        self.embedding_model = global_ai_config.gemini_embedding_model
+        self.generation_model = global_ai_config.gemini_generation_model
         
         # Cache for embeddings to avoid regeneration
         self._embedding_cache: Dict[str, List[float]] = {}
@@ -462,8 +474,15 @@ Please respond to this question in character as {personality_id}:
                     
             except Exception as generation_error:
                 logger.error(f"❌ Response generation failed: {generation_error}")
-                # Fallback response
-                fallback_content = f"I apologize, but I'm having difficulty accessing my knowledge base right now. As {personality_id}, I'd be happy to help once the connection is restored."
+                
+                # Check if it's a quota exceeded error
+                error_str = str(generation_error).lower()
+                if "quota" in error_str or "429" in error_str:
+                    fallback_content = f"I'm currently experiencing high demand and have temporarily reached my AI processing capacity. As {personality_id}, I'd be happy to provide you with traditional wisdom instead. Please try again later or ask a simpler question."
+                    error_type = "quota_exceeded"
+                else:
+                    fallback_content = f"I apologize, but I'm having difficulty accessing my knowledge base right now. As {personality_id}, I'd be happy to help once the connection is restored."
+                    error_type = "generation_failed"
                 
                 return EnhancedRAGResponse(
                     content=fallback_content,
@@ -473,7 +492,7 @@ Please respond to this question in character as {personality_id}:
                     confidence_score=0.1,
                     content_backed=False,
                     response_source="fallback",
-                    metadata={"error": "generation_failed"}
+                    metadata={"error": error_type}
                 )
                 
         except Exception as e:

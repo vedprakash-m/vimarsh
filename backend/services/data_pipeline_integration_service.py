@@ -501,16 +501,29 @@ class DataPipelineIntegrationService:
         personality_map = {
             "krishna": PersonalityType.KRISHNA,
             "buddha": PersonalityType.BUDDHA,
-            "jesus": PersonalityType.JESUS,
-            "einstein": PersonalityType.EINSTEIN,
-            "lincoln": PersonalityType.LINCOLN,
+            "jesus_christ": PersonalityType.JESUS_CHRIST,
+            "albert_einstein": PersonalityType.ALBERT_EINSTEIN,
+            "abraham_lincoln": PersonalityType.ABRAHAM_LINCOLN,
             "marcus_aurelius": PersonalityType.MARCUS_AURELIUS,
             "rumi": PersonalityType.RUMI,
             "lao_tzu": PersonalityType.LAO_TZU,
-            "newton": PersonalityType.NEWTON,
+            "isaac_newton": PersonalityType.ISAAC_NEWTON,
             "chanakya": PersonalityType.CHANAKYA,
             "confucius": PersonalityType.CONFUCIUS,
-            "tesla": PersonalityType.TESLA
+            "nikola_tesla": PersonalityType.NIKOLA_TESLA,
+            "leonardo_da_vinci": PersonalityType.LEONARDO_DA_VINCI,
+            "archimedes": PersonalityType.ARCHIMEDES,
+            "socrates": PersonalityType.SOCRATES,
+            "plato": PersonalityType.PLATO,
+            "aristotle": PersonalityType.ARISTOTLE,
+            "sigmund_freud": PersonalityType.SIGMUND_FREUD,
+            "benjamin_franklin": PersonalityType.BENJAMIN_FRANKLIN,
+            "martin_luther_king_jr": PersonalityType.MARTIN_LUTHER_KING_JR,
+            "george_washington": PersonalityType.GEORGE_WASHINGTON,
+            "mahatma_gandhi": PersonalityType.MAHATMA_GANDHI,
+            "swami_vivekananda": PersonalityType.SWAMI_VIVEKANANDA,
+            "william_shakespeare": PersonalityType.WILLIAM_SHAKESPEARE,
+            "rabindranath_tagore": PersonalityType.RABINDRANATH_TAGORE
         }
         
         return personality_map.get(personality.lower(), personality)

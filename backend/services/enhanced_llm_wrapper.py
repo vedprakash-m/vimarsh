@@ -59,12 +59,29 @@ class EnhancedLLMService:
         return {
             "krishna": "Beloved devotee, in the Bhagavad Gita 2.47, I teach: \"You have the right to perform your prescribed duty, but not to the fruits of action.\" Focus on righteous action with love and dedication. 🙏",
             "buddha": "Dear friend, suffering arises from attachment. Practice mindfulness and compassion. The Middle Way leads to peace and liberation from all forms of suffering.",
-            "jesus": "Beloved child, love is the greatest commandment. \"Love your neighbor as yourself\" (Matthew 22:39). Let God's love guide your heart and actions.",
+            "jesus_christ": "Beloved child, love is the greatest commandment. \"Love your neighbor as yourself\" (Matthew 22:39). Let God's love guide your heart and actions.",
             "rumi": "Beloved, you are not just a drop in the ocean, but the entire ocean in each drop. Let love be your bridge to the divine mystery within.",
-            "einstein": "The important thing is not to stop questioning. Curiosity has its own reason for existing. Wonder at the mysteries of the universe.",
-            "lincoln": "A house divided against itself cannot stand. Let us choose unity over division, and work together for the common good of all.",
+            "albert_einstein": "The important thing is not to stop questioning. Curiosity has its own reason for existing. Wonder at the mysteries of the universe.",
+            "abraham_lincoln": "A house divided against itself cannot stand. Let us choose unity over division, and work together for the common good of all.",
             "marcus_aurelius": "You have power over your mind - not outside events. Realize this, and you will find strength. Focus on what you can control.",
-            "confucius": "The man who moves a mountain begins by carrying away small stones. Cultivate virtue through small, consistent actions."
+            "confucius": "The man who moves a mountain begins by carrying away small stones. Cultivate virtue through small, consistent actions.",
+            "lao_tzu": "The sage does not attempt anything very big, and thus achieves greatness. Act in accordance with the natural flow of life.",
+            "isaac_newton": "If I have seen further it is by standing on the shoulders of giants. Build upon the knowledge of those who came before.",
+            "nikola_tesla": "The present is theirs; the future, for which I really worked, is mine. Think beyond current limitations.",
+            "chanakya": "A person should not be too honest. Straight trees are cut first. Balance wisdom with practical strategy.",
+            "leonardo_da_vinci": "Learning never exhausts the mind. Curiosity and observation are the keys to understanding the world.",
+            "archimedes": "Give me a lever long enough and a fulcrum on which to place it, and I shall move the world. Apply principles systematically.",
+            "socrates": "The only true wisdom is in knowing you know nothing. Question everything and seek truth through dialogue.",
+            "plato": "The unexamined life is not worth living. Seek wisdom, justice, and the good life through philosophical reflection.",
+            "aristotle": "Excellence is never an accident. It is always the result of high intention and intelligent execution.",
+            "sigmund_freud": "The mind is like an iceberg; much lies beneath the surface. Understand your unconscious motivations.",
+            "benjamin_franklin": "An investment in knowledge pays the best interest. Be practical, diplomatic, and continuously learning.",
+            "martin_luther_king_jr": "Injustice anywhere is a threat to justice everywhere. Stand for what is right with love and courage.",
+            "george_washington": "It is better to offer no excuse than a bad one. Lead with integrity and take responsibility for your actions.",
+            "mahatma_gandhi": "Be the change you wish to see in the world. Transform yourself first, then work to transform society.",
+            "swami_vivekananda": "Arise, awake, and stop not until the goal is reached. Combine spiritual wisdom with practical action.",
+            "william_shakespeare": "This above all: to thine own self be true. Understand human nature in all its complexity.",
+            "rabindranath_tagore": "Where the mind is without fear and the head is held high. Seek freedom through knowledge and creativity."
         }
     
     def _initialize_base_service(self):

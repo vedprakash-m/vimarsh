@@ -13,6 +13,14 @@ from typing import Dict, Any, List, Optional
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import centralized AI model configuration
+try:
+    from config.ai_models import AI_CONFIG
+    gemini_model = AI_CONFIG.gemini_generation_model
+except ImportError:
+    # Fallback if config not available  
+    gemini_model = "models/gemini-2.5-flash"
+
 # Create the function app FIRST - this ensures it's available before imports
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -241,6 +249,148 @@ def get_cors_headers() -> Dict[str, str]:
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
     }
+
+@app.route(route="diagnostic", methods=["GET"])
+async def diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """Diagnostic endpoint to test Enhanced RAG service dependencies"""
+    import os
+    try:
+        logger.info('🧪 Diagnostic endpoint triggered.')
+        
+        diagnostic_results = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "tests": {},
+            "summary": {}
+        }
+        
+        # Test 1: Environment Variables
+        required_vars = [
+            'AZURE_COSMOS_CONNECTION_STRING',
+            'GEMINI_API_KEY', 
+            'AZURE_COSMOS_DATABASE_NAME',
+            'AZURE_COSMOS_CONTAINER_NAME'
+        ]
+        
+        env_test = {"missing": [], "present": []}
+        for var in required_vars:
+            value = os.getenv(var)
+            if value:
+                env_test["present"].append({"var": var, "length": len(value)})
+            else:
+                env_test["missing"].append(var)
+        
+        diagnostic_results["tests"]["environment_variables"] = env_test
+        
+        # Test 2: Package Imports
+        import_test = {}
+        try:
+            import google.generativeai as genai
+            import_test["google_generativeai"] = "available"
+        except ImportError as e:
+            import_test["google_generativeai"] = f"missing: {str(e)}"
+        
+        try:
+            import azure.cosmos.cosmos_client as cosmos_client
+            import_test["azure_cosmos"] = "available"
+        except ImportError as e:
+            import_test["azure_cosmos"] = f"missing: {str(e)}"
+        
+        diagnostic_results["tests"]["package_imports"] = import_test
+        
+        # Test 3: Cosmos DB Connection
+        cosmos_test = {"status": "unknown", "error": None}
+        try:
+            connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
+            if connection_string:
+                import azure.cosmos.cosmos_client as cosmos_client
+                client = cosmos_client.CosmosClient.from_connection_string(connection_string)
+                database_name = os.getenv('AZURE_COSMOS_DATABASE_NAME', 'vimarsh-multi-personality')
+                container_name = os.getenv('AZURE_COSMOS_CONTAINER_NAME', 'personality_vectors')
+                database = client.get_database_client(database_name)
+                container = database.get_container_client(container_name)
+                
+                # Try to read container properties
+                properties = container.read()
+                cosmos_test["status"] = "connected"
+                cosmos_test["database"] = database_name
+                cosmos_test["container"] = container_name
+            else:
+                cosmos_test["status"] = "no_connection_string"
+        except Exception as e:
+            cosmos_test["status"] = "failed"
+            cosmos_test["error"] = str(e)
+        
+        diagnostic_results["tests"]["cosmos_db"] = cosmos_test
+        
+        # Test 4: Gemini API
+        gemini_test = {"status": "unknown", "error": None}
+        try:
+            api_key = os.getenv('GEMINI_API_KEY')
+            if api_key:
+                import google.generativeai as genai
+                genai.configure(api_key=api_key)
+                model = genai.GenerativeModel(gemini_model)
+                response = model.generate_content("Hello")
+                if response and response.text:
+                    gemini_test["status"] = "working"
+                    gemini_test["response_sample"] = response.text[:100]
+                else:
+                    gemini_test["status"] = "no_response"
+            else:
+                gemini_test["status"] = "no_api_key"
+        except Exception as e:
+            gemini_test["status"] = "failed"
+            gemini_test["error"] = str(e)
+        
+        diagnostic_results["tests"]["gemini_api"] = gemini_test
+        
+        # Test 5: Enhanced RAG Service
+        rag_test = {"status": "unknown", "error": None}
+        try:
+            from services.enhanced_rag_service_v6 import EnhancedRAGService
+            service = EnhancedRAGService()
+            rag_test["status"] = "initialized"
+        except Exception as e:
+            rag_test["status"] = "failed"
+            rag_test["error"] = str(e)
+        
+        diagnostic_results["tests"]["enhanced_rag_service"] = rag_test
+        
+        # Summary
+        env_ok = len(env_test["missing"]) == 0
+        imports_ok = all("available" in status for status in import_test.values())
+        cosmos_ok = cosmos_test["status"] == "connected"
+        gemini_ok = gemini_test["status"] == "working"
+        rag_ok = rag_test["status"] == "initialized"
+        
+        diagnostic_results["summary"] = {
+            "environment_variables": "pass" if env_ok else "fail",
+            "package_imports": "pass" if imports_ok else "fail", 
+            "cosmos_db": "pass" if cosmos_ok else "fail",
+            "gemini_api": "pass" if gemini_ok else "fail",
+            "enhanced_rag_service": "pass" if rag_ok else "fail",
+            "overall_status": "pass" if all([env_ok, imports_ok, cosmos_ok, gemini_ok, rag_ok]) else "fail"
+        }
+        
+        return func.HttpResponse(
+            json.dumps(diagnostic_results, indent=2),
+            status_code=200,
+            headers=get_cors_headers()
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Diagnostic endpoint error: {str(e)}")
+        error_response = {
+            "error": "Diagnostic test failed",
+            "message": str(e),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        return func.HttpResponse(
+            json.dumps(error_response),
+            status_code=500,
+            headers=get_cors_headers()
+        )
 
 @app.route(route="test", methods=["GET", "POST"])
 def test_simple(req: func.HttpRequest) -> func.HttpResponse:

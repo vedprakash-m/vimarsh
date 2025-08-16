@@ -16,24 +16,7 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 class PersonalityType(Enum):
-    """Supported person            # Get all documents for analysis
-            try:
-                items = list(self.container.query_items(
-                    query="SELECT * FROM c",
-                    enable_cross_partition_query=True
-                ))
-            except Exception as e:
-                logger.error(f"❌ Failed to fetch database stats: {e}")
-                # Return default stats
-                return VectorDatabaseStats(
-                    total_documents=0,
-                    documents_by_personality={},
-                    documents_by_content_type={},
-                    documents_by_source={},
-                    storage_size_mb=0.0,
-                    last_updated=datetime.utcnow().isoformat(),
-                    embedding_dimensions=768
-                ) types"""
+    """Supported personality types"""
     KRISHNA = "krishna"
     BUDDHA = "buddha"
     JESUS_CHRIST = "jesus_christ"
@@ -46,6 +29,19 @@ class PersonalityType(Enum):
     CHANAKYA = "chanakya"
     CONFUCIUS = "confucius"
     NIKOLA_TESLA = "nikola_tesla"
+    LEONARDO_DA_VINCI = "leonardo_da_vinci"
+    ARCHIMEDES = "archimedes"
+    SOCRATES = "socrates"
+    PLATO = "plato"
+    ARISTOTLE = "aristotle"
+    SIGMUND_FREUD = "sigmund_freud"
+    BENJAMIN_FRANKLIN = "benjamin_franklin"
+    MARTIN_LUTHER_KING_JR = "martin_luther_king_jr"
+    GEORGE_WASHINGTON = "george_washington"
+    MAHATMA_GANDHI = "mahatma_gandhi"
+    SWAMI_VIVEKANANDA = "swami_vivekananda"
+    WILLIAM_SHAKESPEARE = "william_shakespeare"
+    RABINDRANATH_TAGORE = "rabindranath_tagore"
 
 class ContentType(Enum):
     """Types of spiritual content"""
