@@ -646,8 +646,8 @@ async def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
 async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Optimized admin role endpoint with caching for faster response"""
     try:
-        # Import working auth service (from backup version)
-        from auth.unified_auth_service import UnifiedAuthService
+        # Import enhanced auth service with database persistence (maintains admin compatibility)
+        from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
         from services.admin_service import AdminService
         
         # Add cache for role responses (5 minute TTL)
@@ -656,7 +656,7 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info("🔐 Admin role endpoint called")
         
-        auth_service = UnifiedAuthService()
+        auth_service = EnhancedUnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -812,11 +812,11 @@ async def admin_role_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 async def admin_monitoring_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin monitoring endpoint for system health and usage data"""
     try:
-        from auth.unified_auth_service import UnifiedAuthService
+        from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
         
         logger.info("📊 Admin monitoring endpoint called")
         
-        auth_service = UnifiedAuthService()
+        auth_service = EnhancedUnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -866,11 +866,11 @@ async def admin_monitoring_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin dashboard endpoint for system statistics and analytics"""
     try:
-        from auth.unified_auth_service import UnifiedAuthService
+        from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
         
         logger.info("📊 Admin dashboard endpoint called")
         
-        auth_service = UnifiedAuthService()
+        auth_service = EnhancedUnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -942,11 +942,11 @@ async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
 async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin cost dashboard endpoint (alias for dashboard with cost focus)"""
     try:
-        from auth.unified_auth_service import UnifiedAuthService
+        from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
         
         logger.info("💰 Admin cost dashboard endpoint called")
         
-        auth_service = UnifiedAuthService()
+        auth_service = EnhancedUnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -1004,11 +1004,11 @@ async def admin_cost_dashboard_endpoint(req: func.HttpRequest) -> func.HttpRespo
 async def admin_users_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin users endpoint for user management data"""
     try:
-        from auth.unified_auth_service import UnifiedAuthService
+        from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
         
         logger.info("👥 Admin users endpoint called")
         
-        auth_service = UnifiedAuthService()
+        auth_service = EnhancedUnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -1101,9 +1101,9 @@ async def admin_personalities_endpoint(req: func.HttpRequest) -> func.HttpRespon
             return await admin_personalities_management(req)
         else:
             # Fallback implementation
-            from auth.unified_auth_service import UnifiedAuthService
+            from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
             
-            auth_service = UnifiedAuthService()
+            auth_service = EnhancedUnifiedAuthService()
             authenticated_user = await auth_service.extract_user_from_request(req)
             
             if not authenticated_user:
@@ -1178,9 +1178,9 @@ async def admin_content_sources_endpoint(req: func.HttpRequest) -> func.HttpResp
             return await admin_content_sources(req)
         else:
             # Fallback implementation
-            from auth.unified_auth_service import UnifiedAuthService
+            from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
             
-            auth_service = UnifiedAuthService()
+            auth_service = EnhancedUnifiedAuthService()
             authenticated_user = await auth_service.extract_user_from_request(req)
             
             if not authenticated_user:
@@ -1260,11 +1260,11 @@ async def admin_content_sources_endpoint(req: func.HttpRequest) -> func.HttpResp
 async def admin_settings_endpoint(req: func.HttpRequest) -> func.HttpResponse:
     """Admin settings endpoint with real admin user information"""
     try:
-        from auth.unified_auth_service import UnifiedAuthService
+        from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
         
         logger.info("⚙️ Admin settings endpoint called")
         
-        auth_service = UnifiedAuthService()
+        auth_service = EnhancedUnifiedAuthService()
         authenticated_user = await auth_service.extract_user_from_request(req)
         
         if not authenticated_user:
@@ -1735,8 +1735,32 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         user_query = query_data.get('query', '').strip()
         personality_id = query_data.get('personality_id', 'krishna')
         language = query_data.get('language', 'English')
-        # Generate unique session-based user ID if none provided
-        user_id = query_data.get('user_id') or query_data.get('session_id') or f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{hash(user_query[:50]) % 10000}"
+        
+        # Enhanced user ID resolution for cross-session memory
+        user_id = query_data.get('user_id') or query_data.get('session_id')
+        
+        # Try to get persistent user ID from authentication if available
+        persistent_user_id = None
+        try:
+            from auth.enhanced_unified_auth_service import EnhancedUnifiedAuthService
+            auth_service = EnhancedUnifiedAuthService()
+            authenticated_user = await auth_service.extract_user_from_request(req)
+            
+            if authenticated_user:
+                persistent_user_id = await auth_service.get_persistent_user_id(authenticated_user)
+                logger.info(f"🔗 Using persistent user ID: {persistent_user_id} for authenticated user: {authenticated_user.email}")
+            
+        except Exception as auth_error:
+            logger.warning(f"⚠️ Could not get persistent user ID: {auth_error}")
+        
+        # Use persistent ID if available, otherwise fallback to session ID
+        if persistent_user_id:
+            user_id = persistent_user_id
+        elif not user_id:
+            # Final fallback to session-based ID
+            user_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{hash(user_query[:50]) % 10000}"
+        
+        logger.debug(f"🆔 Final user ID for conversation: {user_id}")
         
         if not user_query:
             return func.HttpResponse(

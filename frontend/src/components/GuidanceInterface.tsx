@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Send, MessageSquare, Users, Settings, LogOut } from 'lucide-react';
+import { Send, MessageSquare, Users, Settings, LogOut, Download, X } from 'lucide-react';
 // Voice functionality temporarily disabled - imports kept for future implementation
 // import { Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { getApiBaseUrl } from '../config/environment';
 import { getAuthHeaders, authService } from '../auth/authService';
 import DebugAuth from './DebugAuth';
+import { pwaManager } from '../utils/pwa';
 import '../styles/spiritual-theme.css';
 
 interface Message {
@@ -197,6 +198,10 @@ export default function GuidanceInterface() {
   const [isListening, setIsListening] = useState(false);
   const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
   
+  // PWA install prompt state
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
+  
   // Use PersonalityContext instead of local state
   const { 
     selectedPersonality, 
@@ -220,11 +225,42 @@ export default function GuidanceInterface() {
     }
   }, [availablePersonalities.length, selectedPersonality, personalityLoading]);
 
+  // Check for PWA install prompt availability
+  useEffect(() => {
+    const checkInstallPrompt = () => {
+      const installAvailable = pwaManager.canInstall();
+      setCanInstall(installAvailable);
+      
+      // Show install prompt on mobile after user has been active for 30 seconds
+      if (installAvailable && window.innerWidth <= 768) {
+        setTimeout(() => {
+          setShowInstallPrompt(true);
+        }, 30000);
+      }
+    };
+    
+    checkInstallPrompt();
+  }, []);
+
   const handlePersonalitySelect = (personality: Personality) => {
     setSelectedPersonality(personality);
     setShowPersonalitySelector(false);
     // Clear messages when switching personality to provide fresh context
     setMessages([]);
+  };
+
+  // PWA install prompt handlers
+  const handleInstallApp = async () => {
+    try {
+      await pwaManager.showInstallPrompt();
+      setShowInstallPrompt(false);
+    } catch (error) {
+      console.error('Install prompt failed:', error);
+    }
+  };
+
+  const dismissInstallPrompt = () => {
+    setShowInstallPrompt(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -462,26 +498,33 @@ export default function GuidanceInterface() {
       color: 'white',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
     }}>
-      {/* Header */}
+      {/* Mobile-Optimized Header */}
       <header style={{
-        padding: '1rem 2rem',
+        padding: window.innerWidth <= 768 ? '0.75rem 1rem' : '1rem 2rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         background: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: window.innerWidth <= 768 ? '0.5rem' : '0.75rem' 
+        }}>
           <div style={{
-            width: '3rem',
-            height: '3rem',
+            width: window.innerWidth <= 768 ? '2.5rem' : '3rem',
+            height: window.innerWidth <= 768 ? '2.5rem' : '3rem',
             background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.5rem',
+            fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem',
             fontWeight: 'bold',
             color: 'white',
             border: '2px solid rgba(255, 255, 255, 0.3)',
@@ -489,56 +532,79 @@ export default function GuidanceInterface() {
           }}>
             V
           </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700' }}>Vimarsh</h1>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '0.85rem', 
-              opacity: 0.9,
-              fontWeight: '500',
-              color: '#fbbf24'
-            }}>
-              Wisdom Without Boundaries
-            </p>
-          </div>
+          {window.innerWidth > 480 && (
+            <div>
+              <h1 style={{ 
+                margin: 0, 
+                fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem', 
+                fontWeight: '700' 
+              }}>
+                Vimarsh
+              </h1>
+              <p style={{ 
+                margin: 0, 
+                fontSize: window.innerWidth <= 768 ? '0.75rem' : '0.85rem', 
+                opacity: 0.9,
+                fontWeight: '500',
+                color: '#fbbf24'
+              }}>
+                Wisdom Without Boundaries
+              </p>
+            </div>
+          )}
         </div>
         
-        {/* Personality Selector Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '0.75rem',
-            padding: '0.5rem 1rem',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>
-              {selectedPersonality?.name || 'Loading...'}
-            </span>
-            <span style={{ 
-              fontSize: '0.75rem', 
-              opacity: 0.7, 
-              marginLeft: '0.5rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
+        {/* Mobile-Responsive Personality Info & Toggle */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: window.innerWidth <= 768 ? '0.5rem' : '1rem' 
+        }}>
+          {selectedPersonality && (
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: window.innerWidth <= 768 ? '0.5rem' : '0.75rem',
+              padding: window.innerWidth <= 768 ? '0.375rem 0.75rem' : '0.5rem 1rem',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              maxWidth: window.innerWidth <= 768 ? '120px' : 'none',
+              overflow: 'hidden'
             }}>
-              {selectedPersonality?.domain === 'spiritual' ? 'SPIRITUAL' :
-               selectedPersonality?.domain === 'scientific' ? 'SCIENTIFIC' :
-               selectedPersonality?.domain === 'historical' ? 'HISTORICAL' :
-               selectedPersonality?.domain === 'philosophical' ? 'PHILOSOPHICAL' :
-               selectedPersonality?.domain === 'literary' ? 'LITERARY' :
-               selectedPersonality?.domain === 'leadership' ? 'LEADERSHIP' :
-               selectedPersonality?.domain === 'psychology' ? 'PSYCHOLOGY' :
-               'SPIRITUAL'}
-            </span>
-          </div>
+              <div style={{ 
+                fontSize: window.innerWidth <= 768 ? '0.8rem' : '0.9rem', 
+                fontWeight: '600',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {selectedPersonality?.name || 'Loading...'}
+              </div>
+              {window.innerWidth > 480 && (
+                <div style={{ 
+                  fontSize: window.innerWidth <= 768 ? '0.65rem' : '0.75rem', 
+                  opacity: 0.7,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {selectedPersonality?.domain === 'spiritual' ? 'SPIRITUAL' :
+                   selectedPersonality?.domain === 'scientific' ? 'SCIENTIFIC' :
+                   selectedPersonality?.domain === 'historical' ? 'HISTORICAL' :
+                   selectedPersonality?.domain === 'philosophical' ? 'PHILOSOPHICAL' :
+                   selectedPersonality?.domain === 'literary' ? 'LITERARY' :
+                   selectedPersonality?.domain === 'leadership' ? 'LEADERSHIP' :
+                   selectedPersonality?.domain === 'psychology' ? 'PSYCHOLOGY' :
+                   'SPIRITUAL'}
+                </div>
+              )}
+            </div>
+          )}
           <button 
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
             style={{
               background: 'rgba(255, 255, 255, 0.2)',
               border: '1px solid rgba(255, 255, 255, 0.3)',
               color: 'white',
-              padding: '0.5rem',
+              padding: window.innerWidth <= 768 ? '0.5rem' : '0.5rem',
               borderRadius: '0.5rem',
               cursor: 'pointer',
               display: 'flex',
@@ -643,6 +709,88 @@ export default function GuidanceInterface() {
         </div>
       </header>
 
+      {/* PWA Install Prompt */}
+      {showInstallPrompt && canInstall && (
+        <div style={{
+          position: 'fixed',
+          top: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          color: '#333',
+          padding: window.innerWidth <= 768 ? '1rem' : '1.5rem',
+          borderRadius: '12px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+          zIndex: 200,
+          maxWidth: window.innerWidth <= 768 ? '90vw' : '400px',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <Download size={24} color="#FF6B35" />
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Install Vimarsh</h3>
+            <button
+              onClick={dismissInstallPrompt}
+              style={{
+                marginLeft: 'auto',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <X size={18} color="#666" />
+            </button>
+          </div>
+          <p style={{ 
+            margin: '0 0 1rem 0', 
+            fontSize: '0.9rem', 
+            lineHeight: '1.4',
+            color: '#555'
+          }}>
+            Install Vimarsh as an app for faster access and a better mobile experience. Get spiritual guidance anytime, even offline.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button
+              onClick={handleInstallApp}
+              style={{
+                flex: 1,
+                background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+                color: 'white',
+                border: 'none',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              Install Now
+            </button>
+            <button
+              onClick={dismissInstallPrompt}
+              style={{
+                background: 'transparent',
+                color: '#666',
+                border: '1px solid #ddd',
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                cursor: 'pointer'
+              }}
+            >
+              Later
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Personality Selector Modal */}
       {showPersonalitySelector && (
         <PersonalitySelector
@@ -661,43 +809,45 @@ export default function GuidanceInterface() {
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Mobile-Optimized Main Content */}
       <div style={{
-        maxWidth: '1000px',
+        maxWidth: window.innerWidth <= 768 ? '100%' : '1000px',
         margin: '0 auto',
-        padding: '1rem 2rem',
-        minHeight: 'calc(100vh - 140px)',
+        padding: window.innerWidth <= 768 ? '0.75rem 1rem' : '1rem 2rem',
+        minHeight: window.innerWidth <= 768 ? 'calc(100vh - 120px)' : 'calc(100vh - 140px)',
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Welcome Section */}
+        {/* Mobile-Optimized Welcome Section */}
         {messages.length === 0 && (
           <div style={{
             textAlign: 'center',
-            padding: '2rem 1rem',
-            marginBottom: '1rem'
+            padding: window.innerWidth <= 768 ? '1rem 0.5rem' : '2rem 1rem',
+            marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem'
           }}>
             <div style={{
-              fontSize: '4rem',
-              marginBottom: '1rem',
+              fontSize: window.innerWidth <= 768 ? '2.5rem' : '4rem',
+              marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
               filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
             }}>🏵️</div>
             
             {!selectedPersonality ? (
               <>
                 <h2 style={{
-                  fontSize: '2.5rem',
+                  fontSize: window.innerWidth <= 768 ? '1.75rem' : '2.5rem',
                   fontWeight: '700',
-                  marginBottom: '1rem',
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                  marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                  lineHeight: '1.2'
                 }}>Welcome to Vimarsh</h2>
                 <p style={{
-                  fontSize: '1.25rem',
+                  fontSize: window.innerWidth <= 768 ? '1rem' : '1.25rem',
                   opacity: 0.9,
-                  maxWidth: '600px',
-                  margin: '0 auto 2rem',
-                  lineHeight: '1.6',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                  maxWidth: window.innerWidth <= 768 ? '100%' : '600px',
+                  margin: window.innerWidth <= 768 ? '0 auto 1rem' : '0 auto 2rem',
+                  lineHeight: window.innerWidth <= 768 ? '1.4' : '1.6',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                  padding: window.innerWidth <= 768 ? '0 0.5rem' : '0'
                 }}>
                   <strong>Wisdom Without Boundaries</strong><br/>
                   Choose your wisdom guide to begin your journey of knowledge and insight.
@@ -731,10 +881,11 @@ export default function GuidanceInterface() {
             ) : (
               <>
                 <h2 style={{
-                  fontSize: '2.5rem',
+                  fontSize: window.innerWidth <= 768 ? '1.5rem' : '2.5rem',
                   fontWeight: '700',
-                  marginBottom: '1rem',
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                  marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                  lineHeight: '1.2'
                 }}>Welcome to Your {selectedPersonality.domain === 'spiritual' ? 'Spiritual' :
                   selectedPersonality.domain === 'scientific' ? 'Scientific' :
                   selectedPersonality.domain === 'historical' ? 'Historical' :
@@ -744,10 +895,10 @@ export default function GuidanceInterface() {
                   selectedPersonality.domain === 'psychology' ? 'Psychology' :
                   'Spiritual'} Journey</h2>
                 <p style={{
-                  fontSize: '1.25rem',
+                  fontSize: window.innerWidth <= 768 ? '0.95rem' : '1.25rem',
                   opacity: 0.9,
-                  maxWidth: '600px',
-                  margin: '0 auto 1rem',
+                  maxWidth: window.innerWidth <= 768 ? '100%' : '600px',
+                  margin: window.innerWidth <= 768 ? '0 auto 0.75rem' : '0 auto 1rem',
                   lineHeight: '1.6',
                   textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                 }}>
@@ -779,9 +930,9 @@ export default function GuidanceInterface() {
                 
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '1rem',
-                  maxWidth: '800px',
+                  gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: window.innerWidth <= 768 ? '0.75rem' : '1rem',
+                  maxWidth: window.innerWidth <= 768 ? '100%' : '800px',
                   margin: '0 auto'
                 }}>
                   {quickPrompts.map((prompt, index) => (
@@ -821,25 +972,25 @@ export default function GuidanceInterface() {
           </div>
         )}
 
-        {/* Messages */}
+        {/* Mobile-Optimized Messages */}
         <div style={{
           flex: '1',
-          marginBottom: '2rem',
+          marginBottom: window.innerWidth <= 768 ? '1rem' : '2rem',
           overflowY: 'auto'
         }}>
           {messages.map((message) => (
             <div key={message.id} style={{
               display: 'flex',
               justifyContent: message.isUser ? 'flex-end' : 'flex-start',
-              marginBottom: '1rem'
+              marginBottom: window.innerWidth <= 768 ? '0.75rem' : '1rem'
             }}>
               <div style={{
-                maxWidth: '70%',
+                maxWidth: window.innerWidth <= 768 ? '85%' : '70%',
                 background: message.isUser 
                   ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' 
                   : 'rgba(255, 255, 255, 0.1)',
                 borderRadius: '1rem',
-                padding: '1rem',
+                padding: window.innerWidth <= 768 ? '0.75rem' : '1rem',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
@@ -865,8 +1016,8 @@ export default function GuidanceInterface() {
                   ) : (
                     <div>
                       <ReactMarkdown>{message.text}</ReactMarkdown>
-                      {/* Response Source Transparency for Assistant Messages */}
-                      {message.metadata && (
+                      {/* Response Source Transparency for Assistant Messages - Admin Only */}
+                      {message.metadata && user?.role === 'admin' && (
                         <div style={{ marginTop: '0.75rem' }}>
                           <MessageSourceBadge 
                             metadata={message.metadata}
@@ -933,23 +1084,24 @@ export default function GuidanceInterface() {
           </div>
         )}
 
-        {/* Enhanced Input Form */}
+        {/* Mobile-Optimized Input Form */}
         <form 
           onSubmit={handleSubmit}
           style={{
             position: 'sticky',
-            bottom: '1rem',
+            bottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
             background: selectedPersonality ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-            borderRadius: '1.5rem',
-            padding: '1rem',
+            borderRadius: window.innerWidth <= 768 ? '1rem' : '1.5rem',
+            padding: window.innerWidth <= 768 ? '0.75rem' : '1rem',
             backdropFilter: 'blur(10px)',
             border: `1px solid ${selectedPersonality ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
             display: 'flex',
-            gap: '1rem',
+            gap: window.innerWidth <= 768 ? '0.75rem' : '1rem',
             alignItems: 'center',
             opacity: selectedPersonality ? 1 : 0.6,
-            pointerEvents: selectedPersonality ? 'auto' : 'none'
+            pointerEvents: selectedPersonality ? 'auto' : 'none',
+            margin: window.innerWidth <= 768 ? '0 -0.5rem' : '0'
           }}
         >
           <input
@@ -962,8 +1114,8 @@ export default function GuidanceInterface() {
               flex: '1',
               background: selectedPersonality ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
               border: `1px solid ${selectedPersonality ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
-              borderRadius: '1rem',
-              padding: '1rem 1.5rem',
+              borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
+              padding: window.innerWidth <= 768 ? '0.875rem 1rem' : '1rem 1.5rem',
               color: 'white',
               fontSize: '1rem',
               outline: 'none',
@@ -979,14 +1131,14 @@ export default function GuidanceInterface() {
                 ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' 
                 : 'rgba(255, 255, 255, 0.1)',
               border: 'none',
-              borderRadius: '1rem',
-              padding: '1rem',
+              borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
+              padding: window.innerWidth <= 768 ? '0.875rem' : '1rem',
               color: 'white',
               cursor: inputText.trim() && !isLoading && selectedPersonality ? 'pointer' : 'not-allowed',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              minWidth: '3rem',
+              minWidth: window.innerWidth <= 768 ? '2.75rem' : '3rem',
               transition: 'all 0.3s ease',
               boxShadow: inputText.trim() && !isLoading && selectedPersonality ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
             }}

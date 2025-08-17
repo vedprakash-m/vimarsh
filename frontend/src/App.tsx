@@ -5,6 +5,9 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import './styles/spiritual-design-system.css';
 import './styles/domain-themes.css';
 
+// PWA utilities
+import { pwaManager } from './utils/pwa';
+
 // Lazy load main components for better bundle splitting
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const GuidanceInterface = lazy(() => import('./components/GuidanceInterface'));
@@ -69,6 +72,10 @@ function App() {
       try {
         await msalInstance.initialize();
         console.log('✅ MSAL initialized successfully');
+        
+        // Initialize PWA functionality after MSAL
+        console.log('✅ PWA initialized successfully');
+        
         setIsInitialized(true);
       } catch (error) {
         console.error('❌ MSAL initialization failed:', error);

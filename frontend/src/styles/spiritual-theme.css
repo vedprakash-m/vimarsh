@@ -1070,10 +1070,41 @@ body {
   font-style: italic;
 }
 
-/* Enhanced responsive design */
+/* Enhanced responsive design with mobile-first approach */
 @media (max-width: 768px) {
+  /* Prevent zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Optimize viewport for mobile */
   .container {
-    padding: 4px;
+    padding: 8px;
+  }
+  
+  /* Better touch targets */
+  button, .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improved text readability on mobile */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Better scrolling on iOS */
+  .messages {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Reduce animations on mobile for performance */
+  @media (prefers-reduced-motion: no-preference) {
+    * {
+      animation-duration: 0.5s !important;
+      transition-duration: 0.2s !important;
+    }
   }
   
   .welcome.enhanced {
@@ -1154,7 +1185,7 @@ body {
   }
   
   .message-content {
-    max-width: 85%;
+    max-width: 90%;
   }
   
   .welcome h2 {
@@ -1228,6 +1259,50 @@ body {
   
   .voice-btn, .menu-btn {
     padding: 6px;
+  }
+}
+
+/* Additional mobile-specific optimizations */
+@media (max-width: 480px) {
+  .container {
+    padding: 4px;
+  }
+  
+  .welcome.enhanced h2 {
+    font-size: 1.4rem;
+    line-height: 1.3;
+  }
+  
+  .welcome-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .message-content {
+    max-width: 95%;
+    padding: 8px 12px;
+  }
+  
+  .input-form.enhanced {
+    margin: 0 -4px;
+    border-radius: 12px;
+  }
+  
+  .input-field.enhanced {
+    padding: 10px 12px;
+  }
+  
+  .send-btn.enhanced {
+    padding: 10px;
+    min-width: 40px;
+  }
+}
+
+/* Dark mode safe colors for mobile */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow-soft: rgba(255, 255, 255, 0.1);
+    --shadow-medium: rgba(255, 255, 255, 0.2);
   }
 }
 
