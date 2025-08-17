@@ -3,6 +3,19 @@ import { ArrowRight, Brain, Heart, Star, Zap, Users, Shield, Sparkles, MessageCi
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 
+// CSS Variables for Apple Design System
+const cssVariables = `
+  :root {
+    --background-primary: #ffffff;
+    --background-secondary: #f5f5f7;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --accent-brand: #f97316;
+    --accent-interactive: #007aff;
+    --border-color: #d2d2d7;
+  }
+`;
+
 interface Personality {
   id: string;
   name: string;
@@ -13,6 +26,16 @@ interface Personality {
   darkColor: string;
 }
 
+// Apple Design System Colors
+const domainColors = {
+  'Spiritual': '#007aff',
+  'Scientific': '#34c759', 
+  'Philosophical': '#5856d6',
+  'Historical': '#ff9500',
+  'Literary': '#af52de',
+  'Leadership': '#ff3b30'
+};
+
 const personalities: Personality[] = [
   {
     id: 'krishna',
@@ -20,8 +43,8 @@ const personalities: Personality[] = [
     domain: 'Spiritual',
     description: 'Divine wisdom from the Bhagavad Gita with cross-session memory',
     expertise: 'Dharma, duty, and spiritual enlightenment',
-    color: '#4F46E5',
-    darkColor: '#3730A3'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'buddha',
@@ -29,8 +52,8 @@ const personalities: Personality[] = [
     domain: 'Spiritual',
     description: 'Path to liberation from suffering with persistent insights',
     expertise: 'Mindfulness, compassion, and enlightenment',
-    color: '#F59E0B',
-    darkColor: '#D97706'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'jesus_christ',
@@ -38,8 +61,8 @@ const personalities: Personality[] = [
     domain: 'Spiritual',
     description: 'Love, compassion, and spiritual guidance with memory',
     expertise: 'Faith, love, and spiritual transformation',
-    color: '#06B6D4',
-    darkColor: '#0891B2'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'rumi',
@@ -47,8 +70,8 @@ const personalities: Personality[] = [
     domain: 'Spiritual',
     description: 'Mystical poetry and divine love with enhanced citations',
     expertise: 'Sufism, poetry, and spiritual love',
-    color: '#EC4899',
-    darkColor: '#DB2777'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'swami_vivekananda',
@@ -56,8 +79,8 @@ const personalities: Personality[] = [
     domain: 'Spiritual',
     description: 'Vedantic wisdom and spiritual strength with cross-session guidance',
     expertise: 'Vedanta, spirituality, and human potential',
-    color: '#F97316',
-    darkColor: '#EA580C'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'albert_einstein',
@@ -65,8 +88,8 @@ const personalities: Personality[] = [
     domain: 'Scientific',
     description: 'Revolutionary insights into the universe with enhanced RAG',
     expertise: 'Physics, mathematics, and scientific thinking',
-    color: '#10B981',
-    darkColor: '#059669'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'isaac_newton',
@@ -74,8 +97,8 @@ const personalities: Personality[] = [
     domain: 'Scientific',
     description: 'Mathematical genius with persistent scientific insights',
     expertise: 'Mathematics, physics, and natural laws',
-    color: '#8B5CF6',
-    darkColor: '#7C3AED'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'nikola_tesla',
@@ -83,8 +106,8 @@ const personalities: Personality[] = [
     domain: 'Scientific',
     description: 'Visionary inventor with enhanced technical guidance',
     expertise: 'Electrical engineering, innovation, and invention',
-    color: '#0EA5E9',
-    darkColor: '#0284C7'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'leonardo_da_vinci',
@@ -92,8 +115,8 @@ const personalities: Personality[] = [
     domain: 'Scientific',
     description: 'Renaissance genius with persistent creative insights',
     expertise: 'Art, science, and innovation',
-    color: '#059669',
-    darkColor: '#047857'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'archimedes',
@@ -101,8 +124,8 @@ const personalities: Personality[] = [
     domain: 'Scientific',
     description: 'Ancient mathematical genius with enhanced problem-solving',
     expertise: 'Mathematics, physics, and engineering',
-    color: '#7C3AED',
-    darkColor: '#5B21B6'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'abraham_lincoln',
@@ -110,8 +133,8 @@ const personalities: Personality[] = [
     domain: 'Leadership',
     description: 'Leadership through moral conviction with conversation memory',
     expertise: 'Governance, unity, and moral leadership',
-    color: '#EF4444',
-    darkColor: '#DC2626'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'chanakya',
@@ -119,8 +142,8 @@ const personalities: Personality[] = [
     domain: 'Leadership',
     description: 'Ancient strategist with cross-session strategic insights',
     expertise: 'Strategy, economics, and political wisdom',
-    color: '#F97316',
-    darkColor: '#EA580C'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'mahatma_gandhi',
@@ -128,8 +151,8 @@ const personalities: Personality[] = [
     domain: 'Leadership',
     description: 'Non-violent resistance with persistent moral guidance',
     expertise: 'Non-violence, civil rights, and moral leadership',
-    color: '#059669',
-    darkColor: '#047857'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'george_washington',
@@ -137,8 +160,8 @@ const personalities: Personality[] = [
     domain: 'Leadership',
     description: 'Founding leadership with enhanced historical perspective',
     expertise: 'Leadership, governance, and nation-building',
-    color: '#DC2626',
-    darkColor: '#991B1B'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'benjamin_franklin',
@@ -146,8 +169,8 @@ const personalities: Personality[] = [
     domain: 'Leadership',
     description: 'Practical wisdom and diplomacy with cross-session insights',
     expertise: 'Diplomacy, innovation, and practical wisdom',
-    color: '#0891B2',
-    darkColor: '#0E7490'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'martin_luther_king_jr',
@@ -155,8 +178,8 @@ const personalities: Personality[] = [
     domain: 'Leadership',
     description: 'Civil rights leadership with cross-session inspiration',
     expertise: 'Civil rights, equality, and social justice',
-    color: '#7C3AED',
-    darkColor: '#5B21B6'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'marcus_aurelius',
@@ -164,8 +187,8 @@ const personalities: Personality[] = [
     domain: 'Philosophical',
     description: 'Stoic wisdom for life\'s challenges with persistent guidance',
     expertise: 'Philosophy, resilience, and inner strength',
-    color: '#8B5CF6',
-    darkColor: '#7C3AED'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'lao_tzu',
@@ -173,8 +196,8 @@ const personalities: Personality[] = [
     domain: 'Philosophical',
     description: 'The way of natural harmony with persistent wisdom',
     expertise: 'Taoism, balance, and natural wisdom',
-    color: '#14B8A6',
-    darkColor: '#0D9488'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'confucius',
@@ -182,8 +205,8 @@ const personalities: Personality[] = [
     domain: 'Philosophical',
     description: 'Ethics and social harmony with enhanced authenticity',
     expertise: 'Ethics, social harmony, and education',
-    color: '#6366F1',
-    darkColor: '#4F46E5'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'plato',
@@ -191,8 +214,8 @@ const personalities: Personality[] = [
     domain: 'Philosophical',
     description: 'Foundational philosophical wisdom with enhanced reasoning',
     expertise: 'Philosophy, politics, and metaphysics',
-    color: '#DC2626',
-    darkColor: '#B91C1C'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'aristotle',
@@ -200,8 +223,8 @@ const personalities: Personality[] = [
     domain: 'Philosophical',
     description: 'Systematic knowledge with enhanced logical reasoning',
     expertise: 'Logic, ethics, and natural philosophy',
-    color: '#991B1B',
-    darkColor: '#7F1D1D'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'socrates',
@@ -209,8 +232,8 @@ const personalities: Personality[] = [
     domain: 'Philosophical',
     description: 'Questioning wisdom with persistent dialectical memory',
     expertise: 'Philosophy, ethics, and critical thinking',
-    color: '#7C2D12',
-    darkColor: '#451A03'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'william_shakespeare',
@@ -218,8 +241,8 @@ const personalities: Personality[] = [
     domain: 'Literary',
     description: 'Timeless literary wisdom with cross-session creativity',
     expertise: 'Poetry, drama, and human nature',
-    color: '#7C3AED',
-    darkColor: '#5B21B6'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'rabindranath_tagore',
@@ -227,8 +250,8 @@ const personalities: Personality[] = [
     domain: 'Literary',
     description: 'Bengali literary genius with enhanced poetic insights',
     expertise: 'Poetry, literature, and cultural renaissance',
-    color: '#059669',
-    darkColor: '#047857'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   },
   {
     id: 'sigmund_freud',
@@ -236,8 +259,8 @@ const personalities: Personality[] = [
     domain: 'Psychology',
     description: 'Psychological insights with enhanced understanding of the mind',
     expertise: 'Psychology, psychoanalysis, and human behavior',
-    color: '#DC2626',
-    darkColor: '#991B1B'
+    color: '#ffffff',
+    darkColor: '#f5f5f7'
   }
 ];
 
@@ -296,61 +319,63 @@ const LandingPage: React.FC = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      color: 'white',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+      background: 'linear-gradient(to bottom, #fafafa 0%, #ffffff 50%)',
+      color: '#1d1d1f',
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
     }}>
       {/* Header */}
       <header style={{
-        padding: '1rem 2rem',
+        padding: '0.75rem 2rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)'
+        background: '#fafafa',
+        borderBottom: '1px solid #f0f0f0'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
-            width: '4.5rem',
-            height: '4.5rem',
-            background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+            width: '3.5rem',
+            height: '3.5rem',
+            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '2.5rem',
+            fontSize: '2rem',
             fontWeight: 'bold',
             color: 'white',
-            border: '3px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            border: '2px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)'
           }}>
             V
           </div>
           <div>
-            <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: '700' }}>Vimarsh</h1>
-            <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8 }}>Wisdom Without Boundaries</p>
+            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600', color: '#1d1d1f' }}>Vimarsh</h1>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: '#8b8b8b' }}>Wisdom Without Boundaries</p>
           </div>
         </div>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <a href="#personalities" style={{ color: 'white', textDecoration: 'none', opacity: 0.9, fontSize: '0.95rem' }}>Personalities</a>
-          <a href="#features" style={{ color: 'white', textDecoration: 'none', opacity: 0.9, fontSize: '0.95rem' }}>Features</a>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <a href="#personalities" style={{ color: '#6b7280', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Personalities</a>
+          <a href="#features" style={{ color: '#6b7280', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Features</a>
           <button
             onClick={handleBeginJourney}
             style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
+              background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+              border: 'none',
               color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.5rem',
+              padding: '0.6rem 1.25rem',
+              borderRadius: '0.75rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              fontSize: '0.875rem',
-              transition: 'all 0.3s ease'
+              fontSize: '0.85rem',
+              fontWeight: '500',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)'
             }}
           >
-            Begin Journey <ArrowRight size={16} />
+            Begin Journey <ArrowRight size={14} />
           </button>
         </nav>
       </header>
@@ -359,93 +384,87 @@ const LandingPage: React.FC = () => {
       <section style={{
         padding: '4rem 2rem',
         textAlign: 'center',
-        maxWidth: '1200px',
-        margin: '0 auto'
+        maxWidth: '1000px',
+        margin: '2rem auto 4rem'
       }}>
         <h1 style={{
-          fontSize: '3.5rem',
-          fontWeight: '700',
-          marginBottom: '1rem',
-          color: 'white',
-          lineHeight: '1.1',
-          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+          fontSize: '2.75rem',
+          fontWeight: '600',
+          marginBottom: '1.25rem',
+          color: '#1d1d1f',
+          lineHeight: '1.2'
         }}>
-          Converse with History's<br />
+          Converse with<br />
+          History's{' '}
           <span style={{
-            background: 'linear-gradient(135deg, #fef3c7, #fbbf24, #34d399, #60a5fa)',
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            textShadow: 'none',
-            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+            fontWeight: '700'
           }}>
             Greatest Minds
           </span>
         </h1>
 
         <p style={{
-          fontSize: '1.25rem',
-          opacity: 1,
-          maxWidth: '800px',
-          margin: '0 auto 2rem',
-          lineHeight: '1.6',
-          color: 'rgba(255, 255, 255, 0.95)',
-          textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+          fontSize: '1.125rem',
+          color: '#6b7280',
+          maxWidth: '700px',
+          margin: '0 auto 2.5rem',
+          lineHeight: '1.6'
         }}>
-          Experience authentic conversations with 25 distinct personalities across 6 domains - from Einstein about scientific discovery to Krishna for spiritual wisdom, Lincoln for leadership, or Marcus Aurelius for philosophy. Enhanced with cross-session memory, each personality is grounded in their actual works with persistent conversation history that continues across your sessions.
+          Experience authentic conversations with 25 distinct personalities across 6 domains - from Einstein about scientific discovery to Krishna for spiritual wisdom, Lincoln for leadership, or Marcus Aurelius for philosophy.
         </p>
 
         <button
           onClick={handleBeginJourney}
           style={{
-            background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
             color: 'white',
             border: 'none',
-            padding: '1rem 2rem',
-            fontSize: '1.1rem',
+            padding: '0.875rem 2rem',
+            fontSize: '1rem',
             borderRadius: '0.75rem',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.5rem',
-            fontWeight: '600',
-            boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
+            fontWeight: '500',
+            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
             transition: 'all 0.3s ease',
-            marginBottom: '1rem'
+            marginBottom: '0.75rem'
           }}
         >
-          Begin Your Journey
+          Start Your Journey
         </button>
 
-        <p style={{ fontSize: '0.9rem', opacity: 0.9, margin: 0, textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>
-          Secure sign-in with Microsoft to unlock conversations with persistent memory across sessions
+        <p style={{ fontSize: '0.85rem', color: '#9ca3af', margin: 0 }}>
+          Secure sign-in with Microsoft to unlock persistent conversations
         </p>
 
         {/* Stats */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
           gap: '1.5rem',
           marginTop: '4rem',
-          padding: '2rem',
-          background: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '1rem',
-          backdropFilter: 'blur(10px)'
+          padding: '0'
         }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>25</div>
-            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Great Minds</div>
+          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>25</div>
+            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Great Minds</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>6</div>
-            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Domains</div>
+          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>6</div>
+            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Domains</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>1000+</div>
-            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Authentic Texts</div>
+          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>1000+</div>
+            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Authentic Texts</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>Deep</div>
-            <div style={{ opacity: 0.9, fontSize: '0.95rem', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Insights</div>
+          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>Deep</div>
+            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Insights</div>
           </div>
         </div>
       </section>
@@ -453,50 +472,65 @@ const LandingPage: React.FC = () => {
       {/* Interactive Demo */}
       <section style={{
         padding: '4rem 2rem',
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(10px)'
+        maxWidth: '1000px',
+        margin: '4rem auto'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
+            fontSize: '2.25rem',
+            fontWeight: '600',
             textAlign: 'center',
             marginBottom: '3rem',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+            color: '#1d1d1f'
           }}>
-            Experience the Conversation
+            Start Your Journey
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 2fr',
-            gap: '2rem',
-            alignItems: 'start'
+            gridTemplateColumns: '1fr 1fr',
+            gap: '2.5rem',
+            alignItems: 'center'
           }}>
-            {/* Personality Selector */}
+            {/* Personality Selector Grid */}
             <div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: '600', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>Choose a Personality</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <h3 style={{ fontSize: '1.125rem', marginBottom: '1.5rem', fontWeight: '600', color: '#374151' }}>Choose a Great Mind</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 {personalities.slice(0, 4).map((personality) => (
                   <button
                     key={personality.id}
                     onClick={() => setSelectedPersonality(personality)}
                     style={{
                       background: selectedPersonality.id === personality.id 
-                        ? `linear-gradient(135deg, ${personality.color}, ${personality.darkColor})`
-                        : 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      color: 'white',
-                      padding: '1rem',
+                        ? '#6366f1'
+                        : '#ffffff',
+                      border: selectedPersonality.id === personality.id 
+                        ? 'none'
+                        : '1px solid #e5e7eb',
+                      color: selectedPersonality.id === personality.id ? '#ffffff' : '#1f2937',
+                      padding: '1.25rem',
                       borderRadius: '0.75rem',
                       cursor: 'pointer',
-                      textAlign: 'left',
+                      textAlign: 'center',
                       transition: 'all 0.3s ease',
-                      backdropFilter: 'blur(10px)'
-                    }}
-                  >
-                    <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{personality.name}</div>
-                    <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>{personality.domain}</div>
+                      boxShadow: selectedPersonality.id === personality.id 
+                        ? '0 4px 12px rgba(99, 102, 241, 0.25)'
+                        : '0 1px 3px rgba(0, 0, 0, 0.1)',
+                      transform: selectedPersonality.id === personality.id ? 'translateY(-1px)' : 'none'
+                    }}>
+                    <div style={{ 
+                      fontWeight: '600', 
+                      fontSize: '0.9rem',
+                      marginBottom: '0.25rem' 
+                    }}>
+                      {personality.name}
+                    </div>
+                    <div style={{ 
+                      fontSize: '0.75rem', 
+                      opacity: selectedPersonality.id === personality.id ? 0.9 : 0.7 
+                    }}>
+                      {personality.domain}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -504,149 +538,82 @@ const LandingPage: React.FC = () => {
 
             {/* Demo Conversation */}
             <div style={{
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: 'white',
               borderRadius: '1rem',
               padding: '1.5rem',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+              border: '1px solid #f0f0f0'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.75rem',
-                marginBottom: '1.5rem',
-                paddingBottom: '1rem',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
+                marginBottom: '1.25rem',
+                paddingBottom: '0.75rem',
+                borderBottom: '1px solid #f3f4f6'
               }}>
                 <div style={{
-                  width: '3rem',
-                  height: '3rem',
+                  width: '2.5rem',
+                  height: '2.5rem',
                   borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${selectedPersonality.color}, ${selectedPersonality.darkColor})`,
+                  background: '#f8fafc',
+                  border: `2px solid ${domainColors[selectedPersonality.domain as keyof typeof domainColors] || '#6b7280'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: domainColors[selectedPersonality.domain as keyof typeof domainColors] || '#6b7280',
                   fontWeight: '600',
-                  fontSize: '1.25rem'
+                  fontSize: '1rem'
                 }}>
                   {selectedPersonality.name.charAt(0)}
                 </div>
                 <div>
-                  <div style={{ fontWeight: '600', fontSize: '1.1rem' }}>{selectedPersonality.name}</div>
-                  <div style={{ opacity: 0.7, fontSize: '0.85rem' }}>{selectedPersonality.domain} Wisdom</div>
+                  <div style={{ fontWeight: '600', fontSize: '1rem', color: '#1f2937' }}>{selectedPersonality.name}</div>
+                  <div style={{ color: '#6b7280', fontSize: '0.8rem' }}>{selectedPersonality.domain} Wisdom</div>
                 </div>
               </div>
 
               <div style={{ marginBottom: '1rem' }}>
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: '#f3f4f6',
                   padding: '0.75rem 1rem',
                   borderRadius: '1rem 1rem 1rem 0.25rem',
                   marginBottom: '0.75rem',
-                  fontSize: '0.95rem'
+                  fontSize: '0.9rem',
+                  color: '#1f2937'
                 }}>
                   How can I find peace in difficult times?
                 </div>
 
                 <div style={{
-                  background: `linear-gradient(135deg, ${selectedPersonality.color}20, ${selectedPersonality.darkColor}20)`,
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   padding: '1rem',
                   borderRadius: '1rem 1rem 0.25rem 1rem',
-                  fontSize: '0.95rem',
+                  fontSize: '0.9rem',
                   lineHeight: '1.5',
-                  border: `1px solid ${selectedPersonality.color}40`
+                  color: '#1f2937',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
                 }}>
-                  {selectedPersonality.id === 'krishna' && 
-                    <>
-                      <div style={{ marginBottom: '0.75rem' }}>
-                        "In the midst of chaos, remember that you are not the body, nor the mind, but the eternal soul. As I taught Arjuna, perform your duty without attachment to results, and you shall find the peace that surpasses all understanding."
-                      </div>
-                      <div style={{
-                        fontSize: '0.8rem',
-                        opacity: 0.7,
-                        fontStyle: 'italic',
-                        borderTop: `1px solid ${selectedPersonality.color}30`,
-                        paddingTop: '0.5rem'
-                      }}>
-                        Source: Bhagavad Gita 2.47, 6.29 - "You have a right to perform your prescribed duty, but not to the fruits of action"
-                      </div>
-                    </>
-                  }
-                  {selectedPersonality.id === 'buddha' && 
-                    <>
-                      <div style={{ marginBottom: '0.75rem' }}>
-                        "Peace comes from within. Do not seek it without. The root of suffering is attachment - to outcomes, to desires, to the illusion of permanence. When you accept that all things are impermanent and release your grip on expectations, you will find the peace that surpasses understanding."
-                      </div>
-                      <div style={{
-                        fontSize: '0.8rem',
-                        opacity: 0.7,
-                        fontStyle: 'italic',
-                        borderTop: `1px solid ${selectedPersonality.color}30`,
-                        paddingTop: '0.5rem'
-                      }}>
-                        Source: Dhammapada 1.1, Four Noble Truths - "All that we are is the result of what we have thought"
-                      </div>
-                    </>
-                  }
-                  {selectedPersonality.id === 'albert_einstein' && 
-                    <>
-                      <div style={{ marginBottom: '0.75rem' }}>
-                        "In times of difficulty, I find solace in the eternal laws of nature. The universe operates on principles of harmony and order. When we align our understanding with these cosmic truths, we find a peace that transcends temporary troubles."
-                      </div>
-                      <div style={{
-                        fontSize: '0.8rem',
-                        opacity: 0.7,
-                        fontStyle: 'italic',
-                        borderTop: `1px solid ${selectedPersonality.color}30`,
-                        paddingTop: '0.5rem'
-                      }}>
-                        Source: "The World As I See It" (1930) - "A human being is part of the whole called by us universe"
-                      </div>
-                    </>
-                  }
-                  {selectedPersonality.id === 'abraham_lincoln' && 
-                    <>
-                      <div style={{ marginBottom: '0.75rem' }}>
-                        "I have learned that in our darkest hours, we must hold fast to the better angels of our nature. A house divided cannot stand, and neither can the human spirit when it wars against itself. Seek unity within, and peace will follow."
-                      </div>
-                      <div style={{
-                        fontSize: '0.8rem',
-                        opacity: 0.7,
-                        fontStyle: 'italic',
-                        borderTop: `1px solid ${selectedPersonality.color}30`,
-                        paddingTop: '0.5rem'
-                      }}>
-                        Source: First Inaugural Address (1861), House Divided Speech (1858) - "The better angels of our nature"
-                      </div>
-                    </>
-                  }
-                  {selectedPersonality.id === 'aurelius' && 
-                    <>
-                      <div style={{ marginBottom: '0.75rem' }}>
-                        "Remember, you have power over your mind - not outside events. Realize this, and you will find strength. What disturbs people's minds is not events but their judgments about events. Change your perspective, and find your peace."
-                      </div>
-                      <div style={{
-                        fontSize: '0.8rem',
-                        opacity: 0.7,
-                        fontStyle: 'italic',
-                        borderTop: `1px solid ${selectedPersonality.color}30`,
-                        paddingTop: '0.5rem'
-                      }}>
-                        Source: Meditations Book 2.11, 11.18 - "You have power over your mind - not outside events"
-                      </div>
-                    </>
-                  }
+                  {(() => {
+                    const responses = {
+                      krishna: "True peace comes from understanding your dharma - your righteous duty. When you act without attachment to results, performing your duty with devotion, the mind finds its natural state of tranquility.",
+                      buddha: "Suffering arises from attachment and desire. Practice mindfulness, observe your thoughts without judgment, and remember that all difficult times are impermanent - this too shall pass.",
+                      jesus_christ: "Come unto me, all ye that labor and are heavy laden, and I will give you rest. Find peace through faith, love for others, and trust in divine providence.",
+                      albert_einstein: "In the midst of difficulty lies opportunity. Peace comes from understanding that we are part of something greater than ourselves - the magnificent cosmos that operates by natural laws."
+                    };
+                    return responses[selectedPersonality.id as keyof typeof responses] || responses.krishna;
+                  })()}
                 </div>
               </div>
 
               <div style={{
-                fontSize: '0.8rem',
-                opacity: 0.6,
+                fontSize: '0.75rem',
+                color: '#9ca3af',
                 fontStyle: 'italic',
                 textAlign: 'center'
               }}>
-                Authentic responses based on {selectedPersonality.expertise}
+                Response based on authentic {selectedPersonality.expertise}
               </div>
             </div>
           </div>
@@ -656,25 +623,25 @@ const LandingPage: React.FC = () => {
       {/* Personalities Showcase */}
       <section id="personalities" style={{
         padding: '4rem 2rem',
-        maxWidth: '1200px',
-        margin: '0 auto'
+        maxWidth: '1000px',
+        margin: '4rem auto'
       }}>
         <h2 style={{
-          fontSize: '2.5rem',
-          fontWeight: '700',
+          fontSize: '2.25rem',
+          fontWeight: '600',
           textAlign: 'center',
-          marginBottom: '1rem',
-          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+          marginBottom: '0.75rem',
+          color: '#1d1d1f'
         }}>
           Meet the Great Minds
         </h2>
         
         <p style={{
           textAlign: 'center',
-          fontSize: '1.1rem',
-          opacity: 0.8,
+          fontSize: '1rem',
+          color: '#6b7280',
           marginBottom: '3rem',
-          maxWidth: '600px',
+          maxWidth: '550px',
           margin: '0 auto 3rem'
         }}>
           Explore 25 distinct personalities across 6 domains of human knowledge and wisdom
@@ -694,26 +661,30 @@ const LandingPage: React.FC = () => {
               onClick={() => setSelectedDomain(domain)}
               style={{
                 background: selectedDomain === domain 
-                  ? 'linear-gradient(135deg, #fbbf24, #f59e0b)'
-                  : 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '2rem',
+                  ? '#6366f1'
+                  : 'white',
+                border: selectedDomain === domain 
+                  ? 'none'
+                  : '1px solid #e5e7eb',
+                color: selectedDomain === domain ? 'white' : '#374151',
+                padding: '0.6rem 1.25rem',
+                borderRadius: '1.5rem',
                 cursor: 'pointer',
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 fontWeight: '500',
                 transition: 'all 0.3s ease',
-                backdropFilter: 'blur(10px)'
+                boxShadow: selectedDomain === domain ? '0 2px 8px rgba(99, 102, 241, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)'
               }}
               onMouseEnter={(e) => {
                 if (selectedDomain !== domain) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.currentTarget.style.background = '#f9fafb';
+                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (selectedDomain !== domain) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
                 }
               }}
             >
@@ -725,8 +696,8 @@ const LandingPage: React.FC = () => {
         {/* Personalities Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '1rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '1.5rem',
           maxHeight: selectedDomain === 'All' ? 'none' : '800px',
           overflow: selectedDomain === 'All' ? 'visible' : 'hidden'
         }}>
@@ -734,53 +705,67 @@ const LandingPage: React.FC = () => {
             <div
               key={personality.id}
               style={{
-                background: 'rgba(255, 255, 255, 0.1)',
+                background: 'white',
                 borderRadius: '0.75rem',
-                padding: '1.25rem',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                padding: '1.75rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                 transition: 'all 0.3s ease',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                border: '1px solid #f3f4f6'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = `0 15px 30px ${personality.color}25`;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)';
               }}
             >
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.75rem',
-                marginBottom: '0.75rem'
+                marginBottom: '1rem'
               }}>
                 <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
+                  width: '2.25rem',
+                  height: '2.25rem',
                   borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${personality.color}, ${personality.darkColor})`,
+                  background: '#f8fafc',
+                  border: `2px solid ${domainColors[personality.domain as keyof typeof domainColors] || '#6b7280'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: domainColors[personality.domain as keyof typeof domainColors] || '#6b7280',
                   fontWeight: '600',
-                  fontSize: '1rem'
+                  fontSize: '0.9rem'
                 }}>
                   {personality.name.charAt(0)}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{personality.name}</h3>
-                  <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.7 }}>{personality.domain}</p>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    marginBottom: '0.25rem'
+                  }}>
+                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#1f2937' }}>{personality.name}</h3>
+                    <div style={{
+                      width: '0.375rem',
+                      height: '0.375rem',
+                      borderRadius: '50%',
+                      backgroundColor: domainColors[personality.domain as keyof typeof domainColors] || '#6b7280'
+                    }} />
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>{personality.domain}</p>
                 </div>
               </div>
               <p style={{ 
                 margin: '0 0 0.75rem 0', 
-                fontSize: '0.9rem', 
+                fontSize: '0.85rem', 
                 lineHeight: '1.4',
-                opacity: 0.9,
+                color: '#6b7280',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
@@ -790,7 +775,7 @@ const LandingPage: React.FC = () => {
               </p>
               <div style={{
                 fontSize: '0.75rem',
-                opacity: 0.6,
+                color: '#9ca3af',
                 fontStyle: 'italic'
               }}>
                 {personality.expertise}
@@ -810,68 +795,105 @@ const LandingPage: React.FC = () => {
 
       {/* Features */}
       <section id="features" style={{
-        padding: '4rem 2rem',
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(10px)'
+        padding: '3rem 2rem',
+        background: 'rgba(255, 255, 255, 0.8)',
+        borderRadius: '1.25rem',
+        margin: '2rem auto',
+        maxWidth: '1000px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
+            fontSize: '2rem',
+            fontWeight: '600',
             textAlign: 'center',
-            marginBottom: '3rem',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+            marginBottom: '2.5rem',
+            color: '#1f2937'
           }}>
-            Powered by Advanced AI
+            How It Feels to Talk with Genius
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '1.5rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1.25rem'
           }}>
             <div style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '1rem',
-              padding: '2rem',
+              background: 'white',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
               textAlign: 'center',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
             }}>
-              <Brain size={48} style={{ color: '#3b82f6', marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Enhanced RAG Service</h3>
-              <p style={{ opacity: 0.8, lineHeight: '1.5' }}>
-                Advanced Retrieval-Augmented Generation with 25 authentic personalities trained on curated historical texts, providing cited responses grounded in primary sources.
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                background: '#f97316',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <Brain size={24} style={{ color: 'white' }} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>They Actually Think with You</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
+                Each personality draws from their authentic writings, speeches, and works. They don't just recite facts - they engage with your questions using their actual thought patterns and wisdom.
               </p>
             </div>
 
             <div style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '1rem',
-              padding: '2rem',
+              background: 'white',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
               textAlign: 'center',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
             }}>
-              <Shield size={48} style={{ color: '#10b981', marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Cross-Session Memory</h3>
-              <p style={{ opacity: 0.8, lineHeight: '1.5' }}>
-                Enhanced authentication with user persistence ensures your conversations continue seamlessly across sessions with progressive personalization and contextual awareness.
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                background: '#3b82f6',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <Shield size={24} style={{ color: 'white' }} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>They Remember You</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
+                Every conversation builds on the last. Ask Einstein about quantum mechanics today, then return tomorrow and he'll remember your previous discussion and build upon it.
               </p>
             </div>
 
             <div style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '1rem',
-              padding: '2rem',
+              background: 'white',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
               textAlign: 'center',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
             }}>
-              <Sparkles size={48} style={{ color: '#f59e0b', marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Database Integration</h3>
-              <p style={{ opacity: 0.8, lineHeight: '1.5' }}>
-                Azure Cosmos DB integration with user deduplication, conversation persistence, and enhanced citation grounding for transparent source tracking and authentic responses.
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                background: '#10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <Sparkles size={24} style={{ color: 'white' }} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Their Life's Work at Your Fingertips</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
+                Access thousands of years of human wisdom. Whether you need strategic advice from Chanakya, spiritual guidance from Buddha, or scientific insights from Newton.
               </p>
             </div>
           </div>
@@ -882,33 +904,33 @@ const LandingPage: React.FC = () => {
       <footer style={{
         padding: '3rem 2rem 2rem',
         textAlign: 'center',
-        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-        background: 'rgba(0, 0, 0, 0.2)',
-        backdropFilter: 'blur(10px)'
+        background: '#fafafa',
+        color: '#6b7280',
+        marginTop: '4rem'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
             <div style={{
-              width: '2.5rem',
-              height: '2.5rem',
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              width: '2.25rem',
+              height: '2.25rem',
+              background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.5rem',
+              fontSize: '1.25rem',
               fontWeight: 'bold',
               color: 'white',
-              border: '2px solid rgba(255, 255, 255, 0.3)'
+              border: '2px solid rgba(255, 255, 255, 0.2)'
             }}>
               V
             </div>
-            <span style={{ fontSize: '1.5rem', fontWeight: '700' }}>Vimarsh</span>
+            <span style={{ fontSize: '1.375rem', fontWeight: '600', color: '#6b7280' }}>Vimarsh</span>
           </div>
-          <p style={{ opacity: 0.7, marginBottom: '1.5rem', maxWidth: '600px', margin: '0 auto 1.5rem' }}>
+          <p style={{ color: '#6b7280', marginBottom: '1.25rem', maxWidth: '550px', margin: '0 auto 1.25rem', fontSize: '0.9rem' }}>
             Bridging ancient wisdom with modern technology to bring you meaningful conversations with history's greatest minds.
           </p>
-          <div style={{ opacity: 0.5, fontSize: '0.875rem' }}>
+          <div style={{ color: '#9ca3af', fontSize: '0.8rem' }}>
             © 2025 Vimarsh. All rights reserved.
           </div>
         </div>
