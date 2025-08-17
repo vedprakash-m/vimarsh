@@ -1980,8 +1980,10 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             response_source = "template_fallback"
         
         # Store conversation in memory
+        logger.info(f"🔍 Memory Debug - memory_service_available: {memory_service_available}, conversation_memory_service: {conversation_memory_service is not None}, conversation_id: {conversation_id}, user_id: {user_id}")
         if memory_service_available and conversation_memory_service is not None and conversation_id:
             try:
+                logger.info(f"🔍 Attempting to store conversation for user_id: {user_id}, conversation_id: {conversation_id}")
                 # Store user message
                 await conversation_memory_service.add_message(
                     conversation_id=conversation_id,
@@ -1998,10 +2000,11 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     message_type="personality_response",
                     content=response_text
                 )
-                logger.info(f"💾 Stored conversation exchange in memory")
+                logger.info(f"💾 Successfully stored conversation exchange in memory for user_id: {user_id}")
                     
             except Exception as store_error:
-                logger.warning(f"⚠️ Failed to store conversation: {store_error}")
+                logger.error(f"❌ Failed to store conversation: {store_error}")
+                logger.error(f"❌ Error details: {type(store_error).__name__}: {str(store_error)}")
         
         # Get personality info
         if personality_models_available:
