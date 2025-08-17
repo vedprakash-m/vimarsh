@@ -14,6 +14,16 @@ const cssVariables = `
     --accent-interactive: #007aff;
     --border-color: #d2d2d7;
   }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
 `;
 
 interface Personality {
@@ -34,6 +44,211 @@ const domainColors = {
   'Historical': '#ff9500',
   'Literary': '#af52de',
   'Leadership': '#ff3b30'
+};
+
+// Live Conversation Preview Component
+const ConversationPreview: React.FC = () => {
+  const [currentPersonality, setCurrentPersonality] = useState(0);
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const conversations = [
+    {
+      personality: { name: 'Einstein', avatar: '🧠', color: '#34c759' },
+      messages: [
+        { type: 'user', text: 'How do you approach complex problems?' },
+        { type: 'ai', text: 'Imagination is more important than knowledge. I like to think in pictures, not words. When facing the impossible, I ask: what if we\'re looking at this backwards?' }
+      ]
+    },
+    {
+      personality: { name: 'Marcus Aurelius', avatar: '🏛️', color: '#5856d6' },
+      messages: [
+        { type: 'user', text: 'How do I handle difficult people?' },
+        { type: 'ai', text: 'Remember that the best revenge is not to be like your enemy. Focus on what you can control - your own actions and responses. Their behavior is their responsibility.' }
+      ]
+    },
+    {
+      personality: { name: 'Krishna', avatar: '🕉️', color: '#007aff' },
+      messages: [
+        { type: 'user', text: 'I\'m struggling with a difficult decision...' },
+        { type: 'ai', text: 'Do your duty without attachment to results. When the path is unclear, ask yourself: what action aligns with dharma? What serves the greater good beyond yourself?' }
+      ]
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        setMessageIndex((prev) => {
+          if (prev >= conversations[currentPersonality].messages.length - 1) {
+            setCurrentPersonality((p) => (p + 1) % conversations.length);
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [currentPersonality]);
+
+  const currentConvo = conversations[currentPersonality];
+  const displayedMessages = currentConvo.messages.slice(0, messageIndex + 1);
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      borderRadius: '20px',
+      padding: '24px',
+      height: '480px',
+      border: '1px solid #e2e8f0',
+      boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '20px',
+        padding: '12px 16px',
+        background: 'rgba(255,255,255,0.8)',
+        borderRadius: '12px',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div style={{
+          fontSize: '24px',
+          marginRight: '12px'
+        }}>
+          {currentConvo.personality.avatar}
+        </div>
+        <div>
+          <div style={{
+            fontWeight: '600',
+            color: '#1e293b',
+            fontSize: '16px'
+          }}>
+            {currentConvo.personality.name}
+          </div>
+          <div style={{
+            fontSize: '12px',
+            color: '#64748b'
+          }}>
+            ✨ Live conversation
+          </div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div style={{
+        height: '320px',
+        overflowY: 'auto',
+        marginBottom: '16px',
+        paddingRight: '8px'
+      }}>
+        {displayedMessages.map((message, idx) => (
+          <div key={idx} style={{
+            display: 'flex',
+            justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
+            marginBottom: '12px'
+          }}>
+            <div style={{
+              maxWidth: '80%',
+              padding: '12px 16px',
+              borderRadius: '18px',
+              background: message.type === 'user' 
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                : 'rgba(255,255,255,0.9)',
+              color: message.type === 'user' ? 'white' : '#1e293b',
+              fontSize: '14px',
+              lineHeight: '1.4',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: message.type === 'ai' ? '1px solid #e2e8f0' : 'none'
+            }}>
+              {message.text}
+            </div>
+          </div>
+        ))}
+        
+        {isTyping && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            marginBottom: '12px'
+          }}>
+            <div style={{
+              padding: '12px 16px',
+              borderRadius: '18px',
+              background: 'rgba(255,255,255,0.9)',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                gap: '4px',
+                alignItems: 'center'
+              }}>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: currentConvo.personality.color,
+                  animation: 'pulse 1.5s ease-in-out infinite'
+                }}></div>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: currentConvo.personality.color,
+                  animation: 'pulse 1.5s ease-in-out infinite 0.2s'
+                }}></div>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: currentConvo.personality.color,
+                  animation: 'pulse 1.5s ease-in-out infinite 0.4s'
+                }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Input Preview */}
+      <div style={{
+        position: 'absolute',
+        bottom: '16px',
+        left: '24px',
+        right: '24px',
+        background: 'rgba(255,255,255,0.9)',
+        borderRadius: '24px',
+        padding: '12px 20px',
+        border: '1px solid #e2e8f0',
+        backdropFilter: 'blur(10px)',
+        fontSize: '14px',
+        color: '#64748b',
+        fontStyle: 'italic'
+      }}>
+        Ask anything... {currentConvo.personality.name} is listening
+      </div>
+
+      {/* Animated Background */}
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        right: '-20%',
+        width: '200px',
+        height: '200px',
+        background: `linear-gradient(45deg, ${currentConvo.personality.color}20, ${currentConvo.personality.color}10)`,
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        animation: 'float 6s ease-in-out infinite'
+      }}></div>
+    </div>
+  );
 };
 
 const personalities: Personality[] = [
@@ -376,11 +591,15 @@ const LandingPage: React.FC = () => {
         <div style={{
           display: 'flex',
           gap: '4rem',
-          alignItems: 'center',
-          minHeight: '500px'
+          alignItems: 'flex-start',
+          minHeight: '500px',
+          width: '100%'
         }}>
           {/* Left side - Text content */}
-          <div style={{ flex: '1' }}>
+          <div style={{ 
+            width: '50%',
+            paddingRight: '2rem'
+          }}>
             <h1 style={{
               fontSize: '3rem',
               fontWeight: '600',
@@ -388,13 +607,12 @@ const LandingPage: React.FC = () => {
               color: '#1d1d1f',
               lineHeight: '1.2'
             }}>
-              Converse with<br />
-              History's{' '}
+              Step into History.<br />
               <span style={{
                 color: '#8b5cf6',
                 fontWeight: '700'
               }}>
-                Greatest Minds
+                Wisdom Awaits.
               </span>
             </h1>
 
@@ -404,13 +622,13 @@ const LandingPage: React.FC = () => {
               marginBottom: '2rem',
               lineHeight: '1.6'
             }}>
-              Experience authentic conversations with 25 distinct personalities across 6 domains of human knowledge and wisdom — from Einstein about scientific discovery to Krishna for spiritual wisdom, Lincoln for leadership, or Marcus Aurelius for philosophy.
+              What would you ask Einstein about the universe? How would Marcus Aurelius guide you through adversity? Experience real conversations with history's greatest minds — each personality remembers your journey and offers wisdom tailored to your life.
             </p>
 
             <button
               onClick={handleBeginJourney}
               style={{
-                background: '#8b5cf6',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                 color: 'white',
                 border: 'none',
                 padding: '0.875rem 2rem',
@@ -418,10 +636,20 @@ const LandingPage: React.FC = () => {
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
                 fontWeight: '500',
-                marginBottom: '2rem'
+                marginBottom: '2rem',
+                boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.3)';
               }}
             >
-              Start Your Journey
+              Begin Your Journey ✨
             </button>
 
             {/* Stats */}
@@ -432,103 +660,30 @@ const LandingPage: React.FC = () => {
             }}>
               <div>
                 <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>25</div>
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Great Minds</div>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Legendary Minds</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>6</div>
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Domains</div>
+                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>∞</div>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Conversations</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>1000+</div>
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Authentic Texts</div>
+                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>2500+</div>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Years of Wisdom</div>
               </div>
             </div>
           </div>
 
-          {/* Right side - Chat Interface Preview */}
+          {/* Right side - Live Conversation Preview */}
           <div style={{ 
-            flex: '1',
-            maxWidth: '400px'
+            width: '50%',
+            paddingLeft: '2rem'
           }}>
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '1rem',
-              padding: '1.5rem',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #e5e7eb'
-            }}>
-              {/* Chat Header */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                marginBottom: '1rem',
-                paddingBottom: '1rem',
-                borderBottom: '1px solid #f3f4f6'
-              }}>
-                <div style={{
-                  width: '2rem',
-                  height: '2rem',
-                  borderRadius: '50%',
-                  background: '#8b5cf6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '0.875rem',
-                  fontWeight: '600'
-                }}>
-                  K
-                </div>
-                <div>
-                  <div style={{ fontWeight: '600', fontSize: '0.875rem', color: '#1f2937' }}>Krishna</div>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>Spiritual Wisdom</div>
-                </div>
-                <div style={{ marginLeft: 'auto', color: '#6b7280', fontSize: '0.75rem' }}>
-                  Online
-                </div>
-              </div>
-
-              {/* Chat Messages */}
-              <div style={{ marginBottom: '1rem' }}>
-                <div style={{
-                  background: '#f3f4f6',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '1rem 1rem 1rem 0.25rem',
-                  marginBottom: '0.75rem',
-                  fontSize: '0.875rem',
-                  color: '#1f2937'
-                }}>
-                  How can I find peace in difficult times?
-                </div>
-
-                <div style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  padding: '1rem',
-                  borderRadius: '1rem 1rem 0.25rem 1rem',
-                  fontSize: '0.875rem',
-                  lineHeight: '1.5',
-                  color: '#1f2937'
-                }}>
-                  True peace comes from understanding your dharma - your righteous duty. When you act without attachment to results, performing your duty with devotion, the mind finds its natural state of tranquility.
-                </div>
-              </div>
-
-              <div style={{
-                fontSize: '0.75rem',
-                color: '#9ca3af',
-                fontStyle: 'italic',
-                textAlign: 'center'
-              }}>
-                Response based on authentic Bhagavad Gita teachings
-              </div>
-            </div>
+            <ConversationPreview />
           </div>
         </div>
       </section>
 
-      {/* Interactive Demo */}
+      {/* Wisdom in Action */}
       <section style={{
         padding: '4rem 2rem',
         maxWidth: '1200px',
@@ -538,154 +693,229 @@ const LandingPage: React.FC = () => {
         <h2 style={{
           fontSize: '2.25rem',
           fontWeight: '600',
-          marginBottom: '3rem',
+          marginBottom: '1rem',
           color: '#1d1d1f'
         }}>
-          Start Your Journey
+          Wisdom in Action
         </h2>
+        
+        <p style={{
+          fontSize: '1.125rem',
+          color: '#6b7280',
+          marginBottom: '3rem',
+          maxWidth: '600px',
+          margin: '0 auto 3rem auto'
+        }}>
+          See how history's greatest minds would respond to today's challenges
+        </p>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '1.5rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2rem',
           maxWidth: '1000px',
           margin: '0 auto'
         }}>
-          {/* Albert Einstein */}
+          {/* Einstein Card */}
           <div style={{
-            background: '#ffffff',
-            border: '2px solid #e5e7eb',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            textAlign: 'center',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e1f5fe 100%)',
+            border: '1px solid #e2e8f0',
+            borderRadius: '20px',
+            padding: '24px',
+            textAlign: 'left',
             transition: 'all 0.3s ease',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
           }}>
             <div style={{
-              width: '3rem',
-              height: '3rem',
-              background: '#8b5cf6',
-              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1rem',
-              color: 'white',
-              fontSize: '1.25rem',
-              fontWeight: '600'
+              marginBottom: '16px'
             }}>
-              E
+              <div style={{
+                fontSize: '32px',
+                marginRight: '12px'
+              }}>🧠</div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#1e293b' }}>Einstein</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>On Innovation</div>
+              </div>
             </div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>Albert Einstein</h3>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Revolutionary physicist who changed our understanding of space, time, and the universe
-            </p>
-            <div style={{ color: '#8b5cf6', fontSize: '0.75rem', fontWeight: '500' }}>
-              Scientific wisdom
+            <div style={{
+              background: 'rgba(255,255,255,0.8)',
+              padding: '16px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              color: '#334155',
+              fontStyle: 'italic',
+              lineHeight: '1.5'
+            }}>
+              "Innovation is not about having all the answers — it's about asking better questions. What if we approached this problem from the impossible angle?"
             </div>
+            <div style={{
+              position: 'absolute',
+              top: '-20px',
+              right: '-20px',
+              width: '80px',
+              height: '80px',
+              background: 'linear-gradient(45deg, #34c75920, #34c75910)',
+              borderRadius: '50%',
+              filter: 'blur(20px)'
+            }}></div>
           </div>
 
-          {/* Mahatma Gandhi */}
+          {/* Marcus Aurelius Card */}
           <div style={{
-            background: '#ffffff',
-            border: '2px solid #e5e7eb',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            textAlign: 'center',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f3e8ff 100%)',
+            border: '1px solid #e2e8f0',
+            borderRadius: '20px',
+            padding: '24px',
+            textAlign: 'left',
             transition: 'all 0.3s ease',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
           }}>
             <div style={{
-              width: '3rem',
-              height: '3rem',
-              background: '#10b981',
-              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1rem',
-              color: 'white',
-              fontSize: '1.25rem',
-              fontWeight: '600'
+              marginBottom: '16px'
             }}>
-              G
+              <div style={{
+                fontSize: '32px',
+                marginRight: '12px'
+              }}>🏛️</div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#1e293b' }}>Marcus Aurelius</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>On Resilience</div>
+              </div>
             </div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>Mahatma Gandhi</h3>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Advocate of non-violence and truth who led India to independence through peaceful resistance
-            </p>
-            <div style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: '500' }}>
-              Leadership wisdom
+            <div style={{
+              background: 'rgba(255,255,255,0.8)',
+              padding: '16px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              color: '#334155',
+              fontStyle: 'italic',
+              lineHeight: '1.5'
+            }}>
+              "You cannot control what happens to you, but you can master how you respond. In every setback lies the seed of equal or greater benefit."
             </div>
+            <div style={{
+              position: 'absolute',
+              top: '-20px',
+              right: '-20px',
+              width: '80px',
+              height: '80px',
+              background: 'linear-gradient(45deg, #5856d620, #5856d610)',
+              borderRadius: '50%',
+              filter: 'blur(20px)'
+            }}></div>
           </div>
 
-          {/* Socrates */}
+          {/* Krishna Card */}
           <div style={{
-            background: '#ffffff',
-            border: '2px solid #e5e7eb',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            textAlign: 'center',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)',
+            border: '1px solid #e2e8f0',
+            borderRadius: '20px',
+            padding: '24px',
+            textAlign: 'left',
             transition: 'all 0.3s ease',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
           }}>
             <div style={{
-              width: '3rem',
-              height: '3rem',
-              background: '#ef4444',
-              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1rem',
-              color: 'white',
-              fontSize: '1.25rem',
-              fontWeight: '600'
+              marginBottom: '16px'
             }}>
-              S
+              <div style={{
+                fontSize: '32px',
+                marginRight: '12px'
+              }}>🕉️</div>
+              <div>
+                <div style={{ fontWeight: '600', color: '#1e293b' }}>Krishna</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>On Purpose</div>
+              </div>
             </div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>Socrates</h3>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              Ancient Greek philosopher who laid the foundation for Western philosophy through questioning
-            </p>
-            <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '500' }}>
-              Philosophical wisdom
+            <div style={{
+              background: 'rgba(255,255,255,0.8)',
+              padding: '16px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              color: '#334155',
+              fontStyle: 'italic',
+              lineHeight: '1.5'
+            }}>
+              "When you act with dharma as your guide, the outcome becomes secondary. Focus on righteous action, and let the universe handle the results."
             </div>
+            <div style={{
+              position: 'absolute',
+              top: '-20px',
+              right: '-20px',
+              width: '80px',
+              height: '80px',
+              background: 'linear-gradient(45deg, #007aff20, #007aff10)',
+              borderRadius: '50%',
+              filter: 'blur(20px)'
+            }}></div>
           </div>
+        </div>
 
-          {/* William Shakespeare */}
-          <div style={{
-            background: '#ffffff',
-            border: '2px solid #e5e7eb',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            textAlign: 'center',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer'
-          }}>
-            <div style={{
-              width: '3rem',
-              height: '3rem',
-              background: '#8b5cf6',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1rem',
+        <div style={{
+          marginTop: '3rem'
+        }}>
+          <button
+            onClick={handleBeginJourney}
+            style={{
+              background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
               color: 'white',
-              fontSize: '1.25rem',
-              fontWeight: '600'
-            }}>
-              W
-            </div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>William Shakespeare</h3>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              The most acclaimed writer in the English language with unparalleled insight into human nature
-            </p>
-            <div style={{ color: '#8b5cf6', fontSize: '0.75rem', fontWeight: '500' }}>
-              Literary wisdom
-            </div>
-          </div>
+              border: 'none',
+              padding: '12px 24px',
+              fontSize: '16px',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              fontWeight: '500',
+              boxShadow: '0 4px 14px rgba(30, 41, 59, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(30, 41, 59, 0.4)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 14px rgba(30, 41, 59, 0.3)';
+            }}
+          >
+            Explore All 25 Minds →
+          </button>
         </div>
       </section>
 
