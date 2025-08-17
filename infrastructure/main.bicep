@@ -11,7 +11,7 @@ param location string = 'West US 2'
 @secure()
 param geminiApiKey string
 
-@description('Expert review email for spiritual content validation')
+@description('Expert review email for multi-domain content validation')
 param expertReviewEmail string = 'vedprakash.m@me.com'
 
 // Unified Resource Group for All Resources
@@ -23,7 +23,7 @@ resource vimarshResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = 
     project: 'vimarsh'
     costStrategy: 'unified'
     environment: 'production'
-    purpose: 'spiritual-guidance-platform'
+    purpose: 'multi-domain-conversational-platform'
   }
 }
 

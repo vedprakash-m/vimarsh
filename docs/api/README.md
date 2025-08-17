@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Vimarsh API provides spiritual guidance through Lord Krishna's divine wisdom, leveraging advanced AI technology to deliver authentic, reverent responses based on sacred texts like the Bhagavad Gita, Mahabharata, and Srimad Bhagavatam.
+The Vimarsh API provides multi-domain guidance through 25+ historical personalities across spiritual, scientific, philosophical, historical, literary, leadership, and psychology domains. This AI-powered conversational platform delivers authentic responses grounded in the original works and teachings of history's greatest minds.
 
 ## Authentication
 
@@ -43,7 +43,7 @@ Check service availability and status.
 ```json
 {
   "status": "healthy",
-  "service": "vimarsh-spiritual-guidance", 
+  "service": "vimarsh-conversational-platform", 
   "version": "1.0.0",
   "timestamp": "2025-06-24T10:30:00Z",
   "environment": "production"
@@ -56,11 +56,11 @@ Check service availability and status.
 
 ---
 
-### 2. Spiritual Guidance
+### 2. Multi-Domain Guidance
 
-Main endpoint for receiving Lord Krishna's spiritual guidance.
+Main endpoint for receiving guidance from 25+ personalities across multiple domains.
 
-**Endpoint:** `POST /api/spiritual_guidance`
+**Endpoint:** `POST /api/guidance`
 
 **Request Body:**
 ```json

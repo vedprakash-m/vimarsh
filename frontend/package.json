@@ -1,7 +1,7 @@
 {
   "name": "vimarsh-frontend",
   "version": "1.0.0",
-  "description": "Vimarsh AI-powered spiritual guidance platform frontend",
+  "description": "Vimarsh AI-powered conversational platform frontend",
   "private": true,
   "scripts": {
     "start": "react-scripts start",

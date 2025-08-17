@@ -10,7 +10,7 @@ format: Markdown (token-optimized)
 
 ## ⚙️ Architecture & Stack
 
-**Purpose**: AI-powered spiritual guidance system providing personalized advice from Hindu sacred texts through Lord Krishna's divine persona using RAG architecture.
+**Purpose**: AI-powered conversational platform providing personalized wisdom from history's greatest minds across multiple domains (spiritual, scientific, philosophical, historical, literary, leadership) using RAG architecture.
 
 **Stack**: Python 3.12, Azure Functions, React 18, TypeScript, Google Gemini 2.5 Flash, Azure Cosmos DB, Microsoft Entra ID, Azure Key Vault, Bicep IaC, GitHub Actions
 
@@ -22,7 +22,7 @@ format: Markdown (token-optimized)
 
 **CSS**: BEM methodology with spiritual prefix: .vimarsh-block__element--modifier, Sacred color variables: --sacred-saffron, --krishna-blue
 
-**Python**: snake_case for functions/variables, PascalCase for classes, UPPERCASE for constants, Module names: spiritual_guidance, rag_pipeline
+**Python**: snake_case for functions/variables, PascalCase for classes, UPPERCASE for constants, Module names: multi_domain_guidance, rag_pipeline
 
 **Database**: snake_case for all Cosmos DB collections and properties
 
@@ -40,37 +40,37 @@ format: Markdown (token-optimized)
 
 **Azure Function Handler**:
 ```python
-# Standard Azure Functions pattern with spiritual guidance logging
+# Standard Azure Functions pattern with multi-domain guidance logging
 import azure.functions as func
 import logging
 from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
-@app.route(route="spiritual_guidance", methods=["POST"])
-async def spiritual_guidance_handler(req: func.HttpRequest) -> func.HttpResponse:
+@app.route(route="multi_domain_guidance", methods=["POST"])
+async def multi_domain_guidance_handler(req: func.HttpRequest) -> func.HttpResponse:
     try:
-        # Spiritual guidance processing
-        logger.info("🕉️ Processing spiritual guidance request")
+        # Multi-domain guidance processing
+        logger.info("🕉️ Processing multi-domain guidance request")
         return func.HttpResponse(json.dumps(response), mimetype="application/json")
     except Exception as e:
-        logger.error(f"❌ Spiritual guidance error: {str(e)}")
+        logger.error(f"❌ Multi-domain guidance error: {str(e)}")
         return func.HttpResponse("Error processing request", status_code=500)
 ```
 
-**React Spiritual Component**:
+**React Multi-Domain Component**:
 ```tsx
-// All spiritual components follow Sacred Harmony design system
+// All multi-domain components follow Sacred Harmony design system
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface SpiritualComponentProps {
+interface MultiDomainComponentProps {
   className?: string;
   guidance?: string;
   citation?: string;
 }
 
-export const SpiritualComponent: React.FC<SpiritualComponentProps> = ({ 
+export const MultiDomainComponent: React.FC<MultiDomainComponentProps> = ({ 
   className, 
   guidance, 
   citation 
@@ -86,22 +86,22 @@ export const SpiritualComponent: React.FC<SpiritualComponentProps> = ({
 
 **RAG Pipeline Service**:
 ```python
-# Standard pattern for RAG pipeline with spiritual context preservation
+# Standard pattern for RAG pipeline with multi-domain context preservation
 from typing import List, Dict, Any
-from spiritual_guidance.enhanced_service import EnhancedSpiritualGuidanceService
+from multi_domain_guidance.enhanced_service import EnhancedMultiDomainGuidanceService
 
-class SpiritualRAGService:
+class MultiDomainRAGService:
     def __init__(self):
-        self.spiritual_service = EnhancedSpiritualGuidanceService()
+        self.guidance_service = EnhancedMultiDomainGuidanceService()
     
-    async def get_krishna_guidance(self, query: str, context: str = "general") -> Dict[str, Any]:
+    async def get_personality_guidance(self, query: str, personality: str = "krishna") -> Dict[str, Any]:
         try:
-            # Preserve Sanskrit terms and spiritual context
-            response = await self.spiritual_service.generate_guidance(query, context)
+            # Preserve domain-specific terms and cultural context
+            response = await self.guidance_service.generate_guidance(query, personality)
             return {"guidance": response.text, "citations": response.citations}
         except Exception as e:
             logger.error(f"🕉️ RAG pipeline error: {str(e)}")
-            raise SpiritualGuidanceError("Failed to retrieve divine wisdom")
+            raise MultiDomainGuidanceError("Failed to retrieve wisdom")
 ```
 
 ## 🐞 Known Issues

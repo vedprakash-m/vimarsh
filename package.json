@@ -1,7 +1,7 @@
 {
   "name": "vimarsh",
   "version": "1.0.0",
-  "description": "Vimarsh AI-powered spiritual guidance platform",
+  "description": "Vimarsh AI-powered conversational platform",
   "private": true,
   "workspaces": [
     "frontend"

@@ -18,12 +18,12 @@
 ## 1. High-Level Introduction
 
 ### Purpose
-Vimarsh is an **AI-powered spiritual guidance system** that provides personalized advice from Hindu sacred texts through multiple spiritual and philosophical personalities. The platform offers divine wisdom through an authentic AI representation of Lord Krishna alongside 11 other revered personalities from spiritual, scientific, historical, and philosophical domains.
+Vimarsh is an **AI-powered conversational platform** that provides personalized wisdom from history's greatest minds across multiple domains including spiritual, scientific, historical, and philosophical personalities. The platform offers authentic insights through AI representations of 25 renowned personalities from 7 domains of human knowledge and wisdom.
 
 ### North Star
-**"Make timeless wisdom accessible to everyone through AI-powered spiritual guidance that is authentic, contextual, and transformative."**
+**"Make timeless wisdom accessible to everyone through AI-powered conversational guidance that is authentic, contextual, and transformative."**
 
-The vision is to democratize access to spiritual wisdom by leveraging modern AI technology while maintaining the authenticity and depth of traditional teachings.
+The vision is to democratize access to wisdom from history's greatest minds by leveraging modern AI technology while maintaining the authenticity and depth of their teachings.
 
 ### Value Proposition
 

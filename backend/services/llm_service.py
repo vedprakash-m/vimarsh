@@ -49,7 +49,7 @@ class SpiritualResponse:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 class LLMService:
-    """Production LLM service for generating spiritual guidance responses"""
+    """Production LLM service for generating multi-domain guidance responses"""
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
