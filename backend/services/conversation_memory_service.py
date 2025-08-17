@@ -1,8 +1,8 @@
 """
-Conversation Memory Service for Multi-Personality Spiritual Guidance
+Conversation Memory Service for Multi-Personality Guidance
 
 Handles conversation history storage, retrieval, and context management
-for personalized spiritual guidance experiences.
+for personalized guidance experiences.
 """
 
 import logging

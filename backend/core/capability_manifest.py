@@ -224,17 +224,33 @@ class CapabilityManifestService:
             
             memory_service = ConversationMemoryService()
             
-            # Basic service availability test
+            # Check if database service is properly connected
+            database_connected = False
+            cross_session_persistence = False
+            mode = "in_memory"
+            
+            if hasattr(memory_service, 'database_service') and memory_service.database_service:
+                try:
+                    # Check if Phase 2 database service is connected to Cosmos
+                    if hasattr(memory_service.database_service, 'is_cosmos_enabled'):
+                        database_connected = memory_service.database_service.is_cosmos_enabled
+                        if database_connected:
+                            mode = "cosmos_db"
+                            cross_session_persistence = True
+                except Exception:
+                    pass  # Keep conservative defaults
+            
             return ServiceCapability(
                 name="memory_persistence",
                 status=ServiceStatus.OPERATIONAL,
                 available=True,
-                fallback_mode=FallbackMode.CACHED,  # Assume in-memory for safety
+                fallback_mode=FallbackMode.CACHED if not database_connected else FallbackMode.NONE,
                 health_details={
-                    "mode": "in_memory",  # Conservative assumption
+                    "mode": mode,
                     "service_imported": True,
                     "session_support": True,
-                    "cross_session_persistence": False  # Conservative assumption
+                    "cross_session_persistence": cross_session_persistence,
+                    "database_connected": database_connected
                 }
             )
             
