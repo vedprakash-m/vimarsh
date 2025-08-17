@@ -144,6 +144,7 @@ export default function GuidanceInterface() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const navigate = useNavigate();
 
   // Context hooks
@@ -264,7 +265,9 @@ export default function GuidanceInterface() {
           include_citations: true,
           voice_enabled: false,
           conversation_context: recentMessages,
-          personality_id: selectedPersonality.id
+          personality_id: selectedPersonality.id,
+          user_id: sessionId,
+          session_id: sessionId
         })
       });
 

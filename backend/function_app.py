@@ -1735,7 +1735,8 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         user_query = query_data.get('query', '').strip()
         personality_id = query_data.get('personality_id', 'krishna')
         language = query_data.get('language', 'English')
-        user_id = query_data.get('user_id', 'anonymous')  # Add user_id for memory
+        # Generate unique session-based user ID if none provided
+        user_id = query_data.get('user_id') or query_data.get('session_id') or f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{hash(user_query[:50]) % 10000}"
         
         if not user_query:
             return func.HttpResponse(

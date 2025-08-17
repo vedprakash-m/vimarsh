@@ -453,7 +453,7 @@ class EnhancedRAGService:
             
             # Step 3: Create enhanced prompt with context and personality-specific instructions
             personality_context = self._get_personality_context(personality_id)
-            max_chars = 500  # Default limit
+            max_chars = 1000  # Increased to 1000 for comprehensive responses
             if personality_id in personality_configs:
                 max_chars = personality_configs[personality_id].max_chars
             
@@ -505,7 +505,7 @@ Respond now in character:
                     content = response.text.strip()
                     
                     # Log response length for monitoring
-                    max_chars = 500  # Default limit
+                    max_chars = 1000  # Increased to 1000 for comprehensive responses
                     if personality_id in personality_configs:
                         max_chars = personality_configs[personality_id].max_chars
                     
