@@ -319,52 +319,39 @@ const LandingPage: React.FC = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(to bottom, #fafafa 0%, #ffffff 50%)',
+      background: '#ffffff',
       color: '#1d1d1f',
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
     }}>
       {/* Header */}
       <header style={{
-        padding: '0.75rem 2rem',
+        padding: '1rem 2rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#fafafa',
-        borderBottom: '1px solid #f0f0f0'
+        background: '#ffffff'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
-            width: '3.5rem',
-            height: '3.5rem',
-            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            color: 'white',
-            border: '2px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)'
+            width: '1.5rem',
+            height: '1.5rem',
+            background: '#f97316',
+            borderRadius: '50%'
           }}>
-            V
           </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600', color: '#1d1d1f' }}>Vimarsh</h1>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: '#8b8b8b' }}>Wisdom Without Boundaries</p>
-          </div>
+          <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#1d1d1f' }}>Vimarsh</h1>
         </div>
         <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <a href="#personalities" style={{ color: '#6b7280', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Personalities</a>
-          <a href="#features" style={{ color: '#6b7280', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Features</a>
+          <a href="#personalities" style={{ color: '#1d1d1f', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Personalities</a>
+          <a href="#features" style={{ color: '#1d1d1f', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Features</a>
           <button
             onClick={handleBeginJourney}
             style={{
-              background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+              background: '#007aff',
               border: 'none',
               color: 'white',
               padding: '0.6rem 1.25rem',
-              borderRadius: '0.75rem',
+              borderRadius: '1.5rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -372,10 +359,10 @@ const LandingPage: React.FC = () => {
               fontSize: '0.85rem',
               fontWeight: '500',
               transition: 'all 0.3s ease',
-              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)'
+              boxShadow: '0 2px 8px rgba(0, 122, 255, 0.25)'
             }}
           >
-            Begin Journey <ArrowRight size={14} />
+            Get Started
           </button>
         </nav>
       </header>
@@ -383,203 +370,133 @@ const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <section style={{
         padding: '4rem 2rem',
-        textAlign: 'center',
-        maxWidth: '1000px',
-        margin: '2rem auto 4rem'
+        maxWidth: '1200px',
+        margin: '0 auto'
       }}>
-        <h1 style={{
-          fontSize: '2.75rem',
-          fontWeight: '600',
-          marginBottom: '1.25rem',
-          color: '#1d1d1f',
-          lineHeight: '1.2'
-        }}>
-          Converse with<br />
-          History's{' '}
-          <span style={{
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: '700'
-          }}>
-            Greatest Minds
-          </span>
-        </h1>
-
-        <p style={{
-          fontSize: '1.125rem',
-          color: '#6b7280',
-          maxWidth: '700px',
-          margin: '0 auto 2.5rem',
-          lineHeight: '1.6'
-        }}>
-          Experience authentic conversations with 25 distinct personalities across 6 domains - from Einstein about scientific discovery to Krishna for spiritual wisdom, Lincoln for leadership, or Marcus Aurelius for philosophy.
-        </p>
-
-        <button
-          onClick={handleBeginJourney}
-          style={{
-            background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-            color: 'white',
-            border: 'none',
-            padding: '0.875rem 2rem',
-            fontSize: '1rem',
-            borderRadius: '0.75rem',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            fontWeight: '500',
-            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
-            transition: 'all 0.3s ease',
-            marginBottom: '0.75rem'
-          }}
-        >
-          Start Your Journey
-        </button>
-
-        <p style={{ fontSize: '0.85rem', color: '#9ca3af', margin: 0 }}>
-          Secure sign-in with Microsoft to unlock persistent conversations
-        </p>
-
-        {/* Stats */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          gap: '1.5rem',
-          marginTop: '4rem',
-          padding: '0'
+          display: 'flex',
+          gap: '4rem',
+          alignItems: 'center',
+          minHeight: '500px'
         }}>
-          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>25</div>
-            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Great Minds</div>
-          </div>
-          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>6</div>
-            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Domains</div>
-          </div>
-          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>1000+</div>
-            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Authentic Texts</div>
-          </div>
-          <div style={{ textAlign: 'center', background: 'rgba(255, 255, 255, 0.8)', padding: '1.5rem 1rem', borderRadius: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-            <div style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.25rem', color: '#1d1d1f' }}>Deep</div>
-            <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Insights</div>
-          </div>
-        </div>
-      </section>
+          {/* Left side - Text content */}
+          <div style={{ flex: '1' }}>
+            <h1 style={{
+              fontSize: '3rem',
+              fontWeight: '600',
+              marginBottom: '1.25rem',
+              color: '#1d1d1f',
+              lineHeight: '1.2'
+            }}>
+              Converse with<br />
+              History's{' '}
+              <span style={{
+                color: '#8b5cf6',
+                fontWeight: '700'
+              }}>
+                Greatest Minds
+              </span>
+            </h1>
 
-      {/* Interactive Demo */}
-      <section style={{
-        padding: '4rem 2rem',
-        maxWidth: '1000px',
-        margin: '4rem auto'
-      }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <h2 style={{
-            fontSize: '2.25rem',
-            fontWeight: '600',
-            textAlign: 'center',
-            marginBottom: '3rem',
-            color: '#1d1d1f'
-          }}>
-            Start Your Journey
-          </h2>
+            <p style={{
+              fontSize: '1.125rem',
+              color: '#6b7280',
+              marginBottom: '2rem',
+              lineHeight: '1.6'
+            }}>
+              Experience authentic conversations with 25 distinct personalities across 6 domains of human knowledge and wisdom — from Einstein about scientific discovery to Krishna for spiritual wisdom, Lincoln for leadership, or Marcus Aurelius for philosophy.
+            </p>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '2.5rem',
-            alignItems: 'center'
-          }}>
-            {/* Personality Selector Grid */}
-            <div>
-              <h3 style={{ fontSize: '1.125rem', marginBottom: '1.5rem', fontWeight: '600', color: '#374151' }}>Choose a Great Mind</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                {personalities.slice(0, 4).map((personality) => (
-                  <button
-                    key={personality.id}
-                    onClick={() => setSelectedPersonality(personality)}
-                    style={{
-                      background: selectedPersonality.id === personality.id 
-                        ? '#6366f1'
-                        : '#ffffff',
-                      border: selectedPersonality.id === personality.id 
-                        ? 'none'
-                        : '1px solid #e5e7eb',
-                      color: selectedPersonality.id === personality.id ? '#ffffff' : '#1f2937',
-                      padding: '1.25rem',
-                      borderRadius: '0.75rem',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      transition: 'all 0.3s ease',
-                      boxShadow: selectedPersonality.id === personality.id 
-                        ? '0 4px 12px rgba(99, 102, 241, 0.25)'
-                        : '0 1px 3px rgba(0, 0, 0, 0.1)',
-                      transform: selectedPersonality.id === personality.id ? 'translateY(-1px)' : 'none'
-                    }}>
-                    <div style={{ 
-                      fontWeight: '600', 
-                      fontSize: '0.9rem',
-                      marginBottom: '0.25rem' 
-                    }}>
-                      {personality.name}
-                    </div>
-                    <div style={{ 
-                      fontSize: '0.75rem', 
-                      opacity: selectedPersonality.id === personality.id ? 0.9 : 0.7 
-                    }}>
-                      {personality.domain}
-                    </div>
-                  </button>
-                ))}
+            <button
+              onClick={handleBeginJourney}
+              style={{
+                background: '#8b5cf6',
+                color: 'white',
+                border: 'none',
+                padding: '0.875rem 2rem',
+                fontSize: '1rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontWeight: '500',
+                marginBottom: '2rem'
+              }}
+            >
+              Start Your Journey
+            </button>
+
+            {/* Stats */}
+            <div style={{
+              display: 'flex',
+              gap: '3rem',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>25</div>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Great Minds</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>6</div>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Domains</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>1000+</div>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Authentic Texts</div>
               </div>
             </div>
+          </div>
 
-            {/* Demo Conversation */}
+          {/* Right side - Chat Interface Preview */}
+          <div style={{ 
+            flex: '1',
+            maxWidth: '400px'
+          }}>
             <div style={{
-              background: 'white',
+              background: '#ffffff',
               borderRadius: '1rem',
               padding: '1.5rem',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-              border: '1px solid #f0f0f0'
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #e5e7eb'
             }}>
+              {/* Chat Header */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.75rem',
-                marginBottom: '1.25rem',
-                paddingBottom: '0.75rem',
+                marginBottom: '1rem',
+                paddingBottom: '1rem',
                 borderBottom: '1px solid #f3f4f6'
               }}>
                 <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
+                  width: '2rem',
+                  height: '2rem',
                   borderRadius: '50%',
-                  background: '#f8fafc',
-                  border: `2px solid ${domainColors[selectedPersonality.domain as keyof typeof domainColors] || '#6b7280'}`,
+                  background: '#8b5cf6',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: domainColors[selectedPersonality.domain as keyof typeof domainColors] || '#6b7280',
-                  fontWeight: '600',
-                  fontSize: '1rem'
+                  color: 'white',
+                  fontSize: '0.875rem',
+                  fontWeight: '600'
                 }}>
-                  {selectedPersonality.name.charAt(0)}
+                  K
                 </div>
                 <div>
-                  <div style={{ fontWeight: '600', fontSize: '1rem', color: '#1f2937' }}>{selectedPersonality.name}</div>
-                  <div style={{ color: '#6b7280', fontSize: '0.8rem' }}>{selectedPersonality.domain} Wisdom</div>
+                  <div style={{ fontWeight: '600', fontSize: '0.875rem', color: '#1f2937' }}>Krishna</div>
+                  <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>Spiritual Wisdom</div>
+                </div>
+                <div style={{ marginLeft: 'auto', color: '#6b7280', fontSize: '0.75rem' }}>
+                  Online
                 </div>
               </div>
 
+              {/* Chat Messages */}
               <div style={{ marginBottom: '1rem' }}>
                 <div style={{
                   background: '#f3f4f6',
                   padding: '0.75rem 1rem',
                   borderRadius: '1rem 1rem 1rem 0.25rem',
                   marginBottom: '0.75rem',
-                  fontSize: '0.9rem',
+                  fontSize: '0.875rem',
                   color: '#1f2937'
                 }}>
                   How can I find peace in difficult times?
@@ -590,20 +507,11 @@ const LandingPage: React.FC = () => {
                   border: '1px solid #e5e7eb',
                   padding: '1rem',
                   borderRadius: '1rem 1rem 0.25rem 1rem',
-                  fontSize: '0.9rem',
+                  fontSize: '0.875rem',
                   lineHeight: '1.5',
-                  color: '#1f2937',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+                  color: '#1f2937'
                 }}>
-                  {(() => {
-                    const responses = {
-                      krishna: "True peace comes from understanding your dharma - your righteous duty. When you act without attachment to results, performing your duty with devotion, the mind finds its natural state of tranquility.",
-                      buddha: "Suffering arises from attachment and desire. Practice mindfulness, observe your thoughts without judgment, and remember that all difficult times are impermanent - this too shall pass.",
-                      jesus_christ: "Come unto me, all ye that labor and are heavy laden, and I will give you rest. Find peace through faith, love for others, and trust in divine providence.",
-                      albert_einstein: "In the midst of difficulty lies opportunity. Peace comes from understanding that we are part of something greater than ourselves - the magnificent cosmos that operates by natural laws."
-                    };
-                    return responses[selectedPersonality.id as keyof typeof responses] || responses.krishna;
-                  })()}
+                  True peace comes from understanding your dharma - your righteous duty. When you act without attachment to results, performing your duty with devotion, the mind finds its natural state of tranquility.
                 </div>
               </div>
 
@@ -613,8 +521,169 @@ const LandingPage: React.FC = () => {
                 fontStyle: 'italic',
                 textAlign: 'center'
               }}>
-                Response based on authentic {selectedPersonality.expertise}
+                Response based on authentic Bhagavad Gita teachings
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Demo */}
+      <section style={{
+        padding: '4rem 2rem',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        textAlign: 'center'
+      }}>
+        <h2 style={{
+          fontSize: '2.25rem',
+          fontWeight: '600',
+          marginBottom: '3rem',
+          color: '#1d1d1f'
+        }}>
+          Start Your Journey
+        </h2>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '1.5rem',
+          maxWidth: '1000px',
+          margin: '0 auto'
+        }}>
+          {/* Albert Einstein */}
+          <div style={{
+            background: '#ffffff',
+            border: '2px solid #e5e7eb',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            textAlign: 'center',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}>
+            <div style={{
+              width: '3rem',
+              height: '3rem',
+              background: '#8b5cf6',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'white',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              E
+            </div>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>Albert Einstein</h3>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              Revolutionary physicist who changed our understanding of space, time, and the universe
+            </p>
+            <div style={{ color: '#8b5cf6', fontSize: '0.75rem', fontWeight: '500' }}>
+              Scientific wisdom
+            </div>
+          </div>
+
+          {/* Mahatma Gandhi */}
+          <div style={{
+            background: '#ffffff',
+            border: '2px solid #e5e7eb',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            textAlign: 'center',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}>
+            <div style={{
+              width: '3rem',
+              height: '3rem',
+              background: '#10b981',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'white',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              G
+            </div>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>Mahatma Gandhi</h3>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              Advocate of non-violence and truth who led India to independence through peaceful resistance
+            </p>
+            <div style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: '500' }}>
+              Leadership wisdom
+            </div>
+          </div>
+
+          {/* Socrates */}
+          <div style={{
+            background: '#ffffff',
+            border: '2px solid #e5e7eb',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            textAlign: 'center',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}>
+            <div style={{
+              width: '3rem',
+              height: '3rem',
+              background: '#ef4444',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'white',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              S
+            </div>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>Socrates</h3>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              Ancient Greek philosopher who laid the foundation for Western philosophy through questioning
+            </p>
+            <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '500' }}>
+              Philosophical wisdom
+            </div>
+          </div>
+
+          {/* William Shakespeare */}
+          <div style={{
+            background: '#ffffff',
+            border: '2px solid #e5e7eb',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            textAlign: 'center',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}>
+            <div style={{
+              width: '3rem',
+              height: '3rem',
+              background: '#8b5cf6',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'white',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              W
+            </div>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>William Shakespeare</h3>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              The most acclaimed writer in the English language with unparalleled insight into human nature
+            </p>
+            <div style={{ color: '#8b5cf6', fontSize: '0.75rem', fontWeight: '500' }}>
+              Literary wisdom
             </div>
           </div>
         </div>
@@ -661,7 +730,7 @@ const LandingPage: React.FC = () => {
               onClick={() => setSelectedDomain(domain)}
               style={{
                 background: selectedDomain === domain 
-                  ? '#6366f1'
+                  ? '#007aff'
                   : 'white',
                 border: selectedDomain === domain 
                   ? 'none'
@@ -673,7 +742,7 @@ const LandingPage: React.FC = () => {
                 fontSize: '0.85rem',
                 fontWeight: '500',
                 transition: 'all 0.3s ease',
-                boxShadow: selectedDomain === domain ? '0 2px 8px rgba(99, 102, 241, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)'
+                boxShadow: selectedDomain === domain ? '0 2px 8px rgba(0, 122, 255, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.05)'
               }}
               onMouseEnter={(e) => {
                 if (selectedDomain !== domain) {
@@ -913,7 +982,7 @@ const LandingPage: React.FC = () => {
             <div style={{
               width: '2.25rem',
               height: '2.25rem',
-              background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+              background: 'linear-gradient(135deg, #f97316, #ea580c)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
