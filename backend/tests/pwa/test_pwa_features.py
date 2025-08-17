@@ -53,9 +53,11 @@ class TestPWAFeatures:
             assert 'sizes' in icon, "Icon missing sizes"
             assert 'type' in icon, "Icon missing type"
         
-        # Validate spiritual content specific fields
-        assert manifest['name'] == "Vimarsh - AI Spiritual Guidance"
-        assert 'spiritual' in manifest.get('description', '').lower() or 'guidance' in manifest.get('description', '').lower()
+        # Validate content specific fields
+        assert manifest['name'] == "Vimarsh - Wisdom Without Boundaries"
+        assert any(keyword in manifest.get('description', '').lower() 
+                  for keyword in ['wisdom', 'guidance', 'minds', 'personalities']), \
+               "Description should contain relevant keywords"
         
         self.test_results.append({
             "test": "manifest_validation",
