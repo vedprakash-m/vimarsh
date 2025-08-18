@@ -6,14 +6,14 @@
 
 ## 1. Executive Summary
 
-**Vimarsh** is a revolutionary AI-powered multi-personality conversational platform that enables authentic dialogues with history's greatest minds, thinkers, and spiritual leaders through their own curated knowledge bases. Leveraging **Retrieval-Augmented Generation (RAG)** with Google Gemini 2.5 Flash, the platform transforms how users access and interact with profound wisdom across **multiple domains: spiritual, scientific, historical, literary, and philosophical**.
+**Vimarsh** is a revolutionary AI-powered multi-personality conversational platform that enables authentic dialogues with history's greatest minds, thinkers, and spiritual leaders through their own curated knowledge bases. Leveraging **Retrieval-Augmented Generation (RAG)** with Google Gemini 2.5 Flash, the platform transforms how users access and interact with profound wisdom across **6 domains: spiritual, philosophical, leadership, scientific, literary, and psychology**.
 
 **Sanskrit**: *विमर्श (Vimarsh)* - "conversation," "dialogue," or "thoughtful discourse"
 
 **Current Achievement**: Complete multi-personality platform with **25 operational personalities**, advanced Enhanced RAG Service V6, and comprehensive personalization with 32,000+ document knowledge base (Live at https://vimarsh.vedprakash.net)  
 **Vision**: Industry-leading AI wisdom platform with cross-session memory, citation grounding, hybrid search, and adaptive personalization across all domains of human knowledge
 
-The platform democratizes access to timeless wisdom by allowing users to engage in authentic conversations with **25 distinct personalities** spanning **6 major domains** including spiritual guides like **Krishna** and **Jesus Christ**, scientific pioneers like **Albert Einstein** and **Isaac Newton**, literary masters like **William Shakespeare** and **Rabindranath Tagore**, historical leaders like **Abraham Lincoln** and **George Washington**, philosophical thinkers like **Marcus Aurelius** and **Confucius**, and psychological pioneers like **Sigmund Freud**. Each personality maintains their authentic voice, expertise, and cultural context, enhanced by RAG-powered content retrieval from their authentic works and teachings.
+The platform democratizes access to timeless wisdom by allowing users to engage in authentic conversations with **25 distinct personalities** spanning **6 major domains** including spiritual guides like **Krishna** and **Jesus Christ**, scientific pioneers like **Albert Einstein** and **Isaac Newton**, literary masters like **William Shakespeare** and **Rabindranath Tagore**, leadership figures like **Abraham Lincoln** and **Mahatma Gandhi**, philosophical thinkers like **Marcus Aurelius** and **Confucius**, and psychological pioneers like **Sigmund Freud**. Each personality maintains their authentic voice, expertise, and cultural context, enhanced by RAG-powered content retrieval from their authentic works and teachings.
 
 The core principle remains ensuring the **highest possible standard for authentic, respectful, and textually faithful responses** across all personality domains, doing full justice to each historical figure's legacy and wisdom. Users can interact through text or voice interfaces in multiple languages, with each personality offering domain-specific expertise while maintaining their characteristic tone and perspective.
 
@@ -44,49 +44,52 @@ The consequence is reliance on less grounded advice, superficial interpretations
 
 ## 3. Solution Overview: Vimarsh Multi-Personality Platform
 
-**Vimarsh** is a comprehensive AI-powered conversational platform that serves as a bridge between users and history's greatest minds across multiple domains. Users can engage in authentic conversations with **12 distinct personalities** spanning **4 major domains**, each grounded in their authentic works and teachings.
+**Vimarsh** is a comprehensive AI-powered conversational platform that serves as a bridge between users and history's greatest minds across multiple domains. Users can engage in authentic conversations with **25 distinct personalities** spanning **6 major domains**, each grounded in their authentic works and teachings.
 
 > **Note:** Detailed technical specifications, system architecture, and implementation details are documented separately in `Tech_Spec_Vimarsh.md`.
 
 ### Core Personality Roster:
 
-**🕉️ Spiritual Domain (6 personalities):**
+**🕉️ Spiritual Domain (5 personalities):**
 - **Krishna** - Divine guidance from Bhagavad Gita, Mahabharata, and Srimad Bhagavatam
 - **Buddha** - Buddhist teachings on suffering, enlightenment, and the Middle Path
 - **Jesus Christ** - Christian wisdom from King James Bible on love, compassion, and spiritual transformation
 - **Rumi** - Mystical poetry and Sufi spiritual insights
-- **Muhammad** - Prophetic guidance and Islamic wisdom
 - **Swami Vivekananda** - Vedantic philosophy and spiritual awakening
 
-**🧠 Scientific/Rational Domain (6 personalities):**
-- **Albert Einstein** - Scientific inquiry, relativity theory, and philosophy of science
-- **Isaac Newton** - Mathematical genius, natural philosophy, and laws of motion
-- **Nikola Tesla** - Visionary inventor, electrical engineering, and innovation
-- **Leonardo da Vinci** - Renaissance genius, scientific observation, and artistic innovation
-- **Archimedes** - Mathematical principles, physics, and engineering solutions
-- **Benjamin Franklin** - Scientific experimentation, practical wisdom, and invention
-
-**📚 Literary Domain (4 personalities):**
-- **William Shakespeare** - Literary genius, human nature, and dramatic wisdom
-- **Rabindranath Tagore** - Poetry, literature, and cultural renaissance
+**💭 Philosophical Domain (6 personalities):**
+- **Marcus Aurelius** - Stoic philosophy, virtue ethics, and imperial leadership
+- **Lao Tzu** - Taoist principles and natural harmony
+- **Confucius** - Chinese philosophy, ethics, and social harmony
+- **Aristotle** - Logic, ethics, and systematic philosophy
 - **Plato** - Philosophical dialogues and ideal forms
 - **Socrates** - Socratic method and philosophical inquiry
 
-**🏛️ Historical/Leadership Domain (6 personalities):**
-- **Abraham Lincoln** - Leadership, governance, civil rights, and national unity
+**🏛️ Leadership Domain (6 personalities):**
 - **Chanakya** - Ancient strategist, political philosophy from Arthashastra
-- **Mahatma Gandhi** - Non-violence, civil rights, and moral leadership
+- **Abraham Lincoln** - Leadership, governance, civil rights, and national unity
+- **Benjamin Franklin** - Founding father wisdom, diplomacy, and practical philosophy
 - **George Washington** - Founding principles and early American leadership
-- **Marcus Aurelius** - Stoic philosophy, virtue ethics, and imperial leadership
-- **Confucius** - Chinese philosophy, ethics, and social harmony
+- **Mahatma Gandhi** - Non-violence, civil rights, and moral leadership
+- **Martin Luther King Jr.** - Civil rights leadership and moral courage
 
-**💭 Philosophical Domain (3 personalities):**
-- **Aristotle** - Logic, ethics, and systematic philosophy
-- **Lao Tzu** - Taoist principles and natural harmony
+**🔬 Scientific Domain (5 personalities):**
+- **Albert Einstein** - Scientific inquiry, relativity theory, and philosophy of science
+- **Isaac Newton** - Mathematical genius, natural philosophy, and laws of motion
+- **Nikola Tesla** - Visionary inventor, electrical engineering, and innovation
+- **Archimedes** - Mathematical principles, physics, and engineering solutions
+- **Leonardo da Vinci** - Renaissance genius, scientific observation, and artistic innovation
+
+**� Literary Domain (2 personalities):**
+- **Rabindranath Tagore** - Poetry, literature, and cultural renaissance
+- **William Shakespeare** - Literary genius, human nature, and dramatic wisdom
+
+**🧠 Psychology Domain (1 personality):**
+- **Sigmund Freud** - Psychoanalysis, unconscious mind, and human psychology
 
 ### Key User Interactions (Multi-Personality Experience):
 
-* **Personality Selection:** Users can browse and select from 25 personalities across 5 domains based on their interests, questions, or life situations (e.g., spiritual guidance with Krishna or Jesus Christ, scientific inquiry with Einstein or Newton, literary insights with Shakespeare or Tagore, strategic wisdom with Chanakya or Lincoln, philosophical discussion with Aristotle or Confucius).
+* **Personality Selection:** Users can browse and select from 25 personalities across 6 domains based on their interests, questions, or life situations (e.g., spiritual guidance with Krishna or Jesus Christ, scientific inquiry with Einstein or Newton, literary insights with Shakespeare or Tagore, strategic wisdom with Chanakya or Lincoln, philosophical discussion with Aristotle or Confucius, psychological insights with Freud).
 * **RAG-Powered Conversations:** Enhanced RAG Service V6 provides content-backed responses from 32,000+ authentic documents, ensuring historically accurate and contextually relevant dialogues.
 * **Cross-Session Memory:** Platform remembers individual user conversations with each personality, creating personalized journeys and continuing relationships with each historical figure.
 * **Wisdom Journal Integration:** Personal insights tracking with semantic search capabilities, allowing users to record and revisit spiritual milestones.
@@ -104,7 +107,7 @@ The consequence is reliance on less grounded advice, superficial interpretations
 
 ### Key Differentiators:
 
-* **Advanced Multi-Personality System:** 12 operational personalities across 4 domains with authentic voice preservation and cross-session memory capabilities.
+* **Advanced Multi-Personality System:** 25 operational personalities across 6 domains with authentic voice preservation and cross-session memory capabilities.
 * **Enhanced RAG Architecture:** Hybrid search fusion combining BM25 + vector embeddings with citation grounding and quality validation for superior response accuracy.
 * **Persistent Personalization:** Cross-session conversation memory, wisdom journal integration, and progressive user experience adaptation based on interaction patterns.
 * **Administrative Excellence:** Comprehensive admin panel with content management, user analytics, and quality assurance tools for enterprise-grade operation.
@@ -151,7 +154,7 @@ Vimarsh serves a diverse global audience seeking authentic wisdom and insights f
 - Seeking inspiration for innovation and discovery
 - Learning about the intersection of science and spirituality
 
-**🏛️ Historical Domain Users:**
+**🏛️ Leadership Domain Users:**
 - Learning leadership lessons from historical figures
 - Understanding governance and social change
 - Exploring historical decision-making processes
