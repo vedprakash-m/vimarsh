@@ -73,7 +73,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
       padding: '2rem'
     }}>
       <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#ffffff',
         borderRadius: '1.5rem',
         padding: '2rem',
         maxWidth: '900px',
@@ -81,9 +81,9 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
         maxHeight: '80vh',
         overflowY: 'auto',
         position: 'relative',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        color: 'white',
+        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+        border: '1px solid #e2e8f0',
+        color: '#1e293b',
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
         {/* Header */}
@@ -99,8 +99,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: '700',
-              color: 'white',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              color: '#1e293b'
             }}>
               Select Personality
             </h2>
@@ -109,22 +108,24 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
             <button
               onClick={onClose}
               style={{
-                background: 'rgba(255, 255, 255, 0.2)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
                 borderRadius: '0.5rem',
                 padding: '0.5rem',
-                color: 'white',
+                color: '#64748b',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.background = '#f1f5f9';
+                e.currentTarget.style.borderColor = '#cbd5e1';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.background = '#f8fafc';
+                e.currentTarget.style.borderColor = '#e2e8f0';
               }}
             >
               <X size={20} />
@@ -144,14 +145,13 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
               borderRadius: '1rem',
               padding: '1rem 1rem 1rem 3rem',
-              color: 'white',
+              color: '#1e293b',
               fontSize: '1rem',
               outline: 'none',
-              backdropFilter: 'blur(10px)',
               boxSizing: 'border-box'
             }}
           />
@@ -162,7 +162,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
               left: '1rem',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: 'rgba(255, 255, 255, 0.6)'
+              color: '#64748b'
             }}
           />
         </div>
@@ -178,17 +178,16 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
             onClick={() => setSelectedDomain('all')}
             style={{
               background: selectedDomain === 'all' 
-                ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
-                : 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+                ? 'linear-gradient(135deg, #FF6B35, #F7931E)' 
+                : '#f8fafc',
+              border: selectedDomain === 'all' ? 'none' : '1px solid #e2e8f0',
               borderRadius: '1.5rem',
               padding: '0.5rem 1rem',
-              color: 'white',
+              color: selectedDomain === 'all' ? 'white' : '#64748b',
               fontSize: '0.9rem',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              backdropFilter: 'blur(10px)'
+              transition: 'all 0.2s ease'
             }}
           >
             All
@@ -201,17 +200,16 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                 onClick={() => setSelectedDomain(domain)}
                 style={{
                   background: selectedDomain === domain 
-                    ? 'linear-gradient(135deg, #fbbf24, #f59e0b)' 
-                    : 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                    ? 'linear-gradient(135deg, #FF6B35, #F7931E)' 
+                    : '#f8fafc',
+                  border: selectedDomain === domain ? 'none' : '1px solid #e2e8f0',
                   borderRadius: '1.5rem',
                   padding: '0.5rem 1rem',
-                  color: 'white',
+                  color: selectedDomain === domain ? 'white' : '#64748b',
                   fontSize: '0.9rem',
                   fontWeight: '500',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem'
@@ -240,33 +238,33 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                 onClick={() => onPersonalitySelect(personality)}
                 style={{
                   background: isSelected 
-                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))' 
-                    : 'rgba(255, 255, 255, 0.1)',
+                    ? '#fef3e2' 
+                    : '#ffffff',
                   border: isSelected 
-                    ? '2px solid #fbbf24' 
-                    : '1px solid rgba(255, 255, 255, 0.2)',
+                    ? '2px solid #FF6B35' 
+                    : '1px solid #e2e8f0',
                   borderRadius: '1rem',
                   padding: '1.5rem',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.2s ease',
                   position: 'relative',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '1rem'
+                  gap: '1rem',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
                 }}
                 onMouseEnter={(e) => {
                   if (!isSelected) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.2)';
+                    e.currentTarget.style.background = '#f8fafc';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isSelected) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.background = '#ffffff';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
                   }
                 }}
               >
@@ -281,7 +279,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                   justifyContent: 'center',
                   fontSize: '1.5rem',
                   flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                 }}>
                   {domainStyle.icon}
                 </div>
@@ -292,8 +290,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                     margin: '0 0 0.5rem 0',
                     fontSize: '1.25rem',
                     fontWeight: '700',
-                    color: 'white',
-                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
+                    color: '#1e293b'
                   }}>
                     {personality.display_name || personality.name || 'Unknown'}
                   </h3>
@@ -301,7 +298,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                   <p style={{
                     margin: '0 0 1rem 0',
                     fontSize: '0.9rem',
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: '#64748b',
                     lineHeight: '1.4',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
@@ -317,8 +314,8 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                   position: 'absolute',
                   top: '1rem',
                   right: '1rem',
-                  background: `${domainStyle.color}22`,
-                  border: `1px solid ${domainStyle.color}`,
+                  background: `${domainStyle.color}15`,
+                  border: `1px solid ${domainStyle.color}40`,
                   borderRadius: '1rem',
                   padding: '0.25rem 0.75rem',
                   fontSize: '0.75rem',
@@ -338,7 +335,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                     right: '-0.5rem',
                     width: '2rem',
                     height: '2rem',
-                    background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                    background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
@@ -346,7 +343,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                     color: 'white',
                     fontSize: '0.8rem',
                     fontWeight: '700',
-                    boxShadow: '0 4px 12px rgba(251, 191, 36, 0.4)'
+                    boxShadow: '0 2px 8px rgba(255, 107, 53, 0.3)'
                   }}>
                     ✓
                   </div>
@@ -361,10 +358,10 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
           <div style={{
             textAlign: 'center',
             padding: '3rem 2rem',
-            color: 'rgba(255, 255, 255, 0.7)'
+            color: '#64748b'
           }}>
             <Brain size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem' }}>No personalities found</h3>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#475569' }}>No personalities found</h3>
             <p style={{ margin: 0, fontSize: '0.9rem' }}>
               Try adjusting your search or domain filter
             </p>

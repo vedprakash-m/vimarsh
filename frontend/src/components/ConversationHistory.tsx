@@ -115,117 +115,315 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   const stats = getStorageStats();
 
   return (
-    <div className="conversation-history">
+    <div style={{
+      background: '#ffffff',
+      borderRadius: '1rem',
+      border: '1px solid #e2e8f0',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      overflow: 'hidden'
+    }}>
       {/* Header */}
-      <div className="p-4 border-b border-neutral-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="heading-3 text-neutral-800">
+      <div style={{
+        padding: '1rem',
+        borderBottom: '1px solid #e2e8f0'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '1rem'
+        }}>
+          <h2 style={{
+            margin: 0,
+            fontSize: '1.25rem',
+            fontWeight: '700',
+            color: '#1e293b'
+          }}>
             {t('conversationHistory')}
           </h2>
           <button
             onClick={onNewConversation}
-            className="btn-primary text-sm"
+            style={{
+              background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+              border: 'none',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1rem',
+              color: 'white',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'all 0.2s ease'
+            }}
             title={t('newConversation')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            <span className="mr-2">✨</span>
+            <span>✨</span>
             {t('new')}
           </button>
         </div>
 
         {/* Search */}
-        <div className="relative">
+        <div style={{ position: 'relative' }}>
           <input
             type="text"
             placeholder={t('searchConversations')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-saffron-primary focus:border-transparent"
+            style={{
+              width: '100%',
+              paddingLeft: '2.5rem',
+              paddingRight: '1rem',
+              paddingTop: '0.5rem',
+              paddingBottom: '0.5rem',
+              border: '1px solid #e2e8f0',
+              borderRadius: '0.5rem',
+              outline: 'none',
+              fontSize: '0.875rem',
+              backgroundColor: '#f8fafc',
+              boxSizing: 'border-box'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#FF6B35';
+              e.currentTarget.style.backgroundColor = '#ffffff';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = '#e2e8f0';
+              e.currentTarget.style.backgroundColor = '#f8fafc';
+            }}
           />
-          <span className="absolute left-3 top-2.5 text-neutral-400">🔍</span>
+          <span style={{
+            position: 'absolute',
+            left: '0.75rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#64748b'
+          }}>🔍</span>
         </div>
 
         {/* Stats */}
-        <div className="mt-3 text-xs text-neutral-500 flex justify-between">
+        <div style={{
+          marginTop: '0.75rem',
+          fontSize: '0.75rem',
+          color: '#64748b',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}>
           <span>{stats.totalSessions} {t('sessions')}</span>
           <span>{stats.totalMessages} {t('messages')}</span>
         </div>
       </div>
 
       {/* Export Controls */}
-      <div className="p-4 border-b border-neutral-200 bg-neutral-50">
-        <div className="flex gap-2">
+      <div style={{
+        padding: '1rem',
+        borderBottom: '1px solid #e2e8f0',
+        backgroundColor: '#f8fafc'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
             onClick={() => handleExportAll('txt')}
             disabled={isExporting || sessions.length === 0}
-            className="btn-secondary text-xs flex-1"
+            style={{
+              flex: 1,
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '0.5rem',
+              padding: '0.5rem',
+              fontSize: '0.75rem',
+              color: '#64748b',
+              cursor: isExporting || sessions.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: isExporting || sessions.length === 0 ? 0.5 : 1,
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              if (!isExporting && sessions.length > 0) {
+                e.currentTarget.style.backgroundColor = '#f1f5f9';
+                e.currentTarget.style.borderColor = '#cbd5e1';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isExporting && sessions.length > 0) {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.borderColor = '#e2e8f0';
+              }
+            }}
           >
             📄 {t('exportTxt')}
           </button>
           <button
             onClick={() => handleExportAll('json')}
             disabled={isExporting || sessions.length === 0}
-            className="btn-secondary text-xs flex-1"
+            style={{
+              flex: 1,
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '0.5rem',
+              padding: '0.5rem',
+              fontSize: '0.75rem',
+              color: '#64748b',
+              cursor: isExporting || sessions.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: isExporting || sessions.length === 0 ? 0.5 : 1,
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              if (!isExporting && sessions.length > 0) {
+                e.currentTarget.style.backgroundColor = '#f1f5f9';
+                e.currentTarget.style.borderColor = '#cbd5e1';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isExporting && sessions.length > 0) {
+                e.currentTarget.style.backgroundColor = '#ffffff';
+                e.currentTarget.style.borderColor = '#e2e8f0';
+              }
+            }}
           >
             📊 {t('exportJson')}
           </button>
         </div>
         {isExporting && (
-          <div className="mt-2 text-xs text-neutral-600 text-center">
+          <div style={{
+            marginTop: '0.5rem',
+            fontSize: '0.75rem',
+            color: '#64748b',
+            textAlign: 'center'
+          }}>
             {t('exporting')}...
           </div>
         )}
       </div>
 
       {/* Session List */}
-      <div className="flex-1 overflow-y-auto">
+      <div style={{
+        flex: 1,
+        overflowY: 'auto'
+      }}>
         {filteredSessions.length === 0 ? (
-          <div className="p-8 text-center text-neutral-500">
+          <div style={{
+            padding: '2rem',
+            textAlign: 'center',
+            color: '#64748b'
+          }}>
             {searchQuery ? (
               <>
-                <div className="text-4xl mb-4">🔍</div>
-                <p>{t('noSearchResults')}</p>
-                <p className="text-sm mt-2">{t('tryDifferentSearch')}</p>
+                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔍</div>
+                <p style={{ margin: '0 0 0.5rem 0' }}>{t('noSearchResults')}</p>
+                <p style={{ fontSize: '0.875rem', margin: 0 }}>{t('tryDifferentSearch')}</p>
               </>
             ) : (
               <>
-                <div className="text-4xl mb-4">💭</div>
-                <p>{t('noConversations')}</p>
-                <p className="text-sm mt-2">{t('startFirstConversation')}</p>
+                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>💭</div>
+                <p style={{ margin: '0 0 0.5rem 0' }}>{t('noConversations')}</p>
+                <p style={{ fontSize: '0.875rem', margin: 0 }}>{t('startFirstConversation')}</p>
               </>
             )}
           </div>
         ) : (
-          <div className="space-y-1 p-2">
+          <div style={{
+            padding: '0.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.25rem'
+          }}>
             {filteredSessions.map((session) => (
               <div
                 key={session.id}
-                className={`session-item p-3 rounded-lg cursor-pointer transition-colors relative group ${
-                  session.id === currentSessionId
-                    ? 'bg-saffron-light border border-saffron-primary'
-                    : 'hover:bg-neutral-100'
-                }`}
+                data-session={session.id}
+                style={{
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                  background: session.id === currentSessionId ? '#fef3e2' : 'transparent',
+                  border: session.id === currentSessionId ? '1px solid #FF6B35' : '1px solid transparent'
+                }}
                 onClick={() => onSessionSelect(session.id)}
+                onMouseEnter={(e) => {
+                  if (session.id !== currentSessionId) {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                  }
+                  // Show action buttons
+                  const actionButtons = e.currentTarget.querySelector('[data-action-buttons]') as HTMLElement;
+                  if (actionButtons) {
+                    actionButtons.style.opacity = '1';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (session.id !== currentSessionId) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                  // Hide action buttons
+                  const actionButtons = e.currentTarget.querySelector('[data-action-buttons]') as HTMLElement;
+                  if (actionButtons) {
+                    actionButtons.style.opacity = '0';
+                  }
+                }}
               >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-neutral-800 truncate text-sm">
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start'
+                }}>
+                  <div style={{
+                    flex: 1,
+                    minWidth: 0
+                  }}>
+                    <h3 style={{
+                      fontWeight: '500',
+                      color: '#1e293b',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      fontSize: '0.875rem',
+                      margin: 0
+                    }}>
                       {session.title}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-neutral-500">
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      marginTop: '0.25rem',
+                      fontSize: '0.75rem',
+                      color: '#64748b'
+                    }}>
                       <span>{formatDate(new Date(session.updatedAt))}</span>
                       <span>•</span>
                       <span>{session.metadata.messageCount} {t('messages')}</span>
                       <span>•</span>
-                      <span className={`flag flag-${session.language}`}>
+                      <span>
                         {session.language === 'hi' ? '🇮🇳' : '🇬🇧'}
                       </span>
                     </div>
                     {session.metadata.topics && session.metadata.topics.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
+                      <div style={{
+                        marginTop: '0.5rem',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '0.25rem'
+                      }}>
                         {session.metadata.topics.slice(0, 3).map((topic, index) => (
                           <span
                             key={index}
-                            className="inline-block px-2 py-1 bg-neutral-200 text-neutral-600 text-xs rounded"
+                            style={{
+                              display: 'inline-block',
+                              padding: '0.25rem 0.5rem',
+                              backgroundColor: '#f1f5f9',
+                              color: '#64748b',
+                              fontSize: '0.75rem',
+                              borderRadius: '0.25rem'
+                            }}
                           >
                             {topic}
                           </span>
@@ -235,14 +433,36 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
                   </div>
                   
                   {/* Action buttons */}
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div 
+                    data-action-buttons="true"
+                    style={{
+                      display: 'flex',
+                      gap: '0.25rem',
+                      opacity: 0,
+                      transition: 'opacity 0.2s ease'
+                    }}
+                  >
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleExportSession(session.id, 'txt');
                       }}
-                      className="p-1 text-neutral-400 hover:text-neutral-600 rounded"
+                      style={{
+                        padding: '0.25rem',
+                        background: 'none',
+                        border: 'none',
+                        color: '#94a3b8',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        transition: 'color 0.2s ease'
+                      }}
                       title={t('exportSession')}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#64748b';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#94a3b8';
+                      }}
                     >
                       📄
                     </button>
@@ -251,8 +471,22 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
                         e.stopPropagation();
                         setShowDeleteConfirm(session.id);
                       }}
-                      className="p-1 text-neutral-400 hover:text-red-600 rounded"
+                      style={{
+                        padding: '0.25rem',
+                        background: 'none',
+                        border: 'none',
+                        color: '#94a3b8',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        transition: 'color 0.2s ease'
+                      }}
                       title={t('deleteSession')}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#ef4444';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#94a3b8';
+                      }}
                     >
                       🗑️
                     </button>
@@ -266,24 +500,86 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
-            <h3 className="heading-4 text-neutral-800 mb-4">
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '0.5rem',
+            padding: '1.5rem',
+            maxWidth: '24rem',
+            margin: '1rem',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)'
+          }}>
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: '600',
+              color: '#1e293b',
+              marginBottom: '1rem',
+              margin: 0
+            }}>
               {t('confirmDelete')}
             </h3>
-            <p className="body-text text-neutral-600 mb-6">
+            <p style={{
+              color: '#64748b',
+              marginBottom: '1.5rem',
+              lineHeight: '1.5',
+              margin: '1rem 0 1.5rem 0'
+            }}>
               {t('deleteSessionWarning')}
             </p>
-            <div className="flex gap-3">
+            <div style={{
+              display: 'flex',
+              gap: '0.75rem'
+            }}>
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="btn-secondary flex-1"
+                style={{
+                  flex: 1,
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                }}
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={() => handleDeleteSession(showDeleteConfirm)}
-                className="btn-danger flex-1"
+                style={{
+                  flex: 1,
+                  background: '#ef4444',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  color: 'white',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#dc2626';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ef4444';
+                }}
               >
                 {t('delete')}
               </button>

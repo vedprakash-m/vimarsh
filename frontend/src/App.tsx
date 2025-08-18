@@ -2,6 +2,7 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MsalProvider } from '@azure/msal-react';
 import { PublicClientApplication } from '@azure/msal-browser';
+import './styles/vimarsh-design-system.css';
 import './styles/spiritual-design-system.css';
 import './styles/domain-themes.css';
 
@@ -31,27 +32,32 @@ import { msalConfig } from './auth/msalConfig';
 // Create MSAL instance for Vedprakash domain
 const msalInstance = new PublicClientApplication(msalConfig);
 
-// Lightweight loading component for lazy-loaded routes
-const SpiritualLoadingSpinner: React.FC = () => (
+// Apple-inspired loading component for lazy-loaded routes
+const AppleLoadingSpinner: React.FC = () => (
   <div style={{
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    background: 'linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%)',
-    color: '#5D4037',
-    fontFamily: 'Inter, system-ui, sans-serif'
+    background: '#ffffff',
+    color: '#1d1d1f',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
   }}>
     <div style={{
-      width: '40px',
-      height: '40px',
-      border: '3px solid #FF6B35',
-      borderTop: '3px solid transparent',
+      width: '32px',
+      height: '32px',
+      border: '2px solid #f3f4f6',
+      borderTop: '2px solid #f97316',
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     }}></div>
-    <p style={{ marginTop: '16px', fontSize: '14px' }}>Loading wisdom guidance...</p>
+    <p style={{ 
+      marginTop: '16px', 
+      fontSize: '14px',
+      color: '#6e6e73',
+      fontWeight: 500
+    }}>Loading wisdom guidance...</p>
     <style dangerouslySetInnerHTML={{
       __html: `
         @keyframes spin {
@@ -88,7 +94,7 @@ function App() {
 
   // Don't render until MSAL is initialized
   if (!isInitialized) {
-    return <SpiritualLoadingSpinner />;
+    return <AppleLoadingSpinner />;
   }
   
   return (
@@ -101,7 +107,7 @@ function App() {
                 <LanguageProvider>
                 <DomainThemeManager />
                 <Router>
-                  <Suspense fallback={<SpiritualLoadingSpinner />}>
+                  <Suspense fallback={<AppleLoadingSpinner />}>
                     <Routes>
                     {/* Landing Page - Public Route */}
                     <Route path="/" element={<LandingPage />} />

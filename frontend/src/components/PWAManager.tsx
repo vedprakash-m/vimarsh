@@ -54,26 +54,99 @@ export const PWABanner: React.FC<PWABannerProps> = ({ className = '' }) => {
 
   if (showUpdateBanner) {
     return (
-      <div className={`pwa-banner pwa-banner--update ${className}`}>
-        <div className="pwa-banner__content">
-          <RefreshCw className="pwa-banner__icon" size={20} />
-          <div className="pwa-banner__text">
-            <span className="pwa-banner__title">Update Available</span>
-            <span className="pwa-banner__description">
+      <div style={{
+        position: 'fixed',
+        top: '1rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+        borderRadius: '1rem',
+        padding: '1rem 1.5rem',
+        boxShadow: '0 10px 30px rgba(255, 107, 53, 0.3)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        backdropFilter: 'blur(8px)',
+        color: '#ffffff',
+        minWidth: '320px',
+        maxWidth: '480px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem'
+        }}>
+          <RefreshCw 
+            size={20} 
+            style={{
+              color: '#ffffff',
+              flexShrink: 0
+            }}
+          />
+          <div style={{ flex: 1 }}>
+            <span style={{
+              display: 'block',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              marginBottom: '0.25rem'
+            }}>Update Available</span>
+            <span style={{
+              display: 'block',
+              fontSize: '0.75rem',
+              opacity: 0.9,
+              lineHeight: '1.4'
+            }}>
               A new version of Vimarsh is ready to install
             </span>
           </div>
           <button
             onClick={handleUpdate}
             disabled={updating}
-            className="pwa-banner__button pwa-banner__button--primary"
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              color: '#ffffff',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1rem',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              cursor: updating ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              opacity: updating ? 0.7 : 1
+            }}
+            onMouseEnter={(e) => {
+              if (!updating) {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!updating) {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }
+            }}
             aria-label="Update Vimarsh to latest version"
           >
             {updating ? 'Updating...' : 'Update'}
           </button>
           <button
             onClick={() => setShowUpdateBanner(false)}
-            className="pwa-banner__button pwa-banner__button--dismiss"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#ffffff',
+              cursor: 'pointer',
+              padding: '0.25rem',
+              borderRadius: '0.25rem',
+              opacity: 0.7,
+              transition: 'opacity 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '0.7';
+            }}
             aria-label="Dismiss update notification"
           >
             <X size={16} />
@@ -85,26 +158,102 @@ export const PWABanner: React.FC<PWABannerProps> = ({ className = '' }) => {
 
   if (showInstallBanner && !installDismissed) {
     return (
-      <div className={`pwa-banner pwa-banner--install ${className}`}>
-        <div className="pwa-banner__content">
-          <Download className="pwa-banner__icon" size={20} />
-          <div className="pwa-banner__text">
-            <span className="pwa-banner__title">Install Vimarsh</span>
-            <span className="pwa-banner__description">
+      <div style={{
+        position: 'fixed',
+        bottom: '1rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        background: '#ffffff',
+        borderRadius: '1rem',
+        padding: '1rem 1.5rem',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+        border: '2px solid #FF6B35',
+        color: '#1e293b',
+        minWidth: '320px',
+        maxWidth: '480px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem'
+        }}>
+          <Download 
+            size={20} 
+            style={{
+              color: '#FF6B35',
+              flexShrink: 0
+            }}
+          />
+          <div style={{ flex: 1 }}>
+            <span style={{
+              display: 'block',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              marginBottom: '0.25rem',
+              color: '#1e293b'
+            }}>Install Vimarsh</span>
+            <span style={{
+              display: 'block',
+              fontSize: '0.75rem',
+              color: '#64748b',
+              lineHeight: '1.4'
+            }}>
               Get the full app experience with offline access
             </span>
           </div>
           <button
             onClick={handleInstall}
             disabled={installing}
-            className="pwa-banner__button pwa-banner__button--primary"
+            style={{
+              background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 1rem',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              cursor: installing ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              opacity: installing ? 0.7 : 1,
+              boxShadow: '0 2px 8px rgba(255, 107, 53, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              if (!installing) {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!installing) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 107, 53, 0.3)';
+              }
+            }}
             aria-label="Install Vimarsh as an app"
           >
             {installing ? 'Installing...' : 'Install'}
           </button>
           <button
             onClick={dismissInstallBanner}
-            className="pwa-banner__button pwa-banner__button--dismiss"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#64748b',
+              cursor: 'pointer',
+              padding: '0.25rem',
+              borderRadius: '0.25rem',
+              opacity: 0.7,
+              transition: 'opacity 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.color = '#1e293b';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '0.7';
+              e.currentTarget.style.color = '#64748b';
+            }}
             aria-label="Dismiss install prompt"
           >
             <X size={16} />
@@ -142,17 +291,46 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({ className = 
   }
 
   return (
-    <div className={`offline-indicator ${!isOnline ? 'offline-indicator--offline' : 'offline-indicator--online'} ${className}`}>
-      <div className="offline-indicator__content">
+    <div style={{
+      position: 'fixed',
+      top: '1rem',
+      right: '1rem',
+      zIndex: 1000,
+      background: isOnline ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #ef4444, #dc2626)',
+      borderRadius: '0.75rem',
+      padding: '0.75rem 1rem',
+      boxShadow: isOnline ? '0 4px 16px rgba(16, 185, 129, 0.3)' : '0 4px 16px rgba(239, 68, 68, 0.3)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      color: '#ffffff',
+      transition: 'all 0.3s ease',
+      backdropFilter: 'blur(8px)'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
+      }}>
         {isOnline ? (
           <>
-            <Wifi className="offline-indicator__icon" size={16} />
-            <span>Back online</span>
+            <Wifi 
+              size={16} 
+              style={{ color: '#ffffff' }}
+            />
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: '600'
+            }}>Back online</span>
           </>
         ) : (
           <>
-            <WifiOff className="offline-indicator__icon" size={16} />
-            <span>You're offline</span>
+            <WifiOff 
+              size={16} 
+              style={{ color: '#ffffff' }}
+            />
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: '600'
+            }}>You're offline</span>
           </>
         )}
       </div>
@@ -168,19 +346,48 @@ export const PWAStatus: React.FC<PWAStatusProps> = ({ className = '' }) => {
   const { isInstalled, isOnline, canInstall } = usePWA();
 
   return (
-    <div className={`pwa-status ${className}`}>
-      <div className="pwa-status__indicators">
+    <div style={{
+      display: 'flex',
+      gap: '0.5rem',
+      alignItems: 'center'
+    }}>
+      <div style={{
+        display: 'flex',
+        gap: '0.5rem',
+        alignItems: 'center'
+      }}>
         {isInstalled && (
-          <span className="pwa-status__badge pwa-status__badge--installed">
+          <span style={{
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            color: '#ffffff',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '9999px',
+            fontSize: '0.75rem',
+            fontWeight: '600'
+          }}>
             App Installed
           </span>
         )}
         {canInstall && !isInstalled && (
-          <span className="pwa-status__badge pwa-status__badge--installable">
+          <span style={{
+            background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+            color: '#ffffff',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '9999px',
+            fontSize: '0.75rem',
+            fontWeight: '600'
+          }}>
             Installable
           </span>
         )}
-        <span className={`pwa-status__badge ${isOnline ? 'pwa-status__badge--online' : 'pwa-status__badge--offline'}`}>
+        <span style={{
+          background: isOnline ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #ef4444, #dc2626)',
+          color: '#ffffff',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '9999px',
+          fontSize: '0.75rem',
+          fontWeight: '600'
+        }}>
           {isOnline ? 'Online' : 'Offline'}
         </span>
       </div>
@@ -203,7 +410,12 @@ export const PWAManager: React.FC<PWAManagerProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`pwa-manager ${className}`}>
+    <div style={{
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1rem'
+    }}>
       {showInstallPrompt && <PWABanner />}
       {showOfflineIndicator && <OfflineIndicator />}
       {showStatus && <PWAStatus />}

@@ -81,7 +81,7 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
         description: language === 'Hindi' 
           ? 'यह उत्तर आपके विशिष्ट प्रश्न के लिए AI द्वारा तैयार किया गया है'
           : 'This response was crafted specifically for your question using AI wisdom',
-        color: 'from-blue-500 to-blue-600',
+        color: '#3B82F6',
         bgColor: 'bg-white/10 border-white/20'
       };
     }
@@ -94,7 +94,7 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
         description: language === 'Hindi'
           ? 'यह शास्त्रों से लिया गया पारंपरिक ज्ञान है'
           : 'This is timeless wisdom from sacred texts and teachings',
-        color: 'from-amber-500 to-amber-600',
+        color: '#F59E0B',
         bgColor: 'bg-white/10 border-white/20'
       };
     }
@@ -107,7 +107,7 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
         description: language === 'Hindi'
           ? 'यह उत्तर गहन खोज और AI के संयोजन से बनाया गया है'
           : 'This combines deep search through wisdom texts with AI insights',
-        color: 'from-purple-500 to-purple-600',
+        color: '#8B5CF6',
         bgColor: 'bg-white/10 border-white/20'
       };
     }
@@ -120,7 +120,7 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
       description: language === 'Hindi'
         ? 'आध्यात्मिक मार्गदर्शन प्रणाली से उत्तर'
         : 'Response from spiritual guidance system',
-      color: 'from-gray-500 to-gray-600',
+              color: '#6B7280',
       bgColor: 'bg-gray-50 border-gray-200'
     };
   };
@@ -128,16 +128,43 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
   const sourceInfo = getSourceInfo();
   
   return (
-    <div className={`response-source-badge rounded-lg border ${sourceInfo.bgColor} p-3 transition-all duration-200`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">{sourceInfo.icon}</span>
+    <div style={{
+      borderRadius: '0.75rem',
+      border: sourceInfo.type === 'unknown' ? '1px solid #E5E7EB' : '1px solid rgba(255, 255, 255, 0.2)',
+      backgroundColor: sourceInfo.type === 'unknown' ? '#F9FAFB' : 'rgba(255, 255, 255, 0.1)',
+      padding: '0.75rem',
+      transition: 'all 0.2s ease'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <span style={{ fontSize: '1.125rem' }}>{sourceInfo.icon}</span>
           <div>
-            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${sourceInfo.color} text-white`}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: '500',
+              background: `linear-gradient(135deg, ${sourceInfo.color}, ${sourceInfo.color}E6)`,
+              color: '#ffffff'
+            }}>
               {sourceInfo.label}
             </span>
             {metadata.generation_time_ms && (
-              <span className="ml-2 text-xs text-gray-500">
+              <span style={{
+                marginLeft: '0.5rem',
+                fontSize: '0.75rem',
+                color: '#6B7280'
+              }}>
                 {metadata.generation_time_ms}ms
               </span>
             )}
@@ -146,32 +173,71 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
         
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          style={{
+            fontSize: '0.75rem',
+            color: '#6B7280',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'color 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#374151';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#6B7280';
+          }}
           title={showDetails ? 'Hide details' : 'Show details'}
         >
           {showDetails ? '▼' : 'ℹ️'}
         </button>
       </div>
       
-      <p className="text-sm text-gray-600 mt-2">
+      <p style={{
+        fontSize: '0.875rem',
+        color: '#4B5563',
+        marginTop: '0.5rem'
+      }}>
         {sourceInfo.description}
       </p>
       
       {showDetails && (
-        <div className="mt-3 pt-3 border-t border-gray-200 text-xs space-y-2">
-          <div className="grid grid-cols-2 gap-2">
+        <div style={{
+          marginTop: '0.75rem',
+          paddingTop: '0.75rem',
+          borderTop: '1px solid #E5E7EB',
+          fontSize: '0.75rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.5rem'
+        }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '0.5rem'
+          }}>
             <div>
-              <span className="font-medium text-gray-700">Service Mode:</span>
-              <span className="ml-1 text-gray-600">{metadata.service_mode || 'unknown'}</span>
+              <span style={{
+                fontWeight: '500',
+                color: '#374151'
+              }}>Service Mode:</span>
+              <span style={{
+                marginLeft: '0.25rem',
+                color: '#4B5563'
+              }}>{metadata.service_mode || 'unknown'}</span>
             </div>
             {metadata.circuit_breaker_status && (
               <div>
-                <span className="font-medium text-gray-700">Circuit Breaker:</span>
-                <span className={`ml-1 ${
-                  metadata.circuit_breaker_status.state === 'CLOSED' ? 'text-green-600' :
-                  metadata.circuit_breaker_status.state === 'OPEN' ? 'text-red-600' :
-                  'text-yellow-600'
-                }`}>
+                <span style={{
+                  fontWeight: '500',
+                  color: '#374151'
+                }}>Circuit Breaker:</span>
+                <span style={{
+                  marginLeft: '0.25rem',
+                  color: metadata.circuit_breaker_status.state === 'CLOSED' ? '#059669' :
+                        metadata.circuit_breaker_status.state === 'OPEN' ? '#DC2626' :
+                        '#D97706'
+                }}>
                   {metadata.circuit_breaker_status.state}
                 </span>
               </div>
@@ -180,15 +246,28 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
           
           {metadata.fallback_reason && (
             <div>
-              <span className="font-medium text-gray-700">Fallback Reason:</span>
-              <span className="ml-1 text-gray-600 italic">{metadata.fallback_reason}</span>
+              <span style={{
+                fontWeight: '500',
+                color: '#374151'
+              }}>Fallback Reason:</span>
+              <span style={{
+                marginLeft: '0.25rem',
+                color: '#4B5563',
+                fontStyle: 'italic'
+              }}>{metadata.fallback_reason}</span>
             </div>
           )}
           
           {metadata.reliability_stats && (
             <div>
-              <span className="font-medium text-gray-700">Success Rate:</span>
-              <span className="ml-1 text-gray-600">
+              <span style={{
+                fontWeight: '500',
+                color: '#374151'
+              }}>Success Rate:</span>
+              <span style={{
+                marginLeft: '0.25rem',
+                color: '#4B5563'
+              }}>
                 {Math.round(metadata.reliability_stats.success_rate * 100)}%
                 {' '}({metadata.reliability_stats.total_attempts} attempts)
               </span>
@@ -196,9 +275,11 @@ const ResponseSourceBadge: React.FC<ResponseSourceBadgeProps> = ({ metadata, lan
           )}
           
           {metadata.memory_enhanced && (
-            <div className="text-green-600">
-              <span className="font-medium">✓ Memory Enhanced:</span>
-              <span className="ml-1">Personalized based on conversation history</span>
+            <div style={{
+              color: '#059669'
+            }}>
+              <span style={{ fontWeight: '500' }}>✓ Memory Enhanced:</span>
+              <span style={{ marginLeft: '0.25rem' }}>Personalized based on conversation history</span>
             </div>
           )}
         </div>
@@ -326,23 +407,81 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
   const isLongResponse = response.text.length > 300;
 
   return (
-    <div className="response-display bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200/50 p-6 mb-6 transition-all hover:shadow-xl">
+    <div style={{
+      background: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(8px)',
+      borderRadius: '1.5rem',
+      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+      border: '1px solid rgba(226, 232, 240, 0.5)',
+      padding: '1.5rem',
+      marginBottom: '1.5rem',
+      transition: 'all 0.3s ease',
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.1)';
+    }}
+    >
       {/* Response Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 bg-gradient-to-br ${persona.color} rounded-full flex items-center justify-center shadow-md`}>
-            <span className="text-white text-lg font-bold">{persona.avatar}</span>
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        marginBottom: '1rem'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
+          <div style={{
+            width: '2.5rem',
+            height: '2.5rem',
+            background: `linear-gradient(135deg, ${persona.color.includes('saffron') ? '#FF6B35, #F7931E' : '#1e40af, #059669'})`,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          }}>
+            <span style={{
+              color: '#ffffff',
+              fontSize: '1.125rem',
+              fontWeight: '700'
+            }}>{persona.avatar}</span>
           </div>
           <div>
-            <h3 className="heading-4 text-earth-brown mb-0">{persona.name}</h3>
-            <div className="flex items-center gap-2">
-              <p className="caption-text text-neutral-500">{formatTimestamp(response.timestamp)}</p>
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: '600',
+              color: '#1e293b',
+              margin: '0 0 0.25rem 0'
+            }}>{persona.name}</h3>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <p style={{
+                color: '#64748b',
+                fontSize: '0.75rem',
+                margin: 0
+              }}>{formatTimestamp(response.timestamp)}</p>
               {response.tags && response.tags.length > 0 && (
-                <div className="flex gap-1">
+                <div style={{ display: 'flex', gap: '0.25rem' }}>
                   {response.tags.slice(0, 2).map((tag, index) => (
                     <span 
                       key={index} 
-                      className="px-2 py-0.5 bg-lotus-pink-light text-earth-brown text-xs rounded-full"
+                      style={{
+                        padding: '0.125rem 0.5rem',
+                        background: '#fef3f2',
+                        color: '#1e293b',
+                        fontSize: '0.75rem',
+                        borderRadius: '9999px',
+                        border: '1px solid #fed7d7'
+                      }}
                     >
                       {tag}
                     </span>
@@ -354,26 +493,58 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
         </div>
         
         {/* Confidence & Quality Indicators */}
-        <div className="flex flex-col items-end gap-2">
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: '0.5rem'
+        }}>
           {response.confidence && response.confidence > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-neutral-500">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <span style={{
+                fontSize: '0.75rem',
+                color: '#64748b'
+              }}>
                 {currentLanguage === 'Hindi' ? 'विश्वसनीयता' : 'Confidence'}:
               </span>
-              <div className="w-16 h-2 bg-neutral-200 rounded-full overflow-hidden">
+              <div style={{
+                width: '4rem',
+                height: '0.5rem',
+                background: '#e2e8f0',
+                borderRadius: '9999px',
+                overflow: 'hidden'
+              }}>
                 <div 
-                  className="h-full bg-gradient-to-r from-forest-green to-sacred-gold transition-all duration-500"
-                  style={{ width: `${response.confidence * 100}%` }}
+                  style={{
+                    height: '100%',
+                    background: 'linear-gradient(to right, #059669, #F7931E)',
+                    transition: 'all 0.5s ease',
+                    width: `${response.confidence * 100}%`
+                  }}
                 />
               </div>
-              <span className="text-xs font-medium text-neutral-600">
+              <span style={{
+                fontSize: '0.75rem',
+                fontWeight: '500',
+                color: '#475569'
+              }}>
                 {Math.round(response.confidence * 100)}%
               </span>
             </div>
           )}
           
           {/* Spiritual Authenticity Badge */}
-          <div className="flex items-center gap-1 text-xs text-sacred-gold">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+            fontSize: '0.75rem',
+            color: '#F7931E'
+          }}>
             <span>🪷</span>
             <span>{currentLanguage === 'Hindi' ? 'प्रामाणिक' : 'Authentic'}</span>
           </div>
@@ -382,18 +553,50 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
 
       {/* Response Quality Indicator - Subtle and Optional */}
       {response.metadata && (
-        <div className="response-source-indicator mb-2">
-          <details className="group">
-            <summary className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 transition-all duration-200 text-xs text-white/80 cursor-pointer list-none">
-              <span className="text-sm">
+        <div style={{ marginBottom: '0.5rem' }}>
+          <details style={{ display: 'inline-block' }}>
+            <summary style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '9999px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.2s ease',
+              fontSize: '0.75rem',
+              color: 'rgba(255, 255, 255, 0.8)',
+              cursor: 'pointer',
+              listStyle: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+            }}
+            >
+              <span style={{ fontSize: '0.875rem' }}>
                 {response.metadata.ai_generated ? '✨' : response.metadata.response_source?.includes('template') ? '📿' : '🎭'}
               </span>
-              <span className="font-medium">
+              <span style={{ fontWeight: '500' }}>
                 {response.metadata.ai_generated ? 'Personalized' : response.metadata.response_source?.includes('template') ? 'Traditional' : 'Wisdom'}
               </span>
-              <span className="text-xs opacity-60 group-open:rotate-180 transition-transform">ⓘ</span>
+              <span style={{
+                fontSize: '0.75rem',
+                opacity: 0.6,
+                transition: 'transform 0.2s ease'
+              }}>ⓘ</span>
             </summary>
-            <div className="mt-2 p-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20">
+            <div style={{
+              marginTop: '0.5rem',
+              padding: '0.75rem',
+              borderRadius: '0.5rem',
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
               <ResponseSourceBadge 
                 metadata={response.metadata}
                 language={currentLanguage}
@@ -404,20 +607,37 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
       )}
 
       {/* Main Response Text */}
-      <div className="response-content mb-6">
+      <div style={{ marginBottom: '1.5rem' }}>
         {/* Divine Icon based on A/B test */}
         {responseConfig.showDivineIcon && (
-          <div className="divine-icon-container mb-3">
-            <span className="text-2xl">🎭</span>
-            <span className="text-sm font-medium text-krishna-blue ml-2">
+          <div style={{ marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>🎭</span>
+            <span style={{
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: '#1e40af',
+              marginLeft: '0.5rem'
+            }}>
               {currentLanguage === 'Hindi' ? 'श्री कृष्ण' : 'Krishna'}
             </span>
           </div>
         )}
         
-        <div className={`body-text text-neutral-800 leading-relaxed mb-4 ${
-          responseConfig.quoteStyle === 'highlighted' ? 'response-highlighted' : 'response-italic'
-        } ${isLongResponse && !showFullResponse ? 'line-clamp-4' : ''}`}>
+        <div style={{
+          fontSize: '1rem',
+          color: '#1f2937',
+          lineHeight: '1.625',
+          marginBottom: '1rem',
+          fontStyle: responseConfig.quoteStyle === 'highlighted' ? 'normal' : 'italic',
+          background: responseConfig.quoteStyle === 'highlighted' ? 'rgba(255, 107, 53, 0.05)' : 'transparent',
+          padding: responseConfig.quoteStyle === 'highlighted' ? '1rem' : '0',
+          borderRadius: responseConfig.quoteStyle === 'highlighted' ? '0.5rem' : '0',
+          borderLeft: responseConfig.quoteStyle === 'highlighted' ? '4px solid #FF6B35' : 'none',
+          overflow: isLongResponse && !showFullResponse ? 'hidden' : 'visible',
+          display: isLongResponse && !showFullResponse ? '-webkit-box' : 'block',
+          WebkitLineClamp: isLongResponse && !showFullResponse ? 4 : 'none',
+          WebkitBoxOrient: isLongResponse && !showFullResponse ? 'vertical' : 'initial'
+        }}>
           {response.text}
         </div>
         
@@ -425,7 +645,22 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
         {isLongResponse && (
           <button
             onClick={() => setShowFullResponse(!showFullResponse)}
-            className="text-sm text-peacock-blue hover:text-peacock-dark transition-colors mb-4"
+            style={{
+              fontSize: '0.875rem',
+              color: '#1e40af',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'color 0.2s ease',
+              marginBottom: '1rem',
+              padding: 0
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#1e3a8a';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#1e40af';
+            }}
           >
             {showFullResponse 
               ? (currentLanguage === 'Hindi' ? 'कम दिखाएं' : 'Show Less')
@@ -436,19 +671,54 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
 
         {/* Sanskrit Text with Enhanced Display */}
         {response.sanskritText && (
-          <div className="sanskrit-display bg-gradient-to-r from-sacred-gold/10 via-saffron-primary/10 to-lotus-pink-light/20 rounded-lg p-5 mb-4 border border-sacred-gold/20">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">🕉️</span>
-              <span className="text-sm font-medium text-earth-brown">
+          <div style={{
+            background: 'linear-gradient(to right, rgba(247, 147, 30, 0.1), rgba(255, 107, 53, 0.1), rgba(254, 243, 242, 0.2))',
+            borderRadius: '0.5rem',
+            padding: '1.25rem',
+            marginBottom: '1rem',
+            border: '1px solid rgba(247, 147, 30, 0.2)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '0.75rem'
+            }}>
+              <span style={{ fontSize: '1.125rem' }}>🕉️</span>
+              <span style={{
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#1e293b'
+              }}>
                 {currentLanguage === 'Hindi' ? 'मूल संस्कृत श्लोक' : 'Original Sanskrit Verse'}
               </span>
             </div>
-            <div className="sanskrit-text text-lg leading-relaxed text-earth-brown font-devanagari mb-3 text-center">
+            <div style={{
+              fontSize: '1.125rem',
+              lineHeight: '1.625',
+              color: '#1e293b',
+              fontFamily: 'serif',
+              marginBottom: '0.75rem',
+              textAlign: 'center'
+            }}>
               {response.sanskritText}
             </div>
             {response.transliteration && (
-              <div className="transliteration-text text-sm text-neutral-600 italic text-center border-t border-sacred-gold/20 pt-3">
-                <span className="text-xs font-medium text-neutral-500 block mb-1">
+              <div style={{
+                fontSize: '0.875rem',
+                color: '#64748b',
+                fontStyle: 'italic',
+                textAlign: 'center',
+                borderTop: '1px solid rgba(247, 147, 30, 0.2)',
+                paddingTop: '0.75rem'
+              }}>
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  display: 'block',
+                  marginBottom: '0.25rem'
+                }}>
                   {currentLanguage === 'Hindi' ? 'रोमन लिपि' : 'Transliteration'}:
                 </span>
                 {response.transliteration}
@@ -460,12 +730,24 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
 
       {/* Enhanced Citations Section - Positioned based on A/B test */}
       {response.citations.length > 0 && responseConfig.citationPosition === 'inline' && (
-        <div className="citations-section mb-4 citations-inline">
-          <h4 className="text-sm font-medium text-neutral-700 mb-2 flex items-center gap-2">
+        <div style={{ marginBottom: '1rem' }}>
+          <h4 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#334155',
+            marginBottom: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
             <span>📖</span>
             <span>{t('citations')}</span>
           </h4>
-          <div className="flex flex-wrap gap-2">
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.5rem'
+          }}>
             {response.citations.map((citation, index) => (
               <button
                 key={index}
@@ -476,7 +758,25 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                     source: citation.source 
                   });
                 }}
-                className="citation-tag inline-flex items-center gap-1 px-2 py-1 bg-peacock-blue/10 text-peacock-dark text-xs rounded-md hover:bg-peacock-blue/20 transition-colors"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  padding: '0.25rem 0.5rem',
+                  background: 'rgba(30, 64, 175, 0.1)',
+                  color: '#1e40af',
+                  fontSize: '0.75rem',
+                  borderRadius: '0.375rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(30, 64, 175, 0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(30, 64, 175, 0.1)';
+                }}
               >
                 <span>📖</span>
                 <span>{formatCitation(citation)}</span>
@@ -487,28 +787,82 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
       )}
       
       {response.citations.length > 0 && responseConfig.citationPosition === 'bottom' && (
-        <div className="citations-section mb-6 citations-bottom">
-          <h4 className="text-sm font-medium text-neutral-700 mb-3 flex items-center gap-2">
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h4 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#334155',
+            marginBottom: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
             <span>📖</span>
             <span>{t('citations')}</span>
-            <span className="text-xs text-neutral-500">({response.citations.length})</span>
+            <span style={{
+              fontSize: '0.75rem',
+              color: '#64748b'
+            }}>({response.citations.length})</span>
           </h4>
-          <div className="space-y-3">
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem'
+          }}>
             {response.citations.map((citation, index) => (
-              <div key={index} className="citation-card">
-                <div className="flex items-center justify-between p-3 bg-peacock-blue/5 border border-peacock-blue/20 rounded-lg hover:bg-peacock-blue/10 transition-colors">
+              <div key={index}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.75rem',
+                  background: 'rgba(30, 64, 175, 0.05)',
+                  border: '1px solid rgba(30, 64, 175, 0.2)',
+                  borderRadius: '0.75rem',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(30, 64, 175, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(30, 64, 175, 0.05)';
+                }}
+                >
                   <button
                     onClick={() => onCitationClick?.(citation)}
-                    className="flex-1 text-left"
+                    style={{
+                      flex: 1,
+                      textAlign: 'left',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
                   >
-                    <div className="citation-title text-sm font-medium text-peacock-dark mb-1">
+                    <div style={{
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      color: '#1e40af',
+                      marginBottom: '0.25rem'
+                    }}>
                       {formatCitation(citation)}
                     </div>
                     {citation.verseText && expandedCitation === index && (
-                      <div className="citation-preview text-xs text-neutral-600 italic mt-2 p-2 bg-white/50 rounded border-l-2 border-peacock-blue">
+                      <div style={{
+                        fontSize: '0.75rem',
+                        color: '#64748b',
+                        fontStyle: 'italic',
+                        marginTop: '0.5rem',
+                        padding: '0.5rem',
+                        background: 'rgba(255, 255, 255, 0.5)',
+                        borderRadius: '0.25rem',
+                        borderLeft: '2px solid #1e40af'
+                      }}>
                         "{citation.verseText}"
                         {citation.translation && (
-                          <div className="mt-1 text-neutral-500">
+                          <div style={{
+                            marginTop: '0.25rem',
+                            color: '#64748b'
+                          }}>
                             — {citation.translation}
                           </div>
                         )}
@@ -516,11 +870,29 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                     )}
                   </button>
                   
-                  <div className="flex items-center gap-2 ml-3">
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    marginLeft: '0.75rem'
+                  }}>
                     {citation.url && (
                       <button
                         onClick={() => window.open(citation.url, '_blank')}
-                        className="text-xs text-peacock-blue hover:text-peacock-dark"
+                        style={{
+                          fontSize: '0.75rem',
+                          color: '#1e40af',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#1e3a8a';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#1e40af';
+                        }}
                         title="View source online"
                       >
                         🔗
@@ -528,7 +900,20 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                     )}
                     <button
                       onClick={() => toggleCitationDetails(index)}
-                      className="text-xs text-neutral-500 hover:text-neutral-700"
+                      style={{
+                        fontSize: '0.75rem',
+                        color: '#64748b',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'color 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#334155';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#64748b';
+                      }}
                       title={expandedCitation === index ? "Hide details" : "Show details"}
                     >
                       {expandedCitation === index ? '▼' : '▶'}
@@ -543,24 +928,57 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
 
       {/* Related Verses Section */}
       {showRelatedVerses && response.relatedVerses && response.relatedVerses.length > 0 && (
-        <div className="related-verses-section mb-6">
-          <h4 className="text-sm font-medium text-neutral-700 mb-3 flex items-center gap-2">
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h4 style={{
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            color: '#334155',
+            marginBottom: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
             <span>🔗</span>
             <span>{currentLanguage === 'Hindi' ? 'संबंधित श्लोक' : 'Related Verses'}</span>
           </h4>
-          <div className="flex flex-wrap gap-2">
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.5rem'
+          }}>
             {response.relatedVerses.slice(0, 3).map((verse, index) => (
               <button
                 key={index}
                 onClick={() => onCitationClick?.(verse)}
-                className="related-verse-tag bg-lotus-pink-light/30 text-earth-brown text-xs px-3 py-2 rounded-lg hover:bg-lotus-pink-light/50 transition-colors border border-lotus-pink-light"
+                style={{
+                  background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+                  color: '#ffffff',
+                  fontSize: '0.75rem',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '0.75rem',
+                  border: '1px solid rgba(255, 107, 53, 0.3)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
                 title={`Explore ${verse.source}`}
               >
                 {formatCitation(verse)}
               </button>
             ))}
             {response.relatedVerses.length > 3 && (
-              <span className="text-xs text-neutral-500 px-2 py-2">
+              <span style={{
+                fontSize: '0.75rem',
+                color: '#64748b',
+                padding: '0.5rem'
+              }}>
                 +{response.relatedVerses.length - 3} more
               </span>
             )}
@@ -569,87 +987,230 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
       )}
 
       {/* Enhanced Action Controls */}
-      <div className="response-actions flex items-center justify-between pt-4 border-t border-neutral-100">
-        <div className="flex items-center gap-3">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: '1rem',
+        borderTop: '1px solid #F1F5F9'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
           {/* Audio Controls */}
           {showAudioControls && (
             <button
               onClick={() => onSpeakResponse?.(response.text)}
-              className="btn-icon hover:bg-peacock-blue/10 group"
+              style={{
+                padding: '0.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 107, 53, 0.1)';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.transform = 'scale(1)';
+              }}
               aria-label={currentLanguage === 'Hindi' ? 'उत्तर सुनें' : 'Listen to response'}
               title={currentLanguage === 'Hindi' ? 'इस ज्ञान को सुनें' : 'Hear this wisdom spoken'}
             >
-              <span className="text-lg group-hover:scale-110 transition-transform">🔊</span>
+              <span style={{
+                fontSize: '1.125rem',
+                transition: 'transform 0.2s ease'
+              }}>🔊</span>
             </button>
           )}
 
           {/* Copy to Clipboard */}
           <button
             onClick={handleCopyToClipboard}
-            className="btn-icon hover:bg-neutral-100 group"
+            style={{
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#F1F5F9';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.transform = 'scale(1)';
+            }}
             aria-label={currentLanguage === 'Hindi' ? 'उत्तर कॉपी करें' : 'Copy response'}
             title={currentLanguage === 'Hindi' ? 'ज्ञान को क्लिपबोर्ड में कॉपी करें' : 'Copy wisdom to clipboard'}
           >
-            <span className="text-lg group-hover:scale-110 transition-transform">📋</span>
+            <span style={{
+              fontSize: '1.125rem',
+              transition: 'transform 0.2s ease'
+            }}>📋</span>
           </button>
 
           {/* Share Response */}
           <button
             onClick={() => onShareResponse?.(response)}
-            className="btn-icon hover:bg-saffron-primary/10 group"
+            style={{
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 107, 53, 0.1)';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.transform = 'scale(1)';
+            }}
             aria-label={currentLanguage === 'Hindi' ? 'उत्तर साझा करें' : 'Share response'}
             title={currentLanguage === 'Hindi' ? 'इस ज्ञान को साझा करें' : 'Share this wisdom'}
           >
-            <span className="text-lg group-hover:scale-110 transition-transform">🔗</span>
+            <span style={{
+              fontSize: '1.125rem',
+              transition: 'transform 0.2s ease'
+            }}>🔗</span>
           </button>
 
           {/* Sanskrit Study Mode */}
           {response.sanskritText && (
             <button
-              className="btn-icon hover:bg-sacred-gold/10 group"
+              style={{
+                padding: '0.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.1)';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.transform = 'scale(1)';
+              }}
               aria-label="Study Sanskrit"
               title="Study this verse in Sanskrit"
             >
-              <span className="text-lg group-hover:scale-110 transition-transform">📿</span>
+              <span style={{
+                fontSize: '1.125rem',
+                transition: 'transform 0.2s ease'
+              }}>📿</span>
             </button>
           )}
         </div>
 
         {/* Enhanced Feedback Section */}
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-neutral-500">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
+          <span style={{
+            fontSize: '0.75rem',
+            color: '#64748b'
+          }}>
             {currentLanguage === 'Hindi' ? 'सहायक?' : 'Helpful?'}
           </span>
-          <div className="flex items-center gap-1">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem'
+          }}>
             <button
               onClick={() => handleFeedback('helpful')}
-              className={`btn-icon text-sm transition-all ${
-                userFeedback === 'helpful' 
-                  ? 'bg-forest-green/20 text-forest-green' 
-                  : 'hover:bg-forest-green/10 text-neutral-500 hover:text-forest-green'
-              }`}
+              style={{
+                padding: '0.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                background: userFeedback === 'helpful' ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+                color: userFeedback === 'helpful' ? '#059669' : '#64748b',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontSize: '0.875rem'
+              }}
+              onMouseEnter={(e) => {
+                if (userFeedback !== 'helpful') {
+                  e.currentTarget.style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                  e.currentTarget.style.color = '#059669';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (userFeedback !== 'helpful') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#64748b';
+                }
+              }}
               aria-label={currentLanguage === 'Hindi' ? 'सहायक के रूप में चिह्नित करें' : 'Mark as helpful'}
               title={currentLanguage === 'Hindi' ? 'यह मार्गदर्शन सहायक था' : 'This guidance was helpful'}
             >
-              <span className={userFeedback === 'helpful' ? 'text-lg' : ''}>👍</span>
+              <span style={{
+                fontSize: userFeedback === 'helpful' ? '1.125rem' : '1rem'
+              }}>👍</span>
             </button>
             <button
               onClick={() => handleFeedback('not-helpful')}
-              className={`btn-icon text-sm transition-all ${
-                userFeedback === 'not-helpful' 
-                  ? 'bg-red-100 text-red-600' 
-                  : 'hover:bg-red-50 text-neutral-500 hover:text-red-500'
-              }`}
+              style={{
+                padding: '0.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                background: userFeedback === 'not-helpful' ? '#FEF2F2' : 'transparent',
+                color: userFeedback === 'not-helpful' ? '#DC2626' : '#64748b',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontSize: '0.875rem'
+              }}
+              onMouseEnter={(e) => {
+                if (userFeedback !== 'not-helpful') {
+                  e.currentTarget.style.backgroundColor = '#FEF2F2';
+                  e.currentTarget.style.color = '#EF4444';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (userFeedback !== 'not-helpful') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#64748b';
+                }
+              }}
               aria-label={currentLanguage === 'Hindi' ? 'सुधार की आवश्यकता' : 'Mark as not helpful'}
               title={currentLanguage === 'Hindi' ? 'यह मार्गदर्शन में सुधार की आवश्यकता है' : 'This guidance needs improvement'}
             >
-              <span className={userFeedback === 'not-helpful' ? 'text-lg' : ''}>👎</span>
+              <span style={{
+                fontSize: userFeedback === 'not-helpful' ? '1.125rem' : '1rem'
+              }}>👎</span>
             </button>
           </div>
           
           {/* Feedback confirmation */}
           {userFeedback && (
-            <span className="text-xs text-neutral-500 italic">
+            <span style={{
+              fontSize: '0.75rem',
+              color: '#64748b',
+              fontStyle: 'italic'
+            }}>
               {currentLanguage === 'Hindi' ? 'धन्यवाद!' : 'Thank you!'}
             </span>
           )}
@@ -657,18 +1218,35 @@ const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
       </div>
 
       {/* Reverent Footer with Spiritual Blessing */}
-      <div className="mt-6 pt-4 border-t border-neutral-50 text-center">
-        <p className="caption-text text-neutral-400 italic flex items-center justify-center gap-2">
-          <span className="text-sacred-gold">🕉️</span>
+      <div style={{
+        marginTop: '1.5rem',
+        paddingTop: '1rem',
+        borderTop: '1px solid #F8FAFC',
+        textAlign: 'center'
+      }}>
+        <p style={{
+          fontSize: '0.75rem',
+          color: '#9CA3AF',
+          fontStyle: 'italic',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem'
+        }}>
+          <span style={{ color: '#F7931E' }}>🕉️</span>
           {currentLanguage === 'Hindi' ? (
             "सत्यं शिवं सुन्दरम्"
           ) : (
             "May this wisdom guide your path"
           )}
-          <span className="text-sacred-gold">🕉️</span>
+          <span style={{ color: '#F7931E' }}>🕉️</span>
         </p>
         {response.persona === 'krishna' && (
-          <p className="text-xs text-neutral-300 mt-1">
+          <p style={{
+            fontSize: '0.75rem',
+            color: '#D1D5DB',
+            marginTop: '0.25rem'
+          }}>
             {currentLanguage === 'Hindi' 
               ? "भगवान श्रीकृष्ण की कृपा से"
               : "By the grace of Krishna"

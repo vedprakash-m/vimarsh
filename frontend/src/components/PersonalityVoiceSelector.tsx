@@ -65,14 +65,14 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
 
   const getDomainColor = (domain: string) => {
     switch (domain) {
-      case 'spiritual': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'scientific': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'historical': return 'bg-green-100 text-green-800 border-green-200';
-      case 'philosophical': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'literary': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      case 'leadership': return 'bg-red-100 text-red-800 border-red-200';
-      case 'psychology': return 'bg-violet-100 text-violet-800 border-violet-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'spiritual': return { bg: 'rgba(255, 107, 53, 0.1)', text: '#ea580c', border: 'rgba(255, 107, 53, 0.3)' };
+      case 'scientific': return { bg: 'rgba(59, 130, 246, 0.1)', text: '#2563eb', border: 'rgba(59, 130, 246, 0.3)' };
+      case 'historical': return { bg: 'rgba(34, 197, 94, 0.1)', text: '#16a34a', border: 'rgba(34, 197, 94, 0.3)' };
+      case 'philosophical': return { bg: 'rgba(147, 51, 234, 0.1)', text: '#9333ea', border: 'rgba(147, 51, 234, 0.3)' };
+      case 'literary': return { bg: 'rgba(16, 185, 129, 0.1)', text: '#059669', border: 'rgba(16, 185, 129, 0.3)' };
+      case 'leadership': return { bg: 'rgba(239, 68, 68, 0.1)', text: '#dc2626', border: 'rgba(239, 68, 68, 0.3)' };
+      case 'psychology': return { bg: 'rgba(139, 92, 246, 0.1)', text: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)' };
+      default: return { bg: 'rgba(107, 114, 128, 0.1)', text: '#374151', border: 'rgba(107, 114, 128, 0.3)' };
     }
   };
 
@@ -105,66 +105,161 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
   };
 
   return (
-    <div className="personality-voice-selector">
+    <div>
       {/* Current Selection Display */}
       <div 
-        className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-          disabled ? 'bg-gray-50 cursor-not-allowed' : 'bg-white hover:bg-gray-50'
-        }`}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem',
+          border: '2px solid #e2e8f0',
+          borderRadius: '0.75rem',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          transition: 'all 0.3s ease',
+          background: disabled ? '#f8fafc' : '#ffffff'
+        }}
+        onMouseEnter={(e) => {
+          if (!disabled) {
+            e.currentTarget.style.background = '#f8fafc';
+            e.currentTarget.style.borderColor = '#FF6B35';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.15)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled) {
+            e.currentTarget.style.background = '#ffffff';
+            e.currentTarget.style.borderColor = '#e2e8f0';
+            e.currentTarget.style.boxShadow = 'none';
+          }
+        }}
         onClick={() => !disabled && setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-3">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
           {selectedPersonality ? (
             <>
-              <span className="text-xl">{getPersonalityIcon(selectedPersonality.domain)}</span>
+              <span style={{ fontSize: '1.25rem' }}>{getPersonalityIcon(selectedPersonality.domain)}</span>
               <div>
-                <div className="font-medium text-gray-900">
+                <div style={{
+                  fontWeight: '500',
+                  color: '#1e293b'
+                }}>
                   {selectedPersonality.name}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#64748b'
+                }}>
                   {getVoiceCharacteristics(selectedPersonality)}
                 </div>
               </div>
-              <span className={`px-2 py-1 text-xs rounded-full border ${getDomainColor(selectedPersonality.domain)}`}>
+              <span style={{
+                padding: '0.25rem 0.5rem',
+                fontSize: '0.75rem',
+                borderRadius: '9999px',
+                border: `1px solid ${getDomainColor(selectedPersonality.domain).border}`,
+                background: getDomainColor(selectedPersonality.domain).bg,
+                color: getDomainColor(selectedPersonality.domain).text
+              }}>
                 {selectedPersonality.domain}
               </span>
             </>
           ) : (
-            <div className="text-gray-500">Select a personality voice...</div>
+            <div style={{ color: '#64748b' }}>Select a personality voice...</div>
           )}
         </div>
-        <div className={`transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-          <span className="text-gray-400">▼</span>
+        <div style={{
+          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+          transition: 'transform 0.2s ease'
+        }}>
+          <span style={{ color: '#FF6B35' }}>▼</span>
         </div>
       </div>
 
       {/* Expanded Options */}
       {isExpanded && !disabled && (
-        <div className="mt-2 border rounded-lg bg-white shadow-lg max-h-96 overflow-y-auto">
+        <div style={{
+          marginTop: '0.5rem',
+          border: '1px solid #e2e8f0',
+          borderRadius: '0.75rem',
+          background: '#ffffff',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+          maxHeight: '384px',
+          overflowY: 'auto'
+        }}>
           {personalities.map((personality) => (
             <div
               key={personality.id}
-              className={`p-3 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-gray-50 ${
-                selectedPersonality?.id === personality.id ? 'bg-blue-50' : ''
-              }`}
+              style={{
+                padding: '0.75rem',
+                borderBottom: '1px solid #f1f5f9',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s ease',
+                background: selectedPersonality?.id === personality.id ? 'rgba(255, 107, 53, 0.05)' : 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedPersonality?.id !== personality.id) {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedPersonality?.id !== personality.id) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
               onClick={() => handlePersonalitySelect(personality)}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <span className="text-xl">{getPersonalityIcon(personality.domain)}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <div className="font-medium text-gray-900">
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  flex: 1
+                }}>
+                  <span style={{ fontSize: '1.25rem' }}>{getPersonalityIcon(personality.domain)}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <div style={{
+                        fontWeight: '500',
+                        color: '#1e293b'
+                      }}>
                         {personality.name}
                       </div>
-                      <span className={`px-2 py-1 text-xs rounded-full border ${getDomainColor(personality.domain)}`}>
+                      <span style={{
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.75rem',
+                        borderRadius: '9999px',
+                        border: `1px solid ${getDomainColor(personality.domain).border}`,
+                        background: getDomainColor(personality.domain).bg,
+                        color: getDomainColor(personality.domain).text
+                      }}>
                         {personality.domain}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div style={{
+                      fontSize: '0.875rem',
+                      color: '#64748b',
+                      marginTop: '0.25rem'
+                    }}>
                       {getVoiceCharacteristics(personality)}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: '#64748b',
+                      marginTop: '0.25rem'
+                    }}>
                       Rate: {personality.voice_settings.speaking_rate}x • 
                       Pitch: {personality.voice_settings.pitch > 0 ? '+' : ''}{personality.voice_settings.pitch}
                     </div>
@@ -175,7 +270,23 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
                 {onVoicePreview && (
                   <button
                     onClick={(e) => handleVoicePreview(personality, e)}
-                    className="ml-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                    style={{
+                      marginLeft: '0.5rem',
+                      padding: '0.25rem 0.75rem',
+                      fontSize: '0.75rem',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      color: '#2563eb',
+                      border: 'none',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                    }}
                     title="Preview voice"
                   >
                     🔊 Preview
@@ -185,16 +296,37 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
 
               {/* Pronunciation Guide Preview */}
               {Object.keys(personality.pronunciation_guide).length > 0 && (
-                <div className="mt-2 pt-2 border-t border-gray-100">
-                  <div className="text-xs text-gray-500 mb-1">Specialized pronunciation:</div>
-                  <div className="flex flex-wrap gap-1">
+                <div style={{
+                  marginTop: '0.5rem',
+                  paddingTop: '0.5rem',
+                  borderTop: '1px solid #f1f5f9'
+                }}>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: '#64748b',
+                    marginBottom: '0.25rem'
+                  }}>Specialized pronunciation:</div>
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.25rem'
+                  }}>
                     {Object.entries(personality.pronunciation_guide).slice(0, 3).map(([term, guide]) => (
-                      <span key={term} className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-600">
+                      <span key={term} style={{
+                        background: '#f1f5f9',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        color: '#64748b'
+                      }}>
                         {term}
                       </span>
                     ))}
                     {Object.keys(personality.pronunciation_guide).length > 3 && (
-                      <span className="text-xs text-gray-500">
+                      <span style={{
+                        fontSize: '0.75rem',
+                        color: '#64748b'
+                      }}>
                         +{Object.keys(personality.pronunciation_guide).length - 3} more
                       </span>
                     )}
@@ -208,9 +340,25 @@ const PersonalityVoiceSelector: React.FC<PersonalityVoiceSelectorProps> = ({
 
       {/* Voice Settings Display */}
       {selectedPersonality && (
-        <div className="mt-3 p-2 bg-gray-50 rounded text-xs">
-          <div className="font-medium text-gray-700 mb-1">Current Voice Settings:</div>
-          <div className="grid grid-cols-2 gap-2 text-gray-600">
+        <div style={{
+          marginTop: '0.75rem',
+          padding: '0.75rem',
+          background: '#f8fafc',
+          borderRadius: '0.5rem',
+          fontSize: '0.75rem',
+          border: '1px solid #e2e8f0'
+        }}>
+          <div style={{
+            fontWeight: '500',
+            color: '#334155',
+            marginBottom: '0.5rem'
+          }}>Current Voice Settings:</div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '0.5rem',
+            color: '#64748b'
+          }}>
             <div>Speaking Rate: {selectedPersonality.voice_settings.speaking_rate}x</div>
             <div>Pitch: {selectedPersonality.voice_settings.pitch > 0 ? '+' : ''}{selectedPersonality.voice_settings.pitch}</div>
             <div>Volume: {Math.round(selectedPersonality.voice_settings.volume * 100)}%</div>

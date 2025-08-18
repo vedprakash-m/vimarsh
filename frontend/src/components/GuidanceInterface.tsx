@@ -13,6 +13,7 @@ import { getApiBaseUrl } from '../config/environment';
 import { getAuthHeaders, authService } from '../auth/authService';
 import DebugAuth from './DebugAuth';
 import { pwaManager } from '../utils/pwa';
+import '../styles/vimarsh-design-system.css';
 import '../styles/spiritual-theme.css';
 
 interface Message {
@@ -494,22 +495,24 @@ export default function GuidanceInterface() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      color: 'white',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+      background: '#ffffff',
+      color: '#1d1d1f',
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Mobile-Optimized Header */}
       <header style={{
-        padding: window.innerWidth <= 768 ? '0.75rem 1rem' : '1rem 2rem',
+        padding: window.innerWidth <= 768 ? '1rem 1.5rem' : '1.5rem 2rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        background: '#ffffff',
+        borderBottom: '1px solid #e5e7eb',
         position: 'sticky',
         top: 0,
-        zIndex: 100
+        zIndex: 100,
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -519,7 +522,7 @@ export default function GuidanceInterface() {
           <div style={{
             width: window.innerWidth <= 768 ? '2.5rem' : '3rem',
             height: window.innerWidth <= 768 ? '2.5rem' : '3rem',
-            background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+            background: 'linear-gradient(135deg, #f97316, #f59e0b)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
@@ -527,8 +530,7 @@ export default function GuidanceInterface() {
             fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem',
             fontWeight: 'bold',
             color: 'white',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 4px 12px rgba(249, 115, 22, 0.3)'
           }}>
             V
           </div>
@@ -537,16 +539,16 @@ export default function GuidanceInterface() {
               <h1 style={{ 
                 margin: 0, 
                 fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem', 
-                fontWeight: '700' 
+                fontWeight: '600',
+                color: '#1d1d1f'
               }}>
                 Vimarsh
               </h1>
               <p style={{ 
                 margin: 0, 
                 fontSize: window.innerWidth <= 768 ? '0.75rem' : '0.85rem', 
-                opacity: 0.9,
                 fontWeight: '500',
-                color: '#fbbf24'
+                color: '#6e6e73'
               }}>
                 Wisdom Without Boundaries
               </p>
@@ -601,18 +603,27 @@ export default function GuidanceInterface() {
           <button 
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
             style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              color: 'white',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              color: '#1e293b',
               padding: window.innerWidth <= 768 ? '0.5rem' : '0.5rem',
               borderRadius: '0.5rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
             }}
             title="Change Personality"
             disabled={!selectedPersonality}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#f1f5f9';
+              e.currentTarget.style.borderColor = '#cbd5e1';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#f8fafc';
+              e.currentTarget.style.borderColor = '#e2e8f0';
+            }}
           >
             <Users size={18} />
           </button>
@@ -622,31 +633,30 @@ export default function GuidanceInterface() {
             <button 
               onClick={() => navigate('/admin')}
               style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                border: '1px solid rgba(251, 191, 36, 0.6)',
+                background: '#f8fafc',
+                border: '1px solid #fbbf24',
                 color: '#92400e',
                 padding: '0.5rem 1rem',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
                 fontSize: '0.9rem',
                 fontWeight: '600',
                 gap: '0.5rem',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                backdropFilter: 'blur(10px)'
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
               }}
               title="Admin Panel"
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.background = '#fef9c3';
+                e.currentTarget.style.borderColor = '#f59e0b';
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+                e.currentTarget.style.background = '#f8fafc';
+                e.currentTarget.style.borderColor = '#fbbf24';
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
               }}
             >
               ⚙️ Admin
@@ -657,31 +667,30 @@ export default function GuidanceInterface() {
           <button 
             onClick={handleLogout}
             style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(239, 68, 68, 0.6)',
+              background: '#f8fafc',
+              border: '1px solid #ef4444',
               color: '#991b1b',
               padding: '0.5rem 1rem',
               borderRadius: '0.5rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.2s ease',
               fontSize: '0.9rem',
               fontWeight: '600',
               gap: '0.5rem',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-              backdropFilter: 'blur(10px)'
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
             }}
             title="Logout"
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.background = '#fef2f2';
+              e.currentTarget.style.borderColor = '#dc2626';
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+              e.currentTarget.style.background = '#f8fafc';
+              e.currentTarget.style.borderColor = '#ef4444';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
             }}
           >
             <LogOut size={18} />
@@ -716,15 +725,14 @@ export default function GuidanceInterface() {
           top: '80px',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: 'rgba(255, 255, 255, 0.95)',
-          color: '#333',
+          background: '#ffffff',
+          color: '#1e293b',
           padding: window.innerWidth <= 768 ? '1rem' : '1.5rem',
           borderRadius: '12px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
           zIndex: 200,
           maxWidth: window.innerWidth <= 768 ? '90vw' : '400px',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.3)'
+          border: '1px solid #e2e8f0'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
             <Download size={24} color="#FF6B35" />
@@ -827,8 +835,7 @@ export default function GuidanceInterface() {
           }}>
             <div style={{
               fontSize: window.innerWidth <= 768 ? '2.5rem' : '4rem',
-              marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
-              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+              marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem'
             }}>🏵️</div>
             
             {!selectedPersonality ? (
@@ -837,17 +844,16 @@ export default function GuidanceInterface() {
                   fontSize: window.innerWidth <= 768 ? '1.75rem' : '2.5rem',
                   fontWeight: '700',
                   marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                  lineHeight: '1.2'
+                  lineHeight: '1.2',
+                  color: '#1e293b'
                 }}>Welcome to Vimarsh</h2>
                 <p style={{
                   fontSize: window.innerWidth <= 768 ? '1rem' : '1.25rem',
-                  opacity: 0.9,
                   maxWidth: window.innerWidth <= 768 ? '100%' : '600px',
                   margin: window.innerWidth <= 768 ? '0 auto 1rem' : '0 auto 2rem',
                   lineHeight: window.innerWidth <= 768 ? '1.4' : '1.6',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-                  padding: window.innerWidth <= 768 ? '0 0.5rem' : '0'
+                  padding: window.innerWidth <= 768 ? '0 0.5rem' : '0',
+                  color: '#475569'
                 }}>
                   <strong>Wisdom Without Boundaries</strong><br/>
                   Choose your wisdom guide to begin your journey of knowledge and insight.
@@ -855,20 +861,20 @@ export default function GuidanceInterface() {
                 <button
                   onClick={() => setShowPersonalitySelector(true)}
                   style={{
-                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
                     border: 'none',
                     color: 'white',
                     padding: '1rem 2rem',
-                    borderRadius: '1rem',
+                    borderRadius: '0.75rem',
                     fontSize: '1.1rem',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                    transition: 'all 0.3s ease'
+                    boxShadow: '0 2px 8px rgba(255, 107, 53, 0.2)',
+                    transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.3)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
@@ -896,11 +902,10 @@ export default function GuidanceInterface() {
                   'Spiritual'} Journey</h2>
                 <p style={{
                   fontSize: window.innerWidth <= 768 ? '0.95rem' : '1.25rem',
-                  opacity: 0.9,
                   maxWidth: window.innerWidth <= 768 ? '100%' : '600px',
                   margin: window.innerWidth <= 768 ? '0 auto 0.75rem' : '0 auto 1rem',
                   lineHeight: '1.6',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                  color: '#475569'
                 }}>
                   {selectedPersonality.domain === 'spiritual' 
                     ? 'Ask questions about spirituality, philosophy, and find wisdom from ancient teachings with' 
@@ -921,9 +926,9 @@ export default function GuidanceInterface() {
                 </p>
                 <p style={{
                   fontSize: '1rem',
-                  opacity: 0.8,
                   marginBottom: '2rem',
-                  fontStyle: 'italic'
+                  fontStyle: 'italic',
+                  color: '#64748b'
                 }}>
                   {selectedPersonality.description}
                 </p>
@@ -940,27 +945,27 @@ export default function GuidanceInterface() {
                       key={index}
                       onClick={() => setInputText(prompt)}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        color: 'white',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        color: '#334155',
                         padding: '1rem',
                         borderRadius: '0.75rem',
                         cursor: 'pointer',
                         textAlign: 'left',
                         fontSize: '0.9rem',
                         lineHeight: '1.4',
-                        transition: 'all 0.3s ease',
-                        backdropFilter: 'blur(10px)'
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+                        e.currentTarget.style.background = '#f1f5f9';
+                        e.currentTarget.style.borderColor = '#cbd5e1';
+                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.background = '#f8fafc';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
                       }}
                     >
                       {prompt}
@@ -987,22 +992,22 @@ export default function GuidanceInterface() {
               <div style={{
                 maxWidth: window.innerWidth <= 768 ? '85%' : '70%',
                 background: message.isUser 
-                  ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' 
-                  : 'rgba(255, 255, 255, 0.1)',
+                  ? 'linear-gradient(135deg, #FF6B35, #F7931E)' 
+                  : '#ffffff',
                 borderRadius: '1rem',
                 padding: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                border: message.isUser ? 'none' : '1px solid #e2e8f0',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                color: message.isUser ? 'white' : '#1e293b'
               }}>
                 {!message.isUser && (
                   <div style={{
                     fontSize: '0.8rem',
-                    opacity: 0.8,
                     marginBottom: '0.5rem',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem'
+                    gap: '0.5rem',
+                    color: '#64748b'
                   }}>
                     <span>🎭</span> {selectedPersonality?.display_name || 'Wisdom Guide'}
                   </div>
@@ -1051,14 +1056,14 @@ export default function GuidanceInterface() {
             marginBottom: '2rem'
           }}>
             <div style={{
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: '#ffffff',
               borderRadius: '1rem',
               padding: '1.5rem 2rem',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid #e2e8f0',
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem'
+              gap: '1rem',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
             }}>
               <div style={{
                 display: 'flex',
@@ -1070,14 +1075,14 @@ export default function GuidanceInterface() {
                     style={{
                       width: '8px',
                       height: '8px',
-                      background: 'white',
+                      background: '#FF6B35',
                       borderRadius: '50%',
                       animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite`
                     }}
                   />
                 ))}
               </div>
-              <span style={{ fontSize: '0.9rem' }}>
+              <span style={{ fontSize: '0.9rem', color: '#64748b' }}>
                 {selectedPersonality?.display_name || 'Your guide'} is reflecting...
               </span>
             </div>
@@ -1090,12 +1095,11 @@ export default function GuidanceInterface() {
           style={{
             position: 'sticky',
             bottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
-            background: selectedPersonality ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+            background: '#ffffff',
             borderRadius: window.innerWidth <= 768 ? '1rem' : '1.5rem',
             padding: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-            backdropFilter: 'blur(10px)',
-            border: `1px solid ${selectedPersonality ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
             display: 'flex',
             gap: window.innerWidth <= 768 ? '0.75rem' : '1rem',
             alignItems: 'center',
@@ -1112,14 +1116,13 @@ export default function GuidanceInterface() {
             disabled={!selectedPersonality}
             style={{
               flex: '1',
-              background: selectedPersonality ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-              border: `1px solid ${selectedPersonality ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
               borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
               padding: window.innerWidth <= 768 ? '0.875rem 1rem' : '1rem 1.5rem',
-              color: 'white',
+              color: '#1e293b',
               fontSize: '1rem',
               outline: 'none',
-              backdropFilter: 'blur(10px)',
               cursor: selectedPersonality ? 'text' : 'not-allowed'
             }}
           />
@@ -1128,12 +1131,12 @@ export default function GuidanceInterface() {
             disabled={!inputText.trim() || isLoading || !selectedPersonality}
             style={{
               background: inputText.trim() && !isLoading && selectedPersonality
-                ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' 
-                : 'rgba(255, 255, 255, 0.1)',
+                ? 'linear-gradient(135deg, #FF6B35, #F7931E)' 
+                : '#e2e8f0',
               border: 'none',
               borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
               padding: window.innerWidth <= 768 ? '0.875rem' : '1rem',
-              color: 'white',
+              color: inputText.trim() && !isLoading && selectedPersonality ? 'white' : '#94a3b8',
               cursor: inputText.trim() && !isLoading && selectedPersonality ? 'pointer' : 'not-allowed',
               display: 'flex',
               alignItems: 'center',

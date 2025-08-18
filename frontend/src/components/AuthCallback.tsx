@@ -102,122 +102,114 @@ const AuthCallback: React.FC = () => {
   }, [navigate, smartAuth, refreshAuth, instance]);
 
   return (
-    <div className="vimarsh-auth-callback">
-      <div className="callback-container">
-        <div className="callback-content">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      padding: '2rem'
+    }}>
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '1.5rem',
+        padding: '3rem',
+        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e2e8f0',
+        textAlign: 'center',
+        maxWidth: '500px',
+        width: '100%'
+      }}>
+        <div>
           {processing ? (
-            <div className="spiritual-loader">
-              <div className="om-symbol">🕉️</div>
-              <h2>Connecting you to divine wisdom...</h2>
-              <p>Please wait while we complete your authentication.</p>
-              <div className="loading-spinner"></div>
+            <div>
+              <div style={{
+                fontSize: '4rem',
+                marginBottom: '1.5rem',
+                animation: 'pulse 2s ease-in-out infinite'
+              }}>🕉️</div>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#1e293b',
+                marginBottom: '1rem',
+                margin: '0 0 1rem 0'
+              }}>Connecting you to divine wisdom...</h2>
+              <p style={{
+                color: '#64748b',
+                marginBottom: '2rem',
+                lineHeight: '1.6',
+                margin: '0 0 2rem 0'
+              }}>Please wait while we complete your authentication.</p>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '3px solid #f1f5f9',
+                borderTop: '3px solid #FF6B35',
+                borderRadius: '50%',
+                margin: '0 auto',
+                animation: 'spin 1s linear infinite'
+              }}></div>
             </div>
           ) : error ? (
-            <div className="auth-error">
-              <div className="error-symbol">⚠️</div>
-              <h2>Authentication Issue</h2>
-              <p>{error}</p>
-              <p>Redirecting you back to the home page...</p>
+            <div>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1.5rem',
+                color: '#ef4444'
+              }}>⚠️</div>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#1e293b',
+                marginBottom: '1rem',
+                margin: '0 0 1rem 0'
+              }}>Authentication Issue</h2>
+              <p style={{
+                color: '#64748b',
+                marginBottom: '1rem',
+                lineHeight: '1.6',
+                margin: '0 0 1rem 0'
+              }}>{error}</p>
+              <p style={{
+                color: '#64748b',
+                lineHeight: '1.6',
+                margin: 0
+              }}>Redirecting you back to the home page...</p>
             </div>
           ) : (
-            <div className="auth-success">
-              <div className="success-symbol">✅</div>
-              <h2>Authentication Successful</h2>
-              <p>Taking you to your spiritual guidance...</p>
+            <div>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '1.5rem',
+                color: '#10b981'
+              }}>✅</div>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#1e293b',
+                marginBottom: '1rem',
+                margin: '0 0 1rem 0'
+              }}>Authentication Successful</h2>
+              <p style={{
+                color: '#64748b',
+                lineHeight: '1.6',
+                margin: 0
+              }}>Taking you to your spiritual guidance...</p>
             </div>
           )}
         </div>
       </div>
       
       <style>{`
-        .vimarsh-auth-callback {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, var(--sacred-saffron, #ff9933) 0%, var(--krishna-blue, #1e3a8a) 100%);
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        .callback-container {
-          text-align: center;
-          padding: 2rem;
-          max-width: 500px;
-          width: 100%;
-        }
-        
-        .callback-content {
-          background: rgba(255, 255, 255, 0.95);
-          padding: 3rem 2rem;
-          border-radius: 20px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-          backdrop-filter: blur(10px);
-        }
-        
-        .spiritual-loader, .auth-error, .auth-success {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1rem;
-        }
-        
-        .om-symbol, .error-symbol, .success-symbol {
-          font-size: 3rem;
-          margin-bottom: 0.5rem;
-          animation: pulse 2s infinite;
-        }
-        
-        .loading-spinner {
-          width: 40px;
-          height: 40px;
-          border: 3px solid #f3f3f3;
-          border-top: 3px solid var(--krishna-blue, #1e3a8a);
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin-top: 1rem;
+        @keyframes pulse {
+          0%, 100% { opacity: 0.7; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.05); }
         }
         
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        
-        .spiritual-loader {
-          color: var(--krishna-blue, #1e3a8a);
-        }
-        
-        .auth-error {
-          color: #dc2626;
-        }
-        
-        .auth-success {
-          color: #059669;
-        }
-        
-        h2 {
-          color: #374151;
-          margin: 0;
-          font-size: 1.5rem;
-          font-weight: 600;
-        }
-        
-        p {
-          color: #6b7280;
-          margin: 0;
-          line-height: 1.5;
-        }
-        
-        .auth-error h2 {
-          color: #dc2626;
-        }
-        
-        .auth-success h2 {
-          color: #059669;
         }
       `}</style>
     </div>
@@ -225,3 +217,4 @@ const AuthCallback: React.FC = () => {
 };
 
 export default AuthCallback;
+
