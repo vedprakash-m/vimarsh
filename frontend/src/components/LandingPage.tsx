@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Brain, Heart, Star, Zap, Users, Shield, Sparkles, MessageCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Brain, Shield, Sparkles, Play } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 
 // CSS Variables for Apple Design System
@@ -46,207 +46,72 @@ const domainColors = {
   'Leadership': '#ff3b30'
 };
 
-// Live Conversation Preview Component
-const ConversationPreview: React.FC = () => {
-  const [currentPersonality, setCurrentPersonality] = useState(0);
-  const [messageIndex, setMessageIndex] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-
-  const conversations = [
-    {
-      personality: { name: 'Einstein', avatar: '🧠', color: '#34c759' },
-      messages: [
-        { type: 'user', text: 'How do you approach complex problems?' },
-        { type: 'ai', text: 'Imagination is more important than knowledge. I like to think in pictures, not words. When facing the impossible, I ask: what if we\'re looking at this backwards?' }
-      ]
-    },
-    {
-      personality: { name: 'Marcus Aurelius', avatar: '🏛️', color: '#5856d6' },
-      messages: [
-        { type: 'user', text: 'How do I handle difficult people?' },
-        { type: 'ai', text: 'Remember that the best revenge is not to be like your enemy. Focus on what you can control - your own actions and responses. Their behavior is their responsibility.' }
-      ]
-    },
-    {
-      personality: { name: 'Krishna', avatar: '🕉️', color: '#007aff' },
-      messages: [
-        { type: 'user', text: 'I\'m struggling with a difficult decision...' },
-        { type: 'ai', text: 'Do your duty without attachment to results. When the path is unclear, ask yourself: what action aligns with dharma? What serves the greater good beyond yourself?' }
-      ]
-    }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsTyping(true);
-      setTimeout(() => {
-        setIsTyping(false);
-        setMessageIndex((prev) => {
-          if (prev >= conversations[currentPersonality].messages.length - 1) {
-            setCurrentPersonality((p) => (p + 1) % conversations.length);
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [currentPersonality]);
-
-  const currentConvo = conversations[currentPersonality];
-  const displayedMessages = currentConvo.messages.slice(0, messageIndex + 1);
-
+// Static Einstein Conversation Card to match screenshot
+const EinsteinConversationCard: React.FC = () => {
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-      borderRadius: '20px',
-      padding: '24px',
-      height: '480px',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-      position: 'relative',
-      overflow: 'hidden'
+      background: '#fff',
+      borderRadius: 16,
+      padding: 16,
+      width: '100%',
+      maxWidth: 420,
+      border: '1px solid #e5e7eb',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
     }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '20px',
-        padding: '12px 16px',
-        background: 'rgba(255,255,255,0.8)',
-        borderRadius: '12px',
-        backdropFilter: 'blur(10px)'
-      }}>
-        <div style={{
-          fontSize: '24px',
-          marginRight: '12px'
-        }}>
-          {currentConvo.personality.avatar}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            border: '2px solid #34c759',
+            color: '#34c759',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 700
+          }}>E</div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>Albert Einstein</div>
+            <div style={{ fontSize: 11, color: '#6b7280' }}>Theoretical Physicist • Nobel Laureate</div>
+          </div>
         </div>
-        <div>
-          <div style={{
-            fontWeight: '600',
-            color: '#1e293b',
-            fontSize: '16px'
-          }}>
-            {currentConvo.personality.name}
-          </div>
-          <div style={{
-            fontSize: '12px',
-            color: '#64748b'
-          }}>
-            ✨ Live conversation
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#64748b' }}>
+          <span style={{ background: '#e5e7eb', borderRadius: 9999, padding: '2px 8px' }}>Live</span>
         </div>
       </div>
 
-      {/* Messages */}
+      {/* User prompt */}
       <div style={{
-        height: '320px',
-        overflowY: 'auto',
-        marginBottom: '16px',
-        paddingRight: '8px'
+        background: '#f9fafb',
+        border: '1px solid #e5e7eb',
+        borderRadius: 10,
+        padding: '10px 12px',
+        fontSize: 13,
+        color: '#111827',
+        marginBottom: 10
       }}>
-        {displayedMessages.map((message, idx) => (
-          <div key={idx} style={{
-            display: 'flex',
-            justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
-            marginBottom: '12px'
-          }}>
-            <div style={{
-              maxWidth: '80%',
-              padding: '12px 16px',
-              borderRadius: '18px',
-              background: message.type === 'user' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                : 'rgba(255,255,255,0.9)',
-              color: message.type === 'user' ? 'white' : '#1e293b',
-              fontSize: '14px',
-              lineHeight: '1.4',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              border: message.type === 'ai' ? '1px solid #e2e8f0' : 'none'
-            }}>
-              {message.text}
-            </div>
-          </div>
-        ))}
-        
-        {isTyping && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            marginBottom: '12px'
-          }}>
-            <div style={{
-              padding: '12px 16px',
-              borderRadius: '18px',
-              background: 'rgba(255,255,255,0.9)',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            }}>
-              <div style={{
-                display: 'flex',
-                gap: '4px',
-                alignItems: 'center'
-              }}>
-                <div style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: currentConvo.personality.color,
-                  animation: 'pulse 1.5s ease-in-out infinite'
-                }}></div>
-                <div style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: currentConvo.personality.color,
-                  animation: 'pulse 1.5s ease-in-out infinite 0.2s'
-                }}></div>
-                <div style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: currentConvo.personality.color,
-                  animation: 'pulse 1.5s ease-in-out infinite 0.4s'
-                }}></div>
-              </div>
-            </div>
-          </div>
-        )}
+        How can I find peace in difficult times?
       </div>
 
-      {/* Input Preview */}
+      {/* AI response */}
       <div style={{
-        position: 'absolute',
-        bottom: '16px',
-        left: '24px',
-        right: '24px',
-        background: 'rgba(255,255,255,0.9)',
-        borderRadius: '24px',
-        padding: '12px 20px',
-        border: '1px solid #e2e8f0',
-        backdropFilter: 'blur(10px)',
-        fontSize: '14px',
-        color: '#64748b',
-        fontStyle: 'italic'
+        background: '#ffffff',
+        border: '1px solid #e5e7eb',
+        borderRadius: 10,
+        padding: '12px 12px',
+        fontSize: 13,
+        color: '#334155',
+        lineHeight: 1.5,
+        boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
       }}>
-        Ask anything... {currentConvo.personality.name} is listening
+        True peace arises from understanding your dharma — your righteous duty. When you act without attachment to results, performing your duty with devotion, the mind finds its natural state of tranquility.
       </div>
 
-      {/* Animated Background */}
-      <div style={{
-        position: 'absolute',
-        top: '-50%',
-        right: '-20%',
-        width: '200px',
-        height: '200px',
-        background: `linear-gradient(45deg, ${currentConvo.personality.color}20, ${currentConvo.personality.color}10)`,
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-        animation: 'float 6s ease-in-out infinite'
-      }}></div>
+      <div style={{ marginTop: 10, textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>
+        Developed humanly, an authentic RAG‑grounded data sourcing.
+      </div>
     </div>
   );
 };
@@ -482,7 +347,7 @@ const personalities: Personality[] = [
 const LandingPage: React.FC = () => {
   const { isAuthenticated, account, login } = useAuth();
   const navigate = useNavigate();
-  const [selectedPersonality, setSelectedPersonality] = useState(personalities[0]);
+  const location = useLocation();
   const [selectedDomain, setSelectedDomain] = useState('All');
 
   // Helper function to filter personalities by domain
@@ -497,7 +362,11 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
-    if (isAuthenticated && account) {
+    // Allow preview of landing page even when authenticated
+    const params = new URLSearchParams(location.search);
+    const isPreview = params.get('preview') === '1' || params.get('preview') === 'true';
+
+    if (isAuthenticated && account && !isPreview) {
       console.log('🔄 LandingPage: Authenticated user detected, scheduling redirect to guidance');
       console.log('👤 User account:', account.username || account.name);
       
@@ -513,7 +382,7 @@ const LandingPage: React.FC = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [isAuthenticated, account, navigate]);
+  }, [isAuthenticated, account, navigate, location.search]);
 
   const handleSignIn = async () => {
     try {
@@ -538,48 +407,60 @@ const LandingPage: React.FC = () => {
       color: '#1d1d1f',
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
     }}>
+      {/* Root CSS variables */}
+      <style>{cssVariables}</style>
       {/* Header */}
-      <header style={{
-        padding: '1rem 2rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: '#ffffff'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{
-            width: '1.5rem',
-            height: '1.5rem',
-            background: '#f97316',
-            borderRadius: '50%'
-          }}>
+      <header style={{ background: '#ffffff', borderBottom: '1px solid #f3f4f6' }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '1rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              background: '#f97316',
+              borderRadius: '50%'
+            }} />
+            <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: '#1d1d1f' }}>Vimarsh</h1>
           </div>
-          <h1 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#1d1d1f' }}>Vimarsh</h1>
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <a href="#personalities" style={{ color: '#1d1d1f', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Personalities</a>
+            <a href="#features" style={{ color: '#1d1d1f', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>Features</a>
+            <button
+              onClick={handleBeginJourney}
+              style={{
+                background: 'linear-gradient(135deg, #f97316, #f59e0b)',
+                border: 'none',
+                color: 'white',
+                padding: '0.6rem 1.25rem',
+                borderRadius: '1.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                transition: 'all 0.3s ease',
+                boxShadow: '0 6px 18px rgba(249, 115, 22, 0.35)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 10px 24px rgba(249, 115, 22, 0.45)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 6px 18px rgba(249, 115, 22, 0.35)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Sign Up
+            </button>
+          </nav>
         </div>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <a href="#personalities" style={{ color: '#1d1d1f', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Personalities</a>
-          <a href="#features" style={{ color: '#1d1d1f', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500' }}>Features</a>
-          <button
-            onClick={handleBeginJourney}
-            style={{
-              background: '#007aff',
-              border: 'none',
-              color: 'white',
-              padding: '0.6rem 1.25rem',
-              borderRadius: '1.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontSize: '0.85rem',
-              fontWeight: '500',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 8px rgba(0, 122, 255, 0.25)'
-            }}
-          >
-            Get Started
-          </button>
-        </nav>
       </header>
 
       {/* Hero Section */}
@@ -600,6 +481,23 @@ const LandingPage: React.FC = () => {
             width: '50%',
             paddingRight: '2rem'
           }}>
+            {/* Badge */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: '#fff7ed',
+              color: '#9a3412',
+              border: '1px solid #fed7aa',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '9999px',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              marginBottom: '0.75rem'
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
+              Now with Enhanced Memory & Personalization
+            </div>
             <h1 style={{
               fontSize: '3rem',
               fontWeight: '600',
@@ -607,13 +505,14 @@ const LandingPage: React.FC = () => {
               color: '#1d1d1f',
               lineHeight: '1.2'
             }}>
-              Step into History.<br />
+              Converse with History's <br />
               <span style={{
-                color: '#8b5cf6',
-                fontWeight: '700'
-              }}>
-                Wisdom Awaits.
-              </span>
+                background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+                fontWeight: 700
+              }}>Greatest Minds</span>
             </h1>
 
             <p style={{
@@ -625,61 +524,191 @@ const LandingPage: React.FC = () => {
               What would you ask Einstein about the universe? How would Marcus Aurelius guide you through adversity? Experience real conversations with history's greatest minds — each personality remembers your journey and offers wisdom tailored to your life.
             </p>
 
-            <button
-              onClick={handleBeginJourney}
-              style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '0.875rem 2rem',
-                fontSize: '1rem',
-                borderRadius: '0.5rem',
-                cursor: 'pointer',
-                fontWeight: '500',
-                marginBottom: '2rem',
-                boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.3)';
-              }}
-            >
-              Begin Your Journey ✨
-            </button>
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={handleBeginJourney}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.875rem 1.25rem',
+                  fontSize: '1rem',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+                  transition: 'all 0.2s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.3)';
+                }}
+              >
+                Begin Your Journey
+                <ArrowRight size={18} />
+              </button>
+              <button
+                onClick={handleBeginJourney}
+                style={{
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  color: '#1f2937',
+                  padding: '0.875rem 1.25rem',
+                  fontSize: '1rem',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = '#f9fafb';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.06)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <Play size={18} />
+                Watch the Magic
+              </button>
+            </div>
 
-            {/* Stats */}
+      {/* Stats to mirror screenshot */}
             <div style={{
               display: 'flex',
               gap: '3rem',
               alignItems: 'center'
             }}>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>25</div>
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Legendary Minds</div>
+        <div style={{ fontSize: '2rem', fontWeight: 600, color: '#1d1d1f' }}>25</div>
+        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Great minds</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>∞</div>
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Conversations</div>
+        <div style={{ fontSize: '2rem', fontWeight: 600, color: '#1d1d1f' }}>6</div>
+        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Domains</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: '600', color: '#1d1d1f' }}>2500+</div>
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Years of Wisdom</div>
+        <div style={{ fontSize: '2rem', fontWeight: 600, color: '#1d1d1f' }}>1000+</div>
+        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Ancient texts</div>
               </div>
             </div>
           </div>
 
-          {/* Right side - Live Conversation Preview */}
+          {/* Right side - Conversation Card with colorful halo */}
           <div style={{ 
             width: '50%',
-            paddingLeft: '2rem'
+            paddingLeft: '2rem',
+            position: 'relative',
+            minHeight: 420
           }}>
-            <ConversationPreview />
+            {/* Ambient gradient blobs */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: '80%',
+              height: '80%',
+              background: 'radial-gradient(600px circle at 75% 25%, rgba(249,115,22,0.22), rgba(124,58,237,0.16), transparent 60%)',
+              filter: 'blur(10px)',
+              zIndex: 0
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '10%',
+              width: 260,
+              height: 160,
+              background: 'radial-gradient(closest-side, rgba(37,99,235,0.14), transparent)',
+              filter: 'blur(25px)',
+              zIndex: 0
+            }} />
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <EinsteinConversationCard />
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Start Your Journey */}
+      <section style={{
+        padding: '2rem 2rem 0',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: 6, color: '#1d1d1f' }}>Start Your Journey</h2>
+        <p style={{ color: '#6b7280', marginBottom: '1.25rem', fontSize: 13 }}>
+          Begin with these intro cards, each offering unique wisdom from their life’s work.
+        </p>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '1rem'
+        }}>
+          {[
+            { name: 'Albert Einstein', domain: 'Scientific', color: '#34c759', cta: 'Discuss curiosity' },
+            { name: 'Mahatma Gandhi', domain: 'Leadership', color: '#ff3b30', cta: 'Discuss leadership' },
+            { name: 'Socrates', domain: 'Philosophical', color: '#5856d6', cta: 'Explore dialogue' },
+            { name: 'William Shakespeare', domain: 'Literary', color: '#af52de', cta: 'Discuss creativity' }
+          ].map((p) => (
+            <div key={p.name} style={{
+              background: '#ffffff',
+              borderRadius: 12,
+              padding: 16,
+              border: '1px solid #e5e7eb',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+              transition: 'all .2s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.04)';
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: 8 }}>
+                <div style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  border: `2px solid ${p.color}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: p.color,
+                  fontWeight: 700
+                }}>{p.name.charAt(0)}</div>
+                <div>
+                  <div style={{ fontWeight: 600, color: '#111827' }}>{p.name}</div>
+                  <div style={{ fontSize: 12, color: '#6b7280' }}>{p.domain}</div>
+                </div>
+              </div>
+              <button style={{
+                border: '1px solid #e5e7eb',
+                background: '#fff',
+                color: '#1f2937',
+                padding: '6px 10px',
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 500
+              }}
+              onClick={handleBeginJourney}
+              >{p.cta} →</button>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -992,7 +1021,7 @@ const LandingPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Personalities Grid */}
+  {/* Personalities Grid */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -1083,13 +1112,18 @@ const LandingPage: React.FC = () => {
           ))}
         </div>
 
-        {selectedDomain === 'All' && getFilteredPersonalities().length > 12 && (
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
-              Showing all {getFilteredPersonalities().length} personalities
-            </p>
-          </div>
-        )}
+        {/* View all link to match screenshot */}
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <a
+            href="#personalities"
+            onClick={(e) => { e.preventDefault(); /* no-op for now */ }}
+            style={{ color: '#2563eb', fontSize: 14, textDecoration: 'none' }}
+            onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}
+          >
+            View all Great Minds →
+          </a>
+        </div>
       </section>
 
       {/* Features */}
@@ -1196,6 +1230,33 @@ const LandingPage: React.FC = () => {
               </p>
             </div>
           </div>
+
+          <div style={{ marginTop: '2rem' }}>
+            <button
+              onClick={handleBeginJourney}
+              style={{
+                background: 'linear-gradient(135deg, #f97316, #f59e0b)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 20px',
+                fontSize: 16,
+                borderRadius: 9999,
+                cursor: 'pointer',
+                fontWeight: 600,
+                boxShadow: '0 8px 24px rgba(249, 115, 22, 0.35)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 12px 28px rgba(249, 115, 22, 0.45)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(249, 115, 22, 0.35)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Experience This for Yourself
+            </button>
+          </div>
         </div>
       </section>
 
@@ -1239,3 +1300,4 @@ const LandingPage: React.FC = () => {
 };
 
 export default LandingPage;
+ 
