@@ -1,254 +1,302 @@
 # AI Agent Roadmap for Vimarsh Platform
-**⚠️ STRATEGIC PIVOT IMPLEMENTED - See ai_agent_roadmap_revised.md for Updated Strategy**
+**Authenticity-First Strategic Implementation: User-Centric Value Over Technical Complexity**
 
 ---
 
 ## Executive Summary
 
-Vimarsh currently operates at **Level 3 (RAG Excellence)**. Previous ambitions targeted rapid advancement to autonomous multi-agent collaboration (Levels 7–9). After strategic review (PRD, Tech Spec, UX alignment) we are **pivoting to an authenticity-first, user-value-centric roadmap** that deepens core strengths (textual fidelity, personality expansion, evaluation) **before** introducing any orchestration beyond independent personalities.
+Following comprehensive review of PRD, Tech Spec, and UX documentation, Vimarsh has implemented a **fundamental strategic pivot** from complex multi-agent orchestration to an **authenticity-first, user-value-centric approach**. This consolidated roadmap reflects our current implementation status and future direction.
 
-**Strategic Pivot Highlights:**
-- Preserve the platform’s differentiator: strict textual grounding + authentic voice per personality.
-- Accelerate high-ROI deliverables: add validated personalities, conversation history, wisdom journal, search, scoped memory.
-- Pull forward evaluation & citation integrity (prioritize Levels 3–4 + targeted parts of 6 & 8). Delay complex autonomous multi-agent “consensus” (original Level 7) in favor of **user-invoked Panel / Symposium Mode** with **independent** outputs.
-- Reframe multi-agent synthesis as optional, explicitly labeled, and only after maturity in evaluation & guardrails.
+### Strategic Realignment
 
-**Revised Target Horizon (18 months):**
-- Mastery of Levels 3–4 (RAG + LLMOps) → Introduce scoped Level 6 memory + selective Level 8 evaluation → User-controlled multi-view (re-imagined Level 7) **without agent cross-talk** → Optional orchestration (post-18m, gated by quality metrics).
+**Core Insight**: Users seeking wisdom from Krishna want Krishna's authentic voice, not a synthesis committee. Our competitive advantage lies in preserving individual personality authenticity while delivering tangible user value.
+
+**Current Status**: Vimarsh operates at **Level 3 (RAG Excellence)** with 25 validated personalities across 7 domains. We are now focused on deepening this foundation before introducing any multi-personality orchestration.
 
 ---
 
 ## Strategic Principles
-1. Authenticity over Autonomy: No hidden cross-personality blending; each answer must remain attributable and citation-grounded.
-2. User-Orchestrated Multiplicity: Multi-view insights are **requested**, never implicit.
-3. Precision Before Expansion: Elevate retrieval & evaluation quality before layering complexity.
-4. Isolation & Privacy: Memory is partitioned (user_id + personality_id); no leakage.
-5. Measurable Quality: Every phase gated by objective authenticity, citation, and consistency metrics.
-6. Cost Discipline: Time-To-Add-New-Personality (TANP) reduction and per-query cost ceilings.
+
+1. **Strict Textual Grounding**: Every response traceable to authentic source material with explicit citations
+2. **Individual Personality Integrity**: No cross-personality synthesis without explicit user request
+3. **User-Controlled Orchestration**: Multi-personality insights are user-initiated, never autonomous
+4. **Quality Before Quantity**: Perfect existing personalities before adding complexity
+5. **Transparent Attribution**: Clear source tracking and citation for all generated content
+6. **Scoped Personalization**: Memory and context isolated per user-per-personality
 
 ---
 
-## Current Assessment by Level (Condensed)
+## Current Platform Assessment
 
-### 🎯 Level 1: GenAI & Transformer Foundations – ✅ STRONG (95%)
-(Unchanged; foundations solid.)
+### ✅ Level 1-2: Foundations - STRONG (95%)
+- Gemini 2.5 Flash integration complete
+- Personality-specific prompting system operational
+- Transformer foundations solid
 
-### 🎯 Level 2: Prompting & Language Model Behavior – ✅ STRONG (85%)
-Next: introduce structured reasoning (optional CoT expansion), but only where it improves citation clarity.
+### ✅ Level 3: RAG - EXCELLENT (95%)
+- **Current State**: 8,955+ documents across 25 personalities
+- **Active Features**: Vector search, semantic retrieval, citation system
+- **Success Metrics**: 90%+ citation accuracy, 85%+ user satisfaction
+- **Next Phase**: Hybrid search (BM25 + semantic), re-ranking, query transformation
 
-### 🎯 Level 3: RAG – ✅ EXCELLENT (95%)
-Focus: hybrid search (BM25 + dense), re-ranking, diversity filtering, adaptive k per personality.
+### ⚠️ Level 4: LLMOps - MODERATE (45%)
+- **Current State**: Basic pipeline operational
+- **Gap**: Modular architecture, standardized monitoring
+- **Phase 1 Target**: LangChain integration for prompt management, structured monitoring
+- **Success Metric**: Time-to-Add-New-Personality (TANP) reduction from 12+ weeks to ≤6 weeks
 
-### 🎯 Level 4: LLMOps & Tools – ⚠️ MODERATE (45%)
-Refactor into modular retrieval/prompt services before adopting frameworks (avoid premature lock-in). Selective LangChain components for tooling consistency (prompt templates, tracing) only after refactor.
+### 🔄 Level 5: Agents - REDEFINED
+- **Old Vision**: Autonomous multi-agent collaboration
+- **New Approach**: Independent personality pipelines with shared quality framework
+- **Implementation**: Each personality = isolated RAG + evaluation + style bundle
+- **No Cross-Talk**: Maintains authenticity while enabling future orchestration
 
-### 🎯 Level 5: Agents & Frameworks – 🔄 REDEFINED (was WEAK 25%)
-Old vision (autonomous multi-agent orchestration) replaced with **Independent Personality Pipelines**. Each personality = self-contained RAG + style + evaluation bundle. No inter-agent planning layer in Phase 1–2.
+### 🎯 Level 6: Memory - PHASE 2 TARGET (30% → 85%)
+- **Approach**: Scoped per-user-per-personality memory
+- **Privacy Design**: Complete isolation with partition keys (user_id|personality_id)
+- **Implementation**: Episodic + semantic memory without cross-contamination
 
-### 🎯 Level 6: Memory, State & Orchestration – ❌ LIMITED (30%)
-Re-scope to **Scoped Memory v1**: per user-per personality episodic + compressed semantic summaries. No cross-personality synthesis. Working memory = recent turns + distilled prior milestones.
+### 🔄 Level 7: Multi-Agent - RE-IMAGINED AS SYMPOSIUM MODE
+- **Old**: Autonomous agent-to-agent communication
+- **New**: User-controlled independent response presentation
+- **Example**: User asks question → Krishna, Einstein, Marcus Aurelius respond independently → Side-by-side presentation with clear attribution
 
-### 🎯 Level 7: Multi-Agent Systems – 🔄 RE-IMAGINED (Deferred Orchestration)
-Now defined as **Panel / Symposium Mode**: fan-out independent generation → side-by-side responses → optional user-requested comparative summary (Phase 3). No hidden negotiation layer.
-
-### 🎯 Level 8: Evaluation & Reinforcement – ⬆️ PULL-FORWARD (Early Partial Implementation)
-Introduce automated authenticity & citation verification early (Phase 1). Reinforcement / reward modeling postponed until stable evaluation baselines (Phase 3+).
-
-### 🎯 Level 9: Protocols & Safety – ⚠️ MODERATE (40%)
-Add persona deviation detector, cultural sensitivity classifier, refusal policy tests (Phase 2). Formal safety orchestration later.
-
-### 🎯 Level 10: Build & Deploy – ⚠️ MODERATE (60%)
-Incremental improvements: tracing, metrics pipeline, CI gated evaluation scores. Avoid full platform migration until retrieval refactor complete.
-
----
-
-## High-ROI Gaps (Ranked)
-1. Retrieval Quality (hybrid + rerank + dedupe) – immediate user impact.
-2. Personality Expansion Pipeline (tooling + validation harness).
-3. Automated Citation & Grounding Verification (precision baseline).
-4. Conversation History & Wisdom Journal (retention + premium conversion).
-5. Scoped Memory (episodic + semantic compression) with privacy guardrails.
-6. Evaluation Observability (persona style score, hallucination rate, latency SLOs).
-7. Panel Mode (distinct outputs) – cross-domain insight after quality maturity.
+### ⬆️ Level 8: Evaluation - PULLED FORWARD TO PHASE 2
+- **Rationale**: Critical for quality assurance as we scale
+- **Focus**: Authenticity validation, citation accuracy, cultural sensitivity
+- **Target**: 95%+ correlation with expert human evaluation
 
 ---
 
-## Revised Phased Roadmap
+## Three-Phase Implementation Roadmap
 
-### Phase 1 (Months 0–6): Depth & Coverage
-Focus: Strengthen core retrieval + expand validated personalities.
-- Add 4–6 new personalities (Einstein, Buddha, Marcus Aurelius, Lincoln, + optional Rumi / Lao Tzu) with ingestion QA.
-- Retrieval Enhancements: BM25 + dense fusion, semantic rerank (cross-encoder), min redundancy filter, adaptive k.
-- Evaluation v1: Citation grounding checker (string overlap + embedding relevance), persona style classifier (few-shot), hallucination detector heuristic.
-- Conversation History MVP + Wisdom Journal (user export + semantic search).
-- Modular Refactor: `retrieval_service`, `prompt_service`, `citation_service`, instrumentation hooks.
-- Metrics Platform: log retrieval_hit_rate, citation_precision, p95_latency, cost_per_response.
+### **Phase 1: Deepen the Core (0-9 Months)**
+**Target: Master Level 3 & 4 | Focus: Quality + User Features**
 
-Gate to Phase 2:
-- Citation precision ≥ 90%.
-- Persona deviation score ≤ 15% variance across personalities.
-- TANP ≤ 3 weeks → ≤ 2 weeks target trending.
-- p95 end-to-end latency ≤ 2.5 s (median ≤ 1.4 s) on 80% of queries.
+#### Priority 1: Enhanced RAG Quality
+- **Hybrid Search**: BM25 + semantic search fusion for improved relevance
+- **Re-ranking**: Cross-encoder models for context-query relevance
+- **Query Transformation**: Intent classification and query expansion
+- **Diversity Filtering**: Reduce redundant chunks while maintaining coverage
 
-### Phase 2 (Months 6–12): Personalization & Trust
-- Scoped Memory v1: per user-per personality episodic events + compressed semantic snapshot (rolling summary ≤ 1 KB/personality).
-- Memory Safety: partition key (user_id|personality_id), PII scrubbing (regex + heuristic) before persist.
-- Wisdom Journal Enhancements: tagging, milestone auto-detection, search facets (topic, personality, timeframe).
-- Evaluation v2: LLM-as-Judge ensemble (authenticity, tone, citation alignment); drift alerts (weekly baselines).
-- Persona Expansion Pipeline Automation: ingestion QA checklist & automated coverage report.
-- Safety Additions: refusal tests, cultural sensitivity classifier, adversarial prompt regression set.
+#### Priority 2: Critical User Features
+- **Conversation History**: Searchable, exportable conversation archive
+- **Wisdom Journal**: Personal insights tracking with tagging and milestones
+- **Advanced Search**: Semantic search across all conversations
+- **Citation Deep-Links**: Direct links to source texts for further reading
 
-Gates:
-- Return Rate (Day 7) +10% vs Phase 1 baseline.
-- Hallucination rate < 5% (LLM-judge validated).
-- Memory impact: personalization uplift (measured via user feedback) with no increase in hallucination rate.
+#### Priority 3: Platform Standardization
+- **LangChain Integration**: Prompt management and response parsing
+- **Monitoring Pipeline**: Response quality tracking and performance metrics
+- **Modular Architecture**: Separate retrieval, prompt, and citation services
 
-### Phase 3 (Months 12–18): Multi-View Insight (Panel Mode)
-- Panel (Symposium) Mode: independent parallel RAG+LLM per selected personalities (max 3 default, extensible to 5).
-- Optional Comparative Summary: only if user toggles “Compare Perspectives” (meta summary cites each persona explicitly).
-- Advanced Retrieval: persona-adaptive k, cluster-based diversity (embedding centroid spread), intent classification for query rewriting.
-- Evaluation v3: multi-response consistency analyzer (ensures each response remains within persona style band) + cross-personality contrast quality metric.
-- Proactive Suggestions (lightweight): suggest related authentic passages (no unsolicited synthesis).
-
-Gates:
-- Panel responses maintain citation precision parity (±2%) with single-personality baseline.
-- Comparative summary hallucination rate < 5%.
-- Panel adoption ≥ 20% weekly active advanced users.
-
-### Phase 4 (Post-18m, Optional): Selective Orchestration
-- ONLY if metrics plateau and user demand substantiated.
-- Introduce Optional Guided Synthesis Agent (clearly labeled “Derived Comparative Analysis – Not Primary Voice”).
-- Strict transparency: each synthesized claim must link to originating personality outputs & citations.
-
-Go/No-Go Criteria:
-- Sustained authenticity score ≥ 92%.
-- User request rate for deeper synthesis > defined threshold (e.g., 15% of panel sessions).
+#### Phase 1 Success Metrics
+- RAG relevance improvement: ≥20% increase in user-rated response quality
+- Conversation history feature: ≥85% user adoption (among account holders)
+- TANP reduction: 12+ weeks → ≤6 weeks
+- Citation precision: ≥90%
 
 ---
 
-## Memory Architecture (Scoped v1)
-- Working Memory: last N (configurable, default 10) turns + compressed prior summary.
-- Episodic Memory: milestone events (practice applied, gratitude expressed) keyed by timestamp.
-- Semantic Memory: evolving principles (ranked list) with decay & reinforcement weights.
-- Compression Policy: Summarize after every 25 turns or 2 KB raw accumulation (whichever first). Maintain diffs for audit.
-- Data Model (conceptual): `partition_key = f"{user_id}#{personality_id}"`, items typed: {type: episodic|semantic|summary|journal_entry}.
+### **Phase 2: Personalize the Experience (9-18 Months)**
+**Target: Achieve Level 6 & 8 | Focus: Memory + Evaluation**
+
+#### Priority 1: Scoped Memory System
+- **Per-User-Per-Personality Memory**: Krishna remembers Krishna conversations only
+- **Episodic Memory**: Key conversation milestones and insights
+- **Semantic Memory**: Evolving understanding of user's interests
+- **Privacy Guardrails**: Complete isolation with partition keys
+
+#### Priority 2: LLM-as-Judge Evaluation
+- **Authenticity Scoring**: Automated personality voice consistency validation
+- **Citation Verification**: Accuracy of source references
+- **Cultural Sensitivity**: Appropriate handling of spiritual/historical content
+- **Hallucination Detection**: Identification of unsupported claims
+
+#### Priority 3: Enhanced User Experience
+- **Personalized Recommendations**: Suggest personalities based on interests
+- **Progressive Disclosure**: Advanced features revealed based on expertise
+- **Voice Interface Enhancement**: Personality-specific speech patterns
+
+#### Phase 2 Success Metrics
+- Memory feature increases Day 7 return rate by ≥15%
+- Automated evaluation achieves ≥95% correlation with expert validation
+- Hallucination rate: <5%
+- User engagement depth: ≥30% increase in conversation length
 
 ---
 
-## Evaluation Stack (Evolution)
-| Version | Components | Automation Frequency |
-|--------|------------|----------------------|
-| v1 | Citation grounding (overlap + embedding), persona style heuristic | per deploy + nightly |
-| v2 | LLM-as-judge ensemble, drift detector, hallucination scorer | per batch + weekly trend |
-| v3 | Multi-view contrast metrics, summary hallucination audit | panel sessions + weekly |
+### **Phase 3: User-Controlled Multi-View (18+ Months)**
+**Target: Symposium Mode | Focus: Cross-Domain Insights**
 
-Key Scores:
-- Citation Precision = cited_chunks_used / cited_chunks_total.
-- Grounding Score = mean cosine(sim(response segment, source chunk)).
-- Persona Style Score = classifier confidence vs persona profile baseline.
-- Hallucination Rate = % sentences lacking ≥ threshold grounding.
-- Deviation Delta = |current style embedding – baseline centroid|.
+#### Symposium Mode Implementation
+**Revolutionary Multi-Personality Feature Without Compromise**
 
-Alerts:
-- Any personality citation precision < 85% (critical).
-- Style drift > 2σ over 7-day moving window.
+**User Experience Flow**:
+1. User selects 2-3 personalities for a question
+2. Each personality generates independent response from their RAG pipeline
+3. Responses presented side-by-side with clear attribution
+4. Optional user-requested comparative summary (clearly labeled as derived)
 
----
+**Example Output**:
+```
+Question: "What is the nature of reality?"
 
-## Metrics & Targets
-- Retrieval Hit Rate: 66.7% → 80% (Phase 1) → 85% (Phase 2).
-- Citation Precision: 90% Phase 1 gate → 92% Phase 2 → 93%+ Phase 3.
-- Persona Consistency: ≥ 85% Phase 1 → ≥ 90% Phase 2.
-- Hallucination Rate: < 7% Phase 1 → < 5% Phase 2 → < 4% Phase 3.
-- TANP: 4–6 weeks current → ≤ 3 weeks Phase 1 → ≤ 2 weeks Phase 2.
-- Day 7 Return Rate: +10% Phase 2 vs Phase 1 baseline.
-- Panel Adoption: ≥ 20% advanced users (Phase 3).
+Krishna's Perspective (Bhagavad Gita 2.16-20):
+"Reality is composed of both the material (prakṛti) and the spiritual (purusha)..."
+[Citation: Bhagavad Gita 2.20]
 
----
+Einstein's Perspective (Letter to Max Born, 1926):
+"Reality is what can be observed and measured, though perception is frame-dependent..."
+[Citation: Letter to Max Born, December 4, 1926]
 
-## Cost & Performance Guardrails
-- p95 Latency Targets: Single response ≤ 2.5 s; Panel (3 personas) ≤ 4.5 s.
-- Cost per Query (avg): ≤ $0.005 single, ≤ $0.012 panel (Gemini + retrieval + infra).
-- Personality Storage Overhead: < 5% duplication (dedupe hashing per chunk).
-- Memory Storage Budget: ≤ 25 KB active + 100 KB archived per user per personality (rolling window retention + compression).
+Marcus Aurelius' Perspective (Meditations 2.11):
+"The universe is change; our life is what our thoughts make it..."
+[Citation: Meditations 2.11]
 
----
-
-## Tooling & Refactor Plan
-1. Service Modularization (retrieval, prompts, citations, evaluation hooks).
-2. Hybrid Search Integration (BM25 index + existing vector) + late fusion weighting.
-3. Cross-Encoder Re-rank (e.g., MiniLM cross encoder) – top 50 → top k.
-4. Evaluation Harness CLI/CI (run canonical prompt suite, produce JSON scorecard).
-5. Memory Service (compression worker + summarization prompt template).
-6. Panel Execution Orchestrator (fan-out async gather + structured response schema).
-
----
-
-## Risk Register (Condensed)
-| Risk | Impact | Mitigation |
-|------|--------|-----------|
-| Authenticity dilution | High | Independent pipelines; forbid hidden synthesis |
-| Cost creep with personalities | Medium | Monthly cost dashboard; usage-based retention |
-| Memory privacy leakage | High | Partitioning + automated test suite for access layer |
-| Style drift | High | Drift detector + rollback gating |
-| Panel hallucination | Medium | Per-personality grounding + summary gating |
-| Framework lock-in | Medium | Refactor before partial LangChain adoption |
-
----
-
-## Resource & Investment (Revised Projection ~12–15 Months Core)
-| Category | Previous Plan | Revised Focus | Est. Allocation |
-|----------|---------------|--------------|----------------|
-| Retrieval & Refactor | Under-scoped | Core early | 25% |
-| Personality Expansion & QA | Moderate | Accelerated | 20% |
-| Evaluation & Safety | Late | Pulled Forward | 20% |
-| Memory & Journal | Mid | Phase 2 Core | 15% |
-| Panel Mode | Heavy multi-agent | Lightweight fan-out | 10% |
-| Optional Orchestration (Phase 4) | Large | Conditional | 0–10% |
-
-Reduction vs original multi-agent heavy plan lowers projected 24‑month spend by ~30–40% while accelerating user-visible value.
-
----
-
-## Sample Acceptance Criteria (Phase 1 Extract)
-- Retrieval pipeline returns ≥ 1 grounded chunk for 85% of canonical test queries.
-- Citation evaluator F1 ≥ 0.9 on validation set (hand-labeled relevance).
-- New personality ingestion script produces coverage report (unique sections %, orphan sections %, duplicate hash collisions < 2%).
-- Wisdom Journal search latency < 300 ms for 95th percentile queries (index warm).
-
----
-
-## Panel Mode Response Schema (Phase 3 Draft)
-```json
-{
-  "question": "<user_query>",
-  "responses": [
-    {"personality": "krishna", "text": "...", "citations": [ ... ], "meta": {"grounding_score": 0.93}},
-    {"personality": "einstein", "text": "...", "citations": [ ... ], "meta": {"grounding_score": 0.90}}
-  ],
-  "comparative_summary": {
-    "enabled": true,
-    "text": "(Only if user requested)",
-    "attribution_map": {"krishna": ["Gita 2.47"], "einstein": ["Letter 1926"]}
-  }
-}
+[Optional User-Requested Summary]
+Comparative Analysis: These three perspectives represent materialist-spiritual (Krishna), 
+scientific-empirical (Einstein), and philosophical-practical (Marcus Aurelius) approaches 
+to understanding reality's nature.
 ```
 
+#### Phase 3 Success Metrics
+- Symposium Mode adoption: ≥30% of active users try within 30 days
+- Cross-personality engagement: Users interact with ≥3 personalities regularly
+- Citation precision parity: ±2% vs single-personality baseline
+- Premium conversion: Multi-personality users convert at 2x base rate
+
 ---
 
-## Go / No-Go Gates Summary
-| Gate | Metric | Threshold |
-|------|--------|-----------|
-| Phase 1 → 2 | Citation precision | ≥ 90% |
-| Phase 1 → 2 | TANP | ≤ 3 weeks |
-| Phase 2 → 3 | Hallucination rate | < 5% |
-| Phase 2 → 3 | Return rate uplift | ≥ +10% |
-| Phase 3 → 4 (Optional) | Authenticity score | ≥ 92% sustained 60 days |
-| Phase 3 → 4 (Optional) | User demand (panel synthesis requests) | ≥ 15% panel sessions |
+## Current Platform Status (August 2025)
+
+### ✅ Operational Features
+- **25 Personalities**: 5 spiritual, 5 scientific, 6 philosophical, 6 leadership, 2 literary, 1 psychology
+- **7 Domains**: Complete coverage across user interest areas
+- **RAG Pipeline**: 8,955+ documents with vector search and citation system
+- **Domain Theming**: Personality-specific UI colors and styling
+- **Personality Questions**: 100% coverage with authentic, domain-appropriate questions
+
+### 🔄 In Development
+- Enhanced RAG with hybrid search
+- Conversation history and wisdom journal
+- LangChain integration for prompt management
+- Automated evaluation pipeline
+
+### 📋 Architecture Highlights
+- **Frontend**: React 18, TypeScript, Sacred Harmony design system
+- **Backend**: Python 3.12, Azure Functions, Cosmos DB
+- **AI**: Google Gemini 2.5 Flash with custom prompting
+- **Data**: Vector storage with metadata and citation tracking
+- **Infrastructure**: Serverless architecture with cost optimization
+
+---
+
+## Resource Allocation & Investment
+
+### Total Investment (Revised)
+- **Duration**: 18 months (vs. original 24 months)
+- **Cost Reduction**: 30% savings vs. complex multi-agent approach
+- **Focus**: High-ROI user features and authenticity preservation
+
+### Resource Distribution
+| Category | Allocation | Rationale |
+|----------|-----------|-----------|
+| RAG Enhancement & Quality | 25% | Foundation excellence |
+| User-Facing Features | 20% | Retention & monetization |
+| Evaluation & Safety | 20% | Quality assurance |
+| Memory & Personalization | 15% | Simplified, scoped approach |
+| Personality Expansion | 15% | Core value driver |
+| Platform Infrastructure | 5% | Standardization |
+
+---
+
+## Risk Mitigation & Success Guardrails
+
+### Top Risks Addressed
+1. **Authenticity Dilution**: Eliminated through independent personality pipelines
+2. **Feature Complexity**: Simplified to user-controlled experiences
+3. **Technical Debt**: Focused scope allows quality concentration
+4. **Market Timing**: Faster delivery of core value proposition
+
+### Quality Gates
+- All new personalities must pass expert validation before release
+- Citation accuracy ≥90% before any multi-personality features
+- User retention metrics must improve before adding complexity
+- Cost per query must stay under $0.005 single / $0.012 panel
+
+### Performance Targets
+- **Latency**: Single response ≤2.5s, Panel mode ≤4.5s
+- **Accuracy**: Citation precision ≥90%, Hallucination rate <5%
+- **Engagement**: Day 7 return rate improvement ≥15% with memory features
+- **Efficiency**: TANP reduction to ≤6 weeks by Phase 1 end
+
+---
+
+## Memory Architecture (Phase 2)
+
+### Data Model
+```
+partition_key = f"{user_id}#{personality_id}"
+memory_types = ["episodic", "semantic", "summary", "journal_entry"]
+```
+
+### Components
+- **Working Memory**: Last 10 turns + compressed prior summary
+- **Episodic Memory**: Milestone events with timestamps
+- **Semantic Memory**: Evolving principles with decay/reinforcement
+- **Compression Policy**: Summarize after 25 turns or 2KB accumulation
+
+### Privacy & Isolation
+- Complete partition isolation prevents cross-personality leakage
+- PII scrubbing before persistence
+- Automated access control testing
+
+---
+
+## Evaluation Framework Evolution
+
+| Phase | Components | Automation |
+|-------|------------|------------|
+| Phase 1 | Citation grounding, persona style heuristic | Per deploy + nightly |
+| Phase 2 | LLM-as-judge ensemble, drift detection | Per batch + weekly |
+| Phase 3 | Multi-view contrast metrics, summary audit | Panel sessions + weekly |
+
+### Key Metrics
+- **Citation Precision**: cited_chunks_used / cited_chunks_total
+- **Grounding Score**: mean cosine similarity (response, source)
+- **Persona Consistency**: classifier confidence vs baseline
+- **Hallucination Rate**: % sentences lacking threshold grounding
+
+---
+
+## Implementation Timeline
+
+**Months 1-3**: Enhanced RAG (hybrid search, re-ranking) + conversation history
+**Months 4-6**: Wisdom journal + LangChain integration + citation enhancement
+**Months 7-9**: Platform standardization + monitoring pipeline + Phase 1 completion
+**Months 10-12**: Scoped memory system + user personalization
+**Months 13-15**: LLM-as-Judge evaluation + quality automation
+**Months 16-18**: Symposium Mode MVP + advanced analytics + Phase 3 completion
+
+---
+
+## Success Vision
+
+A platform where users can have genuine, citation-grounded conversations with 25+ authenticated personalities, with the option to explore multi-perspective insights through user-controlled symposium experiences—all while maintaining absolute fidelity to each personality's authentic voice and teachings.
+
+**Competitive Advantage**: The only platform that preserves individual personality authenticity while enabling cross-domain wisdom exploration, backed by rigorous textual grounding and transparent citations.
 
 ---
 
 ## Conclusion
-This revised roadmap concentrates investment where Vimarsh’s brand moat is deepest: **authentic, citation-grounded wisdom from multiple historically faithful personalities**. By postponing autonomous multi-agent synthesis and emphasizing verifiable quality, scoped memory, and user-controlled multi-view, we accelerate retention, trust, and monetization while reducing architectural risk. Optional orchestration remains a future lever—activated only if user value plateaus after mastering authenticity at scale.
 
-*Revised: August 9, 2025*
+This consolidated roadmap prioritizes **authentic value delivery over technical complexity**. By focusing on our core strengths—textual fidelity and personality authenticity—we build user trust, drive retention, and establish market leadership before introducing advanced multi-personality features.
+
+The key insight driving this approach: users want access to history's greatest minds as **individuals**, not as participants in an AI committee. Our success lies in preserving and enhancing this authenticity while making it more accessible and personally meaningful.
+
+---
+
+*Document Consolidated: August 17, 2025*  
+*Strategic Alignment: PRD, Tech Spec, UX Documentation*  
+*Next Review: Phase 1 Completion (Month 9)*
