@@ -24,6 +24,33 @@ const cssVariables = `
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-20px) rotate(5deg); }
   }
+
+  /* Responsive hero layout to ensure the Einstein card is visible on smaller screens */
+  .hero-layout {
+    display: flex;
+    gap: 4rem;
+    align-items: flex-start;
+    min-height: 500px;
+    width: 100%;
+  }
+  .hero-left {
+    width: 50%;
+    padding-right: 2rem;
+  }
+  .hero-right {
+    width: 50%;
+    padding-left: 2rem;
+    position: relative;
+    min-height: 420px;
+  }
+  .hero-right .card-wrapper { position: relative; z-index: 1; }
+
+  @media (max-width: 1024px) {
+    .hero-layout { flex-direction: column; gap: 2rem; min-height: unset; }
+    .hero-left, .hero-right { width: 100%; padding: 0; }
+    .hero-right { min-height: auto; }
+    .hero-right .card-wrapper { max-width: 420px; margin: 0 auto; }
+  }
 `;
 
 interface Personality {
@@ -46,7 +73,7 @@ const domainColors = {
   'Leadership': '#ff3b30'
 };
 
-// Static Einstein Conversation Card to match screenshot
+// Static Einstein Conversation Card (hero preview)
 const EinsteinConversationCard: React.FC = () => {
   return (
     <div style={{
@@ -92,7 +119,7 @@ const EinsteinConversationCard: React.FC = () => {
         color: '#111827',
         marginBottom: 10
       }}>
-        How can I find peace in difficult times?
+        Problem: what was your biggest mistake while developing relativity?
       </div>
 
       {/* AI response */}
@@ -106,11 +133,11 @@ const EinsteinConversationCard: React.FC = () => {
         lineHeight: 1.5,
         boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
       }}>
-        True peace arises from understanding your dharma — your righteous duty. When you act without attachment to results, performing your duty with devotion, the mind finds its natural state of tranquility.
+        I tried to force a static universe by adding the cosmological constant. Later observations showed the universe is expanding, and I called that addition my “biggest blunder.” The lesson: let evidence guide the equations, not preference.
       </div>
 
       <div style={{ marginTop: 10, textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>
-        Developed humanly, an authentic RAG‑grounded data sourcing.
+        Built on citations and an expanding repository.
       </div>
     </div>
   );
@@ -469,18 +496,9 @@ const LandingPage: React.FC = () => {
         maxWidth: '1200px',
         margin: '0 auto'
       }}>
-        <div style={{
-          display: 'flex',
-          gap: '4rem',
-          alignItems: 'flex-start',
-          minHeight: '500px',
-          width: '100%'
-        }}>
+        <div className="hero-layout">
           {/* Left side - Text content */}
-          <div style={{ 
-            width: '50%',
-            paddingRight: '2rem'
-          }}>
+          <div className="hero-left">
             {/* Badge */}
             <div style={{
               display: 'inline-flex',
@@ -521,22 +539,22 @@ const LandingPage: React.FC = () => {
               marginBottom: '2rem',
               lineHeight: '1.6'
             }}>
-              What would you ask Einstein about the universe? How would Marcus Aurelius guide you through adversity? Experience real conversations with history's greatest minds — each personality remembers your journey and offers wisdom tailored to your life.
+              Ask Einstein about his failures. Challenge Gandhi’s philosophy. Learn creativity from Shakespeare. Experience authentic, evolving conversations that span domains and deepen over time.
             </p>
 
             <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
               <button
                 onClick={handleBeginJourney}
                 style={{
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                  color: 'white',
+                  background: 'linear-gradient(135deg, #f97316, #f59e0b)',
+                  color: '#ffffff',
                   border: 'none',
                   padding: '0.875rem 1.25rem',
                   fontSize: '1rem',
                   borderRadius: '0.5rem',
                   cursor: 'pointer',
-                  fontWeight: 500,
-                  boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+                  fontWeight: 600,
+                  boxShadow: '0 6px 18px rgba(249, 115, 22, 0.35)',
                   transition: 'all 0.2s ease',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -544,12 +562,13 @@ const LandingPage: React.FC = () => {
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
+                  e.currentTarget.style.boxShadow = '0 10px 24px rgba(249, 115, 22, 0.45)';
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.3)';
+                  e.currentTarget.style.boxShadow = '0 6px 18px rgba(249, 115, 22, 0.35)';
                 }}
+                aria-label="Begin your journey"
               >
                 Begin Your Journey
                 <ArrowRight size={18} />
@@ -606,12 +625,7 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Right side - Conversation Card with colorful halo */}
-          <div style={{ 
-            width: '50%',
-            paddingLeft: '2rem',
-            position: 'relative',
-            minHeight: 420
-          }}>
+          <div className="hero-right">
             {/* Ambient gradient blobs */}
             <div style={{
               position: 'absolute',
@@ -633,7 +647,7 @@ const LandingPage: React.FC = () => {
               filter: 'blur(25px)',
               zIndex: 0
             }} />
-            <div style={{ position: 'relative', zIndex: 1 }}>
+            <div className="card-wrapper">
               <EinsteinConversationCard />
             </div>
           </div>
