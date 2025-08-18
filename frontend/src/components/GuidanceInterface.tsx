@@ -447,6 +447,155 @@ export default function GuidanceInterface() {
           "What is the Way and how do I align with it?"
         ];
       
+      case 'benjamin_franklin':
+      case 'franklin':
+        return [
+          "How can I develop practical wisdom and better habits in daily life?",
+          "What principles of diplomacy and negotiation can help resolve conflicts?",
+          "How do I balance innovation and invention with practical application?",
+          "What role does hard work and industry play in achieving success?"
+        ];
+      
+      case 'isaac_newton':
+      case 'newton':
+        return [
+          "How do the laws of motion apply to understanding life's challenges?",
+          "What role does mathematical thinking play in solving complex problems?",
+          "How do we build upon the work of others to achieve greater discoveries?",
+          "What is the relationship between observation and theoretical understanding?"
+        ];
+      
+      case 'nikola_tesla':
+      case 'tesla':
+        return [
+          "How can I harness the power of imagination and visualization for innovation?",
+          "What role does intuition play in scientific and creative breakthroughs?",
+          "How do I persist through setbacks when pursuing revolutionary ideas?",
+          "What is the relationship between energy, frequency, and vibration in life?"
+        ];
+      
+      case 'leonardo_da_vinci':
+      case 'leonardo':
+      case 'da_vinci':
+        return [
+          "How can I cultivate curiosity and observe the world with fresh eyes?",
+          "What is the connection between art, science, and human understanding?",
+          "How do I develop multiple skills and integrate different disciplines?",
+          "What role does sketching and visual thinking play in problem-solving?"
+        ];
+      
+      case 'archimedes':
+        return [
+          "How do I approach complex problems with systematic thinking?",
+          "What role does practical experimentation play in understanding principles?",
+          "How can simple principles lead to powerful applications?",
+          "What is the relationship between mathematical precision and real-world solutions?"
+        ];
+      
+      case 'william_shakespeare':
+      case 'shakespeare':
+        return [
+          "How does understanding human nature help us navigate relationships?",
+          "What can the complexity of characters teach us about ourselves?",
+          "How do stories and drama reflect the deepest truths about life?",
+          "What role does language and expression play in revealing truth?"
+        ];
+      
+      case 'rabindranath_tagore':
+      case 'tagore':
+        return [
+          "How can education nurture the whole human being?",
+          "What is the relationship between individual creativity and universal truth?",
+          "How do we find harmony between tradition and progress?",
+          "What role does poetry and art play in spiritual development?"
+        ];
+      
+      case 'chanakya':
+        return [
+          "What principles of strategy and statecraft guide effective leadership?",
+          "How do we balance pragmatism with ethical principles in governance?",
+          "What role does understanding human nature play in political wisdom?",
+          "How do we build and maintain power while serving the greater good?"
+        ];
+      
+      case 'confucius':
+        return [
+          "How do we cultivate virtue and moral character in daily life?",
+          "What is the proper relationship between individual growth and social harmony?",
+          "How do we show respect and filial piety in modern relationships?",
+          "What role does education and self-cultivation play in good governance?"
+        ];
+      
+      case 'george_washington':
+      case 'washington':
+        return [
+          "What principles of leadership unite people during times of division?",
+          "How do we balance personal ambition with service to others?",
+          "What role does character and integrity play in earning trust?",
+          "How do we establish lasting institutions while avoiding the corruption of power?"
+        ];
+      
+      case 'mahatma_gandhi':
+      case 'gandhi':
+        return [
+          "How can non-violent resistance create lasting social change?",
+          "What is the relationship between personal transformation and social reform?",
+          "How do we practice truth and simplicity in a complex world?",
+          "What role does self-discipline play in serving others effectively?"
+        ];
+      
+      case 'martin_luther_king_jr':
+      case 'mlk':
+      case 'king':
+        return [
+          "How do we pursue justice while maintaining love for our opponents?",
+          "What role does moral courage play in challenging unjust systems?",
+          "How do we build bridges between different communities and perspectives?",
+          "What is the relationship between individual dignity and collective freedom?"
+        ];
+      
+      case 'socrates':
+        return [
+          "How do we examine our lives and question our assumptions?",
+          "What does it mean to know that we know nothing?",
+          "How do we pursue wisdom through dialogue and questioning?",
+          "What is the relationship between virtue, knowledge, and the good life?"
+        ];
+      
+      case 'plato':
+        return [
+          "How do we distinguish between appearance and reality in our understanding?",
+          "What is the relationship between justice in the soul and justice in society?",
+          "How do we pursue the ideal while living in an imperfect world?",
+          "What role does education play in awakening the mind to truth?"
+        ];
+      
+      case 'aristotle':
+        return [
+          "How do we find the golden mean between extremes in ethical decisions?",
+          "What is the relationship between theoretical knowledge and practical wisdom?",
+          "How do we cultivate excellence through habit and practice?",
+          "What constitutes human flourishing and the good life?"
+        ];
+      
+      case 'sigmund_freud':
+      case 'freud':
+        return [
+          "How do unconscious motivations influence our conscious behavior?",
+          "What role do dreams and symbols play in understanding the psyche?",
+          "How do childhood experiences shape our adult personalities?",
+          "What is the relationship between individual psychology and civilization?"
+        ];
+      
+      case 'swami_vivekananda':
+      case 'vivekananda':
+        return [
+          "How do we realize the divinity within ourselves and others?",
+          "What is the practical application of Vedantic philosophy in daily life?",
+          "How do we serve humanity while pursuing spiritual growth?",
+          "What role does strength and fearlessness play in spiritual development?"
+        ];
+      
       default:
         // Fall back to domain-based questions if personality not found
         switch (selectedPersonality.domain) {
@@ -463,6 +612,13 @@ export default function GuidanceInterface() {
               "How do we build unity and preserve democracy in challenging times?",
               "What role does character play in effective governance?",
               "How do we balance justice with compassion in difficult decisions?"
+            ];
+          case 'leadership':
+            return [
+              "What principles of leadership and governance guide effective decision-making?",
+              "How do we build trust and inspire others during challenging times?",
+              "What role does character and integrity play in true leadership?",
+              "How do we balance competing interests while serving the common good?"
             ];
           case 'philosophical':
             return [
@@ -490,12 +646,29 @@ export default function GuidanceInterface() {
     }
   };
 
+  // Get domain-specific colors for visual enhancement
+  const getDomainColor = (domain: string) => {
+    switch (domain) {
+      case 'spiritual': return { bg: 'rgba(255, 107, 53, 0.1)', text: '#ea580c', border: 'rgba(255, 107, 53, 0.3)', gradient: 'linear-gradient(135deg, #ff6b35, #ea580c)' };
+      case 'scientific': return { bg: 'rgba(59, 130, 246, 0.1)', text: '#2563eb', border: 'rgba(59, 130, 246, 0.3)', gradient: 'linear-gradient(135deg, #3b82f6, #2563eb)' };
+      case 'historical': return { bg: 'rgba(34, 197, 94, 0.1)', text: '#16a34a', border: 'rgba(34, 197, 94, 0.3)', gradient: 'linear-gradient(135deg, #22c55e, #16a34a)' };
+      case 'philosophical': return { bg: 'rgba(147, 51, 234, 0.1)', text: '#9333ea', border: 'rgba(147, 51, 234, 0.3)', gradient: 'linear-gradient(135deg, #9333ea, #7c3aed)' };
+      case 'literary': return { bg: 'rgba(16, 185, 129, 0.1)', text: '#059669', border: 'rgba(16, 185, 129, 0.3)', gradient: 'linear-gradient(135deg, #10b981, #059669)' };
+      case 'leadership': return { bg: 'rgba(239, 68, 68, 0.1)', text: '#dc2626', border: 'rgba(239, 68, 68, 0.3)', gradient: 'linear-gradient(135deg, #ef4444, #dc2626)' };
+      case 'psychology': return { bg: 'rgba(139, 92, 246, 0.1)', text: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)', gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' };
+      default: return { bg: 'rgba(107, 114, 128, 0.1)', text: '#374151', border: 'rgba(107, 114, 128, 0.3)', gradient: 'linear-gradient(135deg, #6b7280, #374151)' };
+    }
+  };
+
   const quickPrompts = getQuickPrompts();
+  const domainColors = selectedPersonality ? getDomainColor(selectedPersonality.domain) : getDomainColor('spiritual');
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#ffffff',
+      background: selectedPersonality 
+        ? `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.95) 100%)`
+        : '#ffffff',
       color: '#1d1d1f',
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
       display: 'flex',
@@ -507,11 +680,16 @@ export default function GuidanceInterface() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#ffffff',
-        borderBottom: '1px solid #e5e7eb',
+        background: selectedPersonality 
+          ? `linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, ${domainColors.bg} 100%)`
+          : '#ffffff',
+        borderBottom: selectedPersonality 
+          ? `2px solid ${domainColors.border}` 
+          : '1px solid #e5e7eb',
         position: 'sticky',
         top: 0,
         zIndex: 100,
+        backdropFilter: 'blur(10px)',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
       }}>
         <div style={{ 
@@ -522,7 +700,7 @@ export default function GuidanceInterface() {
           <div style={{
             width: window.innerWidth <= 768 ? '2.5rem' : '3rem',
             height: window.innerWidth <= 768 ? '2.5rem' : '3rem',
-            background: 'linear-gradient(135deg, #f97316, #f59e0b)',
+            background: selectedPersonality ? domainColors.gradient : 'linear-gradient(135deg, #f97316, #f59e0b)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
@@ -530,7 +708,10 @@ export default function GuidanceInterface() {
             fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem',
             fontWeight: 'bold',
             color: 'white',
-            boxShadow: '0 4px 12px rgba(249, 115, 22, 0.3)'
+            boxShadow: selectedPersonality 
+              ? `0 4px 12px ${domainColors.border}60` 
+              : '0 4px 12px rgba(249, 115, 22, 0.3)',
+            transition: 'all 0.3s ease'
           }}>
             V
           </div>
@@ -603,9 +784,9 @@ export default function GuidanceInterface() {
           <button 
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
             style={{
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              color: '#1e293b',
+              background: selectedPersonality ? domainColors.bg : '#f8fafc',
+              border: selectedPersonality ? `2px solid ${domainColors.border}` : '1px solid #e2e8f0',
+              color: selectedPersonality ? domainColors.text : '#1e293b',
               padding: window.innerWidth <= 768 ? '0.5rem' : '0.5rem',
               borderRadius: '0.5rem',
               cursor: 'pointer',
@@ -891,7 +1072,11 @@ export default function GuidanceInterface() {
                   fontWeight: '700',
                   marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
                   textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                  lineHeight: '1.2'
+                  lineHeight: '1.2',
+                  background: domainColors.gradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
                 }}>Welcome to Your {selectedPersonality.domain === 'spiritual' ? 'Spiritual' :
                   selectedPersonality.domain === 'scientific' ? 'Scientific' :
                   selectedPersonality.domain === 'historical' ? 'Historical' :
@@ -945,9 +1130,9 @@ export default function GuidanceInterface() {
                       key={index}
                       onClick={() => setInputText(prompt)}
                       style={{
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        color: '#334155',
+                        background: `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.9) 100%)`,
+                        border: `2px solid ${domainColors.border}`,
+                        color: domainColors.text,
                         padding: '1rem',
                         borderRadius: '0.75rem',
                         cursor: 'pointer',
@@ -955,17 +1140,22 @@ export default function GuidanceInterface() {
                         fontSize: '0.9rem',
                         lineHeight: '1.4',
                         transition: 'all 0.2s ease',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+                        boxShadow: `0 2px 8px ${domainColors.border}40`,
+                        fontWeight: '500'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#f1f5f9';
-                        e.currentTarget.style.borderColor = '#cbd5e1';
-                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+                        e.currentTarget.style.background = domainColors.gradient;
+                        e.currentTarget.style.borderColor = domainColors.text;
+                        e.currentTarget.style.color = '#ffffff';
+                        e.currentTarget.style.boxShadow = `0 4px 12px ${domainColors.border}60`;
+                        e.currentTarget.style.transform = 'translateY(-2px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = '#f8fafc';
-                        e.currentTarget.style.borderColor = '#e2e8f0';
-                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+                        e.currentTarget.style.background = `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.9) 100%)`;
+                        e.currentTarget.style.borderColor = domainColors.border;
+                        e.currentTarget.style.color = domainColors.text;
+                        e.currentTarget.style.boxShadow = `0 2px 8px ${domainColors.border}40`;
+                        e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
                       {prompt}
@@ -1116,8 +1306,8 @@ export default function GuidanceInterface() {
             disabled={!selectedPersonality}
             style={{
               flex: '1',
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              background: selectedPersonality ? `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(248, 250, 252, 0.9) 100%)` : '#f8fafc',
+              border: selectedPersonality ? `2px solid ${domainColors.border}` : '1px solid #e2e8f0',
               borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
               padding: window.innerWidth <= 768 ? '0.875rem 1rem' : '1rem 1.5rem',
               color: '#1e293b',
@@ -1131,7 +1321,7 @@ export default function GuidanceInterface() {
             disabled={!inputText.trim() || isLoading || !selectedPersonality}
             style={{
               background: inputText.trim() && !isLoading && selectedPersonality
-                ? 'linear-gradient(135deg, #FF6B35, #F7931E)' 
+                ? domainColors.gradient
                 : '#e2e8f0',
               border: 'none',
               borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
@@ -1143,7 +1333,7 @@ export default function GuidanceInterface() {
               justifyContent: 'center',
               minWidth: window.innerWidth <= 768 ? '2.75rem' : '3rem',
               transition: 'all 0.3s ease',
-              boxShadow: inputText.trim() && !isLoading && selectedPersonality ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
+              boxShadow: inputText.trim() && !isLoading && selectedPersonality ? `0 4px 12px ${domainColors.border}60` : 'none'
             }}
           >
             <Send size={18} />
