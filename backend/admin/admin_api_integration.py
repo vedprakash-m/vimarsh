@@ -609,7 +609,7 @@ def admin_dashboard_overview(req: func.HttpRequest) -> func.HttpResponse:
                 try:
                     personalities_container = database.get_container_client('personalities')
                     count_result = list(personalities_container.query_items(
-                        query="SELECT VALUE COUNT(1) FROM c WHERE c.is_active = true",
+                        query="SELECT VALUE COUNT(1) FROM c WHERE c.active = true",
                         enable_cross_partition_query=True
                     ))
                     personality_count = count_result[0] if count_result else 25

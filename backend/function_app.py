@@ -935,7 +935,7 @@ async def admin_dashboard_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 # Query personalities container for count
                 try:
                     personalities_container = database.get_container_client('personalities')
-                    pers_count_query = "SELECT VALUE COUNT(1) FROM c WHERE c.is_active = true"
+                    pers_count_query = "SELECT VALUE COUNT(1) FROM c WHERE c.active = true"
                     pers_count = list(personalities_container.query_items(
                         query=pers_count_query,
                         enable_cross_partition_query=True

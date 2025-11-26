@@ -79,7 +79,7 @@ def _get_mock_overview() -> Dict[str, Any]:
         # Query personalities container
         try:
             personalities_container = database.get_container_client('personalities')
-            personalities_query = "SELECT * FROM c WHERE c.is_active = true"
+            personalities_query = "SELECT * FROM c WHERE c.active = true"
             personalities = list(personalities_container.query_items(
                 query=personalities_query,
                 enable_cross_partition_query=True
