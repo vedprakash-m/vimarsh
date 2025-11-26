@@ -58,7 +58,90 @@ def content_overview(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 def _get_mock_overview() -> Dict[str, Any]:
-    """Get mock overview data for fallback"""
+    """Get real overview data from database with mock fallback"""
+    import os
+    
+    try:
+        from azure.cosmos import CosmosClient
+        
+        connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
+        if not connection_string:
+            logger.warning("⚠️ No Cosmos DB connection string, using fallback")
+            return _get_fallback_overview()
+        
+        client = CosmosClient.from_connection_string(connection_string)
+        database = client.get_database_client('vimarsh-multi-personality')
+        
+        personalities_data = []
+        total_chunks = 0
+        rag_ready_count = 0
+        
+        # Query personalities container
+        try:
+            personalities_container = database.get_container_client('personalities')
+            personalities_query = "SELECT * FROM c WHERE c.is_active = true"
+            personalities = list(personalities_container.query_items(
+                query=personalities_query,
+                enable_cross_partition_query=True
+            ))
+            
+            for personality in personalities:
+                personality_id = personality.get('id', 'unknown')
+                
+                # Get chunk count from personality-vectors
+                chunk_count = 0
+                try:
+                    vectors_container = database.get_container_client('personality-vectors')
+                    chunk_query = f"SELECT VALUE COUNT(1) FROM c WHERE c.personality_id = '{personality_id}'"
+                    chunk_result = list(vectors_container.query_items(
+                        query=chunk_query,
+                        enable_cross_partition_query=True
+                    ))
+                    chunk_count = chunk_result[0] if chunk_result else 0
+                except Exception:
+                    pass
+                
+                total_chunks += chunk_count
+                is_rag_ready = chunk_count > 0
+                if is_rag_ready:
+                    rag_ready_count += 1
+                
+                personalities_data.append({
+                    "id": personality_id,
+                    "name": personality.get('name', personality_id.replace('_', ' ').title()),
+                    "domain": personality.get('domain', 'unknown'),
+                    "status": "rag_ready" if is_rag_ready else "pending",
+                    "content_sources": personality.get('content_sources', 1),
+                    "total_chunks": chunk_count,
+                    "rag_enabled": is_rag_ready
+                })
+                
+        except Exception as pe:
+            logger.warning(f"⚠️ Personalities query error: {pe}")
+            return _get_fallback_overview()
+        
+        total_personalities = len(personalities_data)
+        success_rate = f"{(rag_ready_count / total_personalities * 100):.1f}%" if total_personalities > 0 else "0%"
+        
+        return {
+            "total_personalities": total_personalities,
+            "rag_ready": rag_ready_count,
+            "success_rate": success_rate,
+            "total_chunks": total_chunks,
+            "personalities": personalities_data,
+            "last_updated": datetime.now().isoformat() if 'datetime' in dir() else "2025-11-25T00:00:00Z",
+            "service_version": "database_v2.0"
+        }
+        
+    except ImportError:
+        logger.warning("⚠️ Azure Cosmos SDK not available")
+        return _get_fallback_overview()
+    except Exception as e:
+        logger.error(f"❌ Content overview database error: {e}")
+        return _get_fallback_overview()
+
+def _get_fallback_overview() -> Dict[str, Any]:
+    """Get fallback overview data when database is unavailable"""
     return {
         "total_personalities": 25,
         "rag_ready": 12,
@@ -74,7 +157,8 @@ def _get_mock_overview() -> Dict[str, Any]:
                 "rag_enabled": True
             }
         ],
-        "last_updated": "2025-08-12T18:30:00Z"
+        "last_updated": "2025-08-12T18:30:00Z",
+        "service_version": "fallback_v1.0"
     }
 
 def process_personality_content(req: func.HttpRequest) -> func.HttpResponse:
