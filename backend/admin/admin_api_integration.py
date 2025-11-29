@@ -618,7 +618,7 @@ def admin_dashboard_overview(req: func.HttpRequest) -> func.HttpResponse:
                 
                 # Count vectors/chunks
                 try:
-                    vectors_container = database.get_container_client('personality-vectors')
+                    vectors_container = database.get_container_client('personality_vectors')
                     chunk_result = list(vectors_container.query_items(
                         query="SELECT VALUE COUNT(1) FROM c",
                         enable_cross_partition_query=True

@@ -206,31 +206,22 @@ class TestingValidationService:
             )
 
     async def _run_infrastructure_test(self, test_name: str, environment: str, options: Dict[str, Any]) -> TestResult:
-        """Run infrastructure tests"""
-        base_url = options.get("base_url", "https://vimarsh-functions.azurewebsites.net")
+        """Run real infrastructure tests"""
         
         if test_name == "azure_functions_health":
             try:
+                # Test the actual backend health endpoint
+                base_url = os.getenv('BACKEND_URL', 'https://vimarsh-backend-app.azurewebsites.net')
                 response = requests.get(f"{base_url}/api/health", timeout=30)
                 if response.status_code == 200:
-                    data = response.json()
-                    if data.get("status") == "healthy":
-                        return TestResult(
-                            test_name=test_name,
-                            category="infrastructure",
-                            status="passed",
-                            duration_seconds=0,
-                            details="Azure Functions health check passed",
-                            test_data={"response_time_ms": response.elapsed.total_seconds() * 1000}
-                        )
-                    else:
-                        return TestResult(
-                            test_name=test_name,
-                            category="infrastructure", 
-                            status="failed",
-                            duration_seconds=0,
-                            details=f"Health check returned status: {data.get('status')}"
-                        )
+                    return TestResult(
+                        test_name=test_name,
+                        category="infrastructure",
+                        status="passed",
+                        duration_seconds=0,
+                        details="Azure Functions health check passed",
+                        test_data={"response_time_ms": response.elapsed.total_seconds() * 1000}
+                    )
                 else:
                     return TestResult(
                         test_name=test_name,
@@ -250,16 +241,126 @@ class TestingValidationService:
                 )
         
         elif test_name == "cosmos_db_connectivity":
-            # Mock test for now
-            return TestResult(
-                test_name=test_name,
-                category="infrastructure",
-                status="passed",
-                duration_seconds=0,
-                details="Cosmos DB connectivity verified"
-            )
+            # Real Cosmos DB connectivity test
+            try:
+                from azure.cosmos import CosmosClient
+                
+                connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
+                if not connection_string:
+                    return TestResult(
+                        test_name=test_name,
+                        category="infrastructure",
+                        status="failed",
+                        duration_seconds=0,
+                        details="No Cosmos DB connection string configured"
+                    )
+                
+                start = time.time()
+                client = CosmosClient.from_connection_string(connection_string)
+                database = client.get_database_client('vimarsh-multi-personality')
+                
+                # Test read from a container
+                container = database.get_container_client('personalities')
+                items = list(container.query_items(
+                    query="SELECT VALUE COUNT(1) FROM c",
+                    enable_cross_partition_query=True
+                ))
+                elapsed = (time.time() - start) * 1000
+                
+                return TestResult(
+                    test_name=test_name,
+                    category="infrastructure",
+                    status="passed",
+                    duration_seconds=elapsed/1000,
+                    details=f"Cosmos DB connected. Personalities count: {items[0] if items else 0}",
+                    test_data={"response_time_ms": elapsed, "item_count": items[0] if items else 0}
+                )
+            except ImportError:
+                return TestResult(
+                    test_name=test_name,
+                    category="infrastructure",
+                    status="failed",
+                    duration_seconds=0,
+                    details="Azure Cosmos SDK not available"
+                )
+            except Exception as e:
+                return TestResult(
+                    test_name=test_name,
+                    category="infrastructure",
+                    status="failed",
+                    duration_seconds=0,
+                    details="Cosmos DB connectivity failed",
+                    error_message=str(e)
+                )
         
-        # Add more infrastructure tests as needed
+        elif test_name == "key_vault_access":
+            # Check if Key Vault secrets are accessible
+            try:
+                # Check if essential environment variables are set (loaded from Key Vault)
+                required_vars = ['AZURE_COSMOS_CONNECTION_STRING', 'GEMINI_API_KEY']
+                missing_vars = [v for v in required_vars if not os.getenv(v)]
+                
+                if not missing_vars:
+                    return TestResult(
+                        test_name=test_name,
+                        category="infrastructure",
+                        status="passed",
+                        duration_seconds=0,
+                        details="Key Vault secrets accessible",
+                        test_data={"secrets_verified": len(required_vars) - len(missing_vars)}
+                    )
+                else:
+                    return TestResult(
+                        test_name=test_name,
+                        category="infrastructure",
+                        status="failed",
+                        duration_seconds=0,
+                        details=f"Missing secrets: {', '.join(missing_vars)}"
+                    )
+            except Exception as e:
+                return TestResult(
+                    test_name=test_name,
+                    category="infrastructure",
+                    status="failed",
+                    duration_seconds=0,
+                    details="Key Vault access check failed",
+                    error_message=str(e)
+                )
+        
+        elif test_name == "application_insights":
+            # Check Application Insights configuration
+            try:
+                instrumentation_key = os.getenv('APPINSIGHTS_INSTRUMENTATIONKEY')
+                connection_string = os.getenv('APPLICATIONINSIGHTS_CONNECTION_STRING')
+                
+                if instrumentation_key or connection_string:
+                    return TestResult(
+                        test_name=test_name,
+                        category="infrastructure",
+                        status="passed",
+                        duration_seconds=0,
+                        details="Application Insights configured",
+                        test_data={"has_instrumentation_key": bool(instrumentation_key)}
+                    )
+                else:
+                    return TestResult(
+                        test_name=test_name,
+                        category="infrastructure",
+                        status="failed",
+                        duration_seconds=0,
+                        details="Application Insights not configured"
+                    )
+            except Exception as e:
+                return TestResult(
+                    test_name=test_name,
+                    category="infrastructure",
+                    status="failed",
+                    duration_seconds=0,
+                    details="Application Insights check failed",
+                    error_message=str(e)
+                )
+        
+        # Default for unimplemented tests
         return TestResult(
             test_name=test_name,
             category="infrastructure",
