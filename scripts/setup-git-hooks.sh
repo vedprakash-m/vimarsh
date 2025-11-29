@@ -24,6 +24,13 @@ from pathlib import Path
 repo_root = Path(__file__).parent.parent.parent
 os.chdir(repo_root)
 
+# Use virtual environment Python if available
+venv_python = repo_root / ".venv" / "bin" / "python"
+if venv_python.exists():
+    PYTHON_EXECUTABLE = str(venv_python)
+else:
+    PYTHON_EXECUTABLE = sys.executable
+
 print("🚀 Running fast pre-commit validation...")
 start_time = time.time()
 
@@ -111,7 +118,7 @@ def check_python_syntax():
     
     for py_file in key_files:
         if os.path.exists(py_file):
-            result = subprocess.run([sys.executable, "-m", "py_compile", py_file], 
+            result = subprocess.run([PYTHON_EXECUTABLE, "-m", "py_compile", py_file], 
                                   capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"❌ Syntax error in {py_file}")
@@ -138,7 +145,7 @@ except ImportError as e:
     sys.exit(1)
 """
     
-    result = subprocess.run([sys.executable, "-c", test_script], 
+    result = subprocess.run([PYTHON_EXECUTABLE, "-c", test_script], 
                           capture_output=True, text=True, cwd=repo_root)
     
     if result.returncode == 0:
