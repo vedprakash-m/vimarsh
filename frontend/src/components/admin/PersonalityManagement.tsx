@@ -51,11 +51,11 @@ const PersonalityManagement: React.FC = () => {
           name: p.name,
           domain: p.domain,
           description: p.description || `${p.name} - AI personality specialized in ${p.domain} domain`,
-          isActive: p.status === 'processed' || p.status === 'active',
-          contentSources: p.source_count || 0,
-          responseQuality: p.rag_status === 'ready' ? 95 : p.processing_progress || 0,
-          usageCount: Math.floor(Math.random() * 1000) + 100, // TODO: Get real usage data
-          lastUpdated: p.last_update || new Date().toISOString().split('T')[0]
+          isActive: p.status === 'processed' || p.status === 'active' || p.status === 'rag_ready' || p.rag_enabled === true,
+          contentSources: p.content_sources || p.source_count || 1,
+          responseQuality: p.response_quality || (p.rag_enabled ? 95 : p.processing_progress || 75),
+          usageCount: p.usage_count || p.total_chunks || 0,
+          lastUpdated: p.last_update || p.last_updated || new Date().toISOString().split('T')[0]
         }));
         
         setPersonalities(transformedPersonalities);

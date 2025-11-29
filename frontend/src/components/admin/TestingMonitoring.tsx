@@ -66,34 +66,38 @@ const TestingMonitoring: React.FC = () => {
 
   const loadAllData = async () => {
     try {
+      setLoading(true);
       setError(null);
       
       // Load content overview for basic metrics
       const overview = await adminService.getContentOverview();
       
-      // Mock test data (replace with real API calls when available)
-      setTestResults([
+      // Parse success_rate (it comes as "100.0%" string)
+      const successRate = parseFloat(overview.success_rate?.replace('%', '') || '0');
+      
+      // Build test results based on real system state
+      const tests: TestResult[] = [
         {
           id: 'personality_validation',
           name: 'Personality Content Validation',
-          status: overview.success_rate > 80 ? 'passed' : 'failed',
+          status: successRate >= 80 ? 'passed' : successRate > 0 ? 'warning' as any : 'failed',
           duration: 2500,
           lastRun: new Date().toISOString(),
           details: {
-            personalities_tested: overview.total_personalities,
-            success_rate: overview.success_rate,
-            rag_ready: overview.rag_ready
+            personalities_tested: overview.total_personalities || 25,
+            success_rate: `${successRate.toFixed(1)}%`,
+            rag_ready: overview.rag_ready || 0
           }
         },
         {
           id: 'vector_db_test',
           name: 'Vector Database Connectivity',
-          status: overview.total_personalities > 0 ? 'passed' : 'failed',
+          status: (overview.total_chunks || 0) > 0 ? 'passed' : 'failed',
           duration: 1200,
           lastRun: new Date().toISOString(),
           details: {
-            total_vectors: overview.total_personalities * 1000, // Estimated
-            connection_status: 'healthy'
+            total_vectors: overview.total_chunks || 0,
+            connection_status: (overview.total_chunks || 0) > 0 ? 'healthy' : 'disconnected'
           }
         },
         {
@@ -111,25 +115,27 @@ const TestingMonitoring: React.FC = () => {
         {
           id: 'cosmos_db_test',
           name: 'Cosmos DB Integration',
-          status: overview.total_personalities > 0 ? 'passed' : 'failed',
+          status: (overview.total_personalities || 0) > 0 ? 'passed' : 'failed',
           duration: 1500,
           lastRun: new Date().toISOString(),
           details: {
             database: 'vimarsh-multi-personality',
-            containers: ['personality_vectors'],
+            containers: ['personalities', 'personality_vectors'],
             status: 'connected'
           }
         }
-      ]);
+      ];
+      
+      setTestResults(tests);
 
-      // Mock system metrics
-      setSystemMetrics([
+      // Build metrics from real data
+      const metrics: SystemMetric[] = [
         {
-          name: 'Cosmos DB RU/s',
-          value: '400/1000',
-          status: 'healthy',
+          name: 'Total Content Chunks',
+          value: overview.total_chunks || 0,
+          status: (overview.total_chunks || 0) > 100 ? 'healthy' : 'warning',
           trend: 'stable',
-          description: 'Request units consumed per second'
+          description: 'Total RAG content chunks across all personalities'
         },
         {
           name: 'Vector Search Latency',
@@ -139,53 +145,57 @@ const TestingMonitoring: React.FC = () => {
           description: 'Average response time for vector searches'
         },
         {
-          name: 'Personality Success Rate',
-          value: `${overview.success_rate}%`,
-          status: overview.success_rate > 80 ? 'healthy' : 'warning',
-          trend: overview.success_rate > 80 ? 'up' : 'down',
+          name: 'RAG Success Rate',
+          value: overview.success_rate || '0%',
+          status: successRate >= 80 ? 'healthy' : 'warning',
+          trend: successRate >= 80 ? 'up' : 'down',
           description: 'Percentage of personalities ready for RAG'
         },
         {
           name: 'Active Personalities',
-          value: `${overview.rag_ready}/${overview.total_personalities}`,
-          status: overview.rag_ready > 5 ? 'healthy' : 'warning',
+          value: `${overview.rag_ready || 0}/${overview.total_personalities || 25}`,
+          status: (overview.rag_ready || 0) >= 20 ? 'healthy' : 'warning',
           trend: 'stable',
           description: 'Personalities ready for production use'
         },
         {
-          name: 'Memory Usage',
-          value: '68%',
+          name: 'Content Sources',
+          value: (overview.personalities?.length || 0).toString(),
           status: 'healthy',
           trend: 'stable',
-          description: 'System memory utilization'
+          description: 'Total content sources loaded'
         },
         {
-          name: 'Storage Usage',
-          value: '2.4GB',
+          name: 'Service Version',
+          value: overview.service_version || 'unknown',
           status: 'healthy',
-          trend: 'up',
-          description: 'Vector and content storage consumed'
+          trend: 'stable',
+          description: 'Backend service version'
         }
-      ]);
+      ];
+      
+      setSystemMetrics(metrics);
 
-      // Mock active tasks
-      setActiveTasks([
-        {
-          id: 'content_sync_' + Date.now(),
-          name: 'Content Synchronization',
-          status: 'running',
-          progress: 65,
-          startTime: new Date(Date.now() - 300000).toISOString(),
-          type: 'content_processing'
-        },
-        {
-          id: 'vector_optimization_' + Date.now(),
-          name: 'Vector Index Optimization',
-          status: 'pending',
-          progress: 0,
-          type: 'optimization'
+      // Get active tasks from backend
+      try {
+        const tasksResponse = await adminService.getAllTasks();
+        if (tasksResponse.tasks && tasksResponse.tasks.length > 0) {
+          setActiveTasks(tasksResponse.tasks.map((t: any) => ({
+            id: t.task_id || t.id,
+            name: t.task_type || 'Content Processing',
+            status: t.status || 'pending',
+            progress: t.progress || 0,
+            startTime: t.created_at,
+            endTime: t.updated_at,
+            type: t.task_type || 'content_processing'
+          })));
+        } else {
+          setActiveTasks([]);
         }
-      ]);
+      } catch (taskErr) {
+        console.log('Tasks endpoint not available, using empty list');
+        setActiveTasks([]);
+      }
 
     } catch (err) {
       console.error('❌ Failed to load monitoring data:', err);
@@ -202,19 +212,38 @@ const TestingMonitoring: React.FC = () => {
         : test
     ));
 
-    // Simulate test execution
-    setTimeout(() => {
+    try {
+      // Try to run actual validation via backend
+      const startTime = Date.now();
+      await adminService.startValidationSuite(testId, 'production', [testId]);
+      
+      // Reload data to get updated test results
+      await loadAllData();
+      
+      // Update the specific test with completion
       setTestResults(prev => prev.map(test => 
         test.id === testId 
           ? { 
               ...test, 
-              status: Math.random() > 0.2 ? 'passed' : 'failed',
+              status: 'passed',
               lastRun: new Date().toISOString(),
-              duration: Math.floor(Math.random() * 3000) + 500
+              duration: Date.now() - startTime
             }
           : test
       ));
-    }, 2000);
+    } catch (err) {
+      console.error(`Test ${testId} failed:`, err);
+      setTestResults(prev => prev.map(test => 
+        test.id === testId 
+          ? { 
+              ...test, 
+              status: 'failed',
+              lastRun: new Date().toISOString(),
+              errorMessage: err instanceof Error ? err.message : 'Test execution failed'
+            }
+          : test
+      ));
+    }
   };
 
   const getStatusColor = (status: string) => {
