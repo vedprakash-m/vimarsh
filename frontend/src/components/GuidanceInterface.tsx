@@ -166,7 +166,7 @@ export default function GuidanceInterface() {
   const { 
     currentSession: memoryContext, 
     relationships, 
-    loadMemoryProfile: loadContext, 
+    startSession, 
     endSession,
     isLoading: memoryLoading 
   } = useMemory();
@@ -247,11 +247,11 @@ export default function GuidanceInterface() {
   // Load memory context when personality changes
   useEffect(() => {
     if (selectedPersonality && sessionId) {
-      loadContext(selectedPersonality.id, sessionId).catch(err => {
+      startSession(selectedPersonality.id, sessionId).catch(err => {
         console.warn('Failed to load memory context:', err);
       });
     }
-  }, [selectedPersonality?.id, sessionId, loadContext]);
+  }, [selectedPersonality?.id, sessionId, startSession]);
 
   // Check for PWA install prompt availability
   useEffect(() => {
