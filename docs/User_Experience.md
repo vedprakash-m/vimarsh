@@ -1103,24 +1103,114 @@ State 4: Sending
 
 #### Voice Response Playback
 ```
-Audio Response Player (After AI Response):
+Audio Response Player (After AI Response - Azure Neural Voice):
 ┌─────────────────────────────────────────────────────────────┐
 │ 🔊 Listen to Response                     [Personality Icon]│
+│ 🎭 Voice: Einstein (en-US-GuyNeural)      [⚙️ Voice Settings]│
 │ ━━━━━━●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2:15 / 4:32   │
 │                                                             │
 │ [⏮️ -10s] [⏸️ Pause] [⏭️ +10s]   Speed: [1x ▼]   [🔁]      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+#### Azure Neural Voice Quality Indicator
+```
+Voice Quality Badge (Displayed on Personality Cards):
+┌────────────────────────────────────────────────┐
+│  🕉️ Lord Krishna                              │
+│  ──────────────────                            │
+│  🎙️ Premium Neural Voice                      │
+│  🗣️ Voice: en-IN-PrabhatNeural (Male, Indian) │
+│  💫 Style: Empathetic, Calm                   │
+│  ⏱️ Rate: 0.85x (Contemplative)              │
+└────────────────────────────────────────────────┘
+```
+
+#### Personality Voice Preview (Settings Panel)
+```
+Voice Settings - Personality Voice Preview:
+┌─────────────────────────────────────────────────────────────┐
+│  ⚙️ Voice Settings                                          │
+│  ─────────────────                                          │
+│                                                             │
+│  Current Personality: Albert Einstein                       │
+│  Azure Neural Voice: en-US-GuyNeural (Male)                │
+│  Speaking Style: Friendly, Intellectual                     │
+│                                                             │
+│  🔊 Preview Sample:                                         │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │ "Imagination is more important than knowledge."       │  │
+│  │ [▶️ Play Preview]                                     │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  Voice Controls:                                            │
+│  Speaking Rate:  [●━━━━━━━━━━━] 0.9x                       │
+│  Speaking Pitch: [━━━━●━━━━━━] 1.0                         │
+│  Volume:         [━━━━━━━━●━━] 90%                         │
+│                                                             │
+│  [Save Preferences]  [Reset to Default]                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Personality Voice Mapping Display
+```
+Voice Configuration by Domain (Admin/User Reference):
+┌─────────────────────────────────────────────────────────────┐
+│  🎙️ Personality Voice Assignments                          │
+│  ─────────────────────────────                              │
+│                                                             │
+│  🕉️ SPIRITUAL DOMAIN                                       │
+│  ├─ Krishna:      en-IN-PrabhatNeural   (Male, Indian)     │
+│  ├─ Buddha:       en-IN-PrabhatNeural   (Male, Indian)     │
+│  ├─ Jesus:        en-US-DavisNeural     (Male, Gentle)     │
+│  ├─ Rumi:         en-GB-RyanNeural      (Male, Poetic)     │
+│  └─ Vivekananda:  en-IN-PrabhatNeural   (Male, Inspiring)  │
+│                                                             │
+│  🔬 SCIENTIFIC DOMAIN                                       │
+│  ├─ Einstein:     en-US-GuyNeural       (Male, Friendly)   │
+│  ├─ Newton:       en-GB-RyanNeural      (Male, Scholarly)  │
+│  ├─ Tesla:        en-US-DavisNeural     (Male, Visionary)  │
+│  ├─ Archimedes:   en-GB-ThomasNeural    (Male, Classic)    │
+│  └─ Da Vinci:     en-IT-DiegoNeural     (Male, Creative)   │
+│                                                             │
+│  🏛️ LEADERSHIP DOMAIN                                      │
+│  ├─ Lincoln:      en-US-GuyNeural       (Male, Authority)  │
+│  ├─ Gandhi:       en-IN-PrabhatNeural   (Male, Peaceful)   │
+│  ├─ MLK Jr:       en-US-GuyNeural       (Male, Inspiring)  │
+│  ├─ Washington:   en-US-DavisNeural     (Male, Dignified)  │
+│  ├─ Franklin:     en-US-GuyNeural       (Male, Witty)      │
+│  └─ Chanakya:     en-IN-PrabhatNeural   (Male, Strategic)  │
+│                                                             │
+│  💭 PHILOSOPHICAL DOMAIN                                    │
+│  ├─ M. Aurelius:  en-GB-RyanNeural      (Male, Stoic)      │
+│  ├─ Socrates:     en-GB-ThomasNeural    (Male, Inquiring)  │
+│  ├─ Plato:        en-GB-RyanNeural      (Male, Thoughtful) │
+│  ├─ Aristotle:    en-GB-ThomasNeural    (Male, Academic)   │
+│  ├─ Confucius:    en-US-GuyNeural       (Male, Wise)       │
+│  └─ Lao Tzu:      en-US-DavisNeural     (Male, Serene)     │
+│                                                             │
+│  📚 LITERARY DOMAIN                                         │
+│  ├─ Shakespeare:  en-GB-RyanNeural      (Male, Theatrical) │
+│  └─ Tagore:       en-IN-PrabhatNeural   (Male, Lyrical)    │
+│                                                             │
+│  🧠 PSYCHOLOGY DOMAIN                                       │
+│  └─ Freud:        en-GB-ThomasNeural    (Male, Analytical) │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
 #### Voice Accessibility Features
 ```
-Voice Interface Accessibility:
+Voice Interface Accessibility (Enhanced with Azure Neural):
 - Screen reader announces: "Microphone button. Double tap to start voice input."
 - Haptic feedback on iOS/Android when recording starts/stops
 - Visual confirmation of transcribed text before sending
 - "Re-record" option if transcription is incorrect
 - Keyboard shortcut: Space to toggle voice (when input focused)
 - Text fallback always available alongside voice
+- Azure Neural voice provides clearer, more natural speech for accessibility
+- Adjustable speaking rate (0.5x to 2.0x) for comprehension support
+- Voice style indicators help users understand personality tone
 ```
 
 ### 6.7. Wisdom of the Day Interface

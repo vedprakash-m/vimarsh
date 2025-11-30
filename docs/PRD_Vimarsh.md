@@ -123,6 +123,7 @@ The consequence is reliance on less grounded advice, superficial interpretations
 * **Cultural Authenticity:** Maintains reverence for spiritual figures while presenting historical and scientific personalities with appropriate scholarly respect.
 * **Enhanced Engagement:** Multi-modal interaction (text/voice) with personality-specific characteristics creates immersive conversational experiences.
 * **Voice-First Experience:** Production-ready voice interface enabling natural spoken conversations with any personality, reducing friction for mobile users and accessibility.
+* **Azure Neural Voice Integration:** Premium text-to-speech with **25 personality-matched voices** using gender-appropriate Azure Neural voices with SSML emotional styles for authentic audio embodiment.
 * **Viral Sharing Mechanics:** Social sharing integration with beautiful quote cards, personality-branded share images, and platform-optimized content for organic growth.
 * **Daily Engagement Hooks:** Wisdom of the Day feature providing curated daily insights across domains to drive return visits and introduce new personalities.
 
@@ -259,28 +260,42 @@ The intersection of AI, education, and historical/spiritual content represents a
 
 ### 6.2. User Engagement & Viral Growth Features
 
-**Voice Conversations (Production-Ready):**
+**Voice Conversations (Production-Ready with Azure Neural Voices):**
 
-The voice interface enables natural, hands-free conversations with any of the 25 personalities, creating an immersive experience that feels like genuine dialogue with history's greatest minds.
+The voice interface enables natural, hands-free conversations with any of the 25 personalities, creating an immersive experience that feels like genuine dialogue with history's greatest minds. **Enhanced with Azure Speech Services Neural Voices** for personality-authentic audio output matching each historical figure's gender, cultural background, and speaking style.
 
 * **Core Voice Features:**
   - Real-time speech-to-text using Google Cloud Speech Recognition API
-  - Personality-aware text-to-speech with domain-appropriate voice characteristics
+  - **Azure Neural Text-to-Speech** with personality-matched voices and emotional styles
+  - **Gender-appropriate voice selection** for all 25 personalities (male/female neural voices)
+  - **SSML-enhanced speech synthesis** with personality-specific speaking styles (empathetic, calm, authoritative, contemplative)
   - Seamless voice/text mode switching within conversations
   - Voice activity detection for natural conversation flow
-  - Multi-language support (English, Hindi) with accent handling
+  - Multi-language support (English, Hindi) with accent handling and **Indian English voices** for personalities like Krishna, Buddha, Gandhi, Vivekananda, Tagore, and Chanakya
+
+* **Personality Voice Mapping (25 Personalities):**
+  - **🕉️ Spiritual Domain:** Krishna, Buddha, Vivekananda → Indian English male voices (en-IN-PrabhatNeural) with calm/empathetic styles; Jesus → US English male (en-US-DavisNeural) with gentle style; Rumi → British English male (en-GB-RyanNeural) with poetic delivery
+  - **🔬 Scientific Domain:** Einstein, Newton, Tesla, Archimedes, Da Vinci → US/British English male voices with clear articulation and intellectual tone
+  - **🏛️ Leadership Domain:** Lincoln, Washington, Franklin → US English authoritative male voices; Gandhi, Chanakya → Indian English male voices; Martin Luther King Jr. → US English inspirational male voice
+  - **💭 Philosophical Domain:** Marcus Aurelius, Socrates, Plato, Aristotle → British English contemplative male voices; Confucius, Lao Tzu → US English calm male voices with measured pacing
+  - **📚 Literary Domain:** Shakespeare → British English theatrical male voice; Tagore → Indian English poetic male voice
+  - **🧠 Psychology Domain:** Freud → British English analytical male voice
 
 * **User Experience Benefits:**
+  - **Authentic personality embodiment** through distinct, gender-appropriate neural voices
   - Hands-free wisdom access for mobile users, drivers, or during contemplation
-  - More natural and intimate conversation experience
+  - More natural and intimate conversation experience with personality-matched audio
+  - **Emotional resonance** through SSML voice styles matching personality characteristics
   - Accessibility support for users with visual or motor impairments
   - Reduced friction for quick questions and on-the-go wisdom
 
 * **Technical Implementation:**
-  - Browser-native Web Speech API with Google Cloud fallback
-  - Real-time audio streaming with < 500ms transcription latency
-  - Personality-specific voice parameter configuration
-  - Offline voice caching for frequently used phrases
+  - **Azure Speech Service SDK** integration with neural voice synthesis
+  - Browser-native Web Speech API for speech-to-text input
+  - Real-time audio streaming with < 500ms synthesis latency
+  - **Personality voice configuration** with SSML prosody (rate, pitch, style)
+  - Audio caching for frequently accessed wisdom content
+  - **Cost-optimized usage** with 500K free characters/month (Azure free tier)
 
 **Social Sharing System (Viral Growth Engine):**
 

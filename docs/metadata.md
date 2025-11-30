@@ -1,13 +1,145 @@
 # Vimarsh - AI-Powered Multi-Personality Conversational Platform
 
-**Version**: 7.2 - Hierarchical Memory Architecture (Phase 4 Complete)  
-**Status**: 🎉 **ALL PHASES COMPLETE - WORLD-CLASS MEMORY SYSTEM IMPLEMENTED**  
-**Last Updated**: January 2025  
+**Version**: 7.3 - Azure Neural Voice Enhancement  
+**Status**: 🎙️ **AZURE SPEECH SERVICES INTEGRATION IN PROGRESS**  
+**Last Updated**: November 2025  
 **Live URL**: https://vimarsh.vedprakash.net  
 
 ---
 
-## 🚀 **ACTIVE SPRINT: HIERARCHICAL MEMORY ARCHITECTURE (January 2025)**
+## 🚀 **ACTIVE SPRINT: AZURE NEURAL VOICE ENHANCEMENT (November 2025)**
+
+### **Sprint Vision**
+Transform Vimarsh's voice output from generic browser TTS to premium Azure Neural Voices with personality-matched audio that embodies each historical figure's gender, cultural background, and speaking style. Create an immersive audio experience where users genuinely feel they're hearing wisdom from Krishna, Einstein, Lincoln, and 22 other personalities.
+
+### **Problem Statement**
+Current voice implementation has critical limitations:
+- **Generic Voices**: Web Speech API provides the same robotic voice for all personalities
+- **No Gender Matching**: All 25 personalities (all male historical figures) share identical female/male browser voice
+- **No Cultural Context**: Indian personalities sound American, British figures sound generic
+- **No Emotional Expression**: Cannot express empathy, authority, calm, or enthusiasm
+- **No Personality Differentiation**: Einstein sounds identical to Buddha sounds identical to Shakespeare
+- **Poor Quality**: Browser TTS varies significantly across devices and browsers
+
+### **Solution: Azure Speech Services Neural TTS Integration**
+
+| Component | Current State | Enhanced State |
+|-----------|---------------|----------------|
+| **Voice Engine** | Web Speech API (browser) | Azure Speech Service (Neural TTS) |
+| **Voice Selection** | 1 generic voice | 25 personality-matched voices |
+| **Gender Matching** | Random/inconsistent | All male voices for male personalities |
+| **Cultural Context** | None | Indian English, British English, US English by personality |
+| **Emotional Styles** | None | SSML styles: empathetic, calm, hopeful, serious, cheerful |
+| **Speaking Rate** | Fixed 0.9x | Personality-specific (0.78x-0.95x) |
+| **Quality** | Browser-dependent | Consistent 24kHz neural audio |
+
+### **Personality Voice Mapping (25 Personalities)**
+
+| Domain | Personality | Azure Voice | Gender | Locale | Style |
+|--------|-------------|-------------|--------|--------|-------|
+| 🕉️ Spiritual | Krishna | en-IN-PrabhatNeural | Male | Indian | Empathetic |
+| 🕉️ Spiritual | Buddha | en-IN-PrabhatNeural | Male | Indian | Calm |
+| 🕉️ Spiritual | Jesus | en-US-DavisNeural | Male | US | Gentle |
+| 🕉️ Spiritual | Rumi | en-GB-RyanNeural | Male | British | Lyrical |
+| 🕉️ Spiritual | Vivekananda | en-IN-PrabhatNeural | Male | Indian | Cheerful |
+| 🔬 Scientific | Einstein | en-US-GuyNeural | Male | US | Friendly |
+| 🔬 Scientific | Newton | en-GB-RyanNeural | Male | British | Serious |
+| 🔬 Scientific | Tesla | en-US-DavisNeural | Male | US | Excited |
+| 🔬 Scientific | Archimedes | en-GB-ThomasNeural | Male | British | Newscast |
+| 🔬 Scientific | Da Vinci | it-IT-DiegoNeural | Male | Italian | Chat |
+| 🏛️ Leadership | Lincoln | en-US-GuyNeural | Male | US | Hopeful |
+| 🏛️ Leadership | Gandhi | en-IN-PrabhatNeural | Male | Indian | Calm |
+| 🏛️ Leadership | MLK Jr. | en-US-GuyNeural | Male | US | Hopeful |
+| 🏛️ Leadership | Washington | en-US-DavisNeural | Male | US | Serious |
+| 🏛️ Leadership | Franklin | en-US-GuyNeural | Male | US | Friendly |
+| 🏛️ Leadership | Chanakya | en-IN-PrabhatNeural | Male | Indian | Serious |
+| 💭 Philosophy | M. Aurelius | en-GB-RyanNeural | Male | British | Calm |
+| 💭 Philosophy | Socrates | en-GB-ThomasNeural | Male | British | Chat |
+| 💭 Philosophy | Plato | en-GB-RyanNeural | Male | British | Calm |
+| 💭 Philosophy | Aristotle | en-GB-ThomasNeural | Male | British | Newscast |
+| 💭 Philosophy | Confucius | en-US-GuyNeural | Male | US | Calm |
+| 💭 Philosophy | Lao Tzu | en-US-DavisNeural | Male | US | Calm |
+| 📚 Literary | Shakespeare | en-GB-RyanNeural | Male | British | Cheerful |
+| 📚 Literary | Tagore | en-IN-PrabhatNeural | Male | Indian | Lyrical |
+| 🧠 Psychology | Freud | en-GB-ThomasNeural | Male | British | Calm |
+
+---
+
+### **🎯 PHASE 1: BACKEND AZURE SPEECH SERVICE (Day 1) ⏳ IN PROGRESS**
+
+#### **Task List - Backend Voice Infrastructure**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 1.1 | Create AzureSpeechService | `backend/services/azure_speech_service.py` | Core Azure TTS integration with personality voice mapping | ✅ DONE |
+| 1.2 | Create personality voice config | `backend/config/voice_config.py` | 25 personality-to-voice mappings with SSML settings | ✅ DONE |
+| 1.3 | Implement SSML generator | `backend/services/azure_speech_service.py` | Generate SSML with prosody, style, and voice | ✅ DONE |
+| 1.4 | Create TTS API endpoint | `backend/function_app.py` | POST /api/voice/synthesize + GET /api/voice/info endpoints | ✅ DONE |
+| 1.5 | Add Azure Speech credentials | `docs/deploy_instructions.md`, `backend/.env.example` | Document env vars (AZURE_SPEECH_KEY, AZURE_SPEECH_REGION) | ✅ DONE |
+| 1.6 | Implement audio caching | `backend/services/azure_speech_service.py` | Cache synthesized audio by text hash | ⏳ NOT STARTED |
+
+#### **Task List - Frontend Voice Controls Update**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 1.7 | Update VoiceControls component | `frontend/src/components/VoiceControls.tsx` | Replace Web Speech TTS with Azure TTS API calls + fallback | ✅ DONE |
+| 1.8 | Add voice API service | `frontend/src/services/azureSpeechService.ts` | Frontend API client for TTS synthesis | ✅ DONE |
+| 1.9 | Add audio player component | `frontend/src/components/AudioPlayer.tsx` | Enhanced audio player with controls | ⏳ NOT STARTED |
+| 1.10 | Add voice quality indicator | `frontend/src/components/VoiceQualityBadge.tsx` | Show Azure Neural Voice badge | ⏳ NOT STARTED |
+
+#### **Test Cases - Phase 1 Voice Enhancement**
+
+```
+TEST_VOICE_001: AzureSpeechService initializes with valid credentials ⏳
+TEST_VOICE_002: SSML generator produces valid SSML for all 25 personalities ⏳
+TEST_VOICE_003: TTS API returns audio for short text (<100 chars) ⏳
+TEST_VOICE_004: TTS API returns audio for long text (>500 chars) ⏳
+TEST_VOICE_005: Personality voice mapping returns correct Azure voice ⏳
+TEST_VOICE_006: Indian personalities use en-IN voices ⏳
+TEST_VOICE_007: British personalities use en-GB voices ⏳
+TEST_VOICE_008: US personalities use en-US voices ⏳
+TEST_VOICE_009: Audio caching prevents duplicate synthesis calls ⏳
+TEST_VOICE_010: VoiceControls plays audio from Azure TTS API ⏳
+TEST_VOICE_011: Audio player shows playback progress ⏳
+TEST_VOICE_012: Speaking rate adjustment works (0.5x-2.0x) ⏳
+TEST_VOICE_013: Error handling for Azure API failures ⏳
+TEST_VOICE_014: Fallback to Web Speech API when Azure unavailable ⏳
+TEST_VOICE_015: Voice quality badge displays for Azure Neural voices ⏳
+```
+
+---
+
+### **📁 FILES CREATED IN THIS SPRINT**
+
+| File Path | Description | Lines | Status |
+|-----------|-------------|-------|--------|
+| `backend/services/azure_speech_service.py` | Azure TTS integration with SSML generation | ~300 | ✅ CREATED |
+| `backend/config/voice_config.py` | Personality-to-voice configuration mapping | ~516 | ✅ CREATED |
+| `frontend/src/services/azureSpeechService.ts` | Voice API client for TTS synthesis | ~260 | ✅ CREATED |
+| `frontend/src/components/AudioPlayer.tsx` | Enhanced audio player with controls | ~150 | ⏳ PENDING |
+| `frontend/src/components/VoiceQualityBadge.tsx` | Azure Neural Voice quality indicator | ~50 | ⏳ PENDING |
+
+### **📁 FILES MODIFIED IN THIS SPRINT**
+
+| File Path | Changes | Status |
+|-----------|---------|--------|
+| `backend/function_app.py` | Added POST /api/voice/synthesize, GET /api/voice/info endpoints | ✅ DONE |
+| `backend/.env.example` | Added AZURE_SPEECH_KEY, AZURE_SPEECH_REGION templates | ✅ DONE |
+| `docs/deploy_instructions.md` | Added Azure Speech Service setup guide | ✅ DONE |
+| `backend/requirements.txt` | Added azure-cognitiveservices-speech==1.35.0 | ✅ DONE |
+| `frontend/src/components/VoiceControls.tsx` | Replaced Web Speech TTS with Azure API + fallback | ✅ DONE |
+
+### **💰 COST ESTIMATE**
+
+| Resource | Free Tier | Pay-as-you-go | Estimated Monthly |
+|----------|-----------|---------------|-------------------|
+| Azure Speech Neural TTS | 500K chars/month | $15/1M chars | $0-15/month |
+| Audio Storage (Blob) | 5GB | $0.02/GB | $0-1/month |
+| **Total** | - | - | **$0-16/month** |
+
+---
+
+## 🎉 **COMPLETED SPRINT: HIERARCHICAL MEMORY ARCHITECTURE (January 2025)**
 
 ### **Sprint Vision**
 Transform Vimarsh from a stateless conversational app into a world-class memory-enhanced AI platform that remembers users across sessions, builds personality relationships, and delivers deeply contextual wisdom through a 4-layer hierarchical memory system inspired by cutting-edge research (MemGPT, Stanford's Generative Agents, LangGraph).

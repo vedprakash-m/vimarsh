@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { azureSpeechService } from '../services/azureSpeechService';
 
 interface VoiceState {
   isListening: boolean;
@@ -17,9 +18,10 @@ interface VoiceControlsProps {
   domain?: string;
   disabled?: boolean;
   className?: string;
+  useAzureVoice?: boolean; // Enable Azure Neural Voice (default: true)
 }
 
-// Personality-specific voice settings for text-to-speech
+// Fallback personality-specific voice settings for Web Speech API (browser TTS)
 const getPersonalityVoiceSettings = (personality: string): { rate: number; pitch: number; voiceType: string } => {
   const settings: Record<string, { rate: number; pitch: number; voiceType: string }> = {
     // Spiritual domain - calm, measured delivery
@@ -99,7 +101,8 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   personality = 'default',
   domain = 'spiritual',
   disabled = false,
-  className
+  className,
+  useAzureVoice = true // Default to Azure Neural Voice
 }) => {
   const [voiceState, setVoiceState] = useState<VoiceState>({
     isListening: false,
@@ -111,16 +114,29 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   
   const [isVoiceSupported, setIsVoiceSupported] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [isAzureAvailable, setIsAzureAvailable] = useState(false);
   
   const recognitionRef = useRef<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Check for browser support
+  // Check for browser support and Azure availability
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     setIsVoiceSupported(!!SpeechRecognition);
     setIsSpeechSupported('speechSynthesis' in window);
-  }, []);
+    
+    // Check if Azure Speech Service is available
+    if (useAzureVoice) {
+      azureSpeechService.isAvailable().then(available => {
+        setIsAzureAvailable(available);
+        if (available) {
+          console.log('🎙️ Azure Neural Voice enabled');
+        }
+      }).catch(() => {
+        setIsAzureAvailable(false);
+      });
+    }
+  }, [useAzureVoice]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -234,8 +250,56 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     }
   }, [voiceState.isListening]);
 
-  // Speak text (Text-to-Speech)
-  const speakText = useCallback((text: string) => {
+  // Speak text using Azure Neural Voice (with Web Speech API fallback)
+  const speakText = useCallback(async (text: string) => {
+    if (!text) return;
+    
+    // Use Azure Speech Service if available
+    if (useAzureVoice && isAzureAvailable) {
+      try {
+        setVoiceState(prev => ({ ...prev, isProcessing: true }));
+        
+        await azureSpeechService.speak(text, personality, {
+          format: 'mp3',
+          onStart: () => {
+            setVoiceState(prev => ({ 
+              ...prev, 
+              isSpeaking: true, 
+              isProcessing: false,
+              error: null
+            }));
+          },
+          onEnd: () => {
+            setVoiceState(prev => ({ ...prev, isSpeaking: false }));
+          },
+          onError: (error) => {
+            console.error('Azure Speech error:', error);
+            setVoiceState(prev => ({ 
+              ...prev, 
+              isSpeaking: false,
+              isProcessing: false,
+              error: 'Speech synthesis failed. Using fallback...'
+            }));
+            // Fall back to Web Speech API
+            fallbackSpeakText(text);
+          }
+        });
+        
+        return;
+      } catch (error) {
+        console.warn('Azure Speech failed, using fallback:', error);
+        setVoiceState(prev => ({ ...prev, isProcessing: false }));
+        // Fall back to Web Speech API
+        fallbackSpeakText(text);
+      }
+    } else {
+      // Use Web Speech API as fallback
+      fallbackSpeakText(text);
+    }
+  }, [personality, useAzureVoice, isAzureAvailable]);
+
+  // Fallback to Web Speech API (browser TTS)
+  const fallbackSpeakText = useCallback((text: string) => {
     if (!isSpeechSupported || !text) return;
 
     // Cancel any ongoing speech
@@ -279,13 +343,20 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
     window.speechSynthesis.speak(utterance);
   }, [personality, isSpeechSupported]);
 
-  // Stop speaking
+  // Stop speaking (handles both Azure and Web Speech)
   const stopSpeaking = useCallback(() => {
+    // Stop Azure Speech Service
+    if (useAzureVoice) {
+      azureSpeechService.stop();
+    }
+    
+    // Stop Web Speech API
     if (isSpeechSupported) {
       window.speechSynthesis.cancel();
-      setVoiceState(prev => ({ ...prev, isSpeaking: false }));
     }
-  }, [isSpeechSupported]);
+    
+    setVoiceState(prev => ({ ...prev, isSpeaking: false }));
+  }, [isSpeechSupported, useAzureVoice]);
 
   // Speak the provided text when it changes
   useEffect(() => {
@@ -295,12 +366,13 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   }, [textToSpeak]);
 
   // If neither voice nor speech is supported, don't render
-  if (!isVoiceSupported && !isSpeechSupported) {
+  if (!isVoiceSupported && !isSpeechSupported && !isAzureAvailable) {
     return null;
   }
 
   const domainColor = getDomainColor(domain);
   const { isListening, isSpeaking, isProcessing, error } = voiceState;
+  const canSpeak = isSpeechSupported || isAzureAvailable;
 
   return (
     <div 
@@ -378,8 +450,8 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
         </button>
       )}
 
-      {/* Speaker Button - Read Response */}
-      {isSpeechSupported && textToSpeak && (
+      {/* Speaker Button - Read Response (Azure Neural Voice or Web Speech) */}
+      {canSpeak && textToSpeak && (
         <button
           type="button"
           onClick={isSpeaking ? stopSpeaking : () => speakText(textToSpeak)}

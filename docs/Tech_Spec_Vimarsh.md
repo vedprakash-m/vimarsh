@@ -246,7 +246,8 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
   - `EnhancedRAGServiceV6`: Advanced retrieval with hybrid search and citation grounding
   - `SharingService`: Social sharing URL generation and analytics tracking
   - `WisdomOfTheDayService`: Daily wisdom curation, rotation, and personalization
-  - `VoiceService`: Speech-to-text and text-to-speech integration with Google Cloud
+  - `AzureSpeechService`: **Azure Neural TTS with personality-matched voices and SSML synthesis**
+  - `VoiceService`: Speech-to-text with Web Speech API for voice input
 * **Production Features:**
   - Circuit breaker patterns for high availability
   - Real-time cost tracking and budget enforcement
@@ -258,10 +259,305 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
 **Current External Integrations:**
 * **AI Services:** Google Gemini 2.5 Flash with text-embedding-004 for vectors
 * **Authentication:** Microsoft Entra ID (vedid.onmicrosoft.com tenant)
-* **Voice Services:** Google Cloud Text-to-Speech and Speech-to-Text APIs
+* **Voice Services:** **Azure Speech Service (Neural TTS)** for personality-specific text-to-speech; Web Speech API for speech-to-text input
 * **Monitoring:** Azure Application Insights with custom dashboards and alerting
 * **Storage:** Azure Cosmos DB with vector search for personality knowledge bases  
 * **Translation:** Gemini Pro multilingual capabilities (built-in)
+
+### 3.6. Azure Speech Service Integration (Neural TTS)
+
+**Architecture Overview:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Azure Speech Service Integration               │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Frontend (React)                Backend (Azure Functions)  │
+│  ┌─────────────────┐            ┌──────────────────────┐   │
+│  │ VoiceControls   │            │ AzureSpeechService   │   │
+│  │ ─────────────── │ REST API   │ ──────────────────── │   │
+│  │ • Play/Pause    │ ────────►  │ • SSML Generation    │   │
+│  │ • Speed Control │            │ • Voice Mapping      │   │
+│  │ • Audio Player  │ ◄──────── │ • Azure TTS API      │   │
+│  │                 │  Audio     │ • Audio Caching      │   │
+│  └─────────────────┘  Stream    └──────────────────────┘   │
+│                                           │                 │
+│                                           ▼                 │
+│                              ┌──────────────────────┐       │
+│                              │  Azure Speech Service │       │
+│                              │  (Neural TTS)         │       │
+│                              │  ────────────────────│       │
+│                              │  • 400+ Neural Voices │       │
+│                              │  • SSML Support       │       │
+│                              │  • Emotional Styles   │       │
+│                              │  • Multi-language     │       │
+│                              └──────────────────────┘       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Personality Voice Configuration:**
+```python
+# Personality-to-Azure-Voice Mapping (25 personalities)
+PERSONALITY_VOICE_CONFIG = {
+    # 🕉️ Spiritual Domain - Calm, Empathetic Voices
+    "krishna": {
+        "voice_name": "en-IN-PrabhatNeural",
+        "gender": "male",
+        "locale": "en-IN",
+        "style": "empathetic",
+        "rate": "0.85",
+        "pitch": "-5%"
+    },
+    "buddha": {
+        "voice_name": "en-IN-PrabhatNeural",
+        "gender": "male",
+        "locale": "en-IN",
+        "style": "calm",
+        "rate": "0.80",
+        "pitch": "-8%"
+    },
+    "jesus": {
+        "voice_name": "en-US-DavisNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "gentle",
+        "rate": "0.85",
+        "pitch": "0%"
+    },
+    "rumi": {
+        "voice_name": "en-GB-RyanNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "lyrical",
+        "rate": "0.90",
+        "pitch": "+2%"
+    },
+    "swami_vivekananda": {
+        "voice_name": "en-IN-PrabhatNeural",
+        "gender": "male",
+        "locale": "en-IN",
+        "style": "cheerful",
+        "rate": "0.95",
+        "pitch": "+5%"
+    },
+    
+    # 🔬 Scientific Domain - Clear, Intellectual Voices
+    "einstein": {
+        "voice_name": "en-US-GuyNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "friendly",
+        "rate": "0.90",
+        "pitch": "0%"
+    },
+    "newton": {
+        "voice_name": "en-GB-RyanNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "serious",
+        "rate": "0.85",
+        "pitch": "-3%"
+    },
+    "tesla": {
+        "voice_name": "en-US-DavisNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "excited",
+        "rate": "0.95",
+        "pitch": "+3%"
+    },
+    "archimedes": {
+        "voice_name": "en-GB-ThomasNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "newscast",
+        "rate": "0.88",
+        "pitch": "-2%"
+    },
+    "leonardo_da_vinci": {
+        "voice_name": "it-IT-DiegoNeural",
+        "gender": "male",
+        "locale": "it-IT",
+        "style": "chat",
+        "rate": "0.90",
+        "pitch": "0%"
+    },
+    
+    # 🏛️ Leadership Domain - Authoritative, Inspiring Voices
+    "lincoln": {
+        "voice_name": "en-US-GuyNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "hopeful",
+        "rate": "0.85",
+        "pitch": "-5%"
+    },
+    "gandhi": {
+        "voice_name": "en-IN-PrabhatNeural",
+        "gender": "male",
+        "locale": "en-IN",
+        "style": "calm",
+        "rate": "0.80",
+        "pitch": "-3%"
+    },
+    "martin_luther_king_jr": {
+        "voice_name": "en-US-GuyNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "hopeful",
+        "rate": "0.90",
+        "pitch": "+5%"
+    },
+    "george_washington": {
+        "voice_name": "en-US-DavisNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "serious",
+        "rate": "0.85",
+        "pitch": "-5%"
+    },
+    "benjamin_franklin": {
+        "voice_name": "en-US-GuyNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "friendly",
+        "rate": "0.90",
+        "pitch": "0%"
+    },
+    "chanakya": {
+        "voice_name": "en-IN-PrabhatNeural",
+        "gender": "male",
+        "locale": "en-IN",
+        "style": "serious",
+        "rate": "0.88",
+        "pitch": "-3%"
+    },
+    
+    # 💭 Philosophical Domain - Contemplative, Measured Voices
+    "marcus_aurelius": {
+        "voice_name": "en-GB-RyanNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "calm",
+        "rate": "0.85",
+        "pitch": "-5%"
+    },
+    "socrates": {
+        "voice_name": "en-GB-ThomasNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "chat",
+        "rate": "0.88",
+        "pitch": "0%"
+    },
+    "plato": {
+        "voice_name": "en-GB-RyanNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "calm",
+        "rate": "0.85",
+        "pitch": "-3%"
+    },
+    "aristotle": {
+        "voice_name": "en-GB-ThomasNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "newscast",
+        "rate": "0.88",
+        "pitch": "-2%"
+    },
+    "confucius": {
+        "voice_name": "en-US-GuyNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "calm",
+        "rate": "0.82",
+        "pitch": "-5%"
+    },
+    "lao_tzu": {
+        "voice_name": "en-US-DavisNeural",
+        "gender": "male",
+        "locale": "en-US",
+        "style": "calm",
+        "rate": "0.78",
+        "pitch": "-8%"
+    },
+    
+    # 📚 Literary Domain - Expressive, Theatrical Voices
+    "shakespeare": {
+        "voice_name": "en-GB-RyanNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "cheerful",
+        "rate": "0.88",
+        "pitch": "+3%"
+    },
+    "tagore": {
+        "voice_name": "en-IN-PrabhatNeural",
+        "gender": "male",
+        "locale": "en-IN",
+        "style": "lyrical",
+        "rate": "0.85",
+        "pitch": "0%"
+    },
+    
+    # 🧠 Psychology Domain - Analytical Voice
+    "freud": {
+        "voice_name": "en-GB-ThomasNeural",
+        "gender": "male",
+        "locale": "en-GB",
+        "style": "calm",
+        "rate": "0.88",
+        "pitch": "-3%"
+    }
+}
+```
+
+**SSML Generation Service:**
+```python
+def generate_ssml(text: str, personality: str) -> str:
+    """Generate SSML markup for personality-specific voice synthesis"""
+    config = PERSONALITY_VOICE_CONFIG.get(personality.lower(), PERSONALITY_VOICE_CONFIG["krishna"])
+    
+    ssml = f'''<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" 
+                xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="{config['locale']}">
+        <voice name="{config['voice_name']}">
+            <mstts:express-as style="{config['style']}" styledegree="1.2">
+                <prosody rate="{config['rate']}" pitch="{config['pitch']}">
+                    {escape_ssml(text)}
+                </prosody>
+            </mstts:express-as>
+        </voice>
+    </speak>'''
+    
+    return ssml
+```
+
+**API Endpoint Specification:**
+```
+POST /api/tts/synthesize
+Request Body:
+{
+    "text": "The Bhagavad Gita teaches us...",
+    "personality": "krishna",
+    "format": "audio-24khz-48kbitrate-mono-mp3"
+}
+
+Response:
+{
+    "audio_url": "https://vimarsh-audio.blob.core.windows.net/tts-cache/...",
+    "duration_ms": 4500,
+    "voice_name": "en-IN-PrabhatNeural",
+    "cached": true
+}
+```
+
+**Cost Management:**
+* **Free Tier:** 500,000 characters/month (sufficient for ~2,500 responses)
+* **Pay-as-you-go:** $15 per 1M characters after free tier
+* **Caching Strategy:** Cache synthesized audio by text hash for repeat queries
+* **Estimated Monthly Cost:** $5-15/month at current usage levels
 
 **Authentication & Identity (Current Implementation):**
 * **Identity Provider:** Microsoft Entra ID (production tenant: vedid.onmicrosoft.com)
