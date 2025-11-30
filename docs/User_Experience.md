@@ -950,7 +950,290 @@ Response Quality Indicators (Current Implementation):
 📊 Success rate: 98.7% (displayed in admin dashboard)
 ```
 
-### 6.4. Navigation & Information Architecture
+### 6.5. Social Sharing Interface (New Feature)
+
+#### Share Button Design
+```
+Share Button Placement (After Each AI Response):
+┌─────────────────────────────────────────────────────────────┐
+│ 🧠 Albert Einstein: [🤖 AI Generated]                       │
+│                                                             │
+│ "Imagination is more important than knowledge, for         │
+│  knowledge is limited, whereas imagination embraces        │
+│  the entire world..."                                       │
+│                                                             │
+│ 📖 Citations: Einstein Papers, 1929                        │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 👍  👎  💬 Reply  📤 Share  📋 Copy                    │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Share Modal Design
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 📤 Share This Wisdom                                    [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Preview:                                                   │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  🧠 ALBERT EINSTEIN                                   │  │
+│  │  ─────────────────────────────                        │  │
+│  │  "Imagination is more important than                  │  │
+│  │   knowledge, for knowledge is limited..."             │  │
+│  │                                                       │  │
+│  │  💡 Explore wisdom at vimarsh.vedprakash.net         │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  Share to:                                                  │
+│  ┌───────┬───────┬───────┬───────┬───────┬───────┐         │
+│  │   𝕏   │  f   │  in  │  📱   │  ✈️   │  📧   │         │
+│  │Twitter│  FB  │Linked│WhatsAp│Telegm │ Email │         │
+│  └───────┴───────┴───────┴───────┴───────┴───────┘         │
+│                                                             │
+│  Or copy link:                                              │
+│  ┌─────────────────────────────────────────┬───────┐        │
+│  │ vimarsh.vedprakash.net/share/abc123     │ Copy  │        │
+│  └─────────────────────────────────────────┴───────┘        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Share Card Design Specifications
+```
+Social Share Card (1200×630px for Open Graph):
+┌─────────────────────────────────────────────────────────────┐
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │                                                         │ │
+│ │      🧠                      VIMARSH                   │ │
+│ │   [Avatar]              Wisdom Without Boundaries       │ │
+│ │                                                         │ │
+│ │  ─────────────────────────────────────────────         │ │
+│ │                                                         │ │
+│ │  "Imagination is more important than                   │ │
+│ │   knowledge, for knowledge is limited,                 │ │
+│ │   whereas imagination embraces the                     │ │
+│ │   entire world..."                                      │ │
+│ │                                                         │ │
+│ │        — Albert Einstein                               │ │
+│ │                                                         │ │
+│ │  ─────────────────────────────────────────────         │ │
+│ │  🔬 SCIENTIFIC DOMAIN      vimarsh.vedprakash.net      │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ Colors: Domain-specific (Scientific = #0066CC blue)         │
+│ Font: Inter for UI, Crimson Text for quotes                │
+│ Logo: Vimarsh branding in corner                           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Mobile Share Interface
+```
+Mobile Share Sheet (Native-Style):
+┌─────────────────────────┐
+│ Share Wisdom         [×]│
+├─────────────────────────┤
+│                         │
+│ [Quote preview card]    │
+│                         │
+├─────────────────────────┤
+│ 𝕏    f    in   📱   ✈️ │
+│ Twitter FB  LI  WA   TG │
+├─────────────────────────┤
+│ 📋 Copy Link            │
+│ 📧 Share via Email      │
+│ ⋯  More Options         │
+└─────────────────────────┘
+```
+
+### 6.6. Voice Interface UX (Production-Ready)
+
+#### Voice Activation Button
+```
+Text Input with Voice Toggle:
+┌─────────────────────────────────────────────────────────────┐
+│  🎤 [Speak] or type your question...                       │
+│  ┌───────────────────────────────────────────┬───────────┐ │
+│  │ What is the meaning of life...            │ [Send] 🚀 │ │
+│  └───────────────────────────────────────────┴───────────┘ │
+└─────────────────────────────────────────────────────────────┘
+
+Voice Mode Active:
+┌─────────────────────────────────────────────────────────────┐
+│              🎤 Listening...                               │
+│                                                             │
+│         ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁  (Audio visualization)           │
+│                                                             │
+│    "How do you approach solving complex problems?"         │
+│         (Live transcription)                               │
+│                                                             │
+│              [⏹️ Stop]  [❌ Cancel]                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Voice Recording States
+```
+State 1: Idle
+┌────────────────────────┐
+│ 🎤 Tap to speak        │
+│ (Mic icon pulsing)     │
+└────────────────────────┘
+
+State 2: Listening
+┌────────────────────────┐
+│ 🔴 Listening...        │
+│ ▁▃▅▇▅▃▁ (waveform)     │
+│ [Stop] [Cancel]        │
+└────────────────────────┘
+
+State 3: Processing
+┌────────────────────────┐
+│ ⏳ Processing voice... │
+│ "What you said..."     │
+│ (Shows transcription)  │
+└────────────────────────┘
+
+State 4: Sending
+┌────────────────────────┐
+│ 📤 Sending to Einstein │
+│ (Personality-specific) │
+└────────────────────────┘
+```
+
+#### Voice Response Playback
+```
+Audio Response Player (After AI Response):
+┌─────────────────────────────────────────────────────────────┐
+│ 🔊 Listen to Response                     [Personality Icon]│
+│ ━━━━━━●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   2:15 / 4:32   │
+│                                                             │
+│ [⏮️ -10s] [⏸️ Pause] [⏭️ +10s]   Speed: [1x ▼]   [🔁]      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Voice Accessibility Features
+```
+Voice Interface Accessibility:
+- Screen reader announces: "Microphone button. Double tap to start voice input."
+- Haptic feedback on iOS/Android when recording starts/stops
+- Visual confirmation of transcribed text before sending
+- "Re-record" option if transcription is incorrect
+- Keyboard shortcut: Space to toggle voice (when input focused)
+- Text fallback always available alongside voice
+```
+
+### 6.7. Wisdom of the Day Interface
+
+#### Landing Page Integration
+```
+Landing Page - Wisdom of the Day Section:
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  ✨ WISDOM OF THE DAY                                       │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │                                                       │  │
+│  │  🧠 Albert Einstein                                   │  │
+│  │  ───────────────────                                  │  │
+│  │                                                       │  │
+│  │  "The important thing is not to stop questioning.    │  │
+│  │   Curiosity has its own reason for existence."        │  │
+│  │                                                       │  │
+│  │  📖 Einstein Essays, 1952                            │  │
+│  │                                                       │  │
+│  │  ┌─────────────────────────────────────────────────┐  │  │
+│  │  │ [💬 Ask Einstein]  [📤 Share]  [💾 Save]       │  │  │
+│  │  └─────────────────────────────────────────────────┘  │  │
+│  │                                                       │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  🔄 Refreshes daily at midnight UTC                         │
+│  📅 November 29, 2025 • Day 333 of 365                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Dashboard Greeting (Authenticated Users)
+```
+User Dashboard - Personalized Wisdom Greeting:
+┌─────────────────────────────────────────────────────────────┐
+│  Good morning, Ved! 🌅                                      │
+│                                                             │
+│  Today's Wisdom from your favorite domain:                  │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  🕉️ Lord Krishna                                      │  │
+│  │                                                       │  │
+│  │  "You have the right to work, but never to the       │  │
+│  │   fruit of work. Let not the fruits of action        │  │
+│  │   be your motive."                                    │  │
+│  │                                                       │  │
+│  │  — Bhagavad Gita 2.47                                │  │
+│  │                                                       │  │
+│  │  [Continue Conversation] [Explore More] [Share]       │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  💡 You've explored 8 personalities. Try Lao Tzu next?     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Mobile Wisdom of the Day (PWA)
+```
+Mobile PWA - Daily Wisdom Card:
+┌─────────────────────────┐
+│ ✨ Wisdom of the Day    │
+├─────────────────────────┤
+│                         │
+│  🤔 Marcus Aurelius     │
+│                         │
+│ "Waste no more time     │
+│  arguing about what a   │
+│  good man should be.    │
+│  Be one."               │
+│                         │
+│  📖 Meditations 10.16   │
+│                         │
+├─────────────────────────┤
+│ [💬 Ask] [📤] [💾]     │
+└─────────────────────────┘
+```
+
+#### Wisdom of the Day Widget Variations
+```
+Compact Widget (Sidebar):
+┌────────────────────────┐
+│ ✨ Today's Wisdom       │
+│ 🧠 "Imagination is..." │
+│ — Einstein             │
+│ [Read More →]          │
+└────────────────────────┘
+
+Story Card (1080×1920 for mobile stories):
+┌─────────────────────────┐
+│                         │
+│                         │
+│      ✨ VIMARSH         │
+│   Wisdom of the Day     │
+│                         │
+│  ───────────────────    │
+│                         │
+│  "The only true wisdom  │
+│   is in knowing you     │
+│   know nothing."        │
+│                         │
+│      — Socrates         │
+│                         │
+│  ───────────────────    │
+│                         │
+│  💡 Swipe up to chat    │
+│                         │
+│                         │
+└─────────────────────────┘
+```
+
+### 6.8. Navigation & Information Architecture
 
 #### Primary Navigation (Current Implementation)
 ```

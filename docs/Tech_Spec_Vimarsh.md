@@ -212,6 +212,8 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
   - `DomainThemeManager`: Dynamic theming system with Apple-inspired design language
   - `ServiceStatusIndicator`: Real-time service health monitoring and circuit breaker status display
   - `AuthProvider`: Microsoft Entra ID integration with JWT token management
+  - `ShareButton`: Social sharing component with platform-specific formatting and share card generation
+  - `WisdomOfTheDay`: Daily curated wisdom display with personality rotation and engagement actions
 - **PWA Features (Production Implementation):**
   - Smart installation banners with timing optimization (appears after 3+ interactions)
   - Full offline functionality with conversation caching and fallback responses
@@ -221,6 +223,11 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
   - Background sync for conversation history when connection restored
   - Push notification support for wisdom reminders (optional)
   - Standalone window mode on desktop platforms
+- **Engagement Features (New):**
+  - Voice-first conversation support with Web Speech API integration
+  - One-click social sharing to 6+ platforms with OG-compliant share cards
+  - Daily wisdom rotation with personalized recommendations
+  - Share analytics and tracking for viral growth measurement
 - **Authentication Integration:**
   - Microsoft Entra ID with SSO support
   - Anonymous access for basic functionality
@@ -237,12 +244,16 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
   - `CostManagementService`: Real-time budget monitoring and intelligent caching
   - `HealthMonitoringService`: Service status tracking and automated recovery
   - `EnhancedRAGServiceV6`: Advanced retrieval with hybrid search and citation grounding
+  - `SharingService`: Social sharing URL generation and analytics tracking
+  - `WisdomOfTheDayService`: Daily wisdom curation, rotation, and personalization
+  - `VoiceService`: Speech-to-text and text-to-speech integration with Google Cloud
 * **Production Features:**
   - Circuit breaker patterns for high availability
   - Real-time cost tracking and budget enforcement
   - Intelligent caching with 45% hit rate
   - Automated fallback to template responses
   - Comprehensive logging and monitoring integration
+  - Social share tracking and viral analytics
 
 **Current External Integrations:**
 * **AI Services:** Google Gemini 2.5 Flash with text-embedding-004 for vectors
@@ -2451,7 +2462,1420 @@ This comprehensive cost management system ensures Vimarsh remains financially su
 
 ---
 
-## 20. Current Implementation Status & Production Metrics
+## 20. User Engagement & Viral Growth Technical Specifications
+
+### 20.1. Social Sharing System Architecture
+
+**Overview:**  
+Multi-platform sharing system enabling users to share wisdom insights with proper attribution and beautiful formatting across social networks.
+
+**Frontend Components:**
+
+```typescript
+// SharingInterface.tsx - Core sharing component
+import React, { useState, useCallback } from 'react';
+import { Share2, Copy, Twitter, Facebook, Linkedin, Send, Check } from 'lucide-react';
+
+interface ShareableContent {
+  text: string;
+  personality: string;
+  citation?: string;
+  domain: string;
+  conversationId: string;
+}
+
+interface SharingInterfaceProps {
+  content: ShareableContent;
+  onShareComplete?: (platform: string) => void;
+  variant?: 'inline' | 'modal';
+}
+
+export const SharingInterface: React.FC<SharingInterfaceProps> = ({
+  content,
+  onShareComplete,
+  variant = 'inline'
+}) => {
+  const [copied, setCopied] = useState(false);
+  const [showPlatforms, setShowPlatforms] = useState(false);
+  
+  // Generate shareable text with proper formatting
+  const generateShareText = useCallback(() => {
+    const truncatedText = content.text.length > 280 
+      ? content.text.substring(0, 250) + '...'
+      : content.text;
+    
+    const attribution = `— ${content.personality}`;
+    const citation = content.citation ? ` (${content.citation})` : '';
+    const hashtags = `#Vimarsh #${content.domain}Wisdom`;
+    
+    return `"${truncatedText}"\n\n${attribution}${citation}\n\n${hashtags}`;
+  }, [content]);
+  
+  // Platform-specific share handlers
+  const shareHandlers = {
+    twitter: () => {
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(generateShareText())}&url=${encodeURIComponent(getShareUrl())}`;
+      window.open(shareUrl, '_blank', 'width=550,height=420');
+      onShareComplete?.('twitter');
+    },
+    facebook: () => {
+      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}&quote=${encodeURIComponent(generateShareText())}`;
+      window.open(shareUrl, '_blank', 'width=550,height=420');
+      onShareComplete?.('facebook');
+    },
+    linkedin: () => {
+      const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareUrl())}`;
+      window.open(shareUrl, '_blank', 'width=550,height=420');
+      onShareComplete?.('linkedin');
+    },
+    whatsapp: () => {
+      const shareUrl = `https://wa.me/?text=${encodeURIComponent(generateShareText() + '\n\n' + getShareUrl())}`;
+      window.open(shareUrl, '_blank');
+      onShareComplete?.('whatsapp');
+    },
+    copy: async () => {
+      await navigator.clipboard.writeText(generateShareText() + '\n\n' + getShareUrl());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      onShareComplete?.('copy');
+    },
+    native: async () => {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Wisdom from ${content.personality}`,
+          text: generateShareText(),
+          url: getShareUrl()
+        });
+        onShareComplete?.('native');
+      }
+    }
+  };
+  
+  const getShareUrl = () => {
+    return `https://vimarsh.vedprakash.net/share/${content.conversationId}`;
+  };
+  
+  return (
+    <div className="vimarsh-sharing-interface">
+      <button 
+        className="share-trigger-btn"
+        onClick={() => setShowPlatforms(!showPlatforms)}
+        aria-label="Share this wisdom"
+      >
+        <Share2 size={18} />
+        <span>Share</span>
+      </button>
+      
+      {showPlatforms && (
+        <div className="share-platforms-dropdown">
+          <button onClick={shareHandlers.twitter} className="platform-btn twitter">
+            <Twitter size={16} /> Twitter/X
+          </button>
+          <button onClick={shareHandlers.facebook} className="platform-btn facebook">
+            <Facebook size={16} /> Facebook
+          </button>
+          <button onClick={shareHandlers.linkedin} className="platform-btn linkedin">
+            <Linkedin size={16} /> LinkedIn
+          </button>
+          <button onClick={shareHandlers.whatsapp} className="platform-btn whatsapp">
+            <Send size={16} /> WhatsApp
+          </button>
+          <button onClick={shareHandlers.copy} className="platform-btn copy">
+            {copied ? <Check size={16} /> : <Copy size={16} />}
+            {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+          {navigator.share && (
+            <button onClick={shareHandlers.native} className="platform-btn native">
+              <Share2 size={16} /> More...
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+**Backend Sharing Service Enhancement:**
+
+```python
+# backend/services/sharing_service.py - Enhanced with analytics
+from datetime import datetime
+from typing import Dict, Any, Optional
+import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
+
+class EnhancedSharingService:
+    """Enhanced sharing service with analytics and link generation"""
+    
+    def __init__(self, cosmos_client, analytics_service):
+        self.cosmos = cosmos_client
+        self.analytics = analytics_service
+        self.share_container = cosmos_client.get_container("user_shares")
+    
+    async def create_share_link(
+        self,
+        conversation_id: str,
+        response_text: str,
+        personality: str,
+        domain: str,
+        citation: Optional[str] = None,
+        user_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Create a shareable link for wisdom content"""
+        
+        # Generate unique share ID
+        share_id = self._generate_share_id(conversation_id, response_text)
+        
+        share_data = {
+            "id": share_id,
+            "conversation_id": conversation_id,
+            "response_text": response_text[:500],  # Truncate for preview
+            "personality": personality,
+            "domain": domain,
+            "citation": citation,
+            "user_id": user_id,
+            "created_at": datetime.utcnow().isoformat(),
+            "share_count": 0,
+            "platforms": [],
+            "type": "wisdom_share"
+        }
+        
+        await self.share_container.create_item(share_data)
+        
+        return {
+            "share_id": share_id,
+            "share_url": f"https://vimarsh.vedprakash.net/share/{share_id}",
+            "preview_text": response_text[:140] + "...",
+            "personality": personality,
+            "og_image_url": self._generate_og_image_url(share_id)
+        }
+    
+    async def track_share_event(
+        self,
+        share_id: str,
+        platform: str,
+        referrer: Optional[str] = None
+    ) -> None:
+        """Track when content is shared to a platform"""
+        
+        try:
+            share_doc = await self.share_container.read_item(share_id, share_id)
+            share_doc["share_count"] += 1
+            share_doc["platforms"].append({
+                "platform": platform,
+                "timestamp": datetime.utcnow().isoformat(),
+                "referrer": referrer
+            })
+            await self.share_container.replace_item(share_id, share_doc)
+            
+            # Track in analytics
+            await self.analytics.track_event("share_completed", {
+                "share_id": share_id,
+                "platform": platform,
+                "personality": share_doc["personality"],
+                "domain": share_doc["domain"]
+            })
+            
+        except Exception as e:
+            logger.error(f"Error tracking share event: {e}")
+    
+    def _generate_share_id(self, conversation_id: str, text: str) -> str:
+        """Generate unique share ID"""
+        content = f"{conversation_id}:{text[:100]}:{datetime.utcnow().timestamp()}"
+        return hashlib.sha256(content.encode()).hexdigest()[:12]
+    
+    def _generate_og_image_url(self, share_id: str) -> str:
+        """Generate dynamic OG image URL for social previews"""
+        return f"https://vimarsh.vedprakash.net/api/og-image/{share_id}"
+```
+
+**API Endpoints for Sharing:**
+
+```python
+# backend/function_app.py - Sharing endpoints
+
+@app.route(route="share/create", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+async def create_share(req: func.HttpRequest) -> func.HttpResponse:
+    """Create a shareable link for wisdom content"""
+    try:
+        data = req.get_json()
+        
+        sharing_service = get_sharing_service()
+        share_result = await sharing_service.create_share_link(
+            conversation_id=data.get("conversation_id"),
+            response_text=data.get("response_text"),
+            personality=data.get("personality"),
+            domain=data.get("domain"),
+            citation=data.get("citation"),
+            user_id=data.get("user_id")
+        )
+        
+        return func.HttpResponse(
+            json.dumps(share_result),
+            mimetype="application/json",
+            status_code=201
+        )
+    except Exception as e:
+        logger.error(f"Share creation error: {e}")
+        return func.HttpResponse("Error creating share", status_code=500)
+
+@app.route(route="share/{share_id}", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def get_share(req: func.HttpRequest) -> func.HttpResponse:
+    """Get share content for preview and rendering"""
+    try:
+        share_id = req.route_params.get("share_id")
+        
+        sharing_service = get_sharing_service()
+        share_data = await sharing_service.get_share_content(share_id)
+        
+        if not share_data:
+            return func.HttpResponse("Share not found", status_code=404)
+        
+        # Track view
+        await sharing_service.track_share_view(share_id, req.headers.get("Referer"))
+        
+        return func.HttpResponse(
+            json.dumps(share_data),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Share retrieval error: {e}")
+        return func.HttpResponse("Error retrieving share", status_code=500)
+
+@app.route(route="share/track", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+async def track_share(req: func.HttpRequest) -> func.HttpResponse:
+    """Track share events for analytics"""
+    try:
+        data = req.get_json()
+        
+        sharing_service = get_sharing_service()
+        await sharing_service.track_share_event(
+            share_id=data.get("share_id"),
+            platform=data.get("platform"),
+            referrer=data.get("referrer")
+        )
+        
+        return func.HttpResponse(status_code=204)
+    except Exception as e:
+        logger.error(f"Share tracking error: {e}")
+        return func.HttpResponse("Error tracking share", status_code=500)
+```
+
+**Dynamic OG Image Generation:**
+
+```python
+# backend/services/og_image_service.py
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
+import base64
+
+class OGImageService:
+    """Generate dynamic Open Graph images for social sharing"""
+    
+    # Domain-specific color schemes
+    DOMAIN_COLORS = {
+        "spiritual": {"bg": "#FFF8E1", "accent": "#FF6B00", "text": "#1A1A1A"},
+        "philosophical": {"bg": "#E8EAF6", "accent": "#3F51B5", "text": "#1A1A1A"},
+        "leadership": {"bg": "#E3F2FD", "accent": "#1976D2", "text": "#1A1A1A"},
+        "scientific": {"bg": "#E0F7FA", "accent": "#00838F", "text": "#1A1A1A"},
+        "literary": {"bg": "#FCE4EC", "accent": "#C2185B", "text": "#1A1A1A"},
+        "psychology": {"bg": "#F3E5F5", "accent": "#7B1FA2", "text": "#1A1A1A"}
+    }
+    
+    def generate_wisdom_card(
+        self,
+        text: str,
+        personality: str,
+        domain: str,
+        citation: str = None
+    ) -> bytes:
+        """Generate a beautiful wisdom card image for social sharing"""
+        
+        colors = self.DOMAIN_COLORS.get(domain.lower(), self.DOMAIN_COLORS["spiritual"])
+        
+        # Create image (1200x630 - optimal OG image size)
+        img = Image.new('RGB', (1200, 630), colors["bg"])
+        draw = ImageDraw.Draw(img)
+        
+        # Load fonts (fallback to default if custom not available)
+        try:
+            title_font = ImageFont.truetype("fonts/Playfair-Bold.ttf", 32)
+            quote_font = ImageFont.truetype("fonts/SourceSerif-Regular.ttf", 28)
+            attr_font = ImageFont.truetype("fonts/SourceSans-SemiBold.ttf", 24)
+        except:
+            title_font = ImageFont.load_default()
+            quote_font = ImageFont.load_default()
+            attr_font = ImageFont.load_default()
+        
+        # Draw accent bar
+        draw.rectangle([0, 0, 8, 630], fill=colors["accent"])
+        
+        # Draw Vimarsh branding
+        draw.text((50, 40), "VIMARSH", font=title_font, fill=colors["accent"])
+        draw.text((50, 80), "Timeless Wisdom, Personal Guidance", font=attr_font, fill="#666666")
+        
+        # Draw quote (with word wrap)
+        quote_text = f'"{text[:200]}..."' if len(text) > 200 else f'"{text}"'
+        wrapped_quote = self._wrap_text(quote_text, 50)
+        draw.multiline_text((50, 180), wrapped_quote, font=quote_font, fill=colors["text"], spacing=12)
+        
+        # Draw attribution
+        attribution = f"— {personality}"
+        if citation:
+            attribution += f" ({citation})"
+        draw.text((50, 520), attribution, font=attr_font, fill=colors["accent"])
+        
+        # Draw domain badge
+        self._draw_domain_badge(draw, domain, colors, (1050, 560))
+        
+        # Convert to bytes
+        buffer = BytesIO()
+        img.save(buffer, format='PNG', quality=95)
+        return buffer.getvalue()
+    
+    def _wrap_text(self, text: str, max_chars: int) -> str:
+        """Wrap text to fit within image bounds"""
+        words = text.split()
+        lines = []
+        current_line = []
+        current_length = 0
+        
+        for word in words:
+            if current_length + len(word) + 1 <= max_chars:
+                current_line.append(word)
+                current_length += len(word) + 1
+            else:
+                lines.append(' '.join(current_line))
+                current_line = [word]
+                current_length = len(word)
+        
+        if current_line:
+            lines.append(' '.join(current_line))
+        
+        return '\n'.join(lines[:6])  # Max 6 lines
+    
+    def _draw_domain_badge(self, draw, domain: str, colors: dict, position: tuple):
+        """Draw a small domain indicator badge"""
+        badge_text = domain.upper()
+        draw.rounded_rectangle(
+            [position[0] - 60, position[1] - 15, position[0] + 60, position[1] + 15],
+            radius=12,
+            fill=colors["accent"]
+        )
+        draw.text(position, badge_text, font=ImageFont.load_default(), fill="white", anchor="mm")
+```
+
+### 20.2. Voice Conversation Technical Implementation
+
+**Overview:**  
+Enable two-way voice interactions allowing users to speak questions and hear responses using optimized speech recognition and text-to-speech services.
+
+**Frontend Voice Interface Activation:**
+
+```typescript
+// GuidanceInterface.tsx - Enable voice functionality
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { Mic, MicOff, Volume2, VolumeX, Loader } from 'lucide-react';
+
+interface VoiceState {
+  isListening: boolean;
+  isSpeaking: boolean;
+  isProcessing: boolean;
+  transcript: string;
+  error: string | null;
+}
+
+export const useVoiceConversation = () => {
+  const [voiceState, setVoiceState] = useState<VoiceState>({
+    isListening: false,
+    isSpeaking: false,
+    isProcessing: false,
+    transcript: '',
+    error: null
+  });
+  
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
+  
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+      
+      recognitionRef.current.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        
+        setVoiceState(prev => ({ ...prev, transcript }));
+        
+        if (event.results[0].isFinal) {
+          setVoiceState(prev => ({ ...prev, isListening: false }));
+        }
+      };
+      
+      recognitionRef.current.onerror = (event) => {
+        setVoiceState(prev => ({
+          ...prev,
+          isListening: false,
+          error: `Speech recognition error: ${event.error}`
+        }));
+      };
+    }
+  }, []);
+  
+  const startListening = useCallback(() => {
+    if (recognitionRef.current && !voiceState.isListening) {
+      setVoiceState(prev => ({ ...prev, isListening: true, transcript: '', error: null }));
+      recognitionRef.current.start();
+    }
+  }, [voiceState.isListening]);
+  
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current && voiceState.isListening) {
+      recognitionRef.current.stop();
+      setVoiceState(prev => ({ ...prev, isListening: false }));
+    }
+  }, [voiceState.isListening]);
+  
+  const speakResponse = useCallback(async (text: string, personality: string) => {
+    if ('speechSynthesis' in window) {
+      // Stop any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Get personality-appropriate voice settings
+      const voiceSettings = getPersonalityVoiceSettings(personality);
+      
+      // Try to find a suitable voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(
+        v => v.lang.startsWith(voiceSettings.lang) && v.name.includes(voiceSettings.voiceType)
+      ) || voices.find(v => v.lang.startsWith('en'));
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      
+      utterance.rate = voiceSettings.rate;
+      utterance.pitch = voiceSettings.pitch;
+      utterance.volume = voiceSettings.volume;
+      
+      utterance.onstart = () => {
+        setVoiceState(prev => ({ ...prev, isSpeaking: true }));
+      };
+      
+      utterance.onend = () => {
+        setVoiceState(prev => ({ ...prev, isSpeaking: false }));
+      };
+      
+      synthRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, []);
+  
+  const stopSpeaking = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setVoiceState(prev => ({ ...prev, isSpeaking: false }));
+    }
+  }, []);
+  
+  return {
+    voiceState,
+    startListening,
+    stopListening,
+    speakResponse,
+    stopSpeaking,
+    isVoiceSupported: 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+  };
+};
+
+// Personality-specific voice settings
+const getPersonalityVoiceSettings = (personality: string) => {
+  const settings: Record<string, { lang: string; rate: number; pitch: number; volume: number; voiceType: string }> = {
+    // Spiritual domain - calm, measured delivery
+    krishna: { lang: 'en', rate: 0.85, pitch: 0.9, volume: 1.0, voiceType: 'Male' },
+    buddha: { lang: 'en', rate: 0.8, pitch: 0.85, volume: 0.95, voiceType: 'Male' },
+    jesus: { lang: 'en', rate: 0.85, pitch: 1.0, volume: 1.0, voiceType: 'Male' },
+    rumi: { lang: 'en', rate: 0.9, pitch: 1.0, volume: 1.0, voiceType: 'Male' },
+    vivekananda: { lang: 'en', rate: 0.95, pitch: 1.1, volume: 1.0, voiceType: 'Male' },
+    
+    // Scientific domain - clear, articulate
+    einstein: { lang: 'en', rate: 0.9, pitch: 1.0, volume: 1.0, voiceType: 'Male' },
+    newton: { lang: 'en', rate: 0.85, pitch: 0.95, volume: 1.0, voiceType: 'Male' },
+    tesla: { lang: 'en', rate: 0.9, pitch: 1.05, volume: 1.0, voiceType: 'Male' },
+    
+    // Leadership domain - authoritative, inspiring
+    lincoln: { lang: 'en', rate: 0.85, pitch: 0.9, volume: 1.0, voiceType: 'Male' },
+    gandhi: { lang: 'en', rate: 0.8, pitch: 0.95, volume: 0.95, voiceType: 'Male' },
+    
+    // Default settings
+    default: { lang: 'en', rate: 0.9, pitch: 1.0, volume: 1.0, voiceType: 'Male' }
+  };
+  
+  return settings[personality.toLowerCase()] || settings.default;
+};
+```
+
+**Voice Controls Component:**
+
+```typescript
+// VoiceControls.tsx - Voice interaction UI
+import React from 'react';
+import { Mic, MicOff, Volume2, VolumeX, Loader } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface VoiceControlsProps {
+  isListening: boolean;
+  isSpeaking: boolean;
+  isProcessing: boolean;
+  onStartListening: () => void;
+  onStopListening: () => void;
+  onStopSpeaking: () => void;
+  isVoiceSupported: boolean;
+  className?: string;
+}
+
+export const VoiceControls: React.FC<VoiceControlsProps> = ({
+  isListening,
+  isSpeaking,
+  isProcessing,
+  onStartListening,
+  onStopListening,
+  onStopSpeaking,
+  isVoiceSupported,
+  className
+}) => {
+  if (!isVoiceSupported) {
+    return null; // Don't show controls if voice not supported
+  }
+  
+  return (
+    <div className={cn('vimarsh-voice-controls', className)}>
+      {/* Microphone button */}
+      <button
+        onClick={isListening ? onStopListening : onStartListening}
+        disabled={isProcessing}
+        className={cn(
+          'voice-btn mic-btn',
+          isListening && 'listening',
+          isProcessing && 'processing'
+        )}
+        aria-label={isListening ? 'Stop listening' : 'Start voice input'}
+      >
+        {isProcessing ? (
+          <Loader className="animate-spin" size={20} />
+        ) : isListening ? (
+          <MicOff size={20} />
+        ) : (
+          <Mic size={20} />
+        )}
+      </button>
+      
+      {/* Speaker button - only show when speaking or can stop */}
+      {isSpeaking && (
+        <button
+          onClick={onStopSpeaking}
+          className="voice-btn speaker-btn speaking"
+          aria-label="Stop speaking"
+        >
+          <VolumeX size={20} />
+        </button>
+      )}
+      
+      {/* Listening indicator */}
+      {isListening && (
+        <div className="listening-indicator">
+          <span className="pulse-ring" />
+          <span className="listening-text">Listening...</span>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+**Backend Voice Processing Service:**
+
+```python
+# backend/voice/voice_conversation_service.py
+from google.cloud import speech_v1
+from google.cloud import texttospeech_v1
+from typing import Dict, Any, Optional
+import base64
+import logging
+
+logger = logging.getLogger(__name__)
+
+class VoiceConversationService:
+    """Enhanced voice processing for conversational interactions"""
+    
+    def __init__(self):
+        self.speech_client = speech_v1.SpeechClient()
+        self.tts_client = texttospeech_v1.TextToSpeechClient()
+        
+        # Personality voice mappings
+        self.personality_voices = {
+            "krishna": {"name": "en-IN-Neural2-B", "pitch": -2.0, "rate": 0.85},
+            "buddha": {"name": "en-US-Neural2-J", "pitch": -3.0, "rate": 0.8},
+            "einstein": {"name": "en-GB-Neural2-D", "pitch": -1.0, "rate": 0.9},
+            "lincoln": {"name": "en-US-Neural2-A", "pitch": -2.0, "rate": 0.85},
+            "marcus_aurelius": {"name": "en-GB-Neural2-B", "pitch": -1.5, "rate": 0.85},
+            "default": {"name": "en-US-Neural2-J", "pitch": 0.0, "rate": 0.9}
+        }
+    
+    async def transcribe_audio(
+        self,
+        audio_content: bytes,
+        language_code: str = "en-US"
+    ) -> Dict[str, Any]:
+        """Transcribe audio to text using Google Speech-to-Text"""
+        
+        try:
+            config = speech_v1.RecognitionConfig(
+                encoding=speech_v1.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+                sample_rate_hertz=48000,
+                language_code=language_code,
+                enable_automatic_punctuation=True,
+                model="latest_long",
+                use_enhanced=True,
+                # Boost spiritual and philosophical terms
+                speech_contexts=[speech_v1.SpeechContext(
+                    phrases=[
+                        "dharma", "karma", "moksha", "enlightenment",
+                        "stoicism", "virtue", "wisdom", "philosophy",
+                        "meditation", "mindfulness", "consciousness"
+                    ],
+                    boost=15.0
+                )]
+            )
+            
+            audio = speech_v1.RecognitionAudio(content=audio_content)
+            response = self.speech_client.recognize(config=config, audio=audio)
+            
+            if response.results:
+                transcript = " ".join(
+                    result.alternatives[0].transcript 
+                    for result in response.results
+                )
+                confidence = sum(
+                    result.alternatives[0].confidence 
+                    for result in response.results
+                ) / len(response.results)
+                
+                return {
+                    "success": True,
+                    "transcript": transcript,
+                    "confidence": confidence,
+                    "language": language_code
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": "No speech detected",
+                    "transcript": ""
+                }
+                
+        except Exception as e:
+            logger.error(f"Transcription error: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "transcript": ""
+            }
+    
+    async def synthesize_speech(
+        self,
+        text: str,
+        personality: str,
+        language_code: str = "en-US"
+    ) -> Dict[str, Any]:
+        """Generate speech audio from text with personality-appropriate voice"""
+        
+        try:
+            voice_config = self.personality_voices.get(
+                personality.lower(),
+                self.personality_voices["default"]
+            )
+            
+            # Prepare text with appropriate pauses
+            processed_text = self._add_contemplative_pauses(text)
+            
+            synthesis_input = texttospeech_v1.SynthesisInput(ssml=processed_text)
+            
+            voice = texttospeech_v1.VoiceSelectionParams(
+                language_code=language_code,
+                name=voice_config["name"]
+            )
+            
+            audio_config = texttospeech_v1.AudioConfig(
+                audio_encoding=texttospeech_v1.AudioEncoding.MP3,
+                speaking_rate=voice_config["rate"],
+                pitch=voice_config["pitch"],
+                effects_profile_id=["headphone-class-device"]
+            )
+            
+            response = self.tts_client.synthesize_speech(
+                input=synthesis_input,
+                voice=voice,
+                audio_config=audio_config
+            )
+            
+            # Encode audio as base64 for transmission
+            audio_base64 = base64.b64encode(response.audio_content).decode('utf-8')
+            
+            return {
+                "success": True,
+                "audio_content": audio_base64,
+                "audio_format": "mp3",
+                "duration_estimate": len(text) / 15,  # Rough estimate
+                "voice_used": voice_config["name"]
+            }
+            
+        except Exception as e:
+            logger.error(f"TTS synthesis error: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "audio_content": None
+            }
+    
+    def _add_contemplative_pauses(self, text: str) -> str:
+        """Add SSML pauses for more natural speech rhythm"""
+        
+        ssml = f"<speak>{text}</speak>"
+        
+        # Add pauses after periods for contemplation
+        ssml = ssml.replace(". ", '. <break time="500ms"/> ')
+        
+        # Add pauses after wisdom indicators
+        ssml = ssml.replace(":", ': <break time="300ms"/> ')
+        
+        # Add emphasis to quoted text
+        import re
+        ssml = re.sub(
+            r'"([^"]+)"',
+            r'<emphasis level="moderate">"\1"</emphasis>',
+            ssml
+        )
+        
+        return ssml
+```
+
+### 20.3. Wisdom of the Day System Architecture
+
+**Overview:**  
+Daily curated wisdom feature delivering personalized insights from selected personalities through multiple channels (homepage, push notifications, email digest).
+
+**Database Schema - Wisdom of the Day Collection:**
+
+```json
+{
+  "container_name": "wisdom_of_day",
+  "partition_key": "/date",
+  "indexing_policy": {
+    "automatic": true,
+    "includedPaths": [
+      {"path": "/date/?"},
+      {"path": "/personality/?"},
+      {"path": "/domain/?"},
+      {"path": "/engagement_score/?"}
+    ]
+  },
+  "sample_document": {
+    "id": "wotd-2025-01-15-krishna",
+    "date": "2025-01-15",
+    "personality": "krishna",
+    "domain": "spiritual",
+    "wisdom_text": "The mind is restless and difficult to restrain, but it is subdued by practice.",
+    "source_citation": "Bhagavad Gita, Chapter 6, Verse 35",
+    "context": "This teaching on mental discipline offers practical guidance for those seeking inner peace.",
+    "reflection_prompt": "What practice helps you find stillness when your mind is restless?",
+    "hashtags": ["#MindfulnessWisdom", "#InnerPeace", "#KrishnaTeachings"],
+    "share_count": 0,
+    "engagement_score": 0,
+    "created_at": "2025-01-14T00:00:00Z",
+    "notification_sent": false,
+    "featured": false
+  }
+}
+```
+
+**Backend Wisdom of the Day Service:**
+
+```python
+# backend/services/wisdom_of_day_service.py
+from datetime import datetime, date, timedelta
+from typing import Dict, Any, List, Optional
+import random
+import logging
+
+logger = logging.getLogger(__name__)
+
+class WisdomOfDayService:
+    """Service for curating and delivering daily wisdom"""
+    
+    def __init__(self, cosmos_client, rag_service, notification_service):
+        self.cosmos = cosmos_client
+        self.rag = rag_service
+        self.notifications = notification_service
+        self.wisdom_container = cosmos_client.get_container("wisdom_of_day")
+        self.user_prefs_container = cosmos_client.get_container("user_preferences")
+    
+    async def get_wisdom_of_day(
+        self,
+        target_date: date = None,
+        user_id: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Get wisdom of the day, optionally personalized for user"""
+        
+        target_date = target_date or date.today()
+        date_str = target_date.isoformat()
+        
+        # Check for pre-generated wisdom
+        query = "SELECT * FROM c WHERE c.date = @date"
+        params = [{"name": "@date", "value": date_str}]
+        
+        results = list(self.wisdom_container.query_items(
+            query=query,
+            parameters=params
+        ))
+        
+        if results:
+            wisdom = results[0]
+            
+            # Personalize if user preferences available
+            if user_id:
+                wisdom = await self._personalize_wisdom(wisdom, user_id)
+            
+            return wisdom
+        else:
+            # Generate new wisdom for today
+            return await self._generate_daily_wisdom(target_date)
+    
+    async def _generate_daily_wisdom(self, target_date: date) -> Dict[str, Any]:
+        """Generate wisdom for a specific date"""
+        
+        # Rotate through personalities based on day of week
+        personality_rotation = [
+            "krishna", "marcus_aurelius", "einstein", 
+            "buddha", "lincoln", "rumi", "confucius"
+        ]
+        personality = personality_rotation[target_date.weekday()]
+        
+        # Get domain for personality
+        domain = self._get_personality_domain(personality)
+        
+        # Retrieve curated wisdom from RAG
+        wisdom_content = await self.rag.get_curated_wisdom(
+            personality=personality,
+            theme="daily_inspiration"
+        )
+        
+        wisdom_doc = {
+            "id": f"wotd-{target_date.isoformat()}-{personality}",
+            "date": target_date.isoformat(),
+            "personality": personality,
+            "domain": domain,
+            "wisdom_text": wisdom_content["text"],
+            "source_citation": wisdom_content.get("citation", ""),
+            "context": wisdom_content.get("context", ""),
+            "reflection_prompt": self._generate_reflection_prompt(wisdom_content["text"]),
+            "hashtags": self._generate_hashtags(personality, domain),
+            "share_count": 0,
+            "engagement_score": 0,
+            "created_at": datetime.utcnow().isoformat(),
+            "notification_sent": False,
+            "featured": False
+        }
+        
+        # Store in database
+        await self.wisdom_container.create_item(wisdom_doc)
+        
+        return wisdom_doc
+    
+    async def _personalize_wisdom(
+        self,
+        wisdom: Dict[str, Any],
+        user_id: str
+    ) -> Dict[str, Any]:
+        """Personalize wisdom based on user preferences and history"""
+        
+        try:
+            # Get user preferences
+            user_prefs = await self.user_prefs_container.read_item(user_id, user_id)
+            
+            # Add personalized context
+            if user_prefs.get("preferred_personalities"):
+                wisdom["personalized_note"] = self._generate_personal_note(
+                    wisdom,
+                    user_prefs["preferred_personalities"]
+                )
+            
+            # Track user view
+            await self._track_wisdom_view(wisdom["id"], user_id)
+            
+            return wisdom
+            
+        except Exception:
+            return wisdom  # Return unpersonalized on error
+    
+    def _generate_reflection_prompt(self, wisdom_text: str) -> str:
+        """Generate a reflection question based on wisdom content"""
+        
+        prompts = [
+            "How might this wisdom apply to a challenge you're facing today?",
+            "What aspect of this teaching resonates most with you right now?",
+            "How could you practice this principle in your daily life?",
+            "What would change if you fully embraced this wisdom?",
+            "Who in your life might benefit from hearing this message?"
+        ]
+        
+        return random.choice(prompts)
+    
+    def _generate_hashtags(self, personality: str, domain: str) -> List[str]:
+        """Generate relevant hashtags for social sharing"""
+        
+        base_tags = ["#Vimarsh", "#DailyWisdom"]
+        
+        domain_tags = {
+            "spiritual": ["#SpiritualGrowth", "#InnerPeace"],
+            "philosophical": ["#Philosophy", "#DeepThinking"],
+            "scientific": ["#ScienceWisdom", "#Innovation"],
+            "leadership": ["#LeadershipWisdom", "#Success"],
+            "literary": ["#LiteraryWisdom", "#Poetry"],
+            "psychology": ["#MindWisdom", "#SelfGrowth"]
+        }
+        
+        personality_tags = {
+            "krishna": "#KrishnaWisdom",
+            "buddha": "#BuddhaTeachings",
+            "einstein": "#EinsteinQuotes",
+            "marcus_aurelius": "#Stoicism",
+            "lincoln": "#LincolnWisdom"
+        }
+        
+        tags = base_tags + domain_tags.get(domain, [])
+        if personality in personality_tags:
+            tags.append(personality_tags[personality])
+        
+        return tags[:5]  # Limit to 5 hashtags
+    
+    def _get_personality_domain(self, personality: str) -> str:
+        """Get domain for a personality"""
+        
+        domain_map = {
+            "krishna": "spiritual", "buddha": "spiritual", "jesus": "spiritual",
+            "rumi": "spiritual", "vivekananda": "spiritual",
+            "marcus_aurelius": "philosophical", "confucius": "philosophical",
+            "socrates": "philosophical", "plato": "philosophical", "aristotle": "philosophical",
+            "lao_tzu": "philosophical",
+            "einstein": "scientific", "newton": "scientific", "tesla": "scientific",
+            "davinci": "scientific", "archimedes": "scientific",
+            "lincoln": "leadership", "gandhi": "leadership", "chanakya": "leadership",
+            "washington": "leadership", "franklin": "leadership", "mlk": "leadership",
+            "shakespeare": "literary", "tagore": "literary",
+            "freud": "psychology"
+        }
+        
+        return domain_map.get(personality, "philosophical")
+
+    async def send_daily_notifications(self) -> Dict[str, Any]:
+        """Send daily wisdom notifications to subscribed users"""
+        
+        today = date.today().isoformat()
+        wisdom = await self.get_wisdom_of_day()
+        
+        # Get subscribers
+        subscribers = await self._get_notification_subscribers()
+        
+        sent_count = 0
+        for subscriber in subscribers:
+            try:
+                await self.notifications.send_push(
+                    user_id=subscriber["user_id"],
+                    title=f"🕉️ Wisdom from {wisdom['personality'].title()}",
+                    body=wisdom["wisdom_text"][:100] + "...",
+                    data={"type": "wisdom_of_day", "wisdom_id": wisdom["id"]}
+                )
+                sent_count += 1
+            except Exception as e:
+                logger.error(f"Notification failed for {subscriber['user_id']}: {e}")
+        
+        # Mark wisdom as notified
+        wisdom["notification_sent"] = True
+        await self.wisdom_container.replace_item(wisdom["id"], wisdom)
+        
+        return {"notifications_sent": sent_count, "wisdom_id": wisdom["id"]}
+```
+
+**Frontend Wisdom Card Component:**
+
+```typescript
+// WisdomOfDay.tsx - Daily wisdom display component
+import React, { useState, useEffect } from 'react';
+import { Sparkles, Share2, Heart, BookOpen, ChevronRight } from 'lucide-react';
+import { SharingInterface } from './SharingInterface';
+import { cn } from '@/lib/utils';
+
+interface WisdomData {
+  id: string;
+  date: string;
+  personality: string;
+  domain: string;
+  wisdom_text: string;
+  source_citation: string;
+  context: string;
+  reflection_prompt: string;
+  hashtags: string[];
+}
+
+interface WisdomOfDayProps {
+  className?: string;
+  onExplore?: (personality: string) => void;
+}
+
+export const WisdomOfDay: React.FC<WisdomOfDayProps> = ({ className, onExplore }) => {
+  const [wisdom, setWisdom] = useState<WisdomData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
+  const [showContext, setShowContext] = useState(false);
+  
+  useEffect(() => {
+    fetchWisdomOfDay();
+  }, []);
+  
+  const fetchWisdomOfDay = async () => {
+    try {
+      const response = await fetch('/api/wisdom-of-day');
+      const data = await response.json();
+      setWisdom(data);
+    } catch (error) {
+      console.error('Failed to fetch wisdom:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleSave = async () => {
+    if (wisdom) {
+      await fetch('/api/wisdom/save', {
+        method: 'POST',
+        body: JSON.stringify({ wisdom_id: wisdom.id })
+      });
+      setSaved(true);
+    }
+  };
+  
+  if (loading) {
+    return (
+      <div className={cn('wisdom-card loading', className)}>
+        <div className="wisdom-skeleton" />
+      </div>
+    );
+  }
+  
+  if (!wisdom) return null;
+  
+  const domainColors = {
+    spiritual: 'from-amber-50 to-orange-50 border-amber-200',
+    philosophical: 'from-indigo-50 to-blue-50 border-indigo-200',
+    scientific: 'from-cyan-50 to-teal-50 border-cyan-200',
+    leadership: 'from-blue-50 to-sky-50 border-blue-200',
+    literary: 'from-pink-50 to-rose-50 border-pink-200',
+    psychology: 'from-purple-50 to-violet-50 border-purple-200'
+  };
+  
+  return (
+    <div className={cn(
+      'wisdom-card rounded-xl border-2 p-6 shadow-lg',
+      'bg-gradient-to-br',
+      domainColors[wisdom.domain as keyof typeof domainColors],
+      className
+    )}>
+      {/* Header */}
+      <div className="wisdom-header flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Sparkles className="text-amber-500" size={20} />
+          <span className="text-sm font-medium text-gray-600">Wisdom of the Day</span>
+        </div>
+        <span className="text-xs text-gray-400">
+          {new Date(wisdom.date).toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'short', 
+            day: 'numeric' 
+          })}
+        </span>
+      </div>
+      
+      {/* Wisdom Text */}
+      <blockquote className="wisdom-text text-xl font-serif text-gray-800 leading-relaxed mb-4">
+        "{wisdom.wisdom_text}"
+      </blockquote>
+      
+      {/* Attribution */}
+      <div className="wisdom-attribution flex items-center gap-2 mb-4">
+        <span className="font-semibold text-gray-700">— {wisdom.personality}</span>
+        {wisdom.source_citation && (
+          <span className="text-sm text-gray-500 italic">({wisdom.source_citation})</span>
+        )}
+      </div>
+      
+      {/* Context Toggle */}
+      {wisdom.context && (
+        <button
+          onClick={() => setShowContext(!showContext)}
+          className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1 mb-4"
+        >
+          <BookOpen size={14} />
+          {showContext ? 'Hide context' : 'Show context'}
+        </button>
+      )}
+      
+      {showContext && wisdom.context && (
+        <div className="wisdom-context bg-white/50 rounded-lg p-4 mb-4 text-sm text-gray-600">
+          {wisdom.context}
+        </div>
+      )}
+      
+      {/* Reflection Prompt */}
+      <div className="reflection-prompt bg-white/60 rounded-lg p-4 mb-4">
+        <p className="text-sm text-gray-600 italic">
+          💭 {wisdom.reflection_prompt}
+        </p>
+      </div>
+      
+      {/* Actions */}
+      <div className="wisdom-actions flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSave}
+            className={cn(
+              'action-btn flex items-center gap-1 px-3 py-1.5 rounded-full text-sm',
+              saved ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            )}
+          >
+            <Heart size={14} fill={saved ? 'currentColor' : 'none'} />
+            {saved ? 'Saved' : 'Save'}
+          </button>
+          
+          <SharingInterface
+            content={{
+              text: wisdom.wisdom_text,
+              personality: wisdom.personality,
+              citation: wisdom.source_citation,
+              domain: wisdom.domain,
+              conversationId: wisdom.id
+            }}
+            variant="inline"
+          />
+        </div>
+        
+        <button
+          onClick={() => onExplore?.(wisdom.personality)}
+          className="explore-btn flex items-center gap-1 px-4 py-1.5 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-700"
+        >
+          Explore {wisdom.personality}
+          <ChevronRight size={14} />
+        </button>
+      </div>
+      
+      {/* Hashtags */}
+      <div className="wisdom-hashtags flex flex-wrap gap-2 mt-4">
+        {wisdom.hashtags.map((tag, i) => (
+          <span key={i} className="text-xs text-gray-500">{tag}</span>
+        ))}
+      </div>
+    </div>
+  );
+};
+```
+
+**API Endpoints for Wisdom of the Day:**
+
+```python
+# backend/function_app.py - Wisdom of the Day endpoints
+
+@app.route(route="wisdom-of-day", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def get_wisdom_of_day(req: func.HttpRequest) -> func.HttpResponse:
+    """Get today's curated wisdom"""
+    try:
+        user_id = get_user_id_from_request(req)  # Optional auth
+        
+        wisdom_service = get_wisdom_service()
+        wisdom = await wisdom_service.get_wisdom_of_day(user_id=user_id)
+        
+        return func.HttpResponse(
+            json.dumps(wisdom),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Wisdom of day error: {e}")
+        return func.HttpResponse("Error fetching wisdom", status_code=500)
+
+@app.route(route="wisdom/save", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+async def save_wisdom(req: func.HttpRequest) -> func.HttpResponse:
+    """Save wisdom to user's collection"""
+    try:
+        user_id = get_authenticated_user_id(req)
+        data = req.get_json()
+        
+        wisdom_service = get_wisdom_service()
+        await wisdom_service.save_to_collection(user_id, data["wisdom_id"])
+        
+        return func.HttpResponse(status_code=201)
+    except Exception as e:
+        logger.error(f"Save wisdom error: {e}")
+        return func.HttpResponse("Error saving wisdom", status_code=500)
+
+@app.route(route="wisdom/history", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+async def get_wisdom_history(req: func.HttpRequest) -> func.HttpResponse:
+    """Get past wisdom entries"""
+    try:
+        days = int(req.params.get("days", 7))
+        personality = req.params.get("personality")
+        
+        wisdom_service = get_wisdom_service()
+        history = await wisdom_service.get_wisdom_history(days, personality)
+        
+        return func.HttpResponse(
+            json.dumps(history),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Wisdom history error: {e}")
+        return func.HttpResponse("Error fetching history", status_code=500)
+
+# Timer trigger for daily wisdom generation and notifications
+@app.schedule(schedule="0 0 6 * * *", arg_name="timer", run_on_startup=False)
+async def generate_daily_wisdom(timer: func.TimerRequest) -> None:
+    """Generate wisdom at 6 AM UTC daily and send notifications"""
+    try:
+        wisdom_service = get_wisdom_service()
+        
+        # Generate wisdom for next 7 days (buffer)
+        for i in range(7):
+            target_date = date.today() + timedelta(days=i)
+            await wisdom_service._generate_daily_wisdom(target_date)
+        
+        # Send today's notifications
+        await wisdom_service.send_daily_notifications()
+        
+        logger.info("Daily wisdom generation completed")
+    except Exception as e:
+        logger.error(f"Daily wisdom generation error: {e}")
+```
+
+### 20.4. Integration Points & Testing Requirements
+
+**Frontend Integration Checklist:**
+
+| Component | Location | Integration |
+|-----------|----------|-------------|
+| SharingInterface | `GuidanceInterface.tsx` response area | Import and render after each AI response |
+| VoiceControls | `GuidanceInterface.tsx` input area | Add next to message input field |
+| WisdomOfDay | `LandingPage.tsx` or `Dashboard.tsx` | Feature prominently above the fold |
+| useVoiceConversation | `hooks/useVoiceConversation.ts` | New custom hook file |
+
+**Backend Integration Checklist:**
+
+| Service | File | Dependencies |
+|---------|------|--------------|
+| EnhancedSharingService | `services/sharing_service.py` | Cosmos DB, Analytics |
+| VoiceConversationService | `voice/voice_conversation_service.py` | Google Cloud STT/TTS |
+| WisdomOfDayService | `services/wisdom_of_day_service.py` | Cosmos DB, RAG, Notifications |
+| OGImageService | `services/og_image_service.py` | PIL/Pillow |
+
+**Test Cases Required:**
+
+```python
+# tests/test_engagement_features.py
+
+class TestSocialSharing:
+    """Test cases for social sharing functionality"""
+    
+    async def test_create_share_link(self):
+        """Verify share link generation"""
+        pass
+    
+    async def test_share_tracking_analytics(self):
+        """Verify share events are tracked"""
+        pass
+    
+    async def test_og_image_generation(self):
+        """Verify OG images render correctly"""
+        pass
+    
+    async def test_platform_specific_formatting(self):
+        """Verify text formatting per platform"""
+        pass
+
+class TestVoiceConversation:
+    """Test cases for voice functionality"""
+    
+    async def test_speech_to_text_transcription(self):
+        """Verify audio transcription accuracy"""
+        pass
+    
+    async def test_text_to_speech_synthesis(self):
+        """Verify audio generation"""
+        pass
+    
+    async def test_personality_voice_selection(self):
+        """Verify correct voice per personality"""
+        pass
+    
+    async def test_fallback_on_voice_error(self):
+        """Verify graceful degradation"""
+        pass
+
+class TestWisdomOfDay:
+    """Test cases for wisdom of the day"""
+    
+    async def test_daily_wisdom_generation(self):
+        """Verify wisdom is generated correctly"""
+        pass
+    
+    async def test_personality_rotation(self):
+        """Verify personalities rotate by day"""
+        pass
+    
+    async def test_notification_delivery(self):
+        """Verify push notifications send"""
+        pass
+    
+    async def test_user_personalization(self):
+        """Verify personalized content"""
+        pass
+    
+    async def test_wisdom_save_to_collection(self):
+        """Verify save functionality"""
+        pass
+```
+
+**Performance Requirements:**
+
+| Feature | Metric | Target |
+|---------|--------|--------|
+| Share Link Generation | Response Time | < 200ms |
+| OG Image Generation | Response Time | < 2s |
+| Voice Transcription | Latency | < 3s for 30s audio |
+| Voice Synthesis | Latency | < 2s for 200 words |
+| Wisdom of Day Fetch | Response Time | < 500ms |
+| Notification Delivery | Throughput | 1000 users/minute |
+
+---
+
+## 21. Current Implementation Status & Production Metrics
 
 ### 20.1. Production Deployment Status (August 2025)
 

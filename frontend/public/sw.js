@@ -133,7 +133,8 @@ self.addEventListener('push', (event) => {
     }
   }
   
-  const options = {
+  // Customize notification based on category
+  let options = {
     body: notificationData.body,
     icon: notificationData.icon,
     badge: notificationData.badge,
@@ -141,6 +142,7 @@ self.addEventListener('push', (event) => {
     tag: notificationData.data.category || 'vimarsh',
     requireInteraction: false,
     silent: false,
+    vibrate: [200, 100, 200],
     actions: [
       {
         action: 'open',
@@ -152,6 +154,49 @@ self.addEventListener('push', (event) => {
       }
     ]
   };
+  
+  // Customize for daily wisdom notifications
+  if (notificationData.data.category === 'daily_wisdom') {
+    options = {
+      ...options,
+      tag: 'daily-wisdom',
+      renotify: true,
+      requireInteraction: true, // Keep visible until user interacts
+      actions: [
+        {
+          action: 'read',
+          title: '🙏 Read Wisdom'
+        },
+        {
+          action: 'share',
+          title: '📤 Share'
+        }
+      ]
+    };
+    
+    // Add personality image if available
+    if (notificationData.data.personality) {
+      options.image = `/personalities/${notificationData.data.personality}.jpg`;
+    }
+  }
+  
+  // Customize for new personality notifications
+  if (notificationData.data.category === 'new_personality') {
+    options = {
+      ...options,
+      tag: 'new-personality',
+      actions: [
+        {
+          action: 'explore',
+          title: '✨ Explore'
+        },
+        {
+          action: 'later',
+          title: 'Later'
+        }
+      ]
+    };
+  }
   
   event.waitUntil(
     self.registration.showNotification(notificationData.title, options)
@@ -170,7 +215,25 @@ self.addEventListener('notificationclick', (event) => {
     targetUrl = event.notification.data.url;
   }
   
-  if (event.action === 'open') {
+  // Handle different actions
+  const action = event.action || 'default';
+  const category = event.notification.data?.category;
+  
+  // Determine target URL based on action and category
+  if (category === 'daily_wisdom') {
+    if (action === 'read') {
+      targetUrl = '/'; // Open to main page with wisdom of the day
+    } else if (action === 'share') {
+      targetUrl = '/?action=share'; // Open with share dialog
+    }
+  } else if (category === 'new_personality') {
+    if (action === 'explore') {
+      const personality = event.notification.data.personality;
+      targetUrl = personality ? `/guidance?personality=${personality}` : '/';
+    }
+  }
+  
+  if (action === 'open' || action === 'read' || action === 'explore' || action === 'default') {
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true })
         .then((clientList) => {
@@ -187,9 +250,27 @@ self.addEventListener('notificationclick', (event) => {
           }
         })
     );
-  } else if (event.action === 'later') {
-    // Just close the notification - no action needed
-    console.log('[SW] User chose to view later');
+  } else if (action === 'later' || action === 'share') {
+    // For share, we still want to open the app with share intent
+    if (action === 'share') {
+      event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+          .then((clientList) => {
+            for (const client of clientList) {
+              if (client.url.includes(self.location.origin) && 'focus' in client) {
+                client.focus();
+                return client.navigate(targetUrl);
+              }
+            }
+            if (clients.openWindow) {
+              return clients.openWindow(targetUrl);
+            }
+          })
+      );
+    } else {
+      // Just close the notification - no action needed
+      console.log('[SW] User chose to view later');
+    }
   } else {
     // Default action (clicking notification body)
     event.waitUntil(
@@ -198,6 +279,15 @@ self.addEventListener('notificationclick', (event) => {
           for (const client of clientList) {
             if (client.url.includes(self.location.origin) && 'focus' in client) {
               client.focus();
+              return client.navigate(targetUrl);
+            }
+          }
+          if (clients.openWindow) {
+            return clients.openWindow(targetUrl);
+          }
+        })
+    );
+  };
               return client.navigate(targetUrl);
             }
           }

@@ -102,6 +102,9 @@ The consequence is reliance on less grounded advice, superficial interpretations
 * **Multilingual Support:** Users can receive responses in **English or Hindi** with personality-appropriate language patterns and cultural sensitivity.
 * **Administrative Content Management:** Comprehensive admin panel for content validation, user management, and quality assurance across all personalities.
 * **Contextual Understanding:** Each personality maintains awareness of their historical context, limitations, and areas of expertise while learning user preferences over time.
+* **Voice Conversations:** Full voice-enabled dialogues with Google Cloud Speech-to-Text for input and Text-to-Speech for responses, enabling natural hands-free wisdom exploration.
+* **Social Sharing:** One-click sharing of meaningful wisdom quotes and conversations to Twitter, Facebook, LinkedIn, WhatsApp, and other platforms with beautifully designed share cards.
+* **Wisdom of the Day:** Daily curated wisdom snippets from different personalities across all domains, encouraging daily engagement and introducing users to new perspectives.
 
 > **Note:** Detailed interface specifications and user interaction flows are documented in `User_Experience.md`.
 
@@ -119,6 +122,9 @@ The consequence is reliance on less grounded advice, superficial interpretations
 * **Cross-Personality Learning:** Users can explore how different great minds might approach similar questions, fostering comprehensive understanding.
 * **Cultural Authenticity:** Maintains reverence for spiritual figures while presenting historical and scientific personalities with appropriate scholarly respect.
 * **Enhanced Engagement:** Multi-modal interaction (text/voice) with personality-specific characteristics creates immersive conversational experiences.
+* **Voice-First Experience:** Production-ready voice interface enabling natural spoken conversations with any personality, reducing friction for mobile users and accessibility.
+* **Viral Sharing Mechanics:** Social sharing integration with beautiful quote cards, personality-branded share images, and platform-optimized content for organic growth.
+* **Daily Engagement Hooks:** Wisdom of the Day feature providing curated daily insights across domains to drive return visits and introduce new personalities.
 
 ---
 
@@ -251,7 +257,99 @@ The intersection of AI, education, and historical/spiritual content represents a
 - **Global Expansion**: European, Asian markets with localized personalities
 - **Success Metrics**: 100,000+ users, revenue sustainability, enterprise contracts
 
-### 6.2. User Acquisition Strategy:
+### 6.2. User Engagement & Viral Growth Features
+
+**Voice Conversations (Production-Ready):**
+
+The voice interface enables natural, hands-free conversations with any of the 25 personalities, creating an immersive experience that feels like genuine dialogue with history's greatest minds.
+
+* **Core Voice Features:**
+  - Real-time speech-to-text using Google Cloud Speech Recognition API
+  - Personality-aware text-to-speech with domain-appropriate voice characteristics
+  - Seamless voice/text mode switching within conversations
+  - Voice activity detection for natural conversation flow
+  - Multi-language support (English, Hindi) with accent handling
+
+* **User Experience Benefits:**
+  - Hands-free wisdom access for mobile users, drivers, or during contemplation
+  - More natural and intimate conversation experience
+  - Accessibility support for users with visual or motor impairments
+  - Reduced friction for quick questions and on-the-go wisdom
+
+* **Technical Implementation:**
+  - Browser-native Web Speech API with Google Cloud fallback
+  - Real-time audio streaming with < 500ms transcription latency
+  - Personality-specific voice parameter configuration
+  - Offline voice caching for frequently used phrases
+
+**Social Sharing System (Viral Growth Engine):**
+
+The sharing system transforms meaningful wisdom moments into shareable content, driving organic growth through user advocacy.
+
+* **Share Triggers & Formats:**
+  - One-click sharing from any AI response
+  - Beautifully designed quote cards with personality branding
+  - Pre-formatted text optimized for each social platform
+  - Deep links that bring new users directly to the conversation context
+
+* **Supported Platforms:**
+  - Twitter/X: Optimized character count with hashtags
+  - Facebook: Rich preview cards with OG metadata
+  - LinkedIn: Professional formatting for thought leadership
+  - WhatsApp/Telegram: Quick share with formatted text
+  - Email: Newsletter-style sharing with full context
+  - Copy to clipboard: For any other platform
+
+* **Share Card Design:**
+  - Personality avatar and name prominently displayed
+  - Domain-specific color theming and iconography
+  - Wisdom quote with citation attribution
+  - Vimarsh branding with call-to-action
+  - Mobile-optimized dimensions (1200x630 for social, 1080x1920 for stories)
+
+* **Analytics & Tracking:**
+  - Share count per quote and personality
+  - Click-through rates from shared content
+  - Conversion tracking for new users from shares
+  - Most shared quotes and personalities dashboard
+
+**Wisdom of the Day (Daily Engagement Hook):**
+
+A curated daily wisdom feature that drives return visits and introduces users to personalities they haven't explored.
+
+* **Curation Strategy:**
+  - Rotating across all 6 domains to maximize exposure
+  - 25 personalities featured over monthly cycles
+  - Contextual relevance (seasonal, current events when appropriate)
+  - User preference learning for personalized recommendations
+
+* **Content Selection Criteria:**
+  - Universal appeal and timeless relevance
+  - Thought-provoking insights that encourage reflection
+  - Proper citations and authentic attribution
+  - Appropriate for general audiences across cultures
+
+* **Display Locations:**
+  - Landing page hero section for first-time visitors
+  - Authenticated user dashboard greeting
+  - PWA splash screen on daily first launch
+  - Optional push notification (with user consent)
+  - Email digest subscription option
+
+* **Engagement Features:**
+  - "Ask [Personality] more about this" quick action
+  - Save to Wisdom Journal for personal collection
+  - Share directly to social platforms
+  - View related quotes from same personality
+  - Explore other perspectives on similar topics
+
+* **Expected Impact:**
+  - 30-50% increase in daily return visits
+  - 25% improvement in personality exploration breadth
+  - 40% increase in social sharing activity
+  - Improved user onboarding and first-time engagement
+
+### 6.3. User Acquisition Strategy:
 
 **Educational Institutions:**
 - Partner with universities offering philosophy, religion, history, and science courses

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Send, MessageSquare, Users, Settings, LogOut, Download, X } from 'lucide-react';
-// Voice functionality temporarily disabled - imports kept for future implementation
-// import { Mic, MicOff } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Send, MessageSquare, Users, Settings, LogOut, Download, X, Share2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { SharingInterface } from './SharingInterface';
+import { VoiceControls } from './VoiceControls';
 import PersonalitySelector from './PersonalitySelector';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
@@ -147,6 +147,14 @@ export default function GuidanceInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  
+  // Share state
+  const [shareMessage, setShareMessage] = useState<Message | null>(null);
+  
+  // Voice state
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  
   const navigate = useNavigate();
 
   // Context hooks
@@ -342,6 +350,55 @@ export default function GuidanceInterface() {
       setIsLoading(false);
     }
   };
+
+  // Handle voice input transcript
+  const handleVoiceTranscript = useCallback((transcript: string) => {
+    if (transcript.trim() && selectedPersonality) {
+      setInputText(transcript);
+      // Auto-submit after voice input
+      const form = document.querySelector('form');
+      if (form) {
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(submitEvent);
+      }
+    }
+  }, [selectedPersonality]);
+
+  // Handle TTS for AI responses
+  const speakMessage = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    
+    // Stop any current speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  // Stop speech
+  const stopSpeaking = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  }, []);
+
+  // Handle share button click
+  const handleShareClick = useCallback((message: Message) => {
+    setShareMessage(message);
+  }, []);
+
+  // Close share modal
+  const closeShareModal = useCallback(() => {
+    setShareMessage(null);
+  }, []);
 
   // Generate domain-appropriate placeholder text
   const getPlaceholderText = () => {
@@ -1211,15 +1268,91 @@ export default function GuidanceInterface() {
                   ) : (
                     <div>
                       <ReactMarkdown>{message.text}</ReactMarkdown>
-                      {/* Response Source Transparency for Assistant Messages - Admin Only */}
-                      {message.metadata && user?.role === 'admin' && (
-                        <div style={{ marginTop: '0.75rem' }}>
+                      {/* Action buttons for AI responses */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginTop: '0.75rem',
+                        paddingTop: '0.5rem',
+                        borderTop: '1px solid #f1f5f9'
+                      }}>
+                        {/* Share button */}
+                        <button
+                          onClick={() => handleShareClick(message)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            padding: '0.375rem 0.5rem',
+                            background: 'transparent',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '0.5rem',
+                            cursor: 'pointer',
+                            color: '#64748b',
+                            fontSize: '0.75rem',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#f8fafc';
+                            e.currentTarget.style.borderColor = '#FF6B35';
+                            e.currentTarget.style.color = '#FF6B35';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.borderColor = '#e2e8f0';
+                            e.currentTarget.style.color = '#64748b';
+                          }}
+                          title="Share this wisdom"
+                        >
+                          <Share2 size={14} />
+                          <span>Share</span>
+                        </button>
+                        
+                        {/* Text-to-Speech button */}
+                        <button
+                          onClick={() => isSpeaking ? stopSpeaking() : speakMessage(message.text)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            padding: '0.375rem 0.5rem',
+                            background: isSpeaking ? '#FF6B35' : 'transparent',
+                            border: `1px solid ${isSpeaking ? '#FF6B35' : '#e2e8f0'}`,
+                            borderRadius: '0.5rem',
+                            cursor: 'pointer',
+                            color: isSpeaking ? '#ffffff' : '#64748b',
+                            fontSize: '0.75rem',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isSpeaking) {
+                              e.currentTarget.style.background = '#f8fafc';
+                              e.currentTarget.style.borderColor = '#FF6B35';
+                              e.currentTarget.style.color = '#FF6B35';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSpeaking) {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.borderColor = '#e2e8f0';
+                              e.currentTarget.style.color = '#64748b';
+                            }
+                          }}
+                          title={isSpeaking ? "Stop speaking" : "Listen to this wisdom"}
+                        >
+                          {isSpeaking ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                          <span>{isSpeaking ? 'Stop' : 'Listen'}</span>
+                        </button>
+                        
+                        {/* Response Source Transparency for Assistant Messages - Admin Only */}
+                        {message.metadata && user?.role === 'admin' && (
                           <MessageSourceBadge 
                             metadata={message.metadata}
                             compact={true}
                           />
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1298,6 +1431,14 @@ export default function GuidanceInterface() {
             margin: window.innerWidth <= 768 ? '0 -0.5rem' : '0'
           }}
         >
+          {/* Voice Input Button */}
+          <VoiceControls
+            onTranscript={handleVoiceTranscript}
+            disabled={!selectedPersonality || isLoading}
+            personalityId={selectedPersonality?.id}
+            domain={selectedPersonality?.domain}
+          />
+          
           <input
             type="text"
             value={inputText}
@@ -1340,6 +1481,18 @@ export default function GuidanceInterface() {
           </button>
         </form>
       </div>
+      
+      {/* Share Modal */}
+      {shareMessage && (
+        <SharingInterface
+          content={shareMessage.text}
+          title={`Wisdom from ${selectedPersonality?.display_name || 'Vimarsh'}`}
+          personalityName={selectedPersonality?.display_name}
+          domain={selectedPersonality?.domain}
+          isOpen={!!shareMessage}
+          onClose={closeShareModal}
+        />
+      )}
       
       {/* Debug overlay for troubleshooting auth issues in production */}
       {showDebug && <DebugAuth />}

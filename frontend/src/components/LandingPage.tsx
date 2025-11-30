@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Brain, Shield, Sparkles, Play } from 'lucide-react';
+import { ArrowRight, Brain, Shield, Sparkles, Play, Mic, Share2, Bell, Volume2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { WisdomOfDay } from './WisdomOfDay';
 
 // CSS Variables for Apple Design System
 const cssVariables = `
@@ -514,7 +515,7 @@ const LandingPage: React.FC = () => {
               marginBottom: '0.75rem'
             }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
-              Now with Enhanced Memory & Personalization
+              NEW: Voice Conversations, Social Sharing & Daily Wisdom
             </div>
             <h1 style={{
               fontSize: '3rem',
@@ -652,6 +653,54 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Wisdom of the Day Section */}
+      <section style={{
+        padding: '2rem 2rem 3rem',
+        maxWidth: '800px',
+        margin: '0 auto',
+        textAlign: 'center'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <h2 style={{ 
+            fontSize: '1.5rem', 
+            fontWeight: 600, 
+            color: '#1d1d1f',
+            margin: 0
+          }}>
+            Today's Wisdom
+          </h2>
+          <span style={{
+            background: '#fef3c7',
+            color: '#92400e',
+            fontSize: '0.65rem',
+            fontWeight: 600,
+            padding: '2px 6px',
+            borderRadius: 4,
+            textTransform: 'uppercase'
+          }}>New</span>
+        </div>
+        <p style={{ 
+          color: '#6b7280', 
+          marginBottom: '0.75rem', 
+          fontSize: '0.9rem' 
+        }}>
+          A daily dose of timeless insight from history's greatest minds
+        </p>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          gap: '0.5rem',
+          marginBottom: '1.5rem',
+          fontSize: '0.8rem',
+          color: '#6b7280'
+        }}>
+          <Bell size={14} style={{ color: '#f97316' }} />
+          <span>Get daily wisdom notifications</span>
+        </div>
+        <WisdomOfDay />
       </section>
 
       {/* Start Your Journey */}
@@ -1166,14 +1215,28 @@ const LandingPage: React.FC = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '1.25rem'
           }}>
+            {/* Voice Conversations - NEW */}
             <div style={{
-              background: 'white',
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fff 100%)',
               borderRadius: '0.75rem',
               padding: '1.5rem',
               textAlign: 'center',
-              border: '1px solid #f0f0f0',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+              border: '1px solid #fcd34d',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              position: 'relative'
             }}>
+              <span style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                background: '#f97316',
+                color: 'white',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 4,
+                textTransform: 'uppercase'
+              }}>New</span>
               <div style={{
                 width: '3rem',
                 height: '3rem',
@@ -1184,22 +1247,36 @@ const LandingPage: React.FC = () => {
                 justifyContent: 'center',
                 margin: '0 auto 1rem',
               }}>
-                <Brain size={24} style={{ color: 'white' }} />
+                <Mic size={24} style={{ color: 'white' }} />
               </div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>They Actually Think with You</h3>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Speak, Don't Type</h3>
               <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
-                Each personality draws from their authentic writings, speeches, and works. They don't just recite facts - they engage with your questions using their actual thought patterns and wisdom.
+                Have natural voice conversations with Einstein, Gandhi, or any of our 25 minds. Ask questions by speaking and hear their wisdom read aloud in their unique voice.
               </p>
             </div>
 
+            {/* Share Wisdom - NEW */}
             <div style={{
-              background: 'white',
+              background: 'linear-gradient(135deg, #dbeafe 0%, #fff 100%)',
               borderRadius: '0.75rem',
               padding: '1.5rem',
               textAlign: 'center',
-              border: '1px solid #f0f0f0',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+              border: '1px solid #93c5fd',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              position: 'relative'
             }}>
+              <span style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                background: '#3b82f6',
+                color: 'white',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 4,
+                textTransform: 'uppercase'
+              }}>New</span>
               <div style={{
                 width: '3rem',
                 height: '3rem',
@@ -1210,11 +1287,85 @@ const LandingPage: React.FC = () => {
                 justifyContent: 'center',
                 margin: '0 auto 1rem',
               }}>
-                <Shield size={24} style={{ color: 'white' }} />
+                <Share2 size={24} style={{ color: 'white' }} />
               </div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>They Remember You</h3>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Share the Wisdom</h3>
               <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
-                Every conversation builds on the last. Ask Einstein about quantum mechanics today, then return tomorrow and he'll remember your previous discussion and build upon it.
+                Found a profound insight? Share it instantly on Twitter, LinkedIn, WhatsApp, or any platform. Spread timeless wisdom with beautiful, auto-generated social cards.
+              </p>
+            </div>
+
+            {/* Daily Wisdom - NEW */}
+            <div style={{
+              background: 'linear-gradient(135deg, #dcfce7 0%, #fff 100%)',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
+              textAlign: 'center',
+              border: '1px solid #86efac',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              position: 'relative'
+            }}>
+              <span style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                background: '#10b981',
+                color: 'white',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 4,
+                textTransform: 'uppercase'
+              }}>New</span>
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                background: '#10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <Bell size={24} style={{ color: 'white' }} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Daily Wisdom Delivered</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
+                Start each day inspired. Get a curated insight from a different great mind every morning, with push notifications at your preferred time.
+              </p>
+            </div>
+          </div>
+
+          {/* Original features in second row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1.25rem',
+            marginTop: '1.25rem'
+          }}>
+            <div style={{
+              background: 'white',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
+              textAlign: 'center',
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+            }}>
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                background: '#8b5cf6',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <Brain size={24} style={{ color: 'white' }} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Authentic Thinking</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
+                Each personality draws from their authentic writings and works. They engage with your questions using their actual thought patterns.
               </p>
             </div>
 
@@ -1230,7 +1381,33 @@ const LandingPage: React.FC = () => {
                 width: '3rem',
                 height: '3rem',
                 borderRadius: '50%',
-                background: '#10b981',
+                background: '#ec4899',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <Shield size={24} style={{ color: 'white' }} />
+              </div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Persistent Memory</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
+                Every conversation builds on the last. Return tomorrow and they'll remember your previous discussion and build upon it.
+              </p>
+            </div>
+
+            <div style={{
+              background: 'white',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
+              textAlign: 'center',
+              border: '1px solid #f0f0f0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+            }}>
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                borderRadius: '50%',
+                background: '#06b6d4',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1238,9 +1415,9 @@ const LandingPage: React.FC = () => {
               }}>
                 <Sparkles size={24} style={{ color: 'white' }} />
               </div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Their Life's Work at Your Fingertips</h3>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>1000+ Ancient Texts</h3>
               <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
-                Access thousands of years of human wisdom. Whether you need strategic advice from Chanakya, spiritual guidance from Buddha, or scientific insights from Newton.
+                Access thousands of years of human wisdom. Strategic advice from Chanakya, spiritual guidance from Buddha, or scientific insights from Newton.
               </p>
             </div>
           </div>

@@ -60,6 +60,9 @@
 ### ✨ Enhanced RAG Service V6 Platform Features
 
 **🎯 For Learners & Seekers:**
+- **🎤 Voice Conversations**: Speak naturally with any personality using Web Speech API - ask questions by voice and hear wisdom read aloud with personality-specific speech patterns
+- **📤 Social Sharing**: Share profound insights instantly on Twitter, LinkedIn, WhatsApp, Telegram, Reddit, and Facebook with auto-generated social preview cards
+- **🌅 Wisdom of the Day**: Start each day with curated insights from history's greatest minds, with push notification support at your preferred time
 - **Cross-Session Conversation Memory**: Conversations continue seamlessly across sessions with personality-specific memory isolation
 - **Wisdom Journal Integration**: Personal insights storage with semantic search for reflection and growth tracking
 - **Progressive Personalization**: UI and interaction patterns adapt based on user preferences and behavior patterns

@@ -12,6 +12,8 @@ import { pwaManager } from './utils/pwa';
 // Lazy load main components for better bundle splitting
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const GuidanceInterface = lazy(() => import('./components/GuidanceInterface'));
+const ShareView = lazy(() => import('./pages/ShareView'));
+const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
 
 // Keep lightweight components as regular imports
 import AuthCallback from './components/AuthCallback';
@@ -131,6 +133,20 @@ function App() {
                     element={
                       <ProtectedRoute requireAdmin={true}>
                         <AdminDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Share View - Public Route for shared wisdom */}
+                  <Route path="/share/:shareId" element={<ShareView />} />
+                  <Route path="/share" element={<ShareView />} />
+                  
+                  {/* Wisdom Archive - Protected Route */}
+                  <Route 
+                    path="/wisdom/archive" 
+                    element={
+                      <ProtectedRoute>
+                        <WisdomArchive />
                       </ProtectedRoute>
                     } 
                   />
