@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { MsalProvider } from '@azure/msal-react';
 import { PublicClientApplication } from '@azure/msal-browser';
 import './styles/vimarsh-design-system.css';
@@ -15,6 +15,12 @@ const GuidanceInterface = lazy(() => import('./components/GuidanceInterface'));
 const ShareView = lazy(() => import('./pages/ShareView'));
 const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
 const MemoryDashboard = lazy(() => import('./components/MemoryDashboard'));
+
+// Memory Dashboard Page Wrapper (handles route-based rendering)
+const MemoryDashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  return <MemoryDashboard isOpen={true} onClose={() => navigate(-1)} />;
+};
 
 // Keep lightweight components as regular imports
 import AuthCallback from './components/AuthCallback';
@@ -159,7 +165,7 @@ function App() {
                     path="/memory" 
                     element={
                       <ProtectedRoute>
-                        <MemoryDashboard />
+                        <MemoryDashboardPage />
                       </ProtectedRoute>
                     } 
                   />
