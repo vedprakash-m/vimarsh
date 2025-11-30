@@ -307,7 +307,7 @@ export function useMemoryAwareChat(options: MemoryAwareChatOptions): MemoryAware
         abortControllerRef.current.abort();
       }
     };
-  }, [userId, personalityId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId, personalityId]);
   
   // End session on personality change
   useEffect(() => {
@@ -316,7 +316,7 @@ export function useMemoryAwareChat(options: MemoryAwareChatOptions): MemoryAware
         endCurrentSession();
       }
     };
-  }, [personalityId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [personalityId]);
   
   return {
     messages,

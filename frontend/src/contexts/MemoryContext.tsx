@@ -496,7 +496,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
         endSession();
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const contextValue: MemoryContextType = {
     // State
