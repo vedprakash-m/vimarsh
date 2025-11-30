@@ -860,12 +860,15 @@ export default function GuidanceInterface() {
           
           {/* Memory Context Indicator - Desktop Only */}
           {selectedPersonality && memoryContext && window.innerWidth > 768 && (
-            <MemoryIndicator
-              context={memoryContext}
-              relationship={relationships.find(r => r.personality_id === selectedPersonality.id)}
-              compact={true}
+            <div 
               onClick={() => navigate('/memory')}
-            />
+              style={{ cursor: 'pointer' }}
+            >
+              <MemoryIndicator
+                compact={true}
+                showTooltip={true}
+              />
+            </div>
           )}
           
           <button 
