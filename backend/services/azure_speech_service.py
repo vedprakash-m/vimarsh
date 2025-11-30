@@ -3,12 +3,14 @@ Azure Speech Service for Vimarsh Personality TTS
 
 This module provides Azure Neural Voice integration with personality-specific
 voice configurations and SSML styling for authentic character representation.
+
+Uses REST API instead of SDK to ensure compatibility with Azure Functions.
 """
 
 import logging
 import os
-from typing import Optional, Callable
-import azure.cognitiveservices.speech as speechsdk
+from typing import Optional
+import httpx
 
 from config.voice_config import get_voice_config, VoiceConfig
 
@@ -58,19 +60,27 @@ class AzureSpeechService:
     """
     Azure Speech Service client for personality-based text-to-speech synthesis.
     
+    Uses REST API for Azure Functions compatibility (SDK has native lib issues).
+    
     Supports:
     - Personality-specific Azure Neural Voices
     - SSML styling for authentic character representation
-    - Audio output in various formats (MP3, WAV, OGG)
-    - Streaming support for long-form content
+    - Audio output in MP3/WAV/OGG formats
     """
     
-    # Audio format mappings
+    # Audio format mappings for REST API
     AUDIO_FORMATS = {
-        "mp3": speechsdk.SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3,
-        "mp3-hd": speechsdk.SpeechSynthesisOutputFormat.Audio24Khz48KBitRateMonoMp3,
-        "wav": speechsdk.SpeechSynthesisOutputFormat.Riff16Khz16BitMonoPcm,
-        "ogg": speechsdk.SpeechSynthesisOutputFormat.Ogg16Khz16BitMonoOpus,
+        "mp3": "audio-16khz-32kbitrate-mono-mp3",
+        "mp3-hd": "audio-24khz-48kbitrate-mono-mp3",
+        "wav": "riff-16khz-16bit-mono-pcm",
+        "ogg": "ogg-16khz-16bit-mono-opus",
+    }
+    
+    CONTENT_TYPES = {
+        "mp3": "audio/mpeg",
+        "mp3-hd": "audio/mpeg",
+        "wav": "audio/wav",
+        "ogg": "audio/ogg",
     }
     
     def __init__(self):
@@ -83,6 +93,8 @@ class AzureSpeechService:
             self._initialized = False
         else:
             self._initialized = True
+            self._token_url = f"https://{self.speech_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken"
+            self._tts_url = f"https://{self.speech_region}.tts.speech.microsoft.com/cognitiveservices/v1"
             logger.info(f"🎙️ Azure Speech Service initialized (region: {self.speech_region})")
     
     @property
@@ -90,34 +102,32 @@ class AzureSpeechService:
         """Check if the service is properly configured and available."""
         return self._initialized
     
-    def _create_speech_config(
-        self, 
-        voice_config: VoiceConfig,
-        audio_format: str = "mp3"
-    ) -> speechsdk.SpeechConfig:
+    def _get_access_token(self) -> Optional[str]:
         """
-        Create speech configuration with voice settings.
+        Get access token for Azure Speech Service.
         
-        Args:
-            voice_config: Voice configuration for the personality
-            audio_format: Output audio format (mp3, mp3-hd, wav, ogg)
-            
         Returns:
-            Configured SpeechConfig instance
+            Access token string or None if failed
         """
-        speech_config = speechsdk.SpeechConfig(
-            subscription=self.speech_key,
-            region=self.speech_region
-        )
-        
-        # Set the voice
-        speech_config.speech_synthesis_voice_name = voice_config.voice_name
-        
-        # Set audio format
-        format_enum = self.AUDIO_FORMATS.get(audio_format, self.AUDIO_FORMATS["mp3"])
-        speech_config.set_speech_synthesis_output_format(format_enum)
-        
-        return speech_config
+        try:
+            response = httpx.post(
+                self._token_url,
+                headers={
+                    "Ocp-Apim-Subscription-Key": self.speech_key,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                return response.text
+            else:
+                logger.error(f"❌ Failed to get access token: {response.status_code} - {response.text}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"❌ Token request error: {str(e)}")
+            return None
     
     def synthesize_speech(
         self,
@@ -153,117 +163,46 @@ class AzureSpeechService:
         )
         
         try:
-            # Create speech config
-            speech_config = self._create_speech_config(voice_config, audio_format)
+            # Get access token
+            access_token = self._get_access_token()
+            if not access_token:
+                logger.error("❌ Failed to get access token")
+                return None
             
-            # Use in-memory audio output
-            audio_config = None  # None = in-memory output
+            # Build SSML body
+            body = build_ssml(text, voice_config)
             
-            # Create synthesizer
-            synthesizer = speechsdk.SpeechSynthesizer(
-                speech_config=speech_config,
-                audio_config=audio_config
+            # Get output format
+            output_format = self.AUDIO_FORMATS.get(audio_format, self.AUDIO_FORMATS["mp3"])
+            
+            # Make TTS request
+            response = httpx.post(
+                self._tts_url,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/ssml+xml",
+                    "X-Microsoft-OutputFormat": output_format,
+                    "User-Agent": "VimarshApp/1.0",
+                },
+                content=body.encode("utf-8"),
+                timeout=30.0
             )
             
-            # Synthesize with SSML or plain text
-            if use_ssml:
-                ssml = build_ssml(text, voice_config)
-                result = synthesizer.speak_ssml_async(ssml).get()
-            else:
-                result = synthesizer.speak_text_async(text).get()
-            
-            # Check result
-            if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-                audio_data = result.audio_data
+            if response.status_code == 200:
+                audio_data = response.content
                 logger.info(
                     f"✅ Speech synthesis completed: {len(audio_data)} bytes "
                     f"for {personality}"
                 )
                 return audio_data
-            
-            elif result.reason == speechsdk.ResultReason.Canceled:
-                cancellation = result.cancellation_details
-                logger.error(
-                    f"❌ Speech synthesis canceled: {cancellation.reason}. "
-                    f"Error: {cancellation.error_details}"
-                )
-                return None
-            
             else:
-                logger.error(f"❌ Unexpected result: {result.reason}")
+                logger.error(
+                    f"❌ Speech synthesis failed: {response.status_code} - {response.text}"
+                )
                 return None
                 
         except Exception as e:
             logger.error(f"❌ Speech synthesis error: {str(e)}")
-            raise
-    
-    def synthesize_to_stream(
-        self,
-        text: str,
-        personality: str = "krishna",
-        audio_format: str = "mp3",
-        use_ssml: bool = True,
-        chunk_callback: Optional[Callable] = None
-    ) -> Optional[bytes]:
-        """
-        Synthesize speech with streaming support for real-time playback.
-        
-        This method supports chunk-by-chunk audio delivery for lower latency.
-        
-        Args:
-            text: The text to synthesize
-            personality: The personality ID
-            audio_format: Output format (mp3, mp3-hd, wav, ogg)
-            use_ssml: Whether to use SSML for enhanced styling
-            chunk_callback: Optional callback for streaming chunks
-            
-        Returns:
-            Complete audio bytes if successful, None if failed
-        """
-        if not self.is_available:
-            raise ValueError("Azure Speech Service is not configured. Set AZURE_SPEECH_KEY.")
-        
-        voice_config = get_voice_config(personality)
-        speech_config = self._create_speech_config(voice_config, audio_format)
-        
-        # Create pull audio output stream for streaming
-        stream = speechsdk.audio.PullAudioOutputStream()
-        audio_config = speechsdk.audio.AudioOutputConfig(stream=stream)
-        
-        synthesizer = speechsdk.SpeechSynthesizer(
-            speech_config=speech_config,
-            audio_config=audio_config
-        )
-        
-        audio_chunks = []
-        
-        def handle_audio_data(evt):
-            """Handle streaming audio data events."""
-            if evt.audio_data:
-                audio_chunks.append(evt.audio_data)
-                if chunk_callback:
-                    chunk_callback(evt.audio_data)
-        
-        # Connect to synthesizing event for streaming
-        synthesizer.synthesizing.connect(handle_audio_data)
-        
-        try:
-            if use_ssml:
-                ssml = build_ssml(text, voice_config)
-                result = synthesizer.speak_ssml_async(ssml).get()
-            else:
-                result = synthesizer.speak_text_async(text).get()
-            
-            if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-                # Return complete audio data
-                return result.audio_data
-            else:
-                cancellation = result.cancellation_details
-                logger.error(f"❌ Streaming synthesis failed: {cancellation.error_details}")
-                return None
-                
-        except Exception as e:
-            logger.error(f"❌ Streaming synthesis error: {str(e)}")
             raise
     
     def get_available_voices(self, locale: Optional[str] = None) -> list:
@@ -280,29 +219,35 @@ class AzureSpeechService:
             return []
         
         try:
-            speech_config = speechsdk.SpeechConfig(
-                subscription=self.speech_key,
-                region=self.speech_region
-            )
-            synthesizer = speechsdk.SpeechSynthesizer(
-                speech_config=speech_config,
-                audio_config=None
+            access_token = self._get_access_token()
+            if not access_token:
+                return []
+            
+            voices_url = f"https://{self.speech_region}.tts.speech.microsoft.com/cognitiveservices/voices/list"
+            
+            response = httpx.get(
+                voices_url,
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                },
+                timeout=10.0
             )
             
-            result = synthesizer.get_voices_async(locale or "").get()
-            
-            if result.reason == speechsdk.ResultReason.VoicesListRetrieved:
-                voices = []
-                for voice in result.voices:
-                    voices.append({
-                        "name": voice.name,
-                        "short_name": voice.short_name,
-                        "locale": voice.locale,
-                        "gender": voice.gender.name,
-                        "voice_type": voice.voice_type.name,
-                        "style_list": voice.style_list if hasattr(voice, 'style_list') else []
-                    })
-                return voices
+            if response.status_code == 200:
+                voices = response.json()
+                if locale:
+                    voices = [v for v in voices if v.get("Locale", "").startswith(locale)]
+                return [
+                    {
+                        "name": v.get("Name"),
+                        "short_name": v.get("ShortName"),
+                        "locale": v.get("Locale"),
+                        "gender": v.get("Gender"),
+                        "voice_type": v.get("VoiceType"),
+                        "style_list": v.get("StyleList", [])
+                    }
+                    for v in voices
+                ]
             return []
             
         except Exception as e:
