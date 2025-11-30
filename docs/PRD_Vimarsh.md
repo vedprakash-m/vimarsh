@@ -1386,6 +1386,193 @@ This enhanced framework ensures that Vimarsh maintains the highest standards of 
 * **Authority:** Ability to block users, modify budgets, and implement emergency cost controls
 * **Responsibility:** Ensuring system financial sustainability while maintaining service quality
 
+---
+
+## 14. Hierarchical Memory System - World-Class Conversational Memory
+
+**Objective:** Transform Vimarsh from a stateless Q&A system into a deeply personalized wisdom companion that remembers, learns, and evolves with each user through state-of-the-art memory architecture inspired by cutting-edge AI research (MemGPT, Generative Agents, LangGraph).
+
+### 14.1. Vision & Business Case
+
+**The Memory Problem:**
+Current implementation provides excellent one-shot guidance but lacks the conversational continuity that creates truly transformative spiritual relationships. Users returning after days or weeks start from zero, losing the accumulated context of their spiritual journey.
+
+**The Memory Solution:**
+A 4-layer hierarchical memory architecture that enables each personality to:
+- Remember previous conversations and spiritual progress
+- Build evolving relationships with individual users
+- Learn communication preferences and spiritual needs
+- Provide contextually aware guidance that references past insights
+
+**Business Impact:**
+| Metric | Current State | Target State | Impact |
+|--------|---------------|--------------|--------|
+| Return User Rate (7-day) | ~40% | >65% | +62.5% retention |
+| Session Duration | ~3 questions | ~8 questions | +166% engagement |
+| User Satisfaction | Good | Exceptional | Premium positioning |
+| Competitive Differentiation | Generic AI chat | Personalized companion | Market leadership |
+
+### 14.2. 4-Layer Memory Architecture
+
+**Inspired by MemGPT (UC Berkeley) and Generative Agents (Stanford)**
+
+#### Layer 1: Working Memory (Immediate Context)
+* **Purpose:** Current conversation state and immediately relevant context
+* **Content:** 
+  - Current session messages (all turns)
+  - Retrieved RAG context for current query
+  - Active personality state and guidance mode
+* **Storage:** In-memory, session-scoped
+* **Size:** ~8,000 tokens maximum
+* **Lifecycle:** Cleared on session end
+
+#### Layer 2: Core Memory (User-Personality Relationship)
+* **Purpose:** Persistent knowledge about user-personality relationship
+* **Content:**
+  - User's spiritual profile (goals, challenges, interests)
+  - Relationship state with current personality
+  - Communication preferences (formal/casual, Sanskrit terms, depth)
+  - Key learnings and breakthrough moments
+* **Storage:** Cosmos DB, user-personality scoped
+* **Size:** ~2,000 tokens per personality
+* **Update Frequency:** Every 5-10 conversations or significant moments
+
+#### Layer 3: Episodic Memory (Session Summaries)
+* **Purpose:** Condensed history of past conversations
+* **Content:**
+  - Session summaries with key topics and insights
+  - Emotional context and user state indicators
+  - Questions asked and guidance provided
+  - Temporal markers (when, how long, frequency)
+* **Storage:** Cosmos DB with vector embeddings
+* **Size:** ~500 tokens per session summary
+* **Retention:** 90 days rolling window, important sessions permanent
+
+#### Layer 4: Semantic Archive (Full History)
+* **Purpose:** Complete searchable history for deep context retrieval
+* **Content:**
+  - All conversation messages with embeddings
+  - Cross-session themes and patterns
+  - Reflection insights and spiritual growth markers
+* **Storage:** Cosmos DB with 768-dimensional vectors
+* **Size:** Unlimited, paginated retrieval
+* **Search:** Semantic similarity for relevant history retrieval
+
+### 14.3. Memory-Enhanced Guidance Flow
+
+**Standard Flow (Enhanced):**
+```
+1. User sends query to personality
+2. System retrieves:
+   - Working Memory: Current conversation context
+   - Core Memory: User profile + relationship state
+   - Episodic Memory: Relevant past session summaries (top 3)
+   - Semantic Archive: Similar past conversations (top 5)
+3. Context assembled with memory priorities:
+   - Core Memory (always included)
+   - Working Memory (always included)
+   - Episodic summaries (if relevant)
+   - Semantic matches (if highly relevant, >0.7 similarity)
+4. RAG retrieval with memory-informed query expansion
+5. LLM generates response with full context
+6. Response includes memory-appropriate personalization:
+   - References to past conversations when relevant
+   - Acknowledgment of spiritual progress
+   - Personality-specific relationship evolution
+7. Memory update:
+   - Working Memory: Add new exchange
+   - Episodic Memory: Update session summary (async)
+   - Core Memory: Update if significant insight (async)
+   - Semantic Archive: Store with embeddings (async)
+```
+
+### 14.4. Personality-Specific Memory Behaviors
+
+**Memory Isolation:**
+Each personality maintains completely separate memory space per user, ensuring:
+- Krishna doesn't know what user discussed with Buddha
+- Conversations remain contextually appropriate
+- Users can have different relationships with different personalities
+
+**Personality Memory Styles:**
+
+| Personality | Memory Style | Example Behavior |
+|-------------|--------------|------------------|
+| **Krishna** | Dharmic Journey | "As we discussed your struggle with duty last month, consider how the battlefield metaphor applies here..." |
+| **Buddha** | Mindfulness Progress | "Your meditation practice has evolved from 5 minutes to 20 since we began. Notice how your questions have deepened..." |
+| **Socrates** | Question Evolution | "Your questioning has matured - remember when you first asked about justice? Now you probe its foundations..." |
+| **Einstein** | Curiosity Patterns | "Your fascination with time mirrors my own journey. You've moved from 'what is time' to 'why does it flow'..." |
+| **Lincoln** | Leadership Growth | "When we first spoke of leadership, you focused on authority. Now you ask about responsibility..." |
+
+### 14.5. Reflection & Insight System
+
+**Inspired by Generative Agents (Stanford)**
+
+**Automatic Reflection Generation:**
+After every 10 conversations or 30 days, system generates:
+- Synthesis of user's spiritual themes
+- Patterns in questions and concerns
+- Growth indicators and breakthrough moments
+- Suggested future guidance directions
+
+**Importance Scoring:**
+Each memory item receives importance score (1-10) based on:
+- Emotional intensity of the exchange
+- Breakthrough or insight indicators
+- User engagement signals (length, follow-up questions)
+- Personality-specific significance markers
+
+**Memory Compression:**
+Old memories progressively summarized:
+- 0-7 days: Full detail
+- 7-30 days: Condensed summaries
+- 30-90 days: Key themes only
+- 90+ days: Significant moments only
+
+### 14.6. Privacy & User Control
+
+**Privacy-First Design:**
+* **Explicit Consent:** Memory features require user opt-in
+* **Granular Control:** 
+  - Enable/disable memory per personality
+  - Clear memory for specific personalities
+  - Export all memory data
+  - Delete all data immediately
+* **PII Protection:** Automatic scrubbing of sensitive information
+* **Encryption:** All memory data encrypted at rest (AES-256)
+* **Retention Policies:** User-configurable retention periods
+
+**User Memory Interface:**
+* **Memory Dashboard:** View what each personality remembers
+* **Memory Editing:** Correct or remove specific memories
+* **Journey Timeline:** Visual representation of spiritual journey
+* **Insight Reports:** Periodic summaries of growth and patterns
+
+### 14.7. Memory Success Metrics
+
+| Metric | Baseline | Target | Measurement |
+|--------|----------|--------|-------------|
+| Context Continuity Rate | 0% | >80% | Responses referencing past context |
+| Memory Retrieval Accuracy | N/A | >90% | Relevant memories retrieved |
+| User Satisfaction (Memory) | N/A | >4.5/5 | Post-conversation ratings |
+| Return User Rate (30-day) | ~60% | >80% | User retention analytics |
+| Avg Conversations/User/Month | ~4 | ~12 | Usage frequency |
+| Memory Opt-in Rate | N/A | >75% | Feature adoption |
+| Session Depth (questions) | ~3 | ~8 | Engagement metrics |
+
+### 14.8. Technical Requirements Summary
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Working Memory | In-memory cache | Session state |
+| Core Memory | Cosmos DB | User profiles |
+| Episodic Memory | Cosmos DB + Vectors | Session summaries |
+| Semantic Archive | Cosmos DB + Vectors | Full history search |
+| Reflection Engine | Background Azure Function | Insight generation |
+| Privacy Layer | Encryption + PII scrubbing | Data protection |
+
+> **Note:** Complete technical specifications, API designs, and implementation details are documented in `Tech_Spec_Vimarsh.md` Section 18. User interface specifications for memory features are documented in `User_Experience.md` Section 9.
+
 **Admin User Setup & Management:**
 * **Initial Admin Assignment:** Environment variable configuration (`ADMIN_EMAILS`) for first admin
 * **Self-Assignment Process:** Secure endpoint for initial admin to assign themselves during first deployment

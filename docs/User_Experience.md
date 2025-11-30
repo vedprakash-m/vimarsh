@@ -1582,7 +1582,481 @@ Content Respect:
 
 ---
 
-## 9. Performance & Technical UX
+## 9. Memory-Enhanced User Experience
+
+### 9.1. Conversational Memory UX Vision
+
+**Objective:** Create a deeply personalized spiritual companion experience where users feel genuinely known and understood by each personality, with conversation continuity that mirrors human relationships.
+
+**Design Philosophy:**
+- **Invisible Until Helpful:** Memory features enhance without interrupting spiritual flow
+- **Transparent & Controllable:** Users always know what's remembered and can control it
+- **Personality-Authentic:** Each personality remembers and references past conversations in their unique voice
+- **Privacy-First:** Clear consent mechanisms with granular control
+
+### 9.2. Memory Context Indicators
+
+#### Conversation Header with Memory Status
+```
+Desktop Header with Memory Context:
+┌─────────────────────────────────────────────────────────────┐
+│ 🕉️ Krishna                               [⚙️] [Memory ▼]  │
+│ ─────────────────────────────────────────────────────────── │
+│ 🧠 Remembers: 12 conversations | 💭 Your journey: 3 months │
+│ 📊 Topics: Dharma, Meditation, Relationships               │
+└─────────────────────────────────────────────────────────────┘
+
+Mobile Header (Compact):
+┌─────────────────────────┐
+│ ← 🕉️ Krishna      🧠•   │
+│   12 conversations      │
+└─────────────────────────┘
+```
+
+#### Memory Reference Badges
+```
+Response with Memory Reference:
+┌─────────────────────────────────────────────────────────────┐
+│ 🕉️ Lord Krishna: [🤖 AI] [🧠 Memory-Enhanced]              │
+│                                                             │
+│ "I recall our discussion on dharma from last month,        │
+│  where you were struggling with duty versus desire.        │
+│  Your question today shows beautiful progress..."          │
+│                                                             │
+│ [🧠 Referenced: Feb 15 conversation about duty]            │
+│                                                             │
+│ 📖 Citations: Bhagavad Gita 2.47, 3.35                     │
+│ 👍 👎 💬 Share 📋 Copy                                    │
+└─────────────────────────────────────────────────────────────┘
+
+Badge Types:
+🧠 Memory-Enhanced - Response uses past conversation context
+📝 New Topic - First conversation on this subject
+🔄 Continuation - Directly continues previous session
+💫 Growth Noted - Personality acknowledges user progress
+```
+
+#### Memory Status Indicator States
+```
+Memory Status Dot (Header):
+● Green (🟢): Memory active, rich context available
+● Yellow (🟡): Memory active, limited history
+● Gray (⚪): Memory disabled by user
+● Blue (🔵): First conversation with this personality
+
+Tooltip on Hover:
+┌────────────────────────────┐
+│ 🧠 Memory Status: Active   │
+│ ─────────────────────────  │
+│ Conversations: 12          │
+│ Topics explored: 8         │
+│ First met: Jan 15, 2025    │
+│ Last chat: Yesterday       │
+│ ─────────────────────────  │
+│ [View Memory] [Settings]   │
+└────────────────────────────┘
+```
+
+### 9.3. Relationship Evolution Interface
+
+#### Spiritual Journey Timeline
+```
+Journey Timeline View:
+┌─────────────────────────────────────────────────────────────┐
+│  Your Journey with Lord Krishna                         [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
+│  Jan       Feb       Mar       Apr       May       Jun     │
+│    │         │         │         │         │         │      │
+│  ──●─────────●─────────●─────────●─────────●─────────●──    │
+│    │         │         │         │         │         │      │
+│  First     Deep      Crisis    Break-    Regular   Growth   │
+│  Contact   Dharma    Support   through   Practice  Phase    │
+│            Talk                                              │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│  Key Milestones:                                            │
+│  🌟 Feb 15: First breakthrough on understanding duty        │
+│  🌟 Mar 22: Helped you through work-life balance crisis     │
+│  🌟 May 10: You began regular meditation practice           │
+│                                                             │
+│  Topics Explored: ████████████████░░░░░░ (73% coverage)     │
+│  Dharma ██████ | Meditation ████ | Relationships ███        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Relationship Depth Visualization
+```
+Relationship Progress Card:
+┌───────────────────────────────────────┐
+│  🧠 Your Bond with Einstein           │
+├───────────────────────────────────────┤
+│                                       │
+│  Relationship Level: Intellectual     │
+│  ━━━━━━━━━━━━━━━━●━━━━━━━━━━         │
+│  Curious   →   Engaged   →  Deep     │
+│                                       │
+│  Topics Mastered:                     │
+│  ● Relativity basics     ✓ Explored  │
+│  ● Time perception       ✓ Explored  │
+│  ● Creative thinking     ◐ In Progress│
+│  ○ Philosophy of science   New       │
+│                                       │
+│  Einstein's Note:                     │
+│  "Your questions have evolved from   │
+│   'what is' to 'why does it matter'" │
+│                                       │
+└───────────────────────────────────────┘
+```
+
+### 9.4. Memory-Aware Conversation Flow
+
+#### Welcome Back Experience
+```
+Returning User Welcome (After Days/Weeks Away):
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  🕉️ Welcome back, Ved!                                     │
+│                                                             │
+│  It's been 5 days since our last conversation.             │
+│  Last time, we discussed meditation practices during       │
+│  stressful work situations.                                 │
+│                                                             │
+│  Would you like to:                                         │
+│  ┌─────────────────┬─────────────────┬─────────────────┐    │
+│  │ 🔄 Continue     │ 💬 New Topic    │ 📋 Reflect      │    │
+│  │ Last Topic      │                 │ On Progress     │    │
+│  └─────────────────┴─────────────────┴─────────────────┘    │
+│                                                             │
+│  💡 "How has your meditation practice evolved this week?"  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Suggested Follow-ups with Memory Context
+```
+Memory-Informed Suggestions:
+┌─────────────────────────────────────────────────────────────┐
+│  💡 Based on our conversation history:                      │
+│                                                             │
+│  • "How is the meditation approach working at work?"        │
+│    (Related to Mar 15 discussion)                           │
+│                                                             │
+│  • "Any updates on the work-life balance challenge?"        │
+│    (Follow-up from Feb 22)                                  │
+│                                                             │
+│  • "Ready to explore deeper aspects of dharma?"             │
+│    (Natural progression in your journey)                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Multi-Turn Conversation Continuity
+```
+Within-Session Memory Reference:
+┌─────────────────────────────────────────────────────────────┐
+│ You: How do I handle criticism at work?                     │
+├─────────────────────────────────────────────────────────────┤
+│ 🕉️ Krishna: Consider what I shared earlier about           │
+│ detachment from results. Just as we discussed regarding     │
+│ your meditation practice, apply the same equanimity here... │
+│                                                             │
+│ [References within-session context from 10 minutes ago]     │
+├─────────────────────────────────────────────────────────────┤
+│ You: But this is my boss, not just colleagues               │
+├─────────────────────────────────────────────────────────────┤
+│ 🕉️ Krishna: I understand - you mentioned similar tensions  │
+│ with authority figures last month. Remember how you         │
+│ successfully reframed that situation with your mentor?      │
+│ The same principles apply here...                           │
+│                                                             │
+│ [🧠 Referenced: Jan 28 conversation about workplace hierarchy] │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 9.5. Memory Control Interface
+
+#### Memory Settings Panel
+```
+Memory Preferences (Full Panel):
+┌─────────────────────────────────────────────────────────────┐
+│  🧠 Memory Settings                                     [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Global Memory Controls:                                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ ☑️ Enable conversational memory                     │    │
+│  │ ☑️ Allow cross-session continuity                   │    │
+│  │ ☐ Share insights across personalities               │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│  Per-Personality Memory:                                    │
+│  ┌────────────────────┬──────────┬────────────────────┐     │
+│  │ Personality        │ Status   │ Actions            │     │
+│  ├────────────────────┼──────────┼────────────────────┤     │
+│  │ 🕉️ Krishna         │ ● Active │ [Pause] [Clear]   │     │
+│  │ 🧠 Einstein        │ ● Active │ [Pause] [Clear]   │     │
+│  │ 🤔 Marcus Aurelius │ ○ Paused │ [Resume] [Clear]  │     │
+│  │ 🙏 Buddha          │ ● Active │ [Pause] [Clear]   │     │
+│  └────────────────────┴──────────┴────────────────────┘     │
+│                                                             │
+│  Data Retention:                                            │
+│  Keep memory for: [90 days ▼] after last interaction       │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ [📥 Export All Memory] [🗑️ Clear All Memory]       │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│  Privacy: Memory data is encrypted and never shared.       │
+│  [View Privacy Policy]                                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Memory Dashboard View
+```
+Memory Dashboard (User View):
+┌─────────────────────────────────────────────────────────────┐
+│  🧠 Your Memory Dashboard                               [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  📊 Overview                                                │
+│  ┌────────────┬────────────┬────────────┬────────────┐      │
+│  │ Total      │ Topics     │ Active     │ Insights   │      │
+│  │ Chats: 45  │ Covered: 23│ Bonds: 4   │ Saved: 12  │      │
+│  └────────────┴────────────┴────────────┴────────────┘      │
+│                                                             │
+│  🎭 Personality Memories:                                   │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ 🕉️ Krishna                          [View Details]  │    │
+│  │ 12 conversations • Started Jan 15 • Last: Yesterday │    │
+│  │ Topics: Dharma, Meditation, Purpose, Relationships   │    │
+│  │ [📝 View Summary] [🗑️ Clear] [⏸️ Pause]             │    │
+│  └─────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ 🧠 Einstein                          [View Details]  │    │
+│  │ 8 conversations • Started Feb 3 • Last: 3 days ago  │    │
+│  │ Topics: Creativity, Time, Problem-solving            │    │
+│  │ [📝 View Summary] [🗑️ Clear] [⏸️ Pause]             │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│  📖 Recent Insights:                                        │
+│  • Krishna noted your progress in meditation (Mar 15)       │
+│  • Einstein recognized your improved questioning (Mar 10)   │
+│  • Buddha highlighted mindfulness growth (Mar 5)            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Memory Detail View
+```
+Individual Memory Viewer:
+┌─────────────────────────────────────────────────────────────┐
+│  🕉️ Krishna's Memory of You                            [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Core Understanding (Always Active):                        │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ Your spiritual focus: Finding purpose through duty  │    │
+│  │ Preferred depth: Deep philosophical discussions     │    │
+│  │ Key challenge: Balancing work with spiritual growth │    │
+│  │ Communication style: Direct, appreciates examples   │    │
+│  │ [✏️ Edit] [🗑️ Remove]                               │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│  Session Summaries (Most Recent):                           │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ 📅 Mar 15, 2025 - Meditation at work                │    │
+│  │ You asked about maintaining focus during stressful  │    │
+│  │ meetings. I suggested breath awareness technique.   │    │
+│  │ You committed to trying it this week.               │    │
+│  │ [View Full] [🗑️ Remove]                             │    │
+│  └─────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │ 📅 Mar 8, 2025 - Understanding duty                 │    │
+│  │ Deep discussion about svadharma and your role as    │    │
+│  │ a leader. Breakthrough moment when you connected    │    │
+│  │ dharma to your current career transition.           │    │
+│  │ [View Full] [🗑️ Remove]                             │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+│  [Load More Sessions...]                                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 9.6. First-Time Memory Onboarding
+
+#### Memory Opt-In Flow
+```
+First Conversation - Memory Introduction:
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  🧠 Enable Conversational Memory?                           │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  Would you like me to remember our conversations?   │    │
+│  │                                                     │    │
+│  │  With memory enabled, I can:                        │    │
+│  │  • Continue conversations across sessions           │    │
+│  │  • Reference insights from our past discussions     │    │
+│  │  • Track your spiritual journey progress            │    │
+│  │  • Provide increasingly personalized guidance       │    │
+│  │                                                     │    │
+│  │  Your data remains private, encrypted, and under    │    │
+│  │  your complete control.                             │    │
+│  │                                                     │    │
+│  │  ┌───────────────────┬───────────────────┐          │    │
+│  │  │ ✅ Enable Memory  │ ⏭️ Skip for Now   │          │    │
+│  │  └───────────────────┴───────────────────┘          │    │
+│  │                                                     │    │
+│  │  [Learn more about privacy]                         │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Progressive Memory Education
+```
+Memory Features Tutorial (Progressive):
+
+Step 1 (After 3rd conversation):
+┌─────────────────────────────────┐
+│ 💡 Did you know?                │
+│ I now remember key themes from  │
+│ our conversations. Check your   │
+│ Memory Dashboard to see!        │
+│ [View Dashboard] [Dismiss]      │
+└─────────────────────────────────┘
+
+Step 2 (After 1 week):
+┌─────────────────────────────────┐
+│ 🌟 Journey Milestone!           │
+│ You've had 5 meaningful         │
+│ conversations with Krishna.     │
+│ View your spiritual progress.   │
+│ [View Journey] [Dismiss]        │
+└─────────────────────────────────┘
+
+Step 3 (After breakthrough):
+┌─────────────────────────────────┐
+│ ✨ Insight Generated!           │
+│ Based on our discussions,       │
+│ I've noted an important pattern │
+│ in your spiritual growth.       │
+│ [View Insight] [Dismiss]        │
+└─────────────────────────────────┘
+```
+
+### 9.7. Memory UX in Mobile PWA
+
+#### Mobile Memory Indicators
+```
+Mobile Conversation Header:
+┌─────────────────────────┐
+│ ← 🕉️ Krishna      🧠•12 │
+│   Active memory         │
+└─────────────────────────┘
+
+Mobile Memory Quick View (Swipe Right):
+┌─────────────────────────┐
+│ 🧠 Memory Summary       │
+├─────────────────────────┤
+│ Last chat: Yesterday    │
+│ Topic: Meditation       │
+│ Total: 12 conversations │
+│ ─────────────────────── │
+│ [Full Dashboard →]      │
+└─────────────────────────┘
+```
+
+#### Mobile Memory Settings (Compact)
+```
+Mobile Memory Panel:
+┌─────────────────────────┐
+│ 🧠 Memory              │
+├─────────────────────────┤
+│ Memory: [ON ●]          │
+│ ─────────────────────── │
+│ Krishna    ● [Manage]   │
+│ Einstein   ● [Manage]   │
+│ Buddha     ○ [Enable]   │
+│ ─────────────────────── │
+│ [Export] [Clear All]    │
+└─────────────────────────┘
+```
+
+### 9.8. Memory Error & Edge Case Handling
+
+#### Memory Unavailable State
+```
+Memory Service Temporarily Unavailable:
+┌─────────────────────────────────────────────────────────────┐
+│ ℹ️ Memory features temporarily unavailable                  │
+│                                                             │
+│ Don't worry - I can still provide guidance, but won't      │
+│ reference our past conversations during this session.       │
+│                                                             │
+│ Your memory data is safely stored and will be available    │
+│ once the service is restored.                               │
+│                                                             │
+│ [Continue Without Memory] [Try Again]                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Memory Recovery After Clear
+```
+Memory Cleared Confirmation:
+┌─────────────────────────────────────────────────────────────┐
+│ ✅ Memory Cleared                                           │
+│                                                             │
+│ All conversations with Krishna have been removed.          │
+│ This is permanent and cannot be undone.                    │
+│                                                             │
+│ Starting fresh - I'm Krishna, ready to guide you on        │
+│ your spiritual journey. What wisdom do you seek today?     │
+│                                                             │
+│ [Begin New Journey]                                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 9.9. Memory Accessibility Features
+
+#### Screen Reader Support
+```
+Memory Accessibility Announcements:
+- "Krishna remembers 12 conversations. Memory status: active."
+- "Response enhanced with memory from February 15th."
+- "Memory settings panel. Enable or disable per personality."
+- "Journey timeline showing 6 months of spiritual progress."
+```
+
+#### Keyboard Navigation
+```
+Memory Dashboard Keyboard Shortcuts:
+- M: Open memory dashboard
+- J: View journey timeline
+- S: Open memory settings
+- Esc: Close memory panels
+- Tab: Navigate between memory items
+- Enter: Select/expand memory item
+- Delete: Remove selected memory (with confirmation)
+```
+
+### 9.10. Memory Success Metrics (UX)
+
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Memory Opt-in Rate | >75% | Users enabling memory on first prompt |
+| Memory Dashboard Usage | >30% | Users viewing dashboard monthly |
+| Memory Satisfaction | >4.5/5 | Post-memory-reference ratings |
+| Journey Timeline Views | >50% | Users viewing their journey |
+| Memory Clear Rate | <5% | Users clearing all memory |
+| Memory Reference Appreciation | >80% | Positive reactions to memory refs |
+
+> **Note:** Technical implementation details for the memory system are documented in `Tech_Spec_Vimarsh.md` Section 18. Product requirements and business metrics are documented in `PRD_Vimarsh.md` Section 14.
 
 ### 9.1. Loading & Response States
 

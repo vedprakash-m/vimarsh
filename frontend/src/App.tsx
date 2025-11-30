@@ -14,6 +14,7 @@ const LandingPage = lazy(() => import('./components/LandingPage'));
 const GuidanceInterface = lazy(() => import('./components/GuidanceInterface'));
 const ShareView = lazy(() => import('./pages/ShareView'));
 const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
+const MemoryDashboard = lazy(() => import('./components/MemoryDashboard'));
 
 // Keep lightweight components as regular imports
 import AuthCallback from './components/AuthCallback';
@@ -23,6 +24,7 @@ import { DomainThemeManager } from './components/DomainThemeManager';
 // Context Providers
 import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
+import { MemoryProvider } from './contexts/MemoryContext';
 import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
@@ -105,6 +107,7 @@ function App() {
         <AuthProvider>
           <AdminProvider>
             <PersonalityProvider>
+              <MemoryProvider>
               <AppLoadingProvider>
                 <LanguageProvider>
                 <DomainThemeManager />
@@ -151,6 +154,16 @@ function App() {
                     } 
                   />
                   
+                  {/* Memory Dashboard - Protected Route */}
+                  <Route 
+                    path="/memory" 
+                    element={
+                      <ProtectedRoute>
+                        <MemoryDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
                   {/* Fallback Route - Redirect to Landing */}
                   <Route path="*" element={<LandingPage />} />
                 </Routes>
@@ -158,6 +171,7 @@ function App() {
             </Router>
           </LanguageProvider>
         </AppLoadingProvider>
+        </MemoryProvider>
         </PersonalityProvider>
         </AdminProvider>
       </AuthProvider>

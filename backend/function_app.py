@@ -107,6 +107,19 @@ except Exception as e:
     conversation_memory_service = None
     memory_service_available = False
 
+# Import hierarchical memory service (new 4-layer architecture)
+hierarchical_memory_service = None
+hierarchical_memory_available = False
+try:
+    from services.hierarchical_memory_service import get_memory_service
+    hierarchical_memory_service = get_memory_service()
+    hierarchical_memory_available = True
+    logger.info("✅ Hierarchical memory service initialized (4-layer architecture)")
+except ImportError as e:
+    logger.warning(f"⚠️ Hierarchical memory service not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Hierarchical memory service failed to initialize: {e}")
+
 try:
     from services.safety_service import SafetyService
     safety_service = SafetyService()
@@ -2098,10 +2111,59 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             logger.warning(f"Invalid personality: {personality_id}, defaulting to Krishna")
             personality_id = "krishna"
         
-        # Enhanced response generation with conversation memory
+        # Enhanced response generation with hierarchical memory (4-layer architecture)
         conversation_context = ""
         conversation_id = None
-        if memory_service_available:
+        memory_enhanced_context = None
+        session_id = query_data.get("session_id") or f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Try hierarchical memory first (new 4-layer architecture)
+        if hierarchical_memory_available and hierarchical_memory_service:
+            try:
+                # Assemble working memory context with all 4 layers
+                memory_enhanced_context = await hierarchical_memory_service.assemble_working_memory(
+                    user_id=user_id,
+                    personality_id=personality_id,
+                    session_id=session_id,
+                    current_query=user_query,
+                    current_messages=[]
+                )
+                
+                # Build rich context from hierarchical memory
+                context_parts = []
+                
+                # Add user profile context (Core Memory - Layer 2)
+                if memory_enhanced_context.user_profile_context:
+                    context_parts.append(f"About the seeker:\n{memory_enhanced_context.user_profile_context}")
+                
+                # Add relationship context (Core Memory - Layer 2)
+                if memory_enhanced_context.relationship_context:
+                    context_parts.append(f"Our journey together:\n{memory_enhanced_context.relationship_context}")
+                
+                # Add recent session summaries (Episodic Memory - Layer 3)
+                if memory_enhanced_context.recent_session_summaries:
+                    summaries = "\n".join([f"- {s}" for s in memory_enhanced_context.recent_session_summaries[:3]])
+                    context_parts.append(f"Previous conversations:\n{summaries}")
+                
+                # Add relevant past insights (Episodic Memory - Layer 3)
+                if memory_enhanced_context.relevant_past_insights:
+                    insights = "\n".join([f"- {i}" for i in memory_enhanced_context.relevant_past_insights[:3]])
+                    context_parts.append(f"Relevant wisdom shared before:\n{insights}")
+                
+                # Add retrieved memories from semantic search (Semantic Archive - Layer 4)
+                if memory_enhanced_context.retrieved_memories:
+                    memories = "\n".join([f"- {m}" for m in memory_enhanced_context.retrieved_memories[:3]])
+                    context_parts.append(f"Related memories:\n{memories}")
+                
+                conversation_context = "\n\n".join(context_parts)
+                logger.info(f"🧠 Hierarchical memory context assembled: {len(conversation_context)} chars, "
+                           f"quality: {memory_enhanced_context.context_quality_score:.2f}")
+                
+            except Exception as hier_memory_error:
+                logger.warning(f"⚠️ Hierarchical memory failed, falling back to basic: {hier_memory_error}")
+        
+        # Fallback to basic conversation memory if hierarchical failed
+        if not conversation_context and memory_service_available:
             try:
                 # Get or start conversation
                 conversation_id = await conversation_memory_service.start_conversation(
@@ -2125,7 +2187,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                             recent_msgs.append(f"My previous response: {msg.content[:200]}...")
                     conversation_context = "\n".join(recent_msgs)
                 
-                logger.info(f"🧠 Retrieved conversation context: {len(conversation_context)} chars")
+                logger.info(f"🧠 Basic conversation context: {len(conversation_context)} chars")
                     
             except Exception as memory_error:
                 logger.warning(f"⚠️ Failed to retrieve conversation context: {memory_error}")
@@ -2315,8 +2377,54 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             response_text, response_metadata = await _get_template_fallback_response(personality_id)
             response_source = "template_fallback"
         
-        # Store conversation in memory
-        if memory_service_available and conversation_memory_service is not None and conversation_id:
+        # Store conversation in hierarchical memory (new 4-layer architecture)
+        if hierarchical_memory_available and hierarchical_memory_service is not None:
+            try:
+                from models.memory_models import MessageRole, EmotionalTone
+                
+                # Detect emotional tone from user query (simplified)
+                emotional_keywords = {
+                    EmotionalTone.TROUBLED: ["worried", "anxious", "stressed", "struggling", "lost", "confused"],
+                    EmotionalTone.HOPEFUL: ["hope", "wish", "dream", "aspire", "looking forward"],
+                    EmotionalTone.CURIOUS: ["what", "how", "why", "explain", "understand", "tell me"],
+                    EmotionalTone.GRATEFUL: ["thank", "grateful", "appreciate", "blessed"],
+                    EmotionalTone.SEEKING: ["help", "guide", "seek", "searching", "need"]
+                }
+                
+                user_emotion = EmotionalTone.NEUTRAL
+                query_lower = user_query.lower()
+                for emotion, keywords in emotional_keywords.items():
+                    if any(kw in query_lower for kw in keywords):
+                        user_emotion = emotion
+                        break
+                
+                # Store user message with enhanced metadata
+                await hierarchical_memory_service.store_message(
+                    user_id=user_id,
+                    personality_id=personality_id,
+                    session_id=session_id,
+                    role=MessageRole.USER,
+                    content=user_query,
+                    emotional_tone=user_emotion
+                )
+                
+                # Store personality response
+                await hierarchical_memory_service.store_message(
+                    user_id=user_id,
+                    personality_id=personality_id,
+                    session_id=session_id,
+                    role=MessageRole.ASSISTANT,
+                    content=response_text,
+                    emotional_tone=EmotionalTone.CALM  # Personalities are typically calm
+                )
+                
+                logger.info(f"💾 Stored conversation in hierarchical memory (session: {session_id})")
+                
+            except Exception as hier_store_error:
+                logger.warning(f"⚠️ Failed to store in hierarchical memory: {hier_store_error}")
+        
+        # Fallback: Store in basic conversation memory
+        elif memory_service_available and conversation_memory_service is not None and conversation_id:
             try:
                 # Store user message
                 await conversation_memory_service.add_message(
@@ -3100,3 +3208,17 @@ async def get_og_image(req: func.HttpRequest) -> func.HttpResponse:
 
 # Enhanced CORS handling in each endpoint - no separate OPTIONS handlers needed
 # All endpoints already include proper CORS headers
+
+# ==============================================================================
+# MEMORY API ROUTE REGISTRATION
+# ==============================================================================
+
+# Register hierarchical memory routes if service is available
+try:
+    from services.memory_api import register_memory_routes
+    register_memory_routes(app)
+    logger.info("🧠 Memory API routes registered successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Memory API routes not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Failed to register memory API routes: {e}")

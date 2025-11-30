@@ -5,7 +5,10 @@ import { SharingInterface } from './SharingInterface';
 import { VoiceControls } from './VoiceControls';
 import PersonalitySelector from './PersonalitySelector';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
+import MemoryIndicator from './MemoryIndicator';
+import RelationshipBadge from './RelationshipBadge';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
+import { useMemory } from '../contexts/MemoryContext';
 import { useAdmin } from '../contexts/AdminProviderContext';
 import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
@@ -160,6 +163,13 @@ export default function GuidanceInterface() {
   // Context hooks
   const { user } = useAdmin();
   const { isInitializing, allReady } = useAppLoading();
+  const { 
+    memoryContext, 
+    relationships, 
+    loadContext, 
+    endSession,
+    isLoading: memoryLoading 
+  } = useMemory();
 
   // Don't show admin button until all contexts are ready to prevent layout shift
   const showAdminButton = allReady && user?.isAdmin;
@@ -233,6 +243,15 @@ export default function GuidanceInterface() {
       setShowPersonalitySelector(true);
     }
   }, [availablePersonalities.length, selectedPersonality, personalityLoading]);
+
+  // Load memory context when personality changes
+  useEffect(() => {
+    if (selectedPersonality && sessionId) {
+      loadContext(selectedPersonality.id, sessionId).catch(err => {
+        console.warn('Failed to load memory context:', err);
+      });
+    }
+  }, [selectedPersonality?.id, sessionId, loadContext]);
 
   // Check for PWA install prompt availability
   useEffect(() => {
@@ -838,6 +857,17 @@ export default function GuidanceInterface() {
               )}
             </div>
           )}
+          
+          {/* Memory Context Indicator - Desktop Only */}
+          {selectedPersonality && memoryContext && window.innerWidth > 768 && (
+            <MemoryIndicator
+              context={memoryContext}
+              relationship={relationships.find(r => r.personality_id === selectedPersonality.id)}
+              compact={true}
+              onClick={() => navigate('/memory')}
+            />
+          )}
+          
           <button 
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
             style={{
@@ -1351,6 +1381,28 @@ export default function GuidanceInterface() {
                             metadata={message.metadata}
                             compact={true}
                           />
+                        )}
+                        
+                        {/* Memory-Enhanced Badge */}
+                        {message.metadata?.memory_enhanced && (
+                          <div
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                              padding: '0.25rem 0.5rem',
+                              backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                              border: '1px solid rgba(147, 51, 234, 0.3)',
+                              borderRadius: '0.5rem',
+                              fontSize: '0.7rem',
+                              color: '#9333ea',
+                              cursor: 'help',
+                            }}
+                            title="This response was enhanced with your conversation memory for personalized guidance"
+                          >
+                            <span>🧠</span>
+                            <span>Memory</span>
+                          </div>
                         )}
                       </div>
                     </div>

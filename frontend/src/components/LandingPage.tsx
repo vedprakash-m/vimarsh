@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Brain, Shield, Sparkles, Play, Mic, Share2, Bell, Volume2 } from 'lucide-react';
+import { ArrowRight, Brain, Shield, Sparkles, Play, Mic, Share2, Bell, Volume2, Heart, Trophy, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { WisdomOfDay } from './WisdomOfDay';
@@ -137,8 +137,20 @@ const EinsteinConversationCard: React.FC = () => {
         I tried to force a static universe by adding the cosmological constant. Later observations showed the universe is expanding, and I called that addition my “biggest blunder.” The lesson: let evidence guide the equations, not preference.
       </div>
 
-      <div style={{ marginTop: 10, textAlign: 'center', fontSize: 10, color: '#9ca3af' }}>
-        Built on citations and an expanding repository.
+      {/* Memory indicator */}
+      <div style={{
+        marginTop: 12,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        padding: '6px 10px',
+        background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+        borderRadius: 8,
+        border: '1px solid #bae6fd'
+      }}>
+        <Heart size={12} style={{ color: '#0ea5e9', fill: '#0ea5e9' }} />
+        <span style={{ fontSize: 11, color: '#0369a1', fontWeight: 500 }}>Remembers your journey across sessions</span>
       </div>
     </div>
   );
@@ -505,7 +517,7 @@ const LandingPage: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              background: '#fff7ed',
+              background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)',
               color: '#9a3412',
               border: '1px solid #fed7aa',
               padding: '0.35rem 0.75rem',
@@ -514,8 +526,8 @@ const LandingPage: React.FC = () => {
               fontWeight: 500,
               marginBottom: '0.75rem'
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
-              NEW: Voice Conversations, Social Sharing & Daily Wisdom
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f97316', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              NEW: World-Class Memory • Voice • Social Sharing • Daily Wisdom
             </div>
             <h1 style={{
               fontSize: '3rem',
@@ -604,11 +616,12 @@ const LandingPage: React.FC = () => {
               </button>
             </div>
 
-      {/* Stats to mirror screenshot */}
+      {/* Stats with memory highlight */}
             <div style={{
               display: 'flex',
-              gap: '3rem',
-              alignItems: 'center'
+              gap: '2.5rem',
+              alignItems: 'center',
+              flexWrap: 'wrap'
             }}>
               <div>
         <div style={{ fontSize: '2rem', fontWeight: 600, color: '#1d1d1f' }}>25</div>
@@ -621,6 +634,12 @@ const LandingPage: React.FC = () => {
               <div>
         <div style={{ fontSize: '2rem', fontWeight: 600, color: '#1d1d1f' }}>1000+</div>
         <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Ancient texts</div>
+              </div>
+              <div>
+        <div style={{ fontSize: '2rem', fontWeight: 600, color: '#1d1d1f', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <Heart size={20} style={{ color: '#ec4899', fill: '#ec4899' }} /> ∞
+        </div>
+        <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Memory</div>
               </div>
             </div>
           </div>
@@ -1370,29 +1389,48 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div style={{
-              background: 'white',
+              background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fff 100%)',
               borderRadius: '0.75rem',
               padding: '1.5rem',
               textAlign: 'center',
-              border: '1px solid #f0f0f0',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+              border: '1px solid #f9a8d4',
+              boxShadow: '0 4px 12px rgba(236, 72, 153, 0.12)',
+              position: 'relative'
             }}>
+              <span style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                background: 'linear-gradient(135deg, #ec4899, #be185d)',
+                color: 'white',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: 4,
+                textTransform: 'uppercase'
+              }}>Enhanced</span>
               <div style={{
                 width: '3rem',
                 height: '3rem',
                 borderRadius: '50%',
-                background: '#ec4899',
+                background: 'linear-gradient(135deg, #ec4899, #be185d)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 1rem',
+                boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)'
               }}>
-                <Shield size={24} style={{ color: 'white' }} />
+                <Heart size={24} style={{ color: 'white', fill: 'white' }} />
               </div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.75rem', color: '#1f2937' }}>Persistent Memory</h3>
-              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem' }}>
-                Every conversation builds on the last. Return tomorrow and they'll remember your previous discussion and build upon it.
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1f2937' }}>World-Class Memory</h3>
+              <p style={{ color: '#6b7280', lineHeight: '1.5', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
+                4-layer hierarchical memory inspired by Stanford & Berkeley research. They remember your journey, celebrate milestones, and proactively recall past wisdom.
               </p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.7rem', background: '#fce7f3', color: '#be185d', padding: '2px 8px', borderRadius: 12 }}>🏆 Milestones</span>
+                <span style={{ fontSize: '0.7rem', background: '#fce7f3', color: '#be185d', padding: '2px 8px', borderRadius: 12 }}>🔮 Proactive Recall</span>
+                <span style={{ fontSize: '0.7rem', background: '#fce7f3', color: '#be185d', padding: '2px 8px', borderRadius: 12 }}>📊 Analytics</span>
+              </div>
             </div>
 
             <div style={{

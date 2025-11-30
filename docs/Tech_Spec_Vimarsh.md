@@ -2462,6 +2462,1241 @@ This comprehensive cost management system ensures Vimarsh remains financially su
 
 ---
 
+## 18. Hierarchical Memory System Architecture
+
+**Objective:** Transform Vimarsh from a stateless Q&A system into a deeply personalized wisdom companion with world-class conversational memory inspired by MemGPT (UC Berkeley), Generative Agents (Stanford), and LangGraph best practices.
+
+### 18.1. 4-Layer Memory Architecture
+
+**Architecture Overview:**
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    HIERARCHICAL MEMORY SYSTEM                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ LAYER 1: WORKING MEMORY (In-Memory, Session-Scoped)            │   │
+│  │ • Current conversation context (all turns)                      │   │
+│  │ • Active RAG context (retrieved documents)                      │   │
+│  │ • Personality state and guidance mode                           │   │
+│  │ • Token budget: ~8,000 tokens                                   │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              ↓↑                                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ LAYER 2: CORE MEMORY (Cosmos DB, User-Personality Scoped)      │   │
+│  │ • User spiritual profile and goals                              │   │
+│  │ • Relationship state with each personality                      │   │
+│  │ • Communication preferences (depth, formality, examples)        │   │
+│  │ • Key learnings and breakthrough moments                        │   │
+│  │ • Token budget: ~2,000 tokens per personality                   │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              ↓↑                                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ LAYER 3: EPISODIC MEMORY (Cosmos DB + Vectors, Session-Based)  │   │
+│  │ • Session summaries with key insights                           │   │
+│  │ • Emotional context and user state indicators                   │   │
+│  │ • Topic evolution and question patterns                         │   │
+│  │ • Importance scores (1-10) for retrieval priority               │   │
+│  │ • 768-dimensional embeddings for semantic search                │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              ↓↑                                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ LAYER 4: SEMANTIC ARCHIVE (Cosmos DB + Vectors, Unlimited)     │   │
+│  │ • Full conversation history with embeddings                     │   │
+│  │ • Cross-session themes and patterns                             │   │
+│  │ • Reflection insights and spiritual growth markers              │   │
+│  │ • Searchable via semantic similarity (cosine)                   │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 18.2. HierarchicalMemoryService Implementation
+
+```python
+# backend/services/hierarchical_memory_service.py
+from dataclasses import dataclass, field
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta
+from enum import Enum
+import hashlib
+import json
+import logging
+import asyncio
+
+logger = logging.getLogger(__name__)
+
+class MemoryLayer(Enum):
+    WORKING = "working"
+    CORE = "core"
+    EPISODIC = "episodic"
+    ARCHIVE = "archive"
+
+@dataclass
+class WorkingMemory:
+    """Layer 1: Current session context"""
+    session_id: str
+    user_id: str
+    personality_id: str
+    messages: List[Dict[str, Any]] = field(default_factory=list)
+    rag_context: List[Dict[str, Any]] = field(default_factory=list)
+    guidance_mode: str = "conversational"
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    token_count: int = 0
+    max_tokens: int = 8000
+
+    def add_message(self, role: str, content: str, metadata: Dict = None) -> bool:
+        """Add message to working memory with token management"""
+        msg_tokens = len(content.split()) * 1.3  # Rough token estimate
+        
+        if self.token_count + msg_tokens > self.max_tokens:
+            # Compress oldest messages
+            self._compress_old_messages()
+        
+        self.messages.append({
+            "role": role,
+            "content": content,
+            "timestamp": datetime.utcnow().isoformat(),
+            "metadata": metadata or {}
+        })
+        self.token_count += int(msg_tokens)
+        return True
+
+    def _compress_old_messages(self):
+        """Compress older messages to make room for new ones"""
+        if len(self.messages) > 6:
+            # Keep first 2 and last 4, summarize middle
+            old_messages = self.messages[2:-4]
+            summary = self._create_summary(old_messages)
+            self.messages = self.messages[:2] + [summary] + self.messages[-4:]
+            self.token_count = sum(len(m["content"].split()) * 1.3 for m in self.messages)
+
+    def _create_summary(self, messages: List[Dict]) -> Dict[str, Any]:
+        """Create summary of compressed messages"""
+        topics = set()
+        for msg in messages:
+            # Extract key topics (simplified - could use LLM for better summarization)
+            words = msg["content"].lower().split()
+            topics.update(w for w in words if len(w) > 6)
+        
+        return {
+            "role": "system",
+            "content": f"[Earlier context: Discussed {', '.join(list(topics)[:5])}...]",
+            "timestamp": datetime.utcnow().isoformat(),
+            "metadata": {"compressed": True, "original_count": len(messages)}
+        }
+
+
+@dataclass
+class CoreMemory:
+    """Layer 2: User-personality relationship state"""
+    user_id: str
+    personality_id: str
+    spiritual_profile: Dict[str, Any] = field(default_factory=dict)
+    relationship_state: Dict[str, Any] = field(default_factory=dict)
+    communication_preferences: Dict[str, Any] = field(default_factory=dict)
+    key_learnings: List[Dict[str, Any]] = field(default_factory=list)
+    breakthrough_moments: List[Dict[str, Any]] = field(default_factory=list)
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime = field(default_factory=datetime.utcnow)
+    conversation_count: int = 0
+    total_exchanges: int = 0
+
+    def to_context_string(self) -> str:
+        """Generate context string for LLM prompt"""
+        parts = []
+        
+        if self.spiritual_profile:
+            parts.append(f"User's spiritual focus: {self.spiritual_profile.get('focus', 'general guidance')}")
+            if self.spiritual_profile.get('goals'):
+                parts.append(f"Spiritual goals: {', '.join(self.spiritual_profile['goals'][:3])}")
+        
+        if self.relationship_state:
+            depth = self.relationship_state.get('depth', 'new')
+            parts.append(f"Relationship depth: {depth}")
+            if self.relationship_state.get('topics_explored'):
+                parts.append(f"Topics explored: {', '.join(self.relationship_state['topics_explored'][:5])}")
+        
+        if self.communication_preferences:
+            style = self.communication_preferences.get('style', 'balanced')
+            parts.append(f"Preferred communication style: {style}")
+        
+        if self.key_learnings:
+            recent = self.key_learnings[-2:]
+            for learning in recent:
+                parts.append(f"Key insight: {learning.get('insight', '')[:100]}")
+        
+        return "\n".join(parts) if parts else "New user - first conversation"
+
+    def update_from_conversation(self, conversation_summary: Dict[str, Any]):
+        """Update core memory based on conversation"""
+        self.conversation_count += 1
+        self.total_exchanges += conversation_summary.get('exchange_count', 1)
+        self.updated_at = datetime.utcnow()
+        
+        # Update topics explored
+        new_topics = conversation_summary.get('topics', [])
+        explored = self.relationship_state.get('topics_explored', [])
+        self.relationship_state['topics_explored'] = list(set(explored + new_topics))[:20]
+        
+        # Update relationship depth
+        if self.conversation_count >= 10:
+            self.relationship_state['depth'] = 'deep'
+        elif self.conversation_count >= 5:
+            self.relationship_state['depth'] = 'developing'
+        else:
+            self.relationship_state['depth'] = 'new'
+        
+        # Add breakthrough if significant
+        if conversation_summary.get('breakthrough', False):
+            self.breakthrough_moments.append({
+                "date": datetime.utcnow().isoformat(),
+                "insight": conversation_summary.get('breakthrough_insight', ''),
+                "topic": conversation_summary.get('main_topic', '')
+            })
+
+
+@dataclass
+class EpisodicMemory:
+    """Layer 3: Session summaries with semantic search"""
+    id: str
+    user_id: str
+    personality_id: str
+    session_summary: str
+    key_topics: List[str]
+    emotional_context: str
+    user_questions: List[str]
+    guidance_provided: List[str]
+    importance_score: float  # 1-10
+    embedding: List[float]  # 768-dimensional
+    session_date: datetime
+    duration_minutes: int
+    exchange_count: int
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "personality_id": self.personality_id,
+            "session_summary": self.session_summary,
+            "key_topics": self.key_topics,
+            "emotional_context": self.emotional_context,
+            "user_questions": self.user_questions,
+            "guidance_provided": self.guidance_provided,
+            "importance_score": self.importance_score,
+            "embedding": self.embedding,
+            "session_date": self.session_date.isoformat(),
+            "duration_minutes": self.duration_minutes,
+            "exchange_count": self.exchange_count,
+            "type": "episodic_memory"
+        }
+
+
+class HierarchicalMemoryService:
+    """Main service orchestrating all memory layers"""
+    
+    def __init__(self, cosmos_client, embedding_service):
+        self.cosmos = cosmos_client
+        self.embedding_service = embedding_service
+        
+        # Container references
+        self.core_memory_container = cosmos_client.get_container("core_memory")
+        self.episodic_memory_container = cosmos_client.get_container("episodic_memory")
+        self.conversation_archive = cosmos_client.get_container("conversation_archive")
+        
+        # In-memory working memory cache
+        self.working_memory_cache: Dict[str, WorkingMemory] = {}
+        
+        # Configuration
+        self.episodic_retrieval_limit = 3
+        self.archive_retrieval_limit = 5
+        self.similarity_threshold = 0.7
+        self.reflection_frequency = 10  # Generate reflection every N conversations
+    
+    async def get_or_create_session(
+        self,
+        user_id: str,
+        personality_id: str,
+        session_id: str = None
+    ) -> WorkingMemory:
+        """Get existing or create new working memory session"""
+        
+        cache_key = f"{user_id}:{personality_id}:{session_id or 'active'}"
+        
+        if cache_key in self.working_memory_cache:
+            return self.working_memory_cache[cache_key]
+        
+        # Create new working memory
+        working_memory = WorkingMemory(
+            session_id=session_id or self._generate_session_id(user_id),
+            user_id=user_id,
+            personality_id=personality_id
+        )
+        
+        self.working_memory_cache[cache_key] = working_memory
+        return working_memory
+    
+    async def get_full_context(
+        self,
+        user_id: str,
+        personality_id: str,
+        current_query: str,
+        session_id: str = None
+    ) -> Dict[str, Any]:
+        """Retrieve complete context from all memory layers for LLM prompt"""
+        
+        # Get working memory
+        working = await self.get_or_create_session(user_id, personality_id, session_id)
+        
+        # Get core memory
+        core = await self._get_or_create_core_memory(user_id, personality_id)
+        
+        # Get relevant episodic memories (semantic search)
+        episodic = await self._retrieve_relevant_episodic(
+            user_id, personality_id, current_query
+        )
+        
+        # Get relevant archived conversations (semantic search)
+        archive = await self._retrieve_from_archive(
+            user_id, personality_id, current_query
+        )
+        
+        return {
+            "working_memory": {
+                "messages": working.messages,
+                "rag_context": working.rag_context,
+                "guidance_mode": working.guidance_mode
+            },
+            "core_memory": {
+                "context_string": core.to_context_string(),
+                "conversation_count": core.conversation_count,
+                "relationship_depth": core.relationship_state.get('depth', 'new')
+            },
+            "episodic_memory": [
+                {
+                    "summary": ep.session_summary,
+                    "date": ep.session_date.isoformat() if isinstance(ep.session_date, datetime) else ep.session_date,
+                    "topics": ep.key_topics,
+                    "relevance": ep.importance_score
+                }
+                for ep in episodic
+            ],
+            "archive_memory": [
+                {
+                    "exchange": arch.get("user_query", "")[:100],
+                    "guidance": arch.get("ai_response", "")[:200],
+                    "date": arch.get("timestamp", ""),
+                    "similarity": arch.get("similarity_score", 0)
+                }
+                for arch in archive
+            ],
+            "memory_stats": {
+                "total_conversations": core.conversation_count,
+                "episodic_matches": len(episodic),
+                "archive_matches": len(archive),
+                "relationship_duration_days": (datetime.utcnow() - core.created_at).days
+            }
+        }
+    
+    async def add_exchange(
+        self,
+        user_id: str,
+        personality_id: str,
+        user_query: str,
+        ai_response: str,
+        session_id: str = None,
+        metadata: Dict = None
+    ) -> None:
+        """Add a conversation exchange to memory layers"""
+        
+        # Add to working memory
+        working = await self.get_or_create_session(user_id, personality_id, session_id)
+        working.add_message("user", user_query, metadata)
+        working.add_message("assistant", ai_response, metadata)
+        
+        # Store in archive asynchronously
+        asyncio.create_task(self._store_in_archive(
+            user_id, personality_id, user_query, ai_response, session_id, metadata
+        ))
+    
+    async def end_session(
+        self,
+        user_id: str,
+        personality_id: str,
+        session_id: str = None
+    ) -> None:
+        """End session and create episodic memory summary"""
+        
+        cache_key = f"{user_id}:{personality_id}:{session_id or 'active'}"
+        working = self.working_memory_cache.get(cache_key)
+        
+        if not working or len(working.messages) < 2:
+            return
+        
+        # Generate session summary
+        session_summary = await self._generate_session_summary(working)
+        
+        # Create episodic memory
+        await self._create_episodic_memory(working, session_summary)
+        
+        # Update core memory
+        core = await self._get_or_create_core_memory(user_id, personality_id)
+        core.update_from_conversation(session_summary)
+        await self._save_core_memory(core)
+        
+        # Check if reflection should be generated
+        if core.conversation_count % self.reflection_frequency == 0:
+            asyncio.create_task(self._generate_reflection(user_id, personality_id))
+        
+        # Clear working memory
+        del self.working_memory_cache[cache_key]
+    
+    async def _get_or_create_core_memory(
+        self,
+        user_id: str,
+        personality_id: str
+    ) -> CoreMemory:
+        """Get or create core memory for user-personality pair"""
+        
+        memory_id = f"core:{user_id}:{personality_id}"
+        
+        try:
+            doc = await self.core_memory_container.read_item(memory_id, user_id)
+            return CoreMemory(
+                user_id=doc["user_id"],
+                personality_id=doc["personality_id"],
+                spiritual_profile=doc.get("spiritual_profile", {}),
+                relationship_state=doc.get("relationship_state", {}),
+                communication_preferences=doc.get("communication_preferences", {}),
+                key_learnings=doc.get("key_learnings", []),
+                breakthrough_moments=doc.get("breakthrough_moments", []),
+                created_at=datetime.fromisoformat(doc["created_at"]),
+                updated_at=datetime.fromisoformat(doc["updated_at"]),
+                conversation_count=doc.get("conversation_count", 0),
+                total_exchanges=doc.get("total_exchanges", 0)
+            )
+        except Exception:
+            # Create new core memory
+            return CoreMemory(
+                user_id=user_id,
+                personality_id=personality_id
+            )
+    
+    async def _save_core_memory(self, core: CoreMemory) -> None:
+        """Save core memory to Cosmos DB"""
+        
+        doc = {
+            "id": f"core:{core.user_id}:{core.personality_id}",
+            "user_id": core.user_id,
+            "personality_id": core.personality_id,
+            "spiritual_profile": core.spiritual_profile,
+            "relationship_state": core.relationship_state,
+            "communication_preferences": core.communication_preferences,
+            "key_learnings": core.key_learnings[-10:],  # Keep last 10
+            "breakthrough_moments": core.breakthrough_moments[-5:],  # Keep last 5
+            "created_at": core.created_at.isoformat(),
+            "updated_at": datetime.utcnow().isoformat(),
+            "conversation_count": core.conversation_count,
+            "total_exchanges": core.total_exchanges,
+            "type": "core_memory"
+        }
+        
+        await self.core_memory_container.upsert_item(doc)
+    
+    async def _retrieve_relevant_episodic(
+        self,
+        user_id: str,
+        personality_id: str,
+        query: str
+    ) -> List[EpisodicMemory]:
+        """Retrieve relevant episodic memories using semantic search"""
+        
+        # Generate query embedding
+        query_embedding = await self.embedding_service.generate_embedding(query)
+        
+        # Vector search in Cosmos DB
+        search_query = """
+        SELECT TOP @limit
+            c.id, c.session_summary, c.key_topics, c.emotional_context,
+            c.user_questions, c.guidance_provided, c.importance_score,
+            c.session_date, c.duration_minutes, c.exchange_count,
+            VectorDistance(c.embedding, @embedding) AS similarity
+        FROM c
+        WHERE c.type = 'episodic_memory'
+            AND c.user_id = @user_id
+            AND c.personality_id = @personality_id
+            AND VectorDistance(c.embedding, @embedding) > @threshold
+        ORDER BY VectorDistance(c.embedding, @embedding) DESC
+        """
+        
+        params = [
+            {"name": "@limit", "value": self.episodic_retrieval_limit},
+            {"name": "@user_id", "value": user_id},
+            {"name": "@personality_id", "value": personality_id},
+            {"name": "@embedding", "value": query_embedding},
+            {"name": "@threshold", "value": self.similarity_threshold}
+        ]
+        
+        results = list(self.episodic_memory_container.query_items(
+            query=search_query,
+            parameters=params,
+            enable_cross_partition_query=True
+        ))
+        
+        return [
+            EpisodicMemory(
+                id=r["id"],
+                user_id=user_id,
+                personality_id=personality_id,
+                session_summary=r["session_summary"],
+                key_topics=r["key_topics"],
+                emotional_context=r["emotional_context"],
+                user_questions=r["user_questions"],
+                guidance_provided=r["guidance_provided"],
+                importance_score=r["importance_score"],
+                embedding=[],  # Don't load embedding
+                session_date=datetime.fromisoformat(r["session_date"]),
+                duration_minutes=r["duration_minutes"],
+                exchange_count=r["exchange_count"]
+            )
+            for r in results
+        ]
+    
+    async def _retrieve_from_archive(
+        self,
+        user_id: str,
+        personality_id: str,
+        query: str
+    ) -> List[Dict[str, Any]]:
+        """Retrieve relevant conversations from archive using semantic search"""
+        
+        query_embedding = await self.embedding_service.generate_embedding(query)
+        
+        search_query = """
+        SELECT TOP @limit
+            c.user_query, c.ai_response, c.timestamp,
+            VectorDistance(c.embedding, @embedding) AS similarity_score
+        FROM c
+        WHERE c.type = 'conversation_archive'
+            AND c.user_id = @user_id
+            AND c.personality_id = @personality_id
+            AND VectorDistance(c.embedding, @embedding) > @threshold
+        ORDER BY VectorDistance(c.embedding, @embedding) DESC
+        """
+        
+        params = [
+            {"name": "@limit", "value": self.archive_retrieval_limit},
+            {"name": "@user_id", "value": user_id},
+            {"name": "@personality_id", "value": personality_id},
+            {"name": "@embedding", "value": query_embedding},
+            {"name": "@threshold", "value": self.similarity_threshold}
+        ]
+        
+        return list(self.conversation_archive.query_items(
+            query=search_query,
+            parameters=params,
+            enable_cross_partition_query=True
+        ))
+    
+    async def _store_in_archive(
+        self,
+        user_id: str,
+        personality_id: str,
+        user_query: str,
+        ai_response: str,
+        session_id: str,
+        metadata: Dict
+    ) -> None:
+        """Store conversation exchange in archive with embedding"""
+        
+        # Generate embedding for the exchange
+        combined_text = f"Q: {user_query}\nA: {ai_response[:500]}"
+        embedding = await self.embedding_service.generate_embedding(combined_text)
+        
+        doc = {
+            "id": f"arch:{session_id}:{datetime.utcnow().timestamp()}",
+            "user_id": user_id,
+            "personality_id": personality_id,
+            "session_id": session_id,
+            "user_query": user_query,
+            "ai_response": ai_response,
+            "embedding": embedding,
+            "timestamp": datetime.utcnow().isoformat(),
+            "metadata": metadata or {},
+            "type": "conversation_archive"
+        }
+        
+        await self.conversation_archive.create_item(doc)
+    
+    async def _generate_session_summary(
+        self,
+        working: WorkingMemory
+    ) -> Dict[str, Any]:
+        """Generate summary of session for episodic memory"""
+        
+        # Extract topics from messages
+        all_text = " ".join(m["content"] for m in working.messages)
+        topics = self._extract_topics(all_text)
+        
+        # Detect emotional context
+        emotional_context = self._detect_emotional_context(all_text)
+        
+        # Extract questions asked
+        questions = [
+            m["content"] for m in working.messages 
+            if m["role"] == "user" and "?" in m["content"]
+        ]
+        
+        # Calculate importance score
+        importance = self._calculate_importance(working.messages, topics)
+        
+        return {
+            "summary": self._create_text_summary(working.messages),
+            "topics": topics,
+            "emotional_context": emotional_context,
+            "questions": questions[:5],
+            "importance_score": importance,
+            "exchange_count": len([m for m in working.messages if m["role"] == "user"]),
+            "breakthrough": importance > 8,
+            "main_topic": topics[0] if topics else "general"
+        }
+    
+    async def _create_episodic_memory(
+        self,
+        working: WorkingMemory,
+        summary: Dict[str, Any]
+    ) -> None:
+        """Create and store episodic memory"""
+        
+        # Generate embedding for the summary
+        embedding = await self.embedding_service.generate_embedding(summary["summary"])
+        
+        episodic = EpisodicMemory(
+            id=f"ep:{working.session_id}",
+            user_id=working.user_id,
+            personality_id=working.personality_id,
+            session_summary=summary["summary"],
+            key_topics=summary["topics"],
+            emotional_context=summary["emotional_context"],
+            user_questions=summary["questions"],
+            guidance_provided=[],  # Could extract key guidance points
+            importance_score=summary["importance_score"],
+            embedding=embedding,
+            session_date=working.created_at,
+            duration_minutes=int((datetime.utcnow() - working.created_at).total_seconds() / 60),
+            exchange_count=summary["exchange_count"]
+        )
+        
+        await self.episodic_memory_container.create_item(episodic.to_dict())
+    
+    async def _generate_reflection(
+        self,
+        user_id: str,
+        personality_id: str
+    ) -> None:
+        """Generate periodic reflection on user's spiritual journey"""
+        
+        # Get recent episodic memories
+        recent_memories = await self._get_recent_episodic_memories(user_id, personality_id, limit=10)
+        
+        if not recent_memories:
+            return
+        
+        # Analyze patterns
+        all_topics = []
+        for mem in recent_memories:
+            all_topics.extend(mem.get("key_topics", []))
+        
+        # Find recurring themes
+        topic_counts = {}
+        for topic in all_topics:
+            topic_counts[topic] = topic_counts.get(topic, 0) + 1
+        
+        recurring_themes = [t for t, c in sorted(topic_counts.items(), key=lambda x: -x[1])[:3]]
+        
+        # Generate reflection insight
+        reflection = {
+            "id": f"ref:{user_id}:{personality_id}:{datetime.utcnow().timestamp()}",
+            "user_id": user_id,
+            "personality_id": personality_id,
+            "recurring_themes": recurring_themes,
+            "conversation_count": len(recent_memories),
+            "period_start": recent_memories[-1].get("session_date"),
+            "period_end": recent_memories[0].get("session_date"),
+            "generated_at": datetime.utcnow().isoformat(),
+            "type": "reflection"
+        }
+        
+        # Store reflection (could be used for deeper personalization)
+        await self.episodic_memory_container.create_item(reflection)
+    
+    def _extract_topics(self, text: str) -> List[str]:
+        """Extract key topics from text (simplified - could use NLP)"""
+        # Spiritual/philosophical topic keywords
+        topic_keywords = {
+            "dharma": "duty and dharma",
+            "karma": "karma and action",
+            "meditation": "meditation practice",
+            "peace": "inner peace",
+            "purpose": "life purpose",
+            "relationship": "relationships",
+            "work": "work and career",
+            "fear": "overcoming fear",
+            "anger": "managing emotions",
+            "love": "love and compassion",
+            "death": "mortality and meaning",
+            "suffering": "dealing with suffering",
+            "happiness": "pursuit of happiness",
+            "wisdom": "seeking wisdom",
+            "truth": "truth and reality"
+        }
+        
+        text_lower = text.lower()
+        found_topics = []
+        
+        for keyword, topic in topic_keywords.items():
+            if keyword in text_lower:
+                found_topics.append(topic)
+        
+        return found_topics[:5] if found_topics else ["general spiritual guidance"]
+    
+    def _detect_emotional_context(self, text: str) -> str:
+        """Detect emotional context of conversation"""
+        text_lower = text.lower()
+        
+        # Simple keyword-based detection
+        if any(w in text_lower for w in ["struggle", "difficult", "hard", "pain", "suffering"]):
+            return "seeking support"
+        elif any(w in text_lower for w in ["excited", "happy", "grateful", "blessed"]):
+            return "celebrating growth"
+        elif any(w in text_lower for w in ["confused", "uncertain", "lost", "don't know"]):
+            return "seeking clarity"
+        elif any(w in text_lower for w in ["curious", "wonder", "interested", "learn"]):
+            return "intellectual exploration"
+        else:
+            return "contemplative inquiry"
+    
+    def _calculate_importance(self, messages: List[Dict], topics: List[str]) -> float:
+        """Calculate importance score (1-10) for session"""
+        score = 5.0  # Base score
+        
+        # More exchanges = more importance
+        if len(messages) > 10:
+            score += 1.5
+        elif len(messages) > 6:
+            score += 0.5
+        
+        # Deep topics increase importance
+        deep_topics = ["life purpose", "mortality and meaning", "overcoming fear", "dealing with suffering"]
+        if any(t in deep_topics for t in topics):
+            score += 2.0
+        
+        # Long messages suggest deep engagement
+        avg_length = sum(len(m["content"]) for m in messages) / len(messages)
+        if avg_length > 200:
+            score += 1.0
+        
+        return min(10.0, score)
+    
+    def _create_text_summary(self, messages: List[Dict]) -> str:
+        """Create text summary of conversation"""
+        user_msgs = [m["content"][:100] for m in messages if m["role"] == "user"]
+        
+        if len(user_msgs) == 1:
+            return f"User asked about: {user_msgs[0]}"
+        else:
+            return f"Conversation covering: {user_msgs[0]}... and {len(user_msgs)-1} follow-up questions"
+    
+    def _generate_session_id(self, user_id: str) -> str:
+        """Generate unique session ID"""
+        content = f"{user_id}:{datetime.utcnow().isoformat()}"
+        return hashlib.sha256(content.encode()).hexdigest()[:16]
+
+    # === USER CONTROL METHODS ===
+    
+    async def clear_personality_memory(self, user_id: str, personality_id: str) -> bool:
+        """Clear all memory for a specific personality (user-initiated)"""
+        try:
+            # Clear core memory
+            memory_id = f"core:{user_id}:{personality_id}"
+            await self.core_memory_container.delete_item(memory_id, user_id)
+            
+            # Clear episodic memories
+            query = "SELECT c.id FROM c WHERE c.user_id = @user_id AND c.personality_id = @personality_id"
+            params = [
+                {"name": "@user_id", "value": user_id},
+                {"name": "@personality_id", "value": personality_id}
+            ]
+            
+            items = list(self.episodic_memory_container.query_items(query, params))
+            for item in items:
+                await self.episodic_memory_container.delete_item(item["id"], user_id)
+            
+            # Clear archive
+            archive_items = list(self.conversation_archive.query_items(query, params))
+            for item in archive_items:
+                await self.conversation_archive.delete_item(item["id"], user_id)
+            
+            logger.info(f"Cleared memory for user {user_id}, personality {personality_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error clearing memory: {e}")
+            return False
+    
+    async def export_user_memory(self, user_id: str) -> Dict[str, Any]:
+        """Export all memory data for a user (GDPR compliance)"""
+        export_data = {
+            "user_id": user_id,
+            "exported_at": datetime.utcnow().isoformat(),
+            "core_memories": [],
+            "episodic_memories": [],
+            "conversation_archive": []
+        }
+        
+        # Export core memories
+        query = "SELECT * FROM c WHERE c.user_id = @user_id AND c.type = 'core_memory'"
+        params = [{"name": "@user_id", "value": user_id}]
+        export_data["core_memories"] = list(self.core_memory_container.query_items(query, params))
+        
+        # Export episodic memories (without embeddings)
+        query = "SELECT c.id, c.personality_id, c.session_summary, c.key_topics, c.session_date FROM c WHERE c.user_id = @user_id AND c.type = 'episodic_memory'"
+        export_data["episodic_memories"] = list(self.episodic_memory_container.query_items(query, params))
+        
+        # Export archive (without embeddings)
+        query = "SELECT c.id, c.personality_id, c.user_query, c.ai_response, c.timestamp FROM c WHERE c.user_id = @user_id AND c.type = 'conversation_archive'"
+        export_data["conversation_archive"] = list(self.conversation_archive.query_items(query, params))
+        
+        return export_data
+```
+
+### 18.3. Database Schema Extensions
+
+**New Cosmos DB Containers for Memory System:**
+
+```json
+{
+  "memory_containers": [
+    {
+      "name": "core_memory",
+      "partition_key": "/user_id",
+      "indexing_policy": {
+        "includedPaths": [
+          {"path": "/user_id/?"},
+          {"path": "/personality_id/?"},
+          {"path": "/updated_at/?"},
+          {"path": "/conversation_count/?"}
+        ]
+      },
+      "description": "User-personality relationship state (Layer 2)"
+    },
+    {
+      "name": "episodic_memory",
+      "partition_key": "/user_id",
+      "indexing_policy": {
+        "includedPaths": [
+          {"path": "/user_id/?"},
+          {"path": "/personality_id/?"},
+          {"path": "/session_date/?"},
+          {"path": "/importance_score/?"}
+        ],
+        "vectorIndexes": [
+          {"path": "/embedding", "type": "quantizedFlat"}
+        ]
+      },
+      "vectorEmbeddingPolicy": {
+        "vectorEmbeddings": [
+          {"path": "/embedding", "dataType": "float32", "distanceFunction": "cosine", "dimensions": 768}
+        ]
+      },
+      "description": "Session summaries with semantic search (Layer 3)"
+    },
+    {
+      "name": "conversation_archive",
+      "partition_key": "/user_id",
+      "indexing_policy": {
+        "includedPaths": [
+          {"path": "/user_id/?"},
+          {"path": "/personality_id/?"},
+          {"path": "/timestamp/?"},
+          {"path": "/session_id/?"}
+        ],
+        "vectorIndexes": [
+          {"path": "/embedding", "type": "quantizedFlat"}
+        ]
+      },
+      "vectorEmbeddingPolicy": {
+        "vectorEmbeddings": [
+          {"path": "/embedding", "dataType": "float32", "distanceFunction": "cosine", "dimensions": 768}
+        ]
+      },
+      "ttl": 7776000,
+      "description": "Full conversation history with semantic search (Layer 4), 90-day TTL"
+    }
+  ]
+}
+```
+
+### 18.4. API Endpoints for Memory System
+
+```python
+# backend/function_app.py - Memory API endpoints
+
+@app.route(route="memory/context", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+async def get_memory_context(req: func.HttpRequest) -> func.HttpResponse:
+    """Get full memory context for conversation"""
+    try:
+        data = req.get_json()
+        user_id = data.get("user_id")
+        personality_id = data.get("personality_id")
+        current_query = data.get("query")
+        
+        memory_service = get_memory_service()
+        context = await memory_service.get_full_context(
+            user_id, personality_id, current_query
+        )
+        
+        return func.HttpResponse(
+            json.dumps(context),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Memory context error: {e}")
+        return func.HttpResponse("Error retrieving memory", status_code=500)
+
+@app.route(route="memory/dashboard/{user_id}", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+async def get_memory_dashboard(req: func.HttpRequest) -> func.HttpResponse:
+    """Get user's memory dashboard data"""
+    try:
+        user_id = req.route_params.get("user_id")
+        
+        memory_service = get_memory_service()
+        dashboard = await memory_service.get_user_memory_dashboard(user_id)
+        
+        return func.HttpResponse(
+            json.dumps(dashboard),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Memory dashboard error: {e}")
+        return func.HttpResponse("Error retrieving dashboard", status_code=500)
+
+@app.route(route="memory/clear/{personality_id}", methods=["DELETE"], auth_level=func.AuthLevel.FUNCTION)
+async def clear_personality_memory(req: func.HttpRequest) -> func.HttpResponse:
+    """Clear memory for specific personality (user-initiated)"""
+    try:
+        user_id = req.headers.get("X-User-ID")
+        personality_id = req.route_params.get("personality_id")
+        
+        memory_service = get_memory_service()
+        success = await memory_service.clear_personality_memory(user_id, personality_id)
+        
+        if success:
+            return func.HttpResponse(status_code=204)
+        else:
+            return func.HttpResponse("Failed to clear memory", status_code=500)
+    except Exception as e:
+        logger.error(f"Memory clear error: {e}")
+        return func.HttpResponse("Error clearing memory", status_code=500)
+
+@app.route(route="memory/export", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+async def export_user_memory(req: func.HttpRequest) -> func.HttpResponse:
+    """Export all user memory data (GDPR compliance)"""
+    try:
+        user_id = req.headers.get("X-User-ID")
+        
+        memory_service = get_memory_service()
+        export_data = await memory_service.export_user_memory(user_id)
+        
+        return func.HttpResponse(
+            json.dumps(export_data, indent=2),
+            mimetype="application/json",
+            headers={"Content-Disposition": f"attachment; filename=vimarsh_memory_export_{user_id}.json"}
+        )
+    except Exception as e:
+        logger.error(f"Memory export error: {e}")
+        return func.HttpResponse("Error exporting memory", status_code=500)
+
+@app.route(route="memory/session/end", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+async def end_memory_session(req: func.HttpRequest) -> func.HttpResponse:
+    """End session and create episodic memory"""
+    try:
+        data = req.get_json()
+        user_id = data.get("user_id")
+        personality_id = data.get("personality_id")
+        session_id = data.get("session_id")
+        
+        memory_service = get_memory_service()
+        await memory_service.end_session(user_id, personality_id, session_id)
+        
+        return func.HttpResponse(status_code=204)
+    except Exception as e:
+        logger.error(f"Session end error: {e}")
+        return func.HttpResponse("Error ending session", status_code=500)
+```
+
+### 18.5. Integration with Guidance Endpoint
+
+**Enhanced Guidance Flow with Memory:**
+
+```python
+# Updated spiritual_guidance endpoint with memory integration
+@app.route(route="spiritual_guidance", methods=["POST"])
+async def spiritual_guidance(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        data = req.get_json()
+        user_query = data.get("query")
+        personality_id = data.get("personality", "krishna")
+        user_id = data.get("user_id", "anonymous")
+        session_id = data.get("session_id")
+        memory_enabled = data.get("memory_enabled", True)
+        
+        # Get memory context if enabled
+        memory_context = {}
+        if memory_enabled and user_id != "anonymous":
+            memory_service = get_memory_service()
+            memory_context = await memory_service.get_full_context(
+                user_id, personality_id, user_query, session_id
+            )
+        
+        # Build enhanced prompt with memory
+        enhanced_prompt = build_memory_enhanced_prompt(
+            user_query, 
+            personality_id,
+            memory_context
+        )
+        
+        # Get RAG context
+        rag_context = await rag_service.retrieve_context(user_query, personality_id)
+        
+        # Generate response
+        response = await llm_service.generate_response(
+            enhanced_prompt, 
+            rag_context,
+            memory_context.get("core_memory", {})
+        )
+        
+        # Store exchange in memory
+        if memory_enabled and user_id != "anonymous":
+            await memory_service.add_exchange(
+                user_id, personality_id, user_query, response["text"], session_id
+            )
+        
+        # Add memory metadata to response
+        response["memory"] = {
+            "enabled": memory_enabled,
+            "context_used": bool(memory_context),
+            "relationship_depth": memory_context.get("core_memory", {}).get("relationship_depth", "new"),
+            "conversation_count": memory_context.get("memory_stats", {}).get("total_conversations", 0)
+        }
+        
+        return func.HttpResponse(
+            json.dumps(response),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Guidance error: {e}")
+        return func.HttpResponse("Error generating guidance", status_code=500)
+
+
+def build_memory_enhanced_prompt(
+    query: str,
+    personality_id: str,
+    memory_context: Dict[str, Any]
+) -> str:
+    """Build prompt with memory context injection"""
+    
+    core = memory_context.get("core_memory", {})
+    episodic = memory_context.get("episodic_memory", [])
+    archive = memory_context.get("archive_memory", [])
+    
+    prompt_parts = [f"USER QUESTION: {query}"]
+    
+    # Add core memory context
+    if core.get("context_string"):
+        prompt_parts.append(f"\n[USER CONTEXT]\n{core['context_string']}")
+    
+    # Add relevant episodic memories
+    if episodic:
+        prompt_parts.append("\n[RELEVANT PAST CONVERSATIONS]")
+        for ep in episodic[:2]:
+            prompt_parts.append(f"- {ep['date']}: {ep['summary']}")
+    
+    # Add similar past exchanges
+    if archive:
+        prompt_parts.append("\n[SIMILAR PAST QUESTIONS]")
+        for arch in archive[:2]:
+            prompt_parts.append(f"- User asked: {arch['exchange']}")
+    
+    # Add memory-aware instruction
+    if core.get("conversation_count", 0) > 0:
+        prompt_parts.append(f"\n[INSTRUCTION] This is conversation #{core['conversation_count'] + 1} with this user. Build on the established relationship and reference past discussions when relevant.")
+    
+    return "\n".join(prompt_parts)
+```
+
+### 18.6. Frontend Memory Integration
+
+```typescript
+// frontend/src/hooks/useMemory.ts
+import { useState, useCallback, useEffect } from 'react';
+
+interface MemoryDashboard {
+  totalConversations: number;
+  personalityMemories: PersonalityMemory[];
+  recentInsights: string[];
+  journeyStats: JourneyStats;
+}
+
+interface PersonalityMemory {
+  personalityId: string;
+  personalityName: string;
+  conversationCount: number;
+  firstConversation: string;
+  lastConversation: string;
+  topicsExplored: string[];
+  relationshipDepth: 'new' | 'developing' | 'deep';
+}
+
+export const useMemory = (userId: string) => {
+  const [dashboard, setDashboard] = useState<MemoryDashboard | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [memoryEnabled, setMemoryEnabled] = useState(true);
+  
+  const fetchDashboard = useCallback(async () => {
+    if (!userId) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/memory/dashboard/${userId}`);
+      const data = await response.json();
+      setDashboard(data);
+    } catch (error) {
+      console.error('Failed to fetch memory dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+  
+  const clearPersonalityMemory = useCallback(async (personalityId: string) => {
+    try {
+      await fetch(`/api/memory/clear/${personalityId}`, {
+        method: 'DELETE',
+        headers: { 'X-User-ID': userId }
+      });
+      await fetchDashboard(); // Refresh
+      return true;
+    } catch (error) {
+      console.error('Failed to clear memory:', error);
+      return false;
+    }
+  }, [userId, fetchDashboard]);
+  
+  const exportMemory = useCallback(async () => {
+    try {
+      const response = await fetch('/api/memory/export', {
+        headers: { 'X-User-ID': userId }
+      });
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vimarsh_memory_export_${userId}.json`;
+      a.click();
+    } catch (error) {
+      console.error('Failed to export memory:', error);
+    }
+  }, [userId]);
+  
+  const toggleMemory = useCallback(async (enabled: boolean) => {
+    setMemoryEnabled(enabled);
+    localStorage.setItem('vimarsh_memory_enabled', String(enabled));
+  }, []);
+  
+  useEffect(() => {
+    const saved = localStorage.getItem('vimarsh_memory_enabled');
+    if (saved !== null) {
+      setMemoryEnabled(saved === 'true');
+    }
+  }, []);
+  
+  return {
+    dashboard,
+    loading,
+    memoryEnabled,
+    fetchDashboard,
+    clearPersonalityMemory,
+    exportMemory,
+    toggleMemory
+  };
+};
+```
+
+### 18.7. Memory System Performance Requirements
+
+| Operation | Target Latency | Notes |
+|-----------|---------------|-------|
+| Get Full Context | <300ms | Parallel retrieval from all layers |
+| Store Exchange | <100ms | Async, doesn't block response |
+| Episodic Search (Vector) | <150ms | Top 3 results, 0.7 threshold |
+| Archive Search (Vector) | <200ms | Top 5 results, 0.7 threshold |
+| Session Summary Generation | <500ms | Async, post-conversation |
+| Memory Clear | <1s | Batch delete operation |
+| Memory Export | <5s | Full user data export |
+
+### 18.8. Memory Test Cases
+
+```python
+# backend/tests/test_memory_system.py
+
+class TestHierarchicalMemory:
+    """Comprehensive tests for memory system"""
+    
+    async def test_working_memory_token_management(self):
+        """Verify working memory respects token limits"""
+        pass
+    
+    async def test_core_memory_persistence(self):
+        """Verify core memory persists across sessions"""
+        pass
+    
+    async def test_episodic_semantic_retrieval(self):
+        """Verify semantic search finds relevant sessions"""
+        pass
+    
+    async def test_memory_isolation_between_personalities(self):
+        """Verify Krishna doesn't see Buddha conversations"""
+        pass
+    
+    async def test_reflection_generation(self):
+        """Verify reflections generated at proper intervals"""
+        pass
+    
+    async def test_memory_clear_completeness(self):
+        """Verify all memory layers cleared on user request"""
+        pass
+    
+    async def test_memory_export_completeness(self):
+        """Verify export includes all user data"""
+        pass
+    
+    async def test_guidance_memory_integration(self):
+        """Verify guidance endpoint uses memory context"""
+        pass
+    
+    async def test_memory_disabled_mode(self):
+        """Verify system works when memory disabled"""
+        pass
+    
+    async def test_anonymous_user_handling(self):
+        """Verify memory gracefully handles anonymous users"""
+        pass
+```
+
+> **Note:** User experience specifications for the memory system are documented in `User_Experience.md` Section 9. Product requirements and business metrics are documented in `PRD_Vimarsh.md` Section 14.
+
+---
+
 ## 20. User Engagement & Viral Growth Technical Specifications
 
 ### 20.1. Social Sharing System Architecture
