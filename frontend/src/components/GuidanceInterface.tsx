@@ -164,9 +164,9 @@ export default function GuidanceInterface() {
   const { user } = useAdmin();
   const { isInitializing, allReady } = useAppLoading();
   const { 
-    memoryContext, 
+    currentSession: memoryContext, 
     relationships, 
-    loadContext, 
+    loadMemoryProfile: loadContext, 
     endSession,
     isLoading: memoryLoading 
   } = useMemory();
