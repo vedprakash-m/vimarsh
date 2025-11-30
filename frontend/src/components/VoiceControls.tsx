@@ -314,6 +314,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
       {/* Microphone Button - Voice Input */}
       {isVoiceSupported && (
         <button
+          type="button"
           onClick={isListening ? stopListening : startListening}
           disabled={disabled || isProcessing}
           style={{
@@ -380,6 +381,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
       {/* Speaker Button - Read Response */}
       {isSpeechSupported && textToSpeak && (
         <button
+          type="button"
           onClick={isSpeaking ? stopSpeaking : () => speakText(textToSpeak)}
           disabled={disabled}
           style={{
