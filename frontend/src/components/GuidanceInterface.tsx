@@ -1546,6 +1546,8 @@ export default function GuidanceInterface() {
             domain: selectedPersonality.domain || 'spiritual',
             messageId: shareMessage.id
           }}
+          isModal={true}
+          onClose={closeShareModal}
           onShareComplete={() => closeShareModal()}
         />
       )}

@@ -44,8 +44,11 @@ interface ShareableContent {
 interface SharingInterfaceProps {
   content: ShareableContent;
   onShareComplete?: (platform: string) => void;
+  onClose?: () => void;
   variant?: 'inline' | 'button';
   size?: 'small' | 'medium';
+  autoOpen?: boolean;
+  isModal?: boolean;
 }
 
 // Domain-specific hashtags
@@ -65,12 +68,23 @@ const getDomainHashtags = (domain: string): string[] => {
 export const SharingInterface: React.FC<SharingInterfaceProps> = ({
   content,
   onShareComplete,
+  onClose,
   variant = 'inline',
-  size = 'small'
+  size = 'small',
+  autoOpen = false,
+  isModal = false
 }) => {
   const [copied, setCopied] = useState(false);
-  const [showPlatforms, setShowPlatforms] = useState(false);
+  const [showPlatforms, setShowPlatforms] = useState(autoOpen || isModal);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Handle closing for modal mode
+  const handleClose = useCallback(() => {
+    setShowPlatforms(false);
+    if (isModal && onClose) {
+      onClose();
+    }
+  }, [isModal, onClose]);
 
   // Generate shareable text with proper formatting
   const generateShareText = useCallback((forPlatform?: string) => {
@@ -129,33 +143,33 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
       const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getShareUrl())}`;
       window.open(shareUrl, '_blank', 'width=550,height=420,noopener,noreferrer');
       trackShare('twitter');
-      setShowPlatforms(false);
+      handleClose();
     },
     facebook: () => {
       const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}&quote=${encodeURIComponent(generateShareText('facebook'))}`;
       window.open(shareUrl, '_blank', 'width=550,height=420,noopener,noreferrer');
       trackShare('facebook');
-      setShowPlatforms(false);
+      handleClose();
     },
     linkedin: () => {
       const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareUrl())}`;
       window.open(shareUrl, '_blank', 'width=550,height=500,noopener,noreferrer');
       trackShare('linkedin');
-      setShowPlatforms(false);
+      handleClose();
     },
     whatsapp: () => {
       const text = generateShareText('whatsapp');
       const shareUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n\n' + getShareUrl())}`;
       window.open(shareUrl, '_blank', 'noopener,noreferrer');
       trackShare('whatsapp');
-      setShowPlatforms(false);
+      handleClose();
     },
     telegram: () => {
       const text = generateShareText('telegram');
       const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(getShareUrl())}&text=${encodeURIComponent(text)}`;
       window.open(shareUrl, '_blank', 'noopener,noreferrer');
       trackShare('telegram');
-      setShowPlatforms(false);
+      handleClose();
     },
     copy: async () => {
       try {
@@ -197,7 +211,7 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
           }
         }
       }
-      setShowPlatforms(false);
+      handleClose();
     }
   };
 
@@ -221,6 +235,199 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
 
   const domainColor = getDomainColor(content.domain);
 
+  // Render sharing options panel (used in both modal and dropdown)
+  const renderSharingOptions = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <PlatformButton 
+        icon={<TwitterIcon />} 
+        label="X (Twitter)" 
+        onClick={shareHandlers.twitter}
+        hoverColor="#1DA1F2"
+      />
+      <PlatformButton 
+        icon={<FacebookIcon />} 
+        label="Facebook" 
+        onClick={shareHandlers.facebook}
+        hoverColor="#1877F2"
+      />
+      <PlatformButton 
+        icon={<LinkedInIcon />} 
+        label="LinkedIn" 
+        onClick={shareHandlers.linkedin}
+        hoverColor="#0A66C2"
+      />
+      <PlatformButton 
+        icon={<WhatsAppIcon />} 
+        label="WhatsApp" 
+        onClick={shareHandlers.whatsapp}
+        hoverColor="#25D366"
+      />
+      <PlatformButton 
+        icon={<TelegramIcon />} 
+        label="Telegram" 
+        onClick={shareHandlers.telegram}
+        hoverColor="#0088cc"
+      />
+      
+      <div style={{ 
+        height: '1px', 
+        background: '#e2e8f0', 
+        margin: '0.35rem 0' 
+      }} />
+      
+      <PlatformButton 
+        icon={copied ? <Check size={16} /> : <Copy size={16} />} 
+        label={copied ? "Copied!" : "Copy Link"}
+        onClick={shareHandlers.copy}
+        hoverColor="#10b981"
+        isActive={copied}
+      />
+      
+      {/* Native share for mobile */}
+      {'share' in navigator && (
+        <PlatformButton 
+          icon={<Share2 size={16} />} 
+          label="More options..." 
+          onClick={shareHandlers.native}
+          hoverColor="#6366f1"
+        />
+      )}
+    </div>
+  );
+
+  // Modal mode - full screen overlay
+  if (isModal) {
+    return (
+      <>
+        {/* Full screen backdrop */}
+        <div
+          onClick={handleClose}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 9998,
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+        />
+        
+        {/* Modal content */}
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: '#ffffff',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            zIndex: 9999,
+            minWidth: '280px',
+            maxWidth: '90vw',
+            animation: 'scaleIn 0.2s ease-out'
+          }}
+        >
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            style={{
+              position: 'absolute',
+              top: '0.75rem',
+              right: '0.75rem',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+              color: '#94a3b8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#f1f5f9';
+              e.currentTarget.style.color = '#64748b';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'none';
+              e.currentTarget.style.color = '#94a3b8';
+            }}
+            aria-label="Close share modal"
+          >
+            <X size={20} />
+          </button>
+
+          {/* Modal header */}
+          <div style={{ marginBottom: '1rem', paddingRight: '2rem' }}>
+            <h3 style={{
+              fontSize: '1.1rem',
+              fontWeight: '600',
+              color: '#1e293b',
+              margin: '0 0 0.5rem 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <Share2 size={18} style={{ color: domainColor }} />
+              Share this wisdom
+            </h3>
+            <p style={{
+              fontSize: '0.85rem',
+              color: '#64748b',
+              margin: 0,
+              lineHeight: '1.4'
+            }}>
+              "{content.text.length > 80 ? content.text.substring(0, 80) + '...' : content.text}"
+            </p>
+            <p style={{
+              fontSize: '0.75rem',
+              color: '#94a3b8',
+              margin: '0.25rem 0 0 0',
+              fontStyle: 'italic'
+            }}>
+              — {content.personality}
+            </p>
+          </div>
+
+          <div style={{ 
+            fontSize: '0.7rem', 
+            color: '#94a3b8', 
+            marginBottom: '0.5rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            Share to
+          </div>
+
+          {renderSharingOptions()}
+        </div>
+
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes scaleIn {
+            from {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+        `}</style>
+      </>
+    );
+  }
+
+  // Inline mode - button with dropdown
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       {/* Share Trigger Button */}
@@ -267,7 +474,7 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
         <>
           {/* Backdrop to close dropdown */}
           <div
-            onClick={() => setShowPlatforms(false)}
+            onClick={handleClose}
             style={{
               position: 'fixed',
               top: 0,
@@ -297,7 +504,7 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
           >
             {/* Close button */}
             <button
-              onClick={() => setShowPlatforms(false)}
+              onClick={handleClose}
               style={{
                 position: 'absolute',
                 top: '0.35rem',
@@ -328,63 +535,7 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
               Share to
             </div>
 
-            {/* Platform buttons */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              <PlatformButton 
-                icon={<TwitterIcon />} 
-                label="X (Twitter)" 
-                onClick={shareHandlers.twitter}
-                hoverColor="#1DA1F2"
-              />
-              <PlatformButton 
-                icon={<FacebookIcon />} 
-                label="Facebook" 
-                onClick={shareHandlers.facebook}
-                hoverColor="#1877F2"
-              />
-              <PlatformButton 
-                icon={<LinkedInIcon />} 
-                label="LinkedIn" 
-                onClick={shareHandlers.linkedin}
-                hoverColor="#0A66C2"
-              />
-              <PlatformButton 
-                icon={<WhatsAppIcon />} 
-                label="WhatsApp" 
-                onClick={shareHandlers.whatsapp}
-                hoverColor="#25D366"
-              />
-              <PlatformButton 
-                icon={<TelegramIcon />} 
-                label="Telegram" 
-                onClick={shareHandlers.telegram}
-                hoverColor="#0088cc"
-              />
-              
-              <div style={{ 
-                height: '1px', 
-                background: '#e2e8f0', 
-                margin: '0.35rem 0' 
-              }} />
-              
-              <PlatformButton 
-                icon={copied ? <Check size={16} /> : <Copy size={16} />} 
-                label={copied ? "Copied!" : "Copy Link"}
-                onClick={shareHandlers.copy}
-                hoverColor="#10b981"
-                isActive={copied}
-              />
-              
-              {/* Native share for mobile */}
-              {'share' in navigator && (
-                <PlatformButton 
-                  icon={<Share2 size={16} />} 
-                  label="More options..." 
-                  onClick={shareHandlers.native}
-                  hoverColor="#6366f1"
-                />
-              )}
-            </div>
+            {renderSharingOptions()}
           </div>
         </>
       )}

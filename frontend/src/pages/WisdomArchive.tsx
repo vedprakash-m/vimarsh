@@ -636,6 +636,8 @@ const WisdomArchive: React.FC = () => {
             citation: shareEntry.source_citation,
             domain: shareEntry.domain
           }}
+          isModal={true}
+          onClose={() => setShareEntry(null)}
           onShareComplete={() => setShareEntry(null)}
         />
       )}
