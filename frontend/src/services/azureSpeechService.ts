@@ -59,7 +59,7 @@ class AzureSpeechService {
       return this.voiceInfo;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/voice/info`, {
+    const response = await fetch(`${API_BASE_URL}/voice/info`, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -106,7 +106,7 @@ class AzureSpeechService {
       return audioCache.get(cacheKey)!;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/voice/synthesize`, {
+    const response = await fetch(`${API_BASE_URL}/voice/synthesize`, {
       method: 'POST',
       credentials: 'include',
       headers: {
