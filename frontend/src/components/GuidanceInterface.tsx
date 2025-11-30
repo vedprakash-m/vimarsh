@@ -1538,14 +1538,15 @@ export default function GuidanceInterface() {
       </div>
       
       {/* Share Modal */}
-      {shareMessage && (
+      {shareMessage && selectedPersonality && (
         <SharingInterface
-          content={shareMessage.text}
-          title={`Wisdom from ${selectedPersonality?.display_name || 'Vimarsh'}`}
-          personalityName={selectedPersonality?.display_name}
-          domain={selectedPersonality?.domain}
-          isOpen={!!shareMessage}
-          onClose={closeShareModal}
+          content={{
+            text: shareMessage.text,
+            personality: selectedPersonality.display_name || selectedPersonality.id,
+            domain: selectedPersonality.domain || 'spiritual',
+            messageId: shareMessage.id
+          }}
+          onShareComplete={() => closeShareModal()}
         />
       )}
       
