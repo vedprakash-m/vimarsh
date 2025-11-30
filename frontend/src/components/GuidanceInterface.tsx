@@ -1490,7 +1490,7 @@ export default function GuidanceInterface() {
           <VoiceControls
             onTranscript={handleVoiceTranscript}
             disabled={!selectedPersonality || isLoading}
-            personalityId={selectedPersonality?.id}
+            personality={selectedPersonality?.id}
             domain={selectedPersonality?.domain}
           />
           
