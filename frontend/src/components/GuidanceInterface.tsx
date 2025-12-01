@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Send, MessageSquare, Users, Settings, LogOut, Download, X, Share2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Send, MessageSquare, Users, Settings, LogOut, Download, X, Share2, Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { SharingInterface } from './SharingInterface';
 import { VoiceControls } from './VoiceControls';
+import { azureSpeechService } from '../services/azureSpeechService';
 import PersonalitySelector from './PersonalitySelector';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
 import MemoryIndicator from './MemoryIndicator';
@@ -383,11 +384,39 @@ export default function GuidanceInterface() {
     }
   }, [selectedPersonality]);
 
-  // Handle TTS for AI responses
-  const speakMessage = useCallback((text: string) => {
+  // Handle TTS for AI responses using Azure Neural Voice
+  const speakMessage = useCallback(async (text: string) => {
+    // Get personality ID for voice selection
+    const personalityId = selectedPersonality?.id?.toLowerCase().replace(/\s+/g, '_') || 'krishna';
+    
+    try {
+      // Try Azure Neural Voice first
+      const isAzureAvailable = await azureSpeechService.isAvailable();
+      
+      if (isAzureAvailable) {
+        console.log('🎙️ Using Azure Neural Voice for', personalityId);
+        await azureSpeechService.speak(text, personalityId, {
+          onStart: () => setIsSpeaking(true),
+          onEnd: () => setIsSpeaking(false),
+          onError: (error) => {
+            console.warn('Azure Speech failed, using fallback:', error);
+            fallbackSpeak(text);
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.warn('Azure Speech not available, using fallback:', error);
+    }
+    
+    // Fallback to Web Speech API
+    fallbackSpeak(text);
+  }, [selectedPersonality]);
+
+  // Web Speech API fallback
+  const fallbackSpeak = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) return;
     
-    // Stop any current speech
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
@@ -401,12 +430,13 @@ export default function GuidanceInterface() {
     window.speechSynthesis.speak(utterance);
   }, []);
 
-  // Stop speech
+  // Stop speech (both Azure and Web Speech)
   const stopSpeaking = useCallback(() => {
+    azureSpeechService.stop();
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      setIsSpeaking(false);
     }
+    setIsSpeaking(false);
   }, []);
 
   // Handle share button click
