@@ -181,7 +181,7 @@ self.addEventListener('push', (event) => {
   }
   
   // Customize for new personality notifications
-  if (notificationData.data.category === 'new_personality') {
+  if (notificationData.data.category === 'new_personality' || notificationData.data.category === 'personality_suggestion') {
     options = {
       ...options,
       tag: 'new-personality',
@@ -189,6 +189,65 @@ self.addEventListener('push', (event) => {
         {
           action: 'explore',
           title: '✨ Explore'
+        },
+        {
+          action: 'later',
+          title: 'Later'
+        }
+      ]
+    };
+  }
+  
+  // Customize for streak reminder notifications
+  if (notificationData.data.category === 'streak_reminder' || notificationData.data.category === 'streak_at_risk') {
+    options = {
+      ...options,
+      tag: 'streak-reminder',
+      renotify: true,
+      requireInteraction: notificationData.data.category === 'streak_at_risk', // More urgent if at risk
+      actions: [
+        {
+          action: 'continue',
+          title: '🔥 Continue Streak'
+        },
+        {
+          action: 'later',
+          title: 'Later'
+        }
+      ]
+    };
+  }
+  
+  // Customize for achievement unlock notifications
+  if (notificationData.data.category === 'achievement_unlocked') {
+    options = {
+      ...options,
+      tag: 'achievement',
+      renotify: true,
+      requireInteraction: true,
+      actions: [
+        {
+          action: 'view',
+          title: '🏆 View Achievement'
+        },
+        {
+          action: 'share',
+          title: '📤 Share'
+        }
+      ]
+    };
+  }
+  
+  // Customize for weekly digest/summary notifications
+  if (notificationData.data.category === 'weekly_digest' || notificationData.data.category === 'weekly_summary') {
+    options = {
+      ...options,
+      tag: 'weekly-digest',
+      requireInteraction: false,
+      actions: [
+        {
+          action: 'view',
+          title: '📊 View Summary'
         },
         {
           action: 'later',
@@ -226,14 +285,30 @@ self.addEventListener('notificationclick', (event) => {
     } else if (action === 'share') {
       targetUrl = '/?action=share'; // Open with share dialog
     }
-  } else if (category === 'new_personality') {
+  } else if (category === 'new_personality' || category === 'personality_suggestion') {
     if (action === 'explore') {
       const personality = event.notification.data.personality;
       targetUrl = personality ? `/guidance?personality=${personality}` : '/';
     }
+  } else if (category === 'streak_reminder' || category === 'streak_at_risk') {
+    if (action === 'continue') {
+      targetUrl = '/'; // Open to main page to continue conversation
+    }
+  } else if (category === 'achievement_unlocked') {
+    if (action === 'view') {
+      targetUrl = '/achievements'; // Open to achievements page
+    } else if (action === 'share') {
+      const achievementId = event.notification.data.achievementId;
+      targetUrl = achievementId ? `/achievements?share=${achievementId}` : '/achievements';
+    }
+  } else if (category === 'weekly_digest' || category === 'weekly_summary') {
+    if (action === 'view') {
+      targetUrl = '/profile'; // Open to profile with stats
+    }
   }
   
-  if (action === 'open' || action === 'read' || action === 'explore' || action === 'default') {
+  // Open app or focus existing window
+  if (action !== 'later') {
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true })
         .then((clientList) => {
@@ -250,52 +325,9 @@ self.addEventListener('notificationclick', (event) => {
           }
         })
     );
-  } else if (action === 'later' || action === 'share') {
-    // For share, we still want to open the app with share intent
-    if (action === 'share') {
-      event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true })
-          .then((clientList) => {
-            for (const client of clientList) {
-              if (client.url.includes(self.location.origin) && 'focus' in client) {
-                client.focus();
-                return client.navigate(targetUrl);
-              }
-            }
-            if (clients.openWindow) {
-              return clients.openWindow(targetUrl);
-            }
-          })
-      );
-    } else {
-      // Just close the notification - no action needed
-      console.log('[SW] User chose to view later');
-    }
   } else {
-    // Default action (clicking notification body)
-    event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true })
-        .then((clientList) => {
-          for (const client of clientList) {
-            if (client.url.includes(self.location.origin) && 'focus' in client) {
-              client.focus();
-              return client.navigate(targetUrl);
-            }
-          }
-          if (clients.openWindow) {
-            return clients.openWindow(targetUrl);
-          }
-        })
-    );
-  };
-              return client.navigate(targetUrl);
-            }
-          }
-          if (clients.openWindow) {
-            return clients.openWindow(targetUrl);
-          }
-        })
-    );
+    // Just close the notification - no action needed
+    console.log('[SW] User chose to view later');
   }
   
   // Track notification interaction

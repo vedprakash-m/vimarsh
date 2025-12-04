@@ -316,7 +316,544 @@ User State: Intrigued by diverse wisdom options
 Design Goal: Demonstrate platform breadth while maintaining focus
 ```
 
-**1.2 Personality Selection & First Interaction**
+---
+
+### 4.2. Intelligent Onboarding System (NEW)
+
+The Intelligent Onboarding System guides new users from landing to first meaningful conversation in under 60 seconds through a 3-step wizard that reduces decision paralysis and maximizes first-session engagement.
+
+#### **4.2.1. Onboarding Wizard Flow**
+
+**Trigger Conditions:**
+- First-time visitor (no localStorage session)
+- User clicks "Start Your Journey" CTA
+- Anonymous user without conversation history
+
+**Flow Diagram:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ONBOARDING WIZARD                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Step 1/3 ─────────── Step 2/3 ─────────── Step 3/3        │
+│  Intent    →          Match      →          First           │
+│  Discovery            Personality           Question        │
+│                                                             │
+│  ● ○ ○                ● ● ○                ● ● ●           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Step 1: Intent Discovery Interface**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🌟 Welcome to Vimarsh                               [Skip →]│
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│         What brings you here today?                         │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🧭  Seeking guidance on a life decision                 │ │
+│ │     Navigate challenges with wisdom from great minds    │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🕉️  Exploring spiritual wisdom                          │ │
+│ │     Connect with divine guidance across traditions      │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 📚  Learning from history's great minds                 │ │
+│ │     Discover insights from leaders and innovators       │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🔬  Scientific or philosophical curiosity               │ │
+│ │     Explore ideas with brilliant thinkers               │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 💭  Personal growth and self-improvement                │ │
+│ │     Build resilience and wisdom for daily life          │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🎭  Exploring literature and creativity                 │ │
+│ │     Dive into the minds of literary masters             │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│                           Step 1 of 3                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Intent-to-Personality Mapping Logic:**
+```
+┌────────────────────────────┬─────────────────────────────────┐
+│ User Intent                │ Recommended Personalities       │
+├────────────────────────────┼─────────────────────────────────┤
+│ Life decision guidance     │ Krishna, Marcus Aurelius,       │
+│                            │ Lincoln, Chanakya               │
+├────────────────────────────┼─────────────────────────────────┤
+│ Spiritual wisdom           │ Krishna, Buddha, Jesus,         │
+│                            │ Rumi, Vivekananda               │
+├────────────────────────────┼─────────────────────────────────┤
+│ Learn from history         │ Lincoln, Gandhi, Einstein,      │
+│                            │ Franklin, Washington            │
+├────────────────────────────┼─────────────────────────────────┤
+│ Scientific/philosophical   │ Einstein, Newton, Aristotle,    │
+│                            │ Socrates, Tesla                 │
+├────────────────────────────┼─────────────────────────────────┤
+│ Personal growth            │ Marcus Aurelius, Confucius,     │
+│                            │ Freud, Vivekananda              │
+├────────────────────────────┼─────────────────────────────────┤
+│ Literature/creativity      │ Shakespeare, Tagore,            │
+│                            │ Da Vinci, Rumi                  │
+└────────────────────────────┴─────────────────────────────────┘
+```
+
+**Step 2: Personality Match Interface**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ← Back                                              [Skip →]│
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│         🎯 Recommended for You                              │
+│                                                             │
+│ Based on "Seeking guidance on a life decision"              │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │                                                         │ │
+│ │  🕉️ Krishna                              [Best Match]   │ │
+│ │  ─────────────────────────────────────────────────────  │ │
+│ │  "Divine guidance for life's crossroads"               │ │
+│ │                                                         │ │
+│ │  ✓ Perfect for: Duty, dharma, ethical dilemmas        │ │
+│ │  ✓ Style: Compassionate parables with actionable wisdom │ │
+│ │  ✓ Source: Bhagavad Gita, Mahabharata                  │ │
+│ │                                                         │ │
+│ │                              [Start with Krishna →]     │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌───────────────────────┐  ┌───────────────────────┐       │
+│ │ 🏛️ Marcus Aurelius    │  │ 🎩 Abraham Lincoln    │       │
+│ │ Stoic wisdom for      │  │ Leadership through    │       │
+│ │ difficult choices     │  │ moral conviction      │       │
+│ │ [Select]              │  │ [Select]              │       │
+│ └───────────────────────┘  └───────────────────────┘       │
+│                                                             │
+│ [Show All 25 Personalities]                                │
+│                                                             │
+│                           Step 2 of 3                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Step 3: First Question Catalyst Interface**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ← Back                                                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  🕉️ Ready to begin your conversation with Krishna          │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │  [Avatar: Krishna illustration with divine glow]        ││
+│  │                                                         ││
+│  │  "I am here to guide you, dear seeker. What weighs     ││
+│  │   upon your heart today?"                              ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  💡 Try one of these questions, or ask your own:           │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ "How do I know if I'm on the right path?"              ││
+│  └─────────────────────────────────────────────────────────┘│
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ "What is the nature of duty when choices conflict?"    ││
+│  └─────────────────────────────────────────────────────────┘│
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ "How can I find peace amidst difficult circumstances?" ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  Or type your own question:                                 │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                                              [Ask →] 🚀 ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  🎤 Or speak your question                                  │
+│                                                             │
+│                           Step 3 of 3                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Onboarding Completion States:**
+- **Successful**: User asks first question → Mark onboarding complete, show streak start
+- **Skipped Early**: User clicks "Skip" → Show full personality selector
+- **Abandoned**: User closes wizard → Remember progress, resume on next visit
+
+#### **4.2.2. Personality Quiz Interface**
+
+For users who prefer guided discovery, the 5-question Personality Quiz provides an engaging matching experience.
+
+**Quiz Entry Points:**
+- "Take the Quiz" link in onboarding wizard
+- "Find Your Guide" button on landing page
+- Profile settings: "Retake Personality Quiz"
+
+**Quiz Interface Design:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🎯 Personality Quiz                               [Exit ×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Question 1 of 5                                            │
+│  ████░░░░░░░░░░░░░░░░ 20%                                  │
+│                                                             │
+│  What kind of wisdom resonates most with you?               │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ 🕉️  Spiritual and transcendent insights                ││
+│  │     Divine guidance and inner peace                     ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ 🔬  Logical and evidence-based reasoning               ││
+│  │     Scientific thinking and rational analysis          ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ 🏛️  Practical life wisdom and strategy                 ││
+│  │     Actionable advice for real challenges              ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │ 💭  Philosophical reflection on meaning                ││
+│  │     Deep contemplation on life's big questions         ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Quiz Results Interface:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🎉 Your Wisdom Match                                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                                                         ││
+│  │  [Large Avatar: Marcus Aurelius]                        ││
+│  │                                                         ││
+│  │  🏛️ Marcus Aurelius                                    ││
+│  │  Roman Emperor & Stoic Philosopher                      ││
+│  │                                                         ││
+│  │  Match Score: 94%                                       ││
+│  │                                                         ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  Why this match?                                            │
+│  ─────────────────                                          │
+│  ✓ You value logical, evidence-based reasoning             │
+│  ✓ You prefer practical wisdom for real challenges         │
+│  ✓ You appreciate contemplative, reflective guidance       │
+│  ✓ You're drawn to ancient wisdom with modern relevance    │
+│                                                             │
+│  What to expect:                                            │
+│  Marcus Aurelius offers Stoic wisdom on resilience, duty,   │
+│  and finding tranquility through rational self-examination. │
+│                                                             │
+│  [Start Conversation with Marcus Aurelius →]                │
+│                                                             │
+│  ─────────────────────────────────────────────────────────  │
+│  Other great matches for you:                               │
+│                                                             │
+│  🧠 Einstein (89%)  │  📚 Aristotle (85%)  │  🏛️ Lincoln (82%)│
+│                                                             │
+│  [Share My Results]  [Retake Quiz]  [View All Personalities]│
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 4.3. Habit Building & Engagement UX (NEW)
+
+The engagement system creates sustainable habit loops through streaks, achievements, and progress visualization.
+
+#### **4.3.1. Streak Counter Interface**
+
+**Persistent Streak Display (Header Integration):**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Vimarsh   🔥 12 days  [🎭 Krishna ▼] [Settings] [Profile]  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Expanded Streak Panel (Click to expand):**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🔥 Your Wisdom Streak                                   [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │           🔥 12 Days                                    ││
+│  │       ━━━━━━━━━━━━░░░░░░░░░░░░░░░░░░                   ││
+│  │                                                         ││
+│  │  🎯 Next milestone: 30 days (18 to go)                  ││
+│  │  🏆 Personal best: 23 days                              ││
+│  │  📅 Started: November 22, 2025                          ││
+│  │                                                         ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  This Week:                                                 │
+│  Mon  Tue  Wed  Thu  Fri  Sat  Sun                         │
+│   ✓    ✓    ✓    ✓    ✓    ✓    ○                         │
+│                                                             │
+│  🛡️ Streak Protection: 1 free pass remaining this week     │
+│                                                             │
+│  Keep your streak alive by:                                 │
+│  • Asking a question to any personality                    │
+│  • Saving wisdom to your journal                           │
+│  • Sharing an insight                                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Streak Milestone Celebration Modal:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                    ✨ 🔥 ✨                                 │
+│                                                             │
+│         Congratulations!                                    │
+│         7-Day Streak Achieved!                              │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │  🏅 Consistent Seeker                                   ││
+│  │  You've shown dedication to your wisdom journey         ││
+│  │                                                         ││
+│  │  Reward Unlocked:                                       ││
+│  │  📊 Streak Statistics Dashboard                        ││
+│  └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│  Next milestone: 30 days → "Dedicated Learner" badge       │
+│                                                             │
+│  [Share Achievement 📤]     [Continue Journey →]           │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Streak At-Risk Warning:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ⚠️ Streak Alert                                         [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Your 12-day streak expires in 2 hours!                    │
+│                                                             │
+│  Quick actions to keep your streak:                        │
+│  • [Ask Krishna a question →]                              │
+│  • [Explore today's wisdom →]                              │
+│  • [Add to your journal →]                                 │
+│                                                             │
+│  [Use Streak Protection (1 remaining)]  [Remind me later]  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### **4.3.2. Achievement Badge System Interface**
+
+**Badge Gallery (Profile Section):**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🏆 Your Achievements                          [View All →] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Recently Earned:                                           │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │   🕉️    │  │   🔥    │  │   📤    │  │   ❓    │   │
+│  │ Krishna  │  │ 7-Day   │  │ Wisdom  │  │ Question│   │
+│  │ Devotee  │  │ Streak  │  │ Sharer  │  │ Asker   │   │
+│  │  ⭐ NEW  │  │    ✓    │  │    ✓    │  │    ✓    │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+│                                                             │
+│  In Progress:                                               │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐                 │
+│  │   🧠    │  │   🎤    │  │   🌈    │                 │
+│  │ Einstein │  │ Voice   │  │ Domain  │                 │
+│  │ Apprentice│ │ Pioneer │  │Explorer │                 │
+│  │  7/10    │  │  0/1    │  │  4/6    │                 │
+│  │ ████░░░░ │  │ ░░░░░░░ │  │ ██████░ │                 │
+│  └──────────┘  └──────────┘  └──────────┘                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Badge Unlock Notification:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🎉 Achievement Unlocked!                                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│         ┌─────────────────────┐                            │
+│         │                     │                            │
+│         │        🕉️          │                            │
+│         │                     │                            │
+│         │   Krishna Devotee   │                            │
+│         │                     │                            │
+│         └─────────────────────┘                            │
+│                                                             │
+│  You've completed 10 conversations with Krishna!            │
+│                                                             │
+│  "The wise see all beings as equal." - Bhagavad Gita       │
+│                                                             │
+│  [Share 📤]  [View All Badges]  [Continue →]               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### **4.3.3. Progress Dashboard Interface**
+
+**Dashboard Layout (Full Page):**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 📊 Your Wisdom Journey                    [Share] [Export] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ Overview Stats                                          │ │
+│ │ ┌─────────────┬─────────────┬─────────────┬───────────┐ │ │
+│ │ │ 🔥 Streak   │ ❓ Questions │ 🎭 Explored │ 🏆 Badges │ │ │
+│ │ │    12      │     47      │   8/25     │   7/24   │ │ │
+│ │ │   days     │   asked     │ personali. │  earned  │ │ │
+│ │ └─────────────┴─────────────┴─────────────┴───────────┘ │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 📈 Activity This Month                    [Week][Month] │ │
+│ │                                                         │ │
+│ │ Questions │                                             │ │
+│ │    8      │     ▄                                       │ │
+│ │    6      │   ▄ █ ▄     ▄ ▄                            │ │
+│ │    4      │ ▄ █ █ █   ▄ █ █ ▄   ▄                      │ │
+│ │    2      │ █ █ █ █ ▄ █ █ █ █ ▄ █ ▄                    │ │
+│ │    0      │─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─→                  │ │
+│ │           │ W1      W2      W3      W4                  │ │
+│ │                                                         │ │
+│ │ Most active: Tuesdays | Avg: 3.2 questions/day         │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌───────────────────────────┬─────────────────────────────┐ │
+│ │ 🎭 Personality Relations  │ 🧭 Domain Exploration       │ │
+│ │                           │                             │ │
+│ │ Krishna     ████████ L5  │ 🕉️ Spiritual   ████████ 80% │ │
+│ │ Einstein    ██████░░ L4  │ 🔬 Scientific  █████░░░ 60% │ │
+│ │ M.Aurelius  ████░░░░ L3  │ 🏛️ Leadership  ███░░░░░ 33% │ │
+│ │ Lincoln     ██░░░░░░ L2  │ 💭 Philosophy  ████░░░░ 50% │ │
+│ │ Buddha      █░░░░░░░ L1  │ 📚 Literary    █████░░░ 50% │ │
+│ │                           │ 🧠 Psychology  ████████100% │ │
+│ │ [View All Relationships]  │                             │ │
+│ └───────────────────────────┴─────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🏆 Recent Achievements                                  │ │
+│ │                                                         │ │
+│ │ 🕉️ Krishna Devotee        Earned 2 days ago    ⭐ NEW  │ │
+│ │ 🔥 Consistent Seeker      Earned 5 days ago           │ │
+│ │ 📤 Wisdom Sharer          Earned 1 week ago           │ │
+│ │                                                         │ │
+│ │ [View All 7 Badges]                                     │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🎯 Next Milestones                                      │ │
+│ │                                                         │ │
+│ │ • 🔥 3 more days → 15-day streak milestone              │ │
+│ │ • 🧠 3 more conversations → Einstein Apprentice badge   │ │
+│ │ • 🕉️ Explore Rumi → Complete Spiritual domain          │ │
+│ │ • 📔 5 more entries → Journal Keeper badge              │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 📔 Wisdom Journal                                       │ │
+│ │                                                         │ │
+│ │ 12 entries | 5 tags | Last entry: 2 days ago           │ │
+│ │ [Open Journal →]                                        │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### **4.3.4. Progressive Feature Discovery UX**
+
+**Contextual Feature Tips:**
+
+Feature tips appear as subtle, dismissible overlays at optimal moments:
+
+```
+After 3rd text message - Voice tip:
+┌─────────────────────────────────────────────────────────────┐
+│ 💡 Did you know?                                       [×] │
+│                                                             │
+│ You can speak naturally with Einstein using voice mode!    │
+│                                                             │
+│ [Try Voice Mode 🎤]              [Maybe Later]             │
+└─────────────────────────────────────────────────────────────┘
+
+After meaningful exchange - Share tip:
+┌─────────────────────────────────────────────────────────────┐
+│ 💡 This wisdom resonated!                              [×] │
+│                                                             │
+│ Share this insight with friends who might benefit.         │
+│                                                             │
+│ [Share 📤]                       [Not Now]                 │
+└─────────────────────────────────────────────────────────────┘
+
+Returning user - Memory tip:
+┌─────────────────────────────────────────────────────────────┐
+│ 💡 Welcome back!                                       [×] │
+│                                                             │
+│ Krishna remembers your previous conversation about duty.   │
+│ Continue where you left off?                               │
+│                                                             │
+│ [Continue Conversation]          [Start Fresh]             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Feature Discovery Menu:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ✨ Discover Vimarsh Features                           [×] │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🎤 Voice Conversations                      [Try It →] │ │
+│ │ Speak naturally with any personality                    │ │
+│ │ ░░░░░░░░░░ Not yet tried                               │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🧠 Memory System                              [Active] │ │
+│ │ Personalities remember your journey                     │ │
+│ │ ████████████ Fully active                              │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 📔 Wisdom Journal                           [Explore →] │ │
+│ │ Save and reflect on meaningful insights                 │ │
+│ │ ████░░░░░░ 3 entries saved                             │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 📊 Progress Dashboard                       [View →]   │ │
+│ │ Track your wisdom journey                               │ │
+│ │ █████████░ Recently viewed                             │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 4.4. Returning User Journey (Updated)
+
+**4.1.1 Personality Selection & First Interaction**
 ```
 User Action: Clicks "Start Your Journey" or selects specific personality
 System Response:
@@ -330,7 +867,7 @@ User State: Excited about chosen personality interaction
 Design Goal: Create connection with selected wisdom guide
 ```
 
-**1.3 First Conversation Experience (Enhanced)**
+**4.1.2 First Conversation Experience (Enhanced)**
 ```
 User Action: Asks first question to chosen personality
 System Response:
@@ -352,10 +889,11 @@ Design Goal: Demonstrate AI quality and domain expertise
 User Action: Returns to platform
 System Response:
 - Personalized greeting (if logged in)
+- Streak counter prominently displayed
 - Recent conversation history (optional)
 - Quick action: "Ask a Question"
 - Featured wisdom of the day
-- Progress indicators for spiritual journey
+- Progress indicators for wisdom journey
 
 User State: Comfortable and seeking specific guidance
 Design Goal: Reduce friction and encourage deep engagement

@@ -139,6 +139,343 @@ TEST_VOICE_015: Voice quality badge displays for Azure Neural voices ⏳
 
 ---
 
+## 📋 **NEXT SPRINT: USER ENGAGEMENT & RETENTION (December 2025)**
+
+### **Sprint Vision**
+Transform Vimarsh from a wisdom platform into an engaging habit-forming experience by implementing guided onboarding, gamification (streaks, achievements), and personalized notifications. Reduce time-to-value from ~5 minutes to under 60 seconds and build habit loops that drive daily engagement.
+
+### **Problem Statement**
+Current platform has robust technical foundations but lacks engagement mechanics:
+- **No Onboarding Flow**: New users land on personality grid with no guidance
+- **No Gamification**: No streaks, achievements, or progress tracking
+- **No Habit Triggers**: No daily reminders or notifications
+- **High Time-to-Value**: Users must explore ~25 personalities to find their match
+- **No Progress Visibility**: Users can't see their wisdom journey growth
+
+### **Solution: Engagement Features Suite**
+
+| Feature | Purpose | Impact |
+|---------|---------|--------|
+| **Onboarding Wizard** | 5-question quiz + guided first conversation | ⬇️ Time-to-value: 5min → 60sec |
+| **Personality Quiz** | Match users to ideal personality via domain scoring | ⬆️ Initial engagement: +40% |
+| **Streak System** | Daily check-ins with flame counter + milestones | ⬆️ DAU/MAU: +35% |
+| **Achievement Badges** | 20+ unlockable achievements with points | ⬆️ Session depth: +25% |
+| **Progress Dashboard** | Visual journey tracking with stats | ⬆️ Return rate: +30% |
+| **Daily Notifications** | Personalized wisdom reminders via Web Push | ⬆️ D7 retention: +40% |
+
+---
+
+### **🎯 PHASE 1: ONBOARDING WIZARD (Week 1-2) ✅ COMPLETE**
+
+#### **Task List - Backend Onboarding Infrastructure**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 1.1 | Create OnboardingService | `backend/onboarding/onboarding_service.py` | Core onboarding state management and quiz processing | ✅ DONE |
+| 1.2 | Create PersonalityQuizService | `backend/onboarding/quiz_service.py` | Quiz scoring algorithm with domain weights | ✅ DONE |
+| 1.3 | Create quiz_questions.json | `backend/onboarding/quiz_questions.json` | 8 questions with 5 options each, domain scoring | ✅ DONE |
+| 1.4 | Create onboarding_state container | Cosmos DB | Onboarding progress tracking, partitionKey=/user_id | ✅ DONE |
+| 1.5 | Create GET /onboarding/state endpoint | `backend/onboarding/onboarding_api.py` | Get current onboarding state for user | ✅ DONE |
+| 1.6 | Create POST /onboarding/state/advance endpoint | `backend/onboarding/onboarding_api.py` | Advance to next onboarding step | ✅ DONE |
+| 1.7 | Create POST /onboarding/quiz/response endpoint | `backend/onboarding/onboarding_api.py` | Submit single quiz response | ✅ DONE |
+| 1.8 | Create POST /onboarding/quiz/process endpoint | `backend/onboarding/onboarding_api.py` | Process quiz and get personality match | ✅ DONE |
+| 1.9 | Create POST /onboarding/skip endpoint | `backend/onboarding/onboarding_api.py` | Skip onboarding with optional reason | ✅ DONE |
+| 1.10 | Create POST /onboarding/complete endpoint | `backend/onboarding/onboarding_api.py` | Mark onboarding as complete | ✅ DONE |
+
+#### **Task List - Frontend Onboarding Components**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 1.11 | Create OnboardingWizard | `frontend/src/components/onboarding/OnboardingWizard.tsx` | Main wizard container with step management | ✅ DONE |
+| 1.12 | Create WelcomeStep | `frontend/src/components/onboarding/WelcomeStep.tsx` | Animated welcome with value proposition | ✅ DONE |
+| 1.13 | Create PersonalityQuiz | `frontend/src/components/onboarding/PersonalityQuiz.tsx` | Multi-question quiz with visual options | ✅ DONE |
+| 1.14 | Create QuizQuestion | `frontend/src/components/onboarding/QuizQuestion.tsx` | Individual question with option cards | ✅ DONE |
+| 1.15 | Create MatchResult | `frontend/src/components/onboarding/MatchResult.tsx` | Match reveal with animations | ✅ DONE |
+| 1.16 | Create useOnboarding hook | `frontend/src/components/onboarding/useOnboarding.ts` | Onboarding state management | ✅ DONE |
+| 1.17 | Create onboardingApi service | `frontend/src/components/onboarding/onboardingApi.ts` | API client for onboarding endpoints | ✅ DONE |
+| 1.18 | Create types definitions | `frontend/src/components/onboarding/types.ts` | TypeScript types for onboarding | ✅ DONE |
+| 1.19 | Create index exports | `frontend/src/components/onboarding/index.ts` | Module exports | ✅ DONE |
+| 1.20 | Integrate onboarding into LandingPage | `frontend/src/components/LandingPage.tsx` | Check onboarding status, show wizard | ✅ DONE |
+
+#### **Test Cases - Phase 1 Onboarding**
+
+```
+TEST_ONBOARD_001: OnboardingService initializes state for new user ⏳
+TEST_ONBOARD_002: Quiz responses store correctly in database ⏳
+TEST_ONBOARD_003: Personality matching algorithm returns valid match ⏳
+TEST_ONBOARD_004: Domain scoring aggregates correctly across questions ⏳
+TEST_ONBOARD_005: Onboarding state persists across sessions ⏳
+TEST_ONBOARD_006: Skip onboarding stores skip reason ⏳
+TEST_ONBOARD_007: /onboarding/state returns correct step for returning user ⏳
+TEST_ONBOARD_008: Quiz completion triggers personality match calculation ⏳
+TEST_ONBOARD_009: OnboardingWizard renders correct step based on state ⏳
+TEST_ONBOARD_010: Quiz transitions smoothly between questions ⏳
+TEST_ONBOARD_011: Match result displays correct personality with reasoning ⏳
+TEST_ONBOARD_012: First conversation guide provides helpful prompts ⏳
+TEST_ONBOARD_013: Feature discovery tooltips appear at correct triggers ⏳
+TEST_ONBOARD_014: Onboarding completes in under 60 seconds (UX test) ⏳
+TEST_ONBOARD_015: Mobile onboarding works on iOS and Android ⏳
+```
+
+---
+
+### **🎯 PHASE 2: STREAK & ACHIEVEMENT SYSTEM (Week 2-3) ✅ COMPLETE**
+
+#### **Task List - Backend Engagement Infrastructure**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 2.1 | Create EngagementService | `backend/engagement/engagement_service.py` | Daily check-ins, streak calculation, activity tracking | ✅ DONE |
+| 2.2 | Create AchievementService | `backend/engagement/achievement_service.py` | Achievement unlocking, progress tracking, points | ✅ DONE |
+| 2.3 | Create achievement_definitions.py | `backend/engagement/achievement_definitions.py` | 50+ achievement definitions with criteria | ✅ DONE |
+| 2.4 | Create user_streaks container | Cosmos DB | Streak data, daily activity, partitionKey=/user_id | ✅ DONE |
+| 2.5 | Create achievements container | Cosmos DB | Unlocked achievements, progress, partitionKey=/user_id | ✅ DONE |
+| 2.6 | Create POST /engagement/activity endpoint | `backend/engagement/engagement_api.py` | Record daily check-in and update streak | ✅ DONE |
+| 2.7 | Create GET /engagement/streaks endpoint | `backend/engagement/engagement_api.py` | Get current streak information | ✅ DONE |
+| 2.8 | Create GET /engagement/achievements endpoint | `backend/engagement/engagement_api.py` | Get all achievements with progress | ✅ DONE |
+| 2.9 | Create GET /engagement/dashboard endpoint | `backend/engagement/engagement_api.py` | Get combined engagement dashboard data | ✅ DONE |
+| 2.10 | Create POST /engagement/streaks/freeze endpoint | `backend/engagement/engagement_api.py` | Use streak freeze to protect streak | ✅ DONE |
+| 2.11 | Implement streak grace period | `backend/engagement/engagement_service.py` | Auto streak freeze protection | ✅ DONE |
+| 2.12 | Implement streak freeze feature | `backend/engagement/engagement_service.py` | Allow users to freeze streak (3 per week) | ✅ DONE |
+
+#### **Task List - Frontend Engagement Components**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 2.13 | Create StreakDisplay | `frontend/src/components/engagement/StreakDisplay.tsx` | Compact header streak display with flame icon | ✅ DONE |
+| 2.14 | Create StreakWeekView | `frontend/src/components/engagement/StreakWeekView.tsx` | 7-day activity visualization | ✅ DONE |
+| 2.15 | Create AchievementBadge | `frontend/src/components/engagement/AchievementBadge.tsx` | Single achievement display with progress ring | ✅ DONE |
+| 2.16 | Create AchievementsPanel | `frontend/src/components/engagement/AchievementsPanel.tsx` | Achievement collection view with filtering | ✅ DONE |
+| 2.17 | Create AchievementUnlockModal | `frontend/src/components/engagement/AchievementUnlockModal.tsx` | Celebration modal on unlock | ✅ DONE |
+| 2.18 | Create useEngagement hook | `frontend/src/components/engagement/useEngagement.ts` | Engagement state management (streaks + achievements) | ✅ DONE |
+| 2.19 | Create engagementApi service | `frontend/src/components/engagement/engagementApi.ts` | API client for engagement endpoints | ✅ DONE |
+| 2.20 | Create types definitions | `frontend/src/components/engagement/types.ts` | TypeScript types for engagement | ✅ DONE |
+| 2.21 | Create index exports | `frontend/src/components/engagement/index.ts` | Module exports | ✅ DONE |
+| 2.22 | Add streak counter to header | `frontend/src/components/GuidanceInterface.tsx` | Display streak in navigation | ✅ DONE |
+| 2.23 | Add progress dashboard route | `frontend/src/App.tsx` | Route for /progress page | ✅ DONE |
+| 2.24 | Create ProgressDashboard page | `frontend/src/pages/ProgressDashboard.tsx` | Full progress view with stats and achievements | ✅ DONE |
+| 2.25 | Create StreakDisplayContainer | `frontend/src/components/engagement/StreakDisplayContainer.tsx` | Self-contained streak display with data fetching | ✅ DONE |
+
+#### **Test Cases - Phase 2 Streaks & Achievements**
+
+```
+TEST_ENGAGE_001: EngagementService calculates streak correctly ⏳
+TEST_ENGAGE_002: Streak increments on daily check-in ⏳
+TEST_ENGAGE_003: Streak resets after missing 2 consecutive days ⏳
+TEST_ENGAGE_004: Grace period prevents immediate streak break ⏳
+TEST_ENGAGE_005: Streak freeze pauses streak countdown ⏳
+TEST_ENGAGE_006: Achievement unlocks at correct thresholds ⏳
+TEST_ENGAGE_007: Achievement progress updates in real-time ⏳
+TEST_ENGAGE_008: Points accumulate correctly on achievement unlock ⏳
+TEST_ENGAGE_009: Level calculation based on total points ⏳
+TEST_ENGAGE_010: StreakCounter displays correct day count ⏳
+TEST_ENGAGE_011: StreakCounter animates on milestone (7, 30, 100 days) ⏳
+TEST_ENGAGE_012: AchievementBadge shows locked/unlocked states ⏳
+TEST_ENGAGE_013: AchievementUnlockModal triggers on new unlock ⏳
+TEST_ENGAGE_014: ProgressDashboard loads all metrics correctly ⏳
+TEST_ENGAGE_015: WeeklyActivityChart renders 7-day data ⏳
+TEST_ENGAGE_016: DomainCoverageChart shows 6 domains ⏳
+TEST_ENGAGE_017: Activity recording triggers achievement checks ⏳
+TEST_ENGAGE_018: Multiple achievements can unlock simultaneously ⏳
+```
+
+---
+
+### **🎯 PHASE 3: NOTIFICATION SYSTEM (Week 3-4) ✅ COMPLETE**
+
+#### **Task List - Backend Notification Infrastructure**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 3.1 | Create NotificationService | `backend/notifications/notification_service.py` | Push subscription management, notification generation | ✅ DONE |
+| 3.2 | Create ContentService | `backend/notifications/content_service.py` | Daily wisdom content generation | ✅ DONE |
+| 3.3 | Create notification_templates.py | `backend/notifications/notification_templates.py` | Notification type definitions and templates | ✅ DONE |
+| 3.4 | Create notification_subscriptions container | Cosmos DB | Push subscriptions, preferences, partitionKey=/user_id | ⏳ NEEDS PROVISIONING |
+| 3.5 | Create timer trigger function | `backend/notifications/notification_trigger.py` | Azure Functions timer trigger (hourly) | ✅ DONE |
+| 3.6 | Create POST /notifications/subscribe endpoint | `backend/notifications/notification_api.py` | Subscribe to push notifications | ✅ DONE |
+| 3.7 | Create PUT /notifications/preferences endpoint | `backend/notifications/notification_api.py` | Update notification preferences | ✅ DONE |
+| 3.8 | Create DELETE /notifications/unsubscribe endpoint | `backend/notifications/notification_api.py` | Unsubscribe from notifications | ✅ DONE |
+| 3.9 | Setup VAPID keys | `backend/notifications/notification_service.py` | Generate and store VAPID keys for Web Push | ⏳ NEEDS AZURE SETUP |
+| 3.10 | Implement streak reminder logic | `backend/notifications/notification_trigger.py` | Send reminder if streak at risk | ✅ DONE |
+
+#### **Task List - Frontend Notification Components**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 3.11 | Create PushNotificationService | `frontend/src/components/notifications/pushNotificationService.ts` | Web Push subscription management | ✅ DONE |
+| 3.12 | Create NotificationPermissionPrompt | `frontend/src/components/notifications/NotificationPermissionPrompt.tsx` | Permission request UI | ✅ DONE |
+| 3.13 | Create NotificationPreferencesPanel | `frontend/src/components/notifications/NotificationPreferencesPanel.tsx` | Time, frequency, type settings | ✅ DONE |
+| 3.14 | Update Service Worker | `frontend/public/sw.js` | Handle push events and notification clicks | ✅ DONE |
+| 3.15 | Add notification permission flow | `frontend/src/components/onboarding/NotificationOptInStep.tsx` | Request permission during onboarding | ✅ DONE |
+| 3.16 | Create useNotifications hook | `frontend/src/components/notifications/useNotifications.ts` | Notification state management | ✅ DONE |
+
+#### **Additional Files Created**
+
+| File Path | Description | Status |
+|-----------|-------------|--------|
+| `backend/notifications/__init__.py` | Module exports | ✅ DONE |
+| `frontend/src/components/notifications/types.ts` | TypeScript interfaces | ✅ DONE |
+| `frontend/src/components/notifications/notificationApi.ts` | API client service | ✅ DONE |
+| `frontend/src/components/notifications/index.ts` | Component exports | ✅ DONE |
+
+#### **Dependencies Added**
+
+- `pywebpush==1.14.0` added to `backend/requirements.txt`
+
+#### **Test Cases - Phase 3 Notifications**
+
+```
+TEST_NOTIF_001: NotificationService stores push subscription ⏳
+TEST_NOTIF_002: Timer trigger runs every 15 minutes ⏳
+TEST_NOTIF_003: Users in notification window receive push ⏳
+TEST_NOTIF_004: Timezone handling calculates correct send time ⏳
+TEST_NOTIF_005: Daily wisdom content personalizes by personality ⏳
+TEST_NOTIF_006: Streak reminder sends when streak at risk ⏳
+TEST_NOTIF_007: Achievement notification sends on unlock ⏳
+TEST_NOTIF_008: Unsubscribe removes subscription from database ⏳
+TEST_NOTIF_009: Preference update changes notification behavior ⏳
+TEST_NOTIF_010: Service worker displays notification correctly ⏳
+TEST_NOTIF_011: Notification click opens correct app route ⏳
+TEST_NOTIF_012: Permission prompt follows best practices timing ⏳
+TEST_NOTIF_013: Notification preferences persist across sessions ⏳
+TEST_NOTIF_014: Rate limiting prevents notification spam ⏳
+```
+
+---
+
+### **🎯 PHASE 4: INTEGRATION & POLISH (Week 4-5) ✅ COMPLETE**
+
+#### **Task List - System Integration**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 4.1 | Create EngagementContext | `frontend/src/contexts/EngagementContext.tsx` | Centralized engagement state management | ✅ DONE |
+| 4.2 | Add activity recording to conversation flow | `frontend/src/components/GuidanceInterface.tsx` | Record activity after each message | ✅ DONE |
+| 4.3 | Add achievement modal to GuidanceInterface | `frontend/src/components/GuidanceInterface.tsx` | Show achievement unlocks during conversation | ✅ DONE |
+| 4.4 | Integrate EngagementProvider into App | `frontend/src/App.tsx` | Add provider to app hierarchy | ✅ DONE |
+| 4.5 | Update ProgressDashboard to use context | `frontend/src/pages/ProgressDashboard.tsx` | Use EngagementContext instead of direct API | ✅ DONE |
+| 4.6 | Connect achievement checks to guidance endpoint | `backend/function_app.py` | Check achievements after conversation | ✅ DONE |
+| 4.7 | Add engagement analytics to AnalyticsService | `frontend/src/utils/analytics.ts`, `frontend/src/contexts/EngagementContext.tsx` | Track engagement events (streaks, achievements, check-ins, levels) | ✅ DONE |
+| 4.8 | Create engagement data migration script | `data/migrate_engagement_data.py` | Initialize engagement for existing users | ✅ DONE |
+| 4.9 | Add streak to user profile display | `frontend/src/components/GuidanceInterface.tsx` | Show compact streak in header | ✅ DONE |
+| 4.10 | Add achievements to sharing interface | `frontend/src/components/engagement/AchievementShareModal.tsx` | Allow sharing achievements on social media | ✅ DONE |
+
+#### **Task List - Performance & Polish**
+
+| # | Task | File(s) | Description | Status |
+|---|------|---------|-------------|--------|
+| 4.11 | Optimize engagement queries | `backend/engagement/engagement_service.py`, `backend/engagement/achievement_service.py` | Added TTLCache caching (300s TTL) | ✅ DONE |
+| 4.12 | Add loading states for all engagement components | `frontend/src/components/engagement/` | Skeleton loaders | ✅ DONE |
+| 4.13 | Add error handling and retry logic | `frontend/src/components/engagement/` | Graceful degradation | ✅ DONE |
+| 4.14 | Create engagement onboarding tour | `frontend/src/components/engagement/EngagementTour.tsx` | 5-step tour with react-joyride | ✅ DONE |
+| 4.15 | Add accessibility labels | `frontend/src/components/engagement/` | ARIA labels, keyboard nav | ✅ DONE |
+| 4.16 | Mobile responsiveness audit | `frontend/src/pages/ProgressDashboard.tsx` | Added CSS media queries for responsive layout | ✅ DONE |
+| 4.17 | Dark mode support | `frontend/src/components/engagement/` | Theme-aware styles via MUI | ✅ DONE |
+
+#### **Test Cases - Phase 4 Integration**
+
+```
+TEST_INT_001: Full onboarding → first conversation flow works end-to-end ⏳
+TEST_INT_002: Streak updates after conversation ⏳
+TEST_INT_003: Achievement unlocks trigger modal during conversation ⏳
+TEST_INT_004: Progress dashboard shows all metrics accurately ⏳
+TEST_INT_005: Notification sent at user's preferred time ⏳
+TEST_INT_006: Existing users see engagement features on return ⏳
+TEST_INT_007: Performance: engagement endpoints respond <200ms ⏳
+TEST_INT_008: Mobile onboarding completes without issues ⏳
+TEST_INT_009: Accessibility: all features keyboard navigable ⏳
+TEST_INT_010: Analytics tracks all engagement events correctly ⏳
+```
+
+---
+
+### **📁 FILES TO CREATE IN ENGAGEMENT SPRINT**
+
+| File Path | Description | Est. Lines |
+|-----------|-------------|------------|
+| `backend/onboarding/onboarding_service.py` | Core onboarding state management | ~300 |
+| `backend/onboarding/quiz_service.py` | Quiz scoring and personality matching | ~250 |
+| `backend/onboarding/quiz_questions.json` | 5 quiz questions with options | ~100 |
+| `backend/engagement/engagement_service.py` | Streak calculation, activity tracking | ~400 |
+| `backend/engagement/achievement_service.py` | Achievement unlocking, points | ~350 |
+| `backend/engagement/achievement_definitions.py` | 20+ achievement definitions | ~300 |
+| `backend/notifications/notification_service.py` | Push subscription, notification send | ~350 |
+| `backend/notifications/content_service.py` | Daily wisdom content generation | ~200 |
+| `backend/notifications/notification_templates.py` | Notification type templates | ~150 |
+| `backend/notifications/notification_trigger.py` | Timer trigger function | ~150 |
+| `frontend/src/components/onboarding/OnboardingWizard.tsx` | Main wizard container | ~400 |
+| `frontend/src/components/onboarding/WelcomeStep.tsx` | Animated welcome | ~150 |
+| `frontend/src/components/onboarding/PersonalityQuiz.tsx` | 5-question quiz | ~350 |
+| `frontend/src/components/onboarding/QuizQuestion.tsx` | Question renderer | ~150 |
+| `frontend/src/components/onboarding/PersonalityMatchResult.tsx` | Match reveal | ~200 |
+| `frontend/src/components/onboarding/FirstConversationGuide.tsx` | Guided first chat | ~200 |
+| `frontend/src/components/onboarding/FeatureDiscoveryTooltips.tsx` | Feature discovery | ~250 |
+| `frontend/src/components/onboarding/OnboardingProgress.tsx` | Progress indicator | ~100 |
+| `frontend/src/components/onboarding/hooks/useOnboarding.ts` | Onboarding hook | ~150 |
+| `frontend/src/components/onboarding/hooks/useQuiz.ts` | Quiz hook | ~150 |
+| `frontend/src/components/engagement/StreakCounter.tsx` | Header streak display | ~150 |
+| `frontend/src/components/engagement/StreakWeekView.tsx` | 7-day visualization | ~200 |
+| `frontend/src/components/engagement/AchievementBadge.tsx` | Single achievement | ~150 |
+| `frontend/src/components/engagement/AchievementGrid.tsx` | Achievement collection | ~200 |
+| `frontend/src/components/engagement/AchievementUnlockModal.tsx` | Unlock celebration | ~200 |
+| `frontend/src/components/engagement/ProgressDashboard.tsx` | Progress page | ~500 |
+| `frontend/src/components/engagement/WeeklyActivityChart.tsx` | Weekly graph | ~200 |
+| `frontend/src/components/engagement/DomainCoverageChart.tsx` | Radar chart | ~200 |
+| `frontend/src/components/engagement/hooks/useStreak.ts` | Streak hook | ~100 |
+| `frontend/src/components/engagement/hooks/useAchievements.ts` | Achievements hook | ~150 |
+| `frontend/src/components/engagement/hooks/useEngagement.ts` | Activity hook | ~100 |
+| `frontend/src/services/pushNotificationService.ts` | Web Push service | ~200 |
+| `frontend/src/components/NotificationPermissionPrompt.tsx` | Permission UI | ~150 |
+| `frontend/src/components/NotificationPreferencesPanel.tsx` | Preferences UI | ~200 |
+| `frontend/src/hooks/useNotifications.ts` | Notifications hook | ~100 |
+
+### **📁 FILES TO MODIFY IN ENGAGEMENT SPRINT**
+
+| File Path | Changes |
+|-----------|---------|
+| `backend/function_app.py` | Add 15 new API endpoints for onboarding, engagement, notifications |
+| `frontend/src/components/LandingPage.tsx` | Check onboarding status, show wizard, add streak counter |
+| `frontend/src/contexts/MemoryContext.tsx` | Add engagement tracking properties |
+| `frontend/src/components/GuidanceInterface.tsx` | Add activity recording, achievement triggers |
+| `frontend/src/App.tsx` | Add routes for /progress, update navigation |
+| `frontend/public/sw.js` | Add push notification handlers |
+| `backend/services/analytics_service.py` | Add engagement event tracking |
+| `frontend/src/components/SharingInterface.tsx` | Add achievement sharing |
+
+### **📊 DATABASE CHANGES (ENGAGEMENT SPRINT)**
+
+| Container | Action | Schema | Partition Key |
+|-----------|--------|--------|---------------|
+| `onboarding_state` | CREATE | `{id, user_id, status, current_step, quiz_responses, personality_match, progress, started_at, completed_at}` | `/user_id` |
+| `engagement_tracking` | CREATE | `{id, user_id, streaks, daily_activity, weekly_summary, milestones, notification_schedule}` | `/user_id` |
+| `achievements` | CREATE | `{id, user_id, unlocked_achievements, achievement_progress, total_points, level}` | `/user_id` |
+| `notification_subscriptions` | CREATE | `{id, user_id, push_subscription, preferences, notification_history, stats}` | `/user_id` |
+
+### **📊 SUCCESS METRICS (ENGAGEMENT SPRINT)**
+
+| Metric | Target | Measurement | Baseline |
+|--------|--------|-------------|----------|
+| Time to First Meaningful Conversation | <60 seconds | Onboarding analytics | ~5 minutes |
+| Onboarding Completion Rate | >70% | Onboarding funnel | N/A (new) |
+| 7-Day Retention | +40% | D7 cohort analysis | Current baseline |
+| Daily Active Users (DAU) | +35% | Analytics | Current baseline |
+| Users with 7+ Day Streak | 30% of active users | Engagement tracking | N/A (new) |
+| Achievement Unlock Rate | 2+ per user in first week | Achievement analytics | N/A (new) |
+| Notification Open Rate | >25% | Push analytics | N/A (new) |
+| Session Depth | +25% avg messages | Conversation analytics | Current baseline |
+| Feature Discovery | 80% discover voice/share | Feature tracking | Current baseline |
+
+### **💰 COST ESTIMATE (ENGAGEMENT SPRINT)**
+
+| Resource | Monthly Estimate | Notes |
+|----------|------------------|-------|
+| Cosmos DB (4 new containers) | +$2-5/month | Serverless pricing |
+| Web Push API | $0 | Free (VAPID-based) |
+| Timer Trigger | $0 | Included in Functions |
+| **Total Additional** | **$2-5/month** | Minimal cost increase |
+
+---
+
 ## 🎉 **COMPLETED SPRINT: HIERARCHICAL MEMORY ARCHITECTURE (January 2025)**
 
 ### **Sprint Vision**

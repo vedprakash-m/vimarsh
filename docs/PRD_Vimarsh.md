@@ -364,7 +364,393 @@ A curated daily wisdom feature that drives return visits and introduces users to
   - 40% increase in social sharing activity
   - Improved user onboarding and first-time engagement
 
-### 6.3. User Acquisition Strategy:
+---
+
+## 6.3. User Adoption & Engagement System (NEW)
+
+The User Adoption & Engagement System addresses the critical gap between initial user acquisition and long-term retention through three core pillars: **Intelligent Onboarding**, **Habit-Building Mechanics**, and **Progress Visualization**.
+
+### 6.3.1. Intelligent Onboarding System
+
+**Problem Addressed:**
+New users face decision paralysis when presented with 25 personalities across 6 domains without guidance on where to start, resulting in high bounce rates and missed opportunities for meaningful first interactions.
+
+**Solution: 3-Step Onboarding Wizard**
+
+The Onboarding Wizard guides new users to their first meaningful conversation within 60 seconds through an intelligent matching system.
+
+**Step 1: Intent Discovery**
+```
+"What brings you here today?"
+
+Options:
+🧭 "Seeking guidance on a life decision"     → Leadership/Philosophical personalities
+🕉️ "Exploring spiritual wisdom"              → Spiritual domain personalities
+📚 "Learning from history's great minds"     → Leadership/Scientific personalities  
+🔬 "Scientific or philosophical curiosity"   → Scientific/Philosophical personalities
+💭 "Personal growth and self-improvement"    → Philosophical/Psychology personalities
+🎭 "Exploring literature and creativity"     → Literary domain personalities
+```
+
+**Step 2: Personality Matching (Smart Recommendations)**
+```
+Based on selection, system recommends 2-3 optimal starting personalities:
+
+Example for "Seeking guidance on a life decision":
+┌─────────────────────────────────────────────────────────────┐
+│ 🎯 Recommended for You                                      │
+├─────────────────────────────────────────────────────────────┤
+│ 🕉️ Krishna - "Divine guidance for life's crossroads"      │
+│    Perfect for: Duty, dharma, ethical dilemmas             │
+│                                                             │
+│ 🏛️ Marcus Aurelius - "Stoic wisdom for difficult choices" │
+│    Perfect for: Resilience, virtue, practical philosophy   │
+│                                                             │
+│ 🎩 Lincoln - "Leadership through moral conviction"          │
+│    Perfect for: Integrity, unity, making hard decisions    │
+├─────────────────────────────────────────────────────────────┤
+│ [Select a Guide] or [Show All 25 Personalities]            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Step 3: First Question Catalyst**
+```
+System provides contextual example questions to reduce blank-page syndrome:
+
+For Krishna selection:
+┌─────────────────────────────────────────────────────────────┐
+│ 🕉️ Ready to begin your conversation with Krishna          │
+├─────────────────────────────────────────────────────────────┤
+│ Try one of these questions, or ask your own:               │
+│                                                             │
+│ 💡 "How do I know if I'm on the right path?"               │
+│ 💡 "What is the nature of duty when choices conflict?"     │
+│ 💡 "How can I find peace amidst difficult circumstances?"  │
+│                                                             │
+│ Or type your own question...                                │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │                                              [Ask →]    │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Onboarding Completion Triggers:**
+- User completes first conversation exchange
+- User explores personality selector independently
+- User dismisses onboarding ("I'll explore on my own")
+- User returns within 24 hours (marks as familiar)
+
+**Metrics & Success Criteria:**
+- Time to first meaningful interaction: Target <60 seconds
+- Onboarding completion rate: Target >70%
+- First-session conversation depth: Target 3+ exchanges
+- Next-day return rate for onboarded users: Target >40%
+
+### 6.3.2. Personality Quiz/Matcher
+
+**5-Question Adaptive Quiz:**
+
+For users who prefer guided discovery, the Personality Quiz provides an engaging way to find their ideal starting personality.
+
+**Question Flow:**
+```
+Q1: "What kind of wisdom resonates most with you?"
+    ☐ Spiritual and transcendent insights
+    ☐ Logical and evidence-based reasoning  
+    ☐ Practical life wisdom and strategy
+    ☐ Philosophical reflection on meaning
+
+Q2: "Which historical era interests you most?"
+    ☐ Ancient civilizations (Greece, India, China)
+    ☐ Renaissance and Enlightenment
+    ☐ Modern era (19th-20th century)
+    ☐ All eras equally
+
+Q3: "How do you prefer to learn?"
+    ☐ Through stories and parables
+    ☐ Through structured arguments and logic
+    ☐ Through practical examples and advice
+    ☐ Through poetic and metaphorical language
+
+Q4: "What challenge are you currently facing?"
+    ☐ Finding purpose and meaning
+    ☐ Making a difficult decision
+    ☐ Managing stress and emotions
+    ☐ Seeking creative inspiration
+    ☐ Understanding relationships
+
+Q5: "Do you prefer wisdom that is..."
+    ☐ Direct and action-oriented
+    ☐ Contemplative and reflective
+    ☐ Analytical and systematic
+    ☐ Mystical and intuitive
+```
+
+**Result: Personalized Match with Explanation:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🎯 Your Wisdom Match: Marcus Aurelius                       │
+├─────────────────────────────────────────────────────────────┤
+│ Based on your responses, we recommend starting with         │
+│ Marcus Aurelius, the Stoic philosopher-emperor.             │
+│                                                             │
+│ Why this match:                                             │
+│ ✓ You value logical, evidence-based reasoning              │
+│ ✓ You're drawn to practical wisdom for real challenges     │
+│ ✓ You prefer direct, action-oriented guidance              │
+│                                                             │
+│ What to expect:                                             │
+│ Marcus Aurelius offers timeless Stoic wisdom on resilience, │
+│ duty, and finding tranquility through rational thinking.    │
+│                                                             │
+│ [Start Conversation with Marcus Aurelius →]                 │
+│                                                             │
+│ Other great matches for you:                                │
+│ 🧠 Einstein (92% match) • 📚 Aristotle (87% match)         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 6.3.3. Progressive Feature Discovery
+
+**Problem Addressed:**
+Rich features like voice conversations, memory system, sharing, and wisdom journal remain invisible to users who don't actively explore, leading to underutilization of platform capabilities.
+
+**Solution: Contextual Feature Tips**
+
+Feature tips appear at optimal moments based on user behavior:
+
+| Trigger Condition | Feature Tip |
+|-------------------|-------------|
+| After 3rd text message | "💡 Try voice mode - speak naturally with {personality}" |
+| After meaningful exchange (high engagement) | "📤 This wisdom resonated! Share it with friends" |
+| Returning user (2nd+ session) | "🧠 {Personality} remembers your previous conversations" |
+| 5+ messages in session | "📔 Save insights to your Wisdom Journal for reflection" |
+| Single personality, 3+ sessions | "🎭 Explore other perspectives - try {related personality}" |
+| After positive feedback | "⭐ Help others find wisdom - leave a review" |
+
+**Implementation Rules:**
+- Maximum 1 tip per session to avoid fatigue
+- Tips dismissible with "Don't show again" option
+- Tips track display count and dismissal to optimize timing
+- A/B testing for tip copy and timing optimization
+
+### 6.3.4. Streak System (Habit Building)
+
+**Problem Addressed:**
+Users lack motivation for consistent engagement, missing the compounding benefits of regular wisdom practice and deeper personality relationships.
+
+**Solution: Daily Engagement Streaks**
+
+**Streak Mechanics:**
+- **Daily Check-in**: Any meaningful interaction (question asked, wisdom saved, share completed) counts
+- **Streak Counter**: Prominently displayed showing consecutive days of engagement
+- **Milestone Celebrations**: Special recognition at 7, 30, 100, and 365 days
+- **Streak Protection**: One "free pass" per week for missed days (recoverable within 24 hours)
+- **Freeze Option**: Premium users can freeze streak during known absences
+
+**Visual Design:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🔥 Your Wisdom Streak: 12 Days                              │
+│ ████████████░░░░░░░░░░░░░░░░░░ Next milestone: 30 days     │
+│                                                             │
+│ Keep your streak alive! Ask a question or explore wisdom.   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Streak Notifications:**
+- Morning reminder: "Continue your 12-day streak with {personality}"
+- Evening warning: "Your streak expires in 2 hours - don't lose your progress!"
+- Recovery prompt: "You missed yesterday, but you can recover your streak today!"
+
+**Streak Rewards:**
+| Milestone | Reward |
+|-----------|--------|
+| 7 days | "Wisdom Seeker" badge + unlock streak stats |
+| 30 days | "Dedicated Learner" badge + streak recovery extended to 48h |
+| 100 days | "Wisdom Devotee" badge + exclusive personality insights |
+| 365 days | "Master Seeker" badge + permanent streak protection |
+
+### 6.3.5. Achievement & Badge System
+
+**Problem Addressed:**
+Users lack tangible markers of progress and accomplishment, reducing sense of achievement and motivation for continued exploration.
+
+**Solution: Multi-Category Badge System**
+
+**Badge Categories:**
+
+**🎭 Personality Mastery Badges:**
+| Badge | Requirement | Icon |
+|-------|-------------|------|
+| Krishna Devotee | 10 conversations with Krishna | 🕉️ |
+| Einstein Apprentice | 10 conversations with Einstein | ⚛️ |
+| Stoic Scholar | 10 conversations with Marcus Aurelius | 🏛️ |
+| [Similar for each personality] | ... | ... |
+| Domain Master: Spiritual | 50 conversations across spiritual personalities | 🧘 |
+| Domain Master: Scientific | 50 conversations across scientific personalities | 🔬 |
+| Polymath | Conversations with all 25 personalities | 🌟 |
+
+**📊 Engagement Badges:**
+| Badge | Requirement | Icon |
+|-------|-------------|------|
+| First Steps | Complete first conversation | 👣 |
+| Question Asker | Ask 10 questions | ❓ |
+| Deep Thinker | 50 questions asked | 🤔 |
+| Wisdom Collector | 100 questions asked | 📚 |
+| Voice Pioneer | First voice conversation | 🎤 |
+| Voice Master | 25 voice conversations | 🔊 |
+
+**🤝 Social Badges:**
+| Badge | Requirement | Icon |
+|-------|-------------|------|
+| Wisdom Sharer | Share first wisdom quote | 📤 |
+| Viral Wisdom | Shared content viewed 100+ times | 🌐 |
+| Community Builder | Refer 5 friends who sign up | 👥 |
+
+**🔥 Streak Badges:**
+| Badge | Requirement | Icon |
+|-------|-------------|------|
+| Consistent Seeker | 7-day streak | 🔥 |
+| Dedicated Learner | 30-day streak | ⭐ |
+| Wisdom Devotee | 100-day streak | 💫 |
+| Master Seeker | 365-day streak | 🏆 |
+
+**🏅 Special Badges:**
+| Badge | Requirement | Icon |
+|-------|-------------|------|
+| Early Adopter | Joined during beta period | 🌱 |
+| Feedback Champion | Submitted 10+ feedback items | 💬 |
+| Journal Keeper | 25 wisdom journal entries | 📔 |
+| Cross-Domain Explorer | Conversations in all 6 domains | 🌈 |
+
+**Badge Display & Notifications:**
+- Badge unlock triggers celebratory animation and notification
+- Profile displays earned badges with hover details
+- Badge progress visible in Progress Dashboard
+- Shareable badge achievements to social platforms
+
+### 6.3.6. Progress Dashboard ("Your Wisdom Journey")
+
+**Problem Addressed:**
+Users lack visibility into their overall progress, growth, and engagement patterns, reducing motivation and sense of accomplishment.
+
+**Solution: Comprehensive Progress Dashboard**
+
+**Dashboard Layout:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 📊 Your Wisdom Journey                            [Settings]│
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ ┌─────────────────┬─────────────────┬─────────────────────┐ │
+│ │ 🔥 Streak       │ ❓ Questions    │ 🎭 Personalities    │ │
+│ │ 12 Days         │ 47 Asked        │ 8 of 25 Explored    │ │
+│ │ Personal best:  │ This week: 12   │ ████████░░░░░░░░░░░ │ │
+│ │ 23 days         │                 │ 32% complete        │ │
+│ └─────────────────┴─────────────────┴─────────────────────┘ │
+│                                                             │
+│ 🏆 Recent Achievements                                      │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🕉️ Krishna Devotee     ⭐ New! Earned 2 days ago       │ │
+│ │ 🔥 Consistent Seeker    ✅ 7-day streak achieved        │ │
+│ │ 📤 Wisdom Sharer        ✅ First share completed        │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ 📈 Engagement Trends (Last 30 Days)                        │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │  ▄ ▅ ▃ ▆ ▄ █ ▄ ▅ ▇ ▃ ▅ ▆ ▄ █ ▅ ▃ ▆ ▄ ▅ █ ▄ ▆ ▅ ▃ ▄  │ │
+│ │  Most active: Tuesdays | Avg: 3.2 questions/day        │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ 🎭 Personality Relationships                                │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🕉️ Krishna      ████████████████░░░░ Kindred (Level 5)  │ │
+│ │ 🧠 Einstein     █████████████░░░░░░░ Trusted (Level 4)  │ │
+│ │ 🏛️ M. Aurelius  ████████░░░░░░░░░░░░ Familiar (Level 3)│ │
+│ │ 🎩 Lincoln      █████░░░░░░░░░░░░░░░ Acquaint. (Level 2)│ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ 🧭 Domain Exploration                                       │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🕉️ Spiritual    ████████████████ 67% explored          │ │
+│ │ 🔬 Scientific   ██████████░░░░░░ 40% explored          │ │
+│ │ 🏛️ Leadership   ██████░░░░░░░░░░ 25% explored          │ │
+│ │ 💭 Philosophical████████░░░░░░░░ 33% explored          │ │
+│ │ 📚 Literary     ████░░░░░░░░░░░░ 50% explored          │ │
+│ │ 🧠 Psychology   ██████████████░░ 100% explored         │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ 📔 Wisdom Journal Stats                                     │
+│ 12 entries saved | 5 tags created | Last entry: 2 days ago │
+│                                                             │
+│ 🎯 Next Milestones                                          │
+│ • 3 more days → 15-day streak                              │
+│ • 2 more conversations → Einstein Apprentice badge         │
+│ • Explore Rumi → Complete Spiritual domain                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Dashboard Features:**
+- Real-time sync with all user activity
+- Weekly email digest option for progress summary
+- Exportable progress report for personal records
+- Social sharing of milestone achievements
+- Personalized recommendations based on exploration gaps
+
+### 6.3.7. Re-engagement Mechanics
+
+**Problem Addressed:**
+Users who become inactive often don't return, representing lost potential for meaningful wisdom relationships.
+
+**Solution: Multi-Channel Re-engagement**
+
+**Push Notification Triggers:**
+| Inactivity Period | Message Type | Example |
+|-------------------|--------------|---------|
+| 1 day (streak at risk) | Streak warning | "Your 12-day streak expires in 2 hours!" |
+| 3 days | Gentle reminder | "Krishna has new insights to share..." |
+| 7 days | Personalized hook | "Based on your interest in stoicism, Marcus Aurelius..." |
+| 14 days | Win-back | "We miss you! Here's wisdom you might have missed..." |
+
+**Email Re-engagement Sequence:**
+- Day 3: "Continue your conversation with {last personality}"
+- Day 7: "Weekly wisdom digest from personalities you follow"
+- Day 14: "New features and personalities you haven't explored"
+- Day 30: "Special offer to re-engage" (premium features trial)
+
+**In-App Re-engagement:**
+- "Welcome back!" message with conversation continuity prompt
+- Show what user missed (new features, trending wisdom)
+- Quick-start buttons for previous personalities
+- Streak recovery opportunity if applicable
+
+### 6.3.8. Expected Adoption Impact
+
+**Key Performance Indicators:**
+
+| Metric | Current Baseline | Target (90 Days) | Improvement |
+|--------|------------------|------------------|-------------|
+| Time to First Interaction | Unknown | <60 seconds | Reduce friction |
+| Onboarding Completion | N/A | >70% | New metric |
+| Day-1 Retention | Unknown | 40% | +50% estimated |
+| Day-7 Retention | Unknown | 25% | +40% estimated |
+| Day-30 Retention | Unknown | 15% | +60% estimated |
+| Avg Session Depth | ~3 messages | 8 messages | +167% |
+| Personality Exploration | ~1.5 avg | 4+ personalities | +167% |
+| Voice Feature Adoption | ~5% | 20% | +300% |
+| Social Shares/User | Unknown | 0.5/session | New metric |
+| Streak Participation | N/A | 35% of active users | New metric |
+
+**Business Impact Projections:**
+- Reduced CAC through organic referrals and social sharing
+- Increased LTV through deeper engagement and habit formation
+- Higher premium conversion through feature discovery and value demonstration
+- Improved word-of-mouth through achievement sharing and social proof
+
+---
+
+### 6.4. User Acquisition Strategy:
 
 **Educational Institutions:**
 - Partner with universities offering philosophy, religion, history, and science courses

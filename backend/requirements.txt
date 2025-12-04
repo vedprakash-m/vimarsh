@@ -27,6 +27,9 @@ PyPDF2==3.0.1
 lxml==4.9.3
 # This saves ~500MB in deployment size and improves cold start times
 
+# Push Notifications
+pywebpush==1.14.0
+
 # Utilities
 python-dotenv==1.0.0
 requests==2.31.0

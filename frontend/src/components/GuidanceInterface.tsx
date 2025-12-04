@@ -8,8 +8,10 @@ import PersonalitySelector from './PersonalitySelector';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
 import MemoryIndicator from './MemoryIndicator';
 import RelationshipBadge from './RelationshipBadge';
+import { StreakDisplayContainer, AchievementUnlockModal, AchievementShareModal } from './engagement';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
 import { useMemory } from '../contexts/MemoryContext';
+import { useEngagement } from '../contexts/EngagementContext';
 import { useAdmin } from '../contexts/AdminProviderContext';
 import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
@@ -154,6 +156,8 @@ export default function GuidanceInterface() {
   
   // Share state
   const [shareMessage, setShareMessage] = useState<Message | null>(null);
+  const [shareAchievementOpen, setShareAchievementOpen] = useState(false);
+  const [achievementToShare, setAchievementToShare] = useState<typeof pendingAchievement>(null);
   
   // Voice state
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
@@ -171,6 +175,14 @@ export default function GuidanceInterface() {
     endSession,
     isLoading: memoryLoading 
   } = useMemory();
+  
+  // Engagement context for tracking activity
+  const {
+    recordActivity,
+    showAchievementModal,
+    pendingAchievement,
+    dismissAchievementModal
+  } = useEngagement();
 
   // Don't show admin button until all contexts are ready to prevent layout shift
   const showAdminButton = allReady && user?.isAdmin;
@@ -353,6 +365,43 @@ export default function GuidanceInterface() {
       };
       
       setMessages(prev => [...prev, apiResponse]);
+      
+      // Handle achievements from backend response (backend now tracks engagement)
+      // If backend returned unlocked achievements, trigger the modal
+      if (data.achievements_unlocked && data.achievements_unlocked.length > 0) {
+        console.log('🏆 Achievements unlocked from backend:', data.achievements_unlocked);
+        // Record activity will handle displaying the achievement modal
+        // The backend already recorded the activity, but we call this to update local state
+        recordActivity(
+          'conversation',
+          selectedPersonality.id,
+          selectedPersonality.domain,
+          {
+            session_id: sessionId,
+            message_count: messages.length + 2,
+            response_source: data.metadata?.response_source,
+            // Pass backend achievements to trigger modal
+            backend_achievements: data.achievements_unlocked
+          }
+        ).catch(err => {
+          console.warn('Failed to sync activity state:', err);
+        });
+      } else {
+        // Still record activity for local state sync (non-blocking)
+        recordActivity(
+          'conversation',
+          selectedPersonality.id,
+          selectedPersonality.domain,
+          {
+            session_id: sessionId,
+            message_count: messages.length + 2,
+            response_source: data.metadata?.response_source
+          }
+        ).catch(err => {
+          // Don't let engagement tracking errors affect the user experience
+          console.warn('Failed to record activity:', err);
+        });
+      }
       
     } catch (error) {
       console.error('Error calling guidance API:', error);
@@ -901,6 +950,17 @@ export default function GuidanceInterface() {
             </div>
           )}
           
+          {/* Streak Display - Shows user's conversation streak */}
+          {window.innerWidth > 480 && (
+            <div 
+              onClick={() => navigate('/progress')}
+              style={{ cursor: 'pointer' }}
+              title="View your progress"
+            >
+              <StreakDisplayContainer compact={true} />
+            </div>
+          )}
+          
           <button 
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
             style={{
@@ -928,6 +988,12 @@ export default function GuidanceInterface() {
           >
             <Users size={18} />
           </button>
+          
+          {/* Compact Streak Display in Header */}
+          <StreakDisplayContainer 
+            compact={true}
+            onClick={() => navigate('/progress')}
+          />
           
           {/* Admin Panel Button - Only visible to admin users after full initialization */}
           {showAdminButton && (
@@ -1581,6 +1647,30 @@ export default function GuidanceInterface() {
           onShareComplete={() => closeShareModal()}
         />
       )}
+      
+      {/* Achievement Unlock Modal */}
+      {showAchievementModal && pendingAchievement && (
+        <AchievementUnlockModal
+          achievement={pendingAchievement}
+          open={showAchievementModal}
+          onClose={dismissAchievementModal}
+          onShare={() => {
+            setAchievementToShare(pendingAchievement);
+            setShareAchievementOpen(true);
+            dismissAchievementModal();
+          }}
+        />
+      )}
+      
+      {/* Achievement Share Modal */}
+      <AchievementShareModal
+        open={shareAchievementOpen}
+        achievement={achievementToShare}
+        onClose={() => {
+          setShareAchievementOpen(false);
+          setAchievementToShare(null);
+        }}
+      />
       
       {/* Debug overlay for troubleshooting auth issues in production */}
       {showDebug && <DebugAuth />}

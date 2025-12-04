@@ -3,6 +3,8 @@ import { ArrowRight, Brain, Shield, Sparkles, Play, Mic, Share2, Bell, Volume2, 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { WisdomOfDay } from './WisdomOfDay';
+import { OnboardingWizard } from './onboarding';
+import { onboardingApi } from './onboarding/onboardingApi';
 
 // CSS Variables for Apple Design System
 const cssVariables = `
@@ -389,6 +391,8 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedDomain, setSelectedDomain] = useState('All');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
 
   // Helper function to filter personalities by domain
   const getFilteredPersonalities = () => {
@@ -396,6 +400,40 @@ const LandingPage: React.FC = () => {
       return personalities;
     }
     return personalities.filter(p => p.domain === selectedDomain);
+  };
+
+  // Check onboarding status for authenticated users
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (isAuthenticated && account && !onboardingChecked) {
+        try {
+          const state = await onboardingApi.getOnboardingState();
+          // Show onboarding wizard if not completed
+          if (state && state.status !== 'complete') {
+            setShowOnboarding(true);
+          }
+          setOnboardingChecked(true);
+        } catch (error) {
+          console.log('📋 Onboarding check skipped (new user or service unavailable)');
+          // For new users, show onboarding wizard
+          setShowOnboarding(true);
+          setOnboardingChecked(true);
+        }
+      }
+    };
+    
+    checkOnboardingStatus();
+  }, [isAuthenticated, account, onboardingChecked]);
+
+  // Handle onboarding completion
+  const handleOnboardingComplete = (personalityId?: string) => {
+    setShowOnboarding(false);
+    if (personalityId) {
+      // Navigate to guidance with the matched personality
+      navigate(`/guidance?personality=${personalityId}`);
+    } else {
+      navigate('/guidance');
+    }
   };
 
   // Redirect authenticated users - with protection against circular redirects
@@ -1524,6 +1562,15 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Onboarding Wizard for New Users */}
+      {showOnboarding && (
+        <OnboardingWizard
+          open={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
+          onComplete={handleOnboardingComplete}
+        />
+      )}
     </div>
   );
 };

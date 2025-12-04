@@ -15,6 +15,7 @@ const GuidanceInterface = lazy(() => import('./components/GuidanceInterface'));
 const ShareView = lazy(() => import('./pages/ShareView'));
 const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
 const MemoryDashboard = lazy(() => import('./components/MemoryDashboard'));
+const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
 
 // Memory Dashboard Page Wrapper (handles route-based rendering)
 const MemoryDashboardPage: React.FC = () => {
@@ -31,10 +32,20 @@ import { DomainThemeManager } from './components/DomainThemeManager';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
 import { MemoryProvider } from './contexts/MemoryContext';
+import { EngagementProvider } from './contexts/EngagementContext';
 import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
 import AdminDashboard from './components/admin/AdminDashboard';
+
+// Engagement Tour
+import EngagementTour, { useEngagementTour } from './components/engagement/EngagementTour';
+
+// Engagement Tour Wrapper - auto-shows tour for new users
+const EngagementTourWrapper: React.FC = () => {
+  const { showTour, closeTour } = useEngagementTour();
+  return <EngagementTour open={showTour} onClose={closeTour} />;
+};
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -114,6 +125,8 @@ function App() {
           <AdminProvider>
             <PersonalityProvider>
               <MemoryProvider>
+              <EngagementProvider>
+              <EngagementTourWrapper />
               <AppLoadingProvider>
                 <LanguageProvider>
                 <DomainThemeManager />
@@ -170,6 +183,16 @@ function App() {
                     } 
                   />
                   
+                  {/* Progress Dashboard - Protected Route */}
+                  <Route 
+                    path="/progress" 
+                    element={
+                      <ProtectedRoute>
+                        <ProgressDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
                   {/* Fallback Route - Redirect to Landing */}
                   <Route path="*" element={<LandingPage />} />
                 </Routes>
@@ -177,6 +200,7 @@ function App() {
             </Router>
           </LanguageProvider>
         </AppLoadingProvider>
+        </EngagementProvider>
         </MemoryProvider>
         </PersonalityProvider>
         </AdminProvider>

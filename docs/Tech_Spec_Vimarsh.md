@@ -1257,6 +1257,1150 @@ def handle_tts_error(error: Exception, text: str, language: str) -> Dict[str, An
 
 ---
 
+## 7. User Engagement & Retention Features
+
+### 7.1. Onboarding System Architecture
+
+**Overview:**
+The onboarding system guides new users through personalized personality discovery using a wizard-based interface with progressive disclosure, reducing time-to-value from ~5 minutes to under 60 seconds.
+
+**System Architecture:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Onboarding Service Architecture                │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Frontend (React)                Backend (Azure Functions)  │
+│  ┌─────────────────┐            ┌──────────────────────┐   │
+│  │ OnboardingWizard│            │ OnboardingService    │   │
+│  │ ─────────────── │ REST API   │ ──────────────────── │   │
+│  │ • WelcomeStep   │ ────────►  │ • Quiz Processing    │   │
+│  │ • QuizStep      │            │ • Personality Match  │   │
+│  │ • ResultStep    │ ◄──────── │ • Profile Creation   │   │
+│  │ • FirstChatStep │  JSON      │ • Progress Tracking  │   │
+│  └─────────────────┘            └──────────────────────┘   │
+│                                           │                 │
+│                                           ▼                 │
+│                              ┌──────────────────────┐       │
+│                              │  Cosmos DB Containers │       │
+│                              │  ──────────────────── │       │
+│                              │  • onboarding_state   │       │
+│                              │  • user_preferences   │       │
+│                              │  • analytics          │       │
+│                              └──────────────────────┘       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Database Schema - onboarding_state Container:**
+```json
+{
+  "id": "onboarding_{user_id}",
+  "user_id": "string",
+  "partition_key": "{user_id}",
+  "status": "not_started | in_progress | completed | skipped",
+  "current_step": "welcome | quiz | result | first_chat | discovery | complete",
+  "quiz_responses": [
+    {
+      "question_id": "string",
+      "selected_option": "string",
+      "domain_scores": { "spiritual": 2, "scientific": 1, ... },
+      "answered_at": "ISO8601"
+    }
+  ],
+  "personality_match": {
+    "primary": "krishna",
+    "secondary": "einstein",
+    "match_scores": { "krishna": 0.85, "einstein": 0.72, ... },
+    "reasoning": "string"
+  },
+  "progress": {
+    "welcome_completed": true,
+    "quiz_completed": true,
+    "first_conversation_completed": false,
+    "feature_discovery_completed": false
+  },
+  "started_at": "ISO8601",
+  "completed_at": "ISO8601",
+  "time_spent_seconds": 45,
+  "skipped": false,
+  "skip_reason": "string | null",
+  "version": "1.0",
+  "created_at": "ISO8601",
+  "updated_at": "ISO8601"
+}
+```
+
+**Backend API Endpoints:**
+
+```python
+# Onboarding API Endpoints (backend/onboarding/onboarding_api.py)
+
+@app.route(route="onboarding/state", methods=["GET"])
+async def get_onboarding_state(req: func.HttpRequest) -> func.HttpResponse:
+    """Get current onboarding state for user"""
+    user_id = get_user_id_from_request(req)
+    state = await onboarding_service.get_state(user_id)
+    return func.HttpResponse(json.dumps(state), mimetype="application/json")
+
+@app.route(route="onboarding/start", methods=["POST"])
+async def start_onboarding(req: func.HttpRequest) -> func.HttpResponse:
+    """Initialize onboarding for new user"""
+    user_id = get_user_id_from_request(req)
+    state = await onboarding_service.start_onboarding(user_id)
+    return func.HttpResponse(json.dumps(state), mimetype="application/json")
+
+@app.route(route="onboarding/quiz/submit", methods=["POST"])
+async def submit_quiz_response(req: func.HttpRequest) -> func.HttpResponse:
+    """Submit a single quiz response"""
+    body = req.get_json()
+    user_id = get_user_id_from_request(req)
+    result = await onboarding_service.submit_quiz_response(
+        user_id=user_id,
+        question_id=body["question_id"],
+        selected_option=body["selected_option"]
+    )
+    return func.HttpResponse(json.dumps(result), mimetype="application/json")
+
+@app.route(route="onboarding/quiz/complete", methods=["POST"])
+async def complete_quiz(req: func.HttpRequest) -> func.HttpResponse:
+    """Complete quiz and get personality match"""
+    user_id = get_user_id_from_request(req)
+    match_result = await onboarding_service.calculate_personality_match(user_id)
+    return func.HttpResponse(json.dumps(match_result), mimetype="application/json")
+
+@app.route(route="onboarding/skip", methods=["POST"])
+async def skip_onboarding(req: func.HttpRequest) -> func.HttpResponse:
+    """Skip onboarding (with optional reason)"""
+    body = req.get_json()
+    user_id = get_user_id_from_request(req)
+    await onboarding_service.skip_onboarding(user_id, body.get("reason"))
+    return func.HttpResponse(status_code=204)
+
+@app.route(route="onboarding/complete", methods=["POST"])
+async def complete_onboarding(req: func.HttpRequest) -> func.HttpResponse:
+    """Mark onboarding as complete"""
+    user_id = get_user_id_from_request(req)
+    result = await onboarding_service.complete_onboarding(user_id)
+    return func.HttpResponse(json.dumps(result), mimetype="application/json")
+```
+
+**Frontend Component Architecture:**
+
+```typescript
+// OnboardingWizard Component Structure (frontend/src/components/onboarding/)
+
+// Main wizard orchestrator
+interface OnboardingWizardProps {
+  onComplete: (result: OnboardingResult) => void;
+  onSkip: () => void;
+}
+
+interface OnboardingState {
+  currentStep: OnboardingStep;
+  quizResponses: QuizResponse[];
+  personalityMatch: PersonalityMatch | null;
+  progress: OnboardingProgress;
+}
+
+type OnboardingStep = 'welcome' | 'quiz' | 'result' | 'first_chat' | 'discovery' | 'complete';
+
+// Quiz system types
+interface QuizQuestion {
+  id: string;
+  text: string;
+  options: QuizOption[];
+  domain_weights: Record<Domain, number>;
+}
+
+interface QuizOption {
+  id: string;
+  text: string;
+  icon?: string;
+  personality_hints: string[]; // e.g., ["krishna", "buddha"]
+}
+
+interface PersonalityMatch {
+  primary: PersonalityId;
+  secondary: PersonalityId;
+  match_score: number;
+  reasoning: string;
+  domain: Domain;
+}
+
+// Component file structure:
+// frontend/src/components/onboarding/
+// ├── OnboardingWizard.tsx        - Main wizard container
+// ├── WelcomeStep.tsx             - Animated welcome with value proposition
+// ├── PersonalityQuiz.tsx         - 5-question quiz with visual options
+// ├── QuizQuestion.tsx            - Individual question renderer
+// ├── PersonalityMatchResult.tsx  - Match reveal with animations
+// ├── FirstConversationGuide.tsx  - Guided first conversation
+// ├── FeatureDiscoveryTooltips.tsx- Progressive feature discovery
+// ├── OnboardingProgress.tsx      - Step progress indicator
+// └── hooks/
+//     ├── useOnboarding.ts        - Onboarding state management
+//     └── useQuiz.ts              - Quiz logic and scoring
+```
+
+**Personality Quiz Scoring Algorithm:**
+
+```python
+# backend/onboarding/quiz_service.py
+
+class PersonalityQuizService:
+    """Service for processing quiz responses and matching personalities"""
+    
+    # Domain weights for each question option
+    QUIZ_QUESTIONS = [
+        {
+            "id": "life_guidance",
+            "text": "When facing a difficult decision, I usually seek...",
+            "options": [
+                {"id": "inner_peace", "text": "Inner peace and spiritual clarity", 
+                 "weights": {"spiritual": 3, "philosophical": 1}},
+                {"id": "logical_analysis", "text": "Logical analysis and evidence", 
+                 "weights": {"scientific": 3, "philosophical": 1}},
+                {"id": "historical_wisdom", "text": "Lessons from great leaders", 
+                 "weights": {"leadership": 3, "historical": 2}},
+                {"id": "creative_insight", "text": "Creative and artistic perspectives", 
+                 "weights": {"literary": 3, "philosophical": 1}},
+            ]
+        },
+        # ... 4 more questions
+    ]
+    
+    # Personality-to-domain mapping
+    PERSONALITY_DOMAINS = {
+        "spiritual": ["krishna", "buddha", "jesus", "rumi", "swami_vivekananda"],
+        "scientific": ["einstein", "newton", "tesla", "archimedes", "leonardo"],
+        "philosophical": ["marcus_aurelius", "lao_tzu", "confucius", "aristotle", "plato", "socrates"],
+        "leadership": ["chanakya", "lincoln", "gandhi", "washington", "mlk"],
+        "literary": ["tagore", "shakespeare"],
+        "psychology": ["freud"]
+    }
+    
+    async def calculate_match(self, responses: List[QuizResponse]) -> PersonalityMatch:
+        """Calculate best personality match from quiz responses"""
+        
+        # Aggregate domain scores
+        domain_scores = defaultdict(int)
+        for response in responses:
+            question = self.get_question(response.question_id)
+            option = self.get_option(question, response.selected_option)
+            for domain, weight in option["weights"].items():
+                domain_scores[domain] += weight
+        
+        # Normalize scores
+        total = sum(domain_scores.values())
+        normalized = {d: s/total for d, s in domain_scores.items()}
+        
+        # Get top domain and select personality
+        top_domain = max(normalized, key=normalized.get)
+        personalities = self.PERSONALITY_DOMAINS[top_domain]
+        
+        # Use additional heuristics to pick specific personality
+        primary = await self._select_personality(personalities, responses)
+        secondary = await self._get_secondary_match(normalized, primary)
+        
+        return PersonalityMatch(
+            primary=primary,
+            secondary=secondary,
+            match_score=normalized[top_domain],
+            reasoning=self._generate_reasoning(primary, responses),
+            domain=top_domain
+        )
+    
+    def _generate_reasoning(self, personality: str, responses: List[QuizResponse]) -> str:
+        """Generate personalized reasoning for the match"""
+        reasoning_templates = {
+            "krishna": "Your responses show a deep desire for spiritual wisdom and inner peace. Krishna's teachings on duty, devotion, and detachment align beautifully with your quest for meaningful guidance.",
+            "einstein": "Your analytical approach and curiosity about the universe suggest you'd resonate with Einstein's way of exploring life's mysteries through wonder and scientific inquiry.",
+            # ... templates for all 25 personalities
+        }
+        return reasoning_templates.get(personality, f"Based on your responses, {personality} is your ideal wisdom guide.")
+```
+
+### 7.2. Streak & Engagement Tracking System
+
+**Overview:**
+A gamification layer that tracks daily engagement, rewards consistency, and creates habit loops through streak tracking, achievements, and progress visualization.
+
+**System Architecture:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Engagement Tracking Architecture               │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Frontend Components        Backend Services                │
+│  ┌─────────────────┐       ┌──────────────────────┐        │
+│  │ StreakCounter   │       │ EngagementService    │        │
+│  │ • Flame Icon    │ ───►  │ • Daily Check-in     │        │
+│  │ • Day Count     │       │ • Streak Calculation │        │
+│  │ • Weekly View   │ ◄───  │ • Milestone Detection│        │
+│  └─────────────────┘       └──────────────────────┘        │
+│                                     │                       │
+│  ┌─────────────────┐               │                       │
+│  │ AchievementBadge│               ▼                       │
+│  │ • Badge Icon    │       ┌──────────────────────┐        │
+│  │ • Progress Ring │       │ Cosmos DB            │        │
+│  │ • Unlock Status │       │ • engagement_tracking│        │
+│  └─────────────────┘       │ • achievements       │        │
+│                            │ • user_preferences   │        │
+│  ┌─────────────────┐       └──────────────────────┘        │
+│  │ ProgressDashboard│                                      │
+│  │ • Weekly Graph   │                                      │
+│  │ • Domain Coverage│                                      │
+│  │ • Insights Saved │                                      │
+│  └─────────────────┘                                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Database Schema - engagement_tracking Container:**
+```json
+{
+  "id": "engagement_{user_id}",
+  "user_id": "string",
+  "partition_key": "{user_id}",
+  "streaks": {
+    "current_streak": 7,
+    "longest_streak": 14,
+    "streak_start_date": "2024-01-15",
+    "last_activity_date": "2024-01-21",
+    "streak_history": [
+      {"start": "2024-01-01", "end": "2024-01-05", "length": 5},
+      {"start": "2024-01-15", "end": null, "length": 7}
+    ],
+    "grace_period_used": false,
+    "freeze_count": 2
+  },
+  "daily_activity": {
+    "2024-01-21": {
+      "conversations": 3,
+      "personalities_engaged": ["krishna", "einstein"],
+      "insights_saved": 1,
+      "time_spent_minutes": 12,
+      "first_activity_at": "ISO8601"
+    }
+  },
+  "weekly_summary": {
+    "week_of": "2024-01-15",
+    "total_conversations": 15,
+    "unique_personalities": 5,
+    "domains_explored": ["spiritual", "scientific", "philosophical"],
+    "insights_saved": 4,
+    "total_time_minutes": 45
+  },
+  "milestones": {
+    "first_conversation": {"achieved": true, "date": "2024-01-01"},
+    "streak_3_days": {"achieved": true, "date": "2024-01-03"},
+    "streak_7_days": {"achieved": true, "date": "2024-01-21"},
+    "streak_30_days": {"achieved": false, "date": null},
+    "all_domains_explored": {"achieved": false, "date": null}
+  },
+  "notification_schedule": {
+    "daily_reminder_time": "08:00",
+    "timezone": "America/New_York",
+    "enabled": true,
+    "last_sent": "2024-01-21T08:00:00Z"
+  },
+  "created_at": "ISO8601",
+  "updated_at": "ISO8601"
+}
+```
+
+**Database Schema - achievements Container:**
+```json
+{
+  "id": "achievements_{user_id}",
+  "user_id": "string",
+  "partition_key": "{user_id}",
+  "unlocked_achievements": [
+    {
+      "achievement_id": "first_conversation",
+      "unlocked_at": "ISO8601",
+      "personality": "krishna",
+      "notification_shown": true
+    }
+  ],
+  "achievement_progress": {
+    "conversation_count": {
+      "current": 25,
+      "milestones": [1, 10, 25, 50, 100, 500],
+      "next_milestone": 50
+    },
+    "streak_days": {
+      "current": 7,
+      "milestones": [3, 7, 14, 30, 60, 100, 365],
+      "next_milestone": 14
+    },
+    "personalities_met": {
+      "current": 8,
+      "milestones": [1, 5, 10, 15, 25],
+      "next_milestone": 10,
+      "personalities": ["krishna", "einstein", "buddha", ...]
+    },
+    "domains_explored": {
+      "current": 4,
+      "milestones": [1, 3, 6],
+      "next_milestone": 6,
+      "domains": ["spiritual", "scientific", "philosophical", "leadership"]
+    },
+    "insights_saved": {
+      "current": 12,
+      "milestones": [1, 5, 10, 25, 50, 100],
+      "next_milestone": 25
+    }
+  },
+  "total_points": 450,
+  "level": 3,
+  "level_progress": 0.65,
+  "created_at": "ISO8601",
+  "updated_at": "ISO8601"
+}
+```
+
+**Achievement Definitions:**
+
+```python
+# backend/engagement/achievement_definitions.py
+
+ACHIEVEMENT_DEFINITIONS = {
+    # Streak Achievements
+    "streak_3_days": {
+        "id": "streak_3_days",
+        "name": "Spark of Consistency",
+        "description": "Maintained a 3-day wisdom streak",
+        "icon": "🔥",
+        "points": 30,
+        "category": "streak",
+        "tier": "bronze"
+    },
+    "streak_7_days": {
+        "id": "streak_7_days",
+        "name": "Week of Wisdom",
+        "description": "Maintained a 7-day wisdom streak",
+        "icon": "🔥🔥",
+        "points": 70,
+        "category": "streak",
+        "tier": "silver"
+    },
+    "streak_30_days": {
+        "id": "streak_30_days",
+        "name": "Moon Cycle Master",
+        "description": "Maintained a 30-day wisdom streak",
+        "icon": "🌙",
+        "points": 300,
+        "category": "streak",
+        "tier": "gold"
+    },
+    "streak_100_days": {
+        "id": "streak_100_days",
+        "name": "Centurion of Wisdom",
+        "description": "Maintained a 100-day wisdom streak",
+        "icon": "👑",
+        "points": 1000,
+        "category": "streak",
+        "tier": "platinum"
+    },
+    
+    # Exploration Achievements
+    "first_conversation": {
+        "id": "first_conversation",
+        "name": "Seeker Awakened",
+        "description": "Started your first wisdom conversation",
+        "icon": "🌱",
+        "points": 10,
+        "category": "exploration",
+        "tier": "bronze"
+    },
+    "all_domains": {
+        "id": "all_domains",
+        "name": "Renaissance Soul",
+        "description": "Explored all 6 wisdom domains",
+        "icon": "🌈",
+        "points": 200,
+        "category": "exploration",
+        "tier": "gold"
+    },
+    "all_personalities": {
+        "id": "all_personalities",
+        "name": "Wisdom Collector",
+        "description": "Conversed with all 25 personalities",
+        "icon": "📚",
+        "points": 500,
+        "category": "exploration",
+        "tier": "platinum"
+    },
+    
+    # Depth Achievements
+    "kindred_spirit": {
+        "id": "kindred_spirit",
+        "name": "Kindred Spirit",
+        "description": "Reached Kindred Spirit relationship level",
+        "icon": "💫",
+        "points": 150,
+        "category": "depth",
+        "tier": "gold"
+    },
+    "insight_collector_10": {
+        "id": "insight_collector_10",
+        "name": "Insight Collector",
+        "description": "Saved 10 wisdom insights to your journal",
+        "icon": "💎",
+        "points": 50,
+        "category": "depth",
+        "tier": "silver"
+    }
+}
+```
+
+**Backend API Endpoints:**
+
+```python
+# backend/engagement/engagement_api.py
+
+@app.route(route="engagement/check-in", methods=["POST"])
+async def daily_check_in(req: func.HttpRequest) -> func.HttpResponse:
+    """Record daily check-in and update streak"""
+    user_id = get_user_id_from_request(req)
+    result = await engagement_service.record_check_in(user_id)
+    return func.HttpResponse(json.dumps(result), mimetype="application/json")
+
+@app.route(route="engagement/streak", methods=["GET"])
+async def get_streak(req: func.HttpRequest) -> func.HttpResponse:
+    """Get current streak information"""
+    user_id = get_user_id_from_request(req)
+    streak = await engagement_service.get_streak_info(user_id)
+    return func.HttpResponse(json.dumps(streak), mimetype="application/json")
+
+@app.route(route="engagement/achievements", methods=["GET"])
+async def get_achievements(req: func.HttpRequest) -> func.HttpResponse:
+    """Get all achievements with progress"""
+    user_id = get_user_id_from_request(req)
+    achievements = await achievement_service.get_user_achievements(user_id)
+    return func.HttpResponse(json.dumps(achievements), mimetype="application/json")
+
+@app.route(route="engagement/progress", methods=["GET"])
+async def get_progress_dashboard(req: func.HttpRequest) -> func.HttpResponse:
+    """Get progress dashboard data"""
+    user_id = get_user_id_from_request(req)
+    progress = await engagement_service.get_progress_summary(user_id)
+    return func.HttpResponse(json.dumps(progress), mimetype="application/json")
+
+@app.route(route="engagement/activity", methods=["POST"])
+async def record_activity(req: func.HttpRequest) -> func.HttpResponse:
+    """Record a user activity (conversation, insight saved, etc.)"""
+    body = req.get_json()
+    user_id = get_user_id_from_request(req)
+    result = await engagement_service.record_activity(
+        user_id=user_id,
+        activity_type=body["activity_type"],
+        metadata=body.get("metadata", {})
+    )
+    return func.HttpResponse(json.dumps(result), mimetype="application/json")
+```
+
+**Frontend Component Specifications:**
+
+```typescript
+// frontend/src/components/engagement/
+
+// StreakCounter.tsx - Header streak display
+interface StreakCounterProps {
+  streak: number;
+  isActive: boolean;
+  showWeekView?: boolean;
+}
+
+// Visual states:
+// - streak === 0: Gray flame, "Start your streak!"
+// - streak >= 1: Orange flame, animated pulse
+// - streak >= 7: Fire gradient, celebration particles on milestone
+// - streak >= 30: Golden flame with crown
+
+// AchievementBadge.tsx - Individual achievement display
+interface AchievementBadgeProps {
+  achievement: Achievement;
+  unlocked: boolean;
+  progress?: number; // 0-1 for partially complete
+  size: 'small' | 'medium' | 'large';
+  showProgress?: boolean;
+}
+
+// Visual states:
+// - unlocked: Full color, golden border, icon visible
+// - locked: Grayscale, lock icon overlay
+// - in-progress: Partial color fill based on progress
+
+// ProgressDashboard.tsx - Full progress view
+interface ProgressDashboardProps {
+  userId: string;
+}
+
+// Sections:
+// 1. Weekly activity heatmap (7 day grid)
+// 2. Domain coverage radar chart
+// 3. Achievement showcase (recent + in-progress)
+// 4. Statistics summary (conversations, insights, time)
+// 5. Personality relationship overview
+
+// Component file structure:
+// frontend/src/components/engagement/
+// ├── StreakCounter.tsx          - Compact header streak display
+// ├── StreakWeekView.tsx         - 7-day activity visualization
+// ├── AchievementBadge.tsx       - Single achievement display
+// ├── AchievementGrid.tsx        - Achievement collection view
+// ├── AchievementUnlockModal.tsx - Celebration modal on unlock
+// ├── ProgressDashboard.tsx      - Full progress overview
+// ├── WeeklyActivityChart.tsx    - Weekly engagement graph
+// ├── DomainCoverageChart.tsx    - Radar chart of domains
+// └── hooks/
+//     ├── useStreak.ts           - Streak state management
+//     ├── useAchievements.ts     - Achievement tracking
+//     └── useEngagement.ts       - Activity recording
+```
+
+### 7.3. Daily Notification System
+
+**Overview:**
+A configurable notification system that delivers personalized daily wisdom reminders to maintain engagement and support habit formation.
+
+**Notification Service Architecture:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Notification Service Architecture              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Azure Functions (Timer Trigger)                           │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ DailyWisdomNotificationTrigger                       │   │
+│  │ • Runs every 15 minutes                              │   │
+│  │ • Queries users with notifications due               │   │
+│  │ • Generates personalized content                     │   │
+│  │ • Sends via Web Push API                             │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                          │                                  │
+│                          ▼                                  │
+│  ┌─────────────────┐    ┌─────────────────┐               │
+│  │ Content Service │    │ Push Service    │               │
+│  │ • Quote Selection│    │ • Web Push API  │               │
+│  │ • Personalization│    │ • VAPID Keys    │               │
+│  │ • Streak Context │    │ • Subscription  │               │
+│  └─────────────────┘    │   Management    │               │
+│                          └─────────────────┘               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Database Schema - notification_subscriptions:**
+```json
+{
+  "id": "notification_{user_id}",
+  "user_id": "string",
+  "partition_key": "{user_id}",
+  "push_subscription": {
+    "endpoint": "https://fcm.googleapis.com/...",
+    "keys": {
+      "p256dh": "...",
+      "auth": "..."
+    }
+  },
+  "preferences": {
+    "daily_wisdom_enabled": true,
+    "preferred_time": "08:00",
+    "timezone": "America/New_York",
+    "streak_reminders": true,
+    "achievement_notifications": true,
+    "preferred_personality": "krishna"
+  },
+  "notification_history": [
+    {
+      "id": "notif_123",
+      "type": "daily_wisdom",
+      "sent_at": "ISO8601",
+      "opened": true,
+      "opened_at": "ISO8601",
+      "content_preview": "Krishna says..."
+    }
+  ],
+  "stats": {
+    "total_sent": 30,
+    "total_opened": 22,
+    "open_rate": 0.73,
+    "last_opened": "ISO8601"
+  },
+  "created_at": "ISO8601",
+  "updated_at": "ISO8601"
+}
+```
+
+**Notification Types:**
+
+```python
+# backend/notifications/notification_types.py
+
+NOTIFICATION_TEMPLATES = {
+    "daily_wisdom": {
+        "title_templates": [
+            "{personality} has wisdom for you today",
+            "Your daily moment of reflection awaits",
+            "🕉️ {personality} invites you to reflect"
+        ],
+        "body_templates": [
+            "\"{quote}\"",
+            "Continue your {streak_count}-day journey of wisdom",
+            "Explore today's insight from {personality}"
+        ],
+        "icon": "/icons/notification-wisdom.png",
+        "badge": "/icons/badge-om.png",
+        "actions": [
+            {"action": "open", "title": "Reflect Now"},
+            {"action": "later", "title": "Remind Later"}
+        ]
+    },
+    "streak_reminder": {
+        "title_templates": [
+            "🔥 Don't break your {streak_count}-day streak!",
+            "Your streak needs you today",
+            "Keep the wisdom flowing"
+        ],
+        "body_templates": [
+            "You haven't visited today. Quick conversation to maintain your streak?",
+            "Just {hours} hours left to keep your {streak_count}-day streak alive!"
+        ],
+        "urgency": "time-sensitive",
+        "icon": "/icons/notification-streak.png"
+    },
+    "achievement_unlocked": {
+        "title_templates": [
+            "🏆 Achievement Unlocked: {achievement_name}!",
+            "You've earned a new badge!"
+        ],
+        "body_templates": [
+            "{achievement_description}. +{points} wisdom points!",
+            "Your dedication to wisdom is paying off!"
+        ],
+        "icon": "/icons/notification-achievement.png"
+    },
+    "milestone_celebration": {
+        "title_templates": [
+            "🎉 {milestone_name} Reached!",
+            "Celebrating your wisdom journey"
+        ],
+        "body_templates": [
+            "You've had {count} conversations! The sages are impressed.",
+            "Your {streak_count}-day streak is truly remarkable!"
+        ],
+        "icon": "/icons/notification-celebration.png"
+    }
+}
+```
+
+**Backend Timer Trigger:**
+
+```python
+# backend/notifications/notification_trigger.py
+
+import azure.functions as func
+from datetime import datetime, timedelta
+import pytz
+
+@app.timer_trigger(schedule="0 */15 * * * *", arg_name="timer")
+async def daily_wisdom_notification_trigger(timer: func.TimerRequest):
+    """
+    Timer trigger that runs every 15 minutes to send notifications
+    to users whose preferred notification time is within the window.
+    """
+    current_time = datetime.now(pytz.UTC)
+    
+    # Query users with notifications due in this 15-minute window
+    users = await notification_service.get_users_with_notifications_due(
+        window_start=current_time,
+        window_end=current_time + timedelta(minutes=15)
+    )
+    
+    for user in users:
+        try:
+            # Generate personalized content
+            content = await content_service.generate_daily_wisdom(
+                user_id=user["user_id"],
+                preferred_personality=user["preferences"].get("preferred_personality"),
+                streak_count=user.get("current_streak", 0)
+            )
+            
+            # Send push notification
+            await push_service.send_notification(
+                subscription=user["push_subscription"],
+                notification_type="daily_wisdom",
+                content=content
+            )
+            
+            # Record notification sent
+            await notification_service.record_notification_sent(
+                user_id=user["user_id"],
+                notification_type="daily_wisdom",
+                content_preview=content["quote"][:50]
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to send notification to {user['user_id']}: {e}")
+```
+
+**Frontend Push Notification Setup:**
+
+```typescript
+// frontend/src/services/pushNotificationService.ts
+
+export class PushNotificationService {
+  private vapidPublicKey: string;
+  
+  async requestPermission(): Promise<NotificationPermission> {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      await this.subscribeUser();
+    }
+    return permission;
+  }
+  
+  async subscribeUser(): Promise<PushSubscription | null> {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+      });
+      
+      // Send subscription to backend
+      await api.post('/notifications/subscribe', {
+        subscription: subscription.toJSON()
+      });
+      
+      return subscription;
+    } catch (error) {
+      console.error('Push subscription failed:', error);
+      return null;
+    }
+  }
+  
+  async updatePreferences(preferences: NotificationPreferences): Promise<void> {
+    await api.put('/notifications/preferences', preferences);
+  }
+}
+
+// Service Worker notification handler
+// frontend/public/sw.js
+self.addEventListener('push', (event) => {
+  const data = event.data?.json() ?? {};
+  
+  const options = {
+    body: data.body,
+    icon: data.icon || '/icons/notification-default.png',
+    badge: data.badge || '/icons/badge-om.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: data.id,
+      url: data.url || '/'
+    },
+    actions: data.actions || [
+      { action: 'open', title: 'Open Vimarsh' }
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  if (event.action === 'open' || !event.action) {
+    event.waitUntil(
+      clients.openWindow(event.notification.data.url)
+    );
+  }
+});
+```
+
+### 7.4. Progress Dashboard Technical Specifications
+
+**Dashboard Data Aggregation:**
+
+```python
+# backend/engagement/progress_service.py
+
+class ProgressDashboardService:
+    """Service for aggregating progress dashboard data"""
+    
+    async def get_dashboard_data(self, user_id: str) -> Dict[str, Any]:
+        """Aggregate all dashboard metrics"""
+        
+        # Parallel data fetching for performance
+        streak_data, achievements, activity, insights = await asyncio.gather(
+            self.engagement_service.get_streak_info(user_id),
+            self.achievement_service.get_user_achievements(user_id),
+            self.get_weekly_activity(user_id),
+            self.get_insights_summary(user_id)
+        )
+        
+        return {
+            "streak": streak_data,
+            "achievements": {
+                "unlocked": achievements["unlocked"],
+                "in_progress": achievements["in_progress"][:3],  # Top 3 closest
+                "total_points": achievements["total_points"],
+                "level": achievements["level"]
+            },
+            "weekly_activity": activity,
+            "domain_coverage": await self.calculate_domain_coverage(user_id),
+            "personality_connections": await self.get_personality_stats(user_id),
+            "insights_summary": insights,
+            "generated_at": datetime.now().isoformat()
+        }
+    
+    async def calculate_domain_coverage(self, user_id: str) -> Dict[str, float]:
+        """Calculate exploration percentage for each domain"""
+        
+        user_conversations = await self.db.get_user_conversations(user_id)
+        personalities_engaged = set(c["personality_id"] for c in user_conversations)
+        
+        coverage = {}
+        for domain, personalities in DOMAIN_PERSONALITIES.items():
+            engaged_count = len(personalities_engaged.intersection(set(personalities)))
+            total_count = len(personalities)
+            coverage[domain] = engaged_count / total_count
+        
+        return coverage
+    
+    async def get_weekly_activity(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get last 7 days of activity for visualization"""
+        
+        today = datetime.now().date()
+        week_data = []
+        
+        for i in range(7):
+            date = today - timedelta(days=i)
+            activity = await self.engagement_service.get_daily_activity(user_id, date)
+            week_data.append({
+                "date": date.isoformat(),
+                "day_name": date.strftime("%a"),
+                "conversations": activity.get("conversations", 0),
+                "time_spent_minutes": activity.get("time_spent_minutes", 0),
+                "insights_saved": activity.get("insights_saved", 0),
+                "active": activity.get("conversations", 0) > 0
+            })
+        
+        return list(reversed(week_data))  # Chronological order
+```
+
+**Frontend Dashboard Component:**
+
+```typescript
+// frontend/src/components/engagement/ProgressDashboard.tsx
+
+interface ProgressDashboardData {
+  streak: StreakInfo;
+  achievements: {
+    unlocked: Achievement[];
+    in_progress: AchievementProgress[];
+    total_points: number;
+    level: number;
+  };
+  weekly_activity: DailyActivity[];
+  domain_coverage: Record<Domain, number>;
+  personality_connections: PersonalityConnection[];
+  insights_summary: InsightsSummary;
+}
+
+// Dashboard sections:
+// 1. Hero section: Streak flame + level badge + points
+// 2. Weekly activity: 7-day heatmap with conversation counts
+// 3. Domain radar: 6-axis radar chart showing domain exploration
+// 4. Achievements: Recent unlocks + 3 closest to unlock
+// 5. Personality connections: Grid of personalities with relationship levels
+// 6. Insights: Journal entry count + recent highlights
+
+// Responsive layouts:
+// - Mobile: Single column, collapsible sections
+// - Tablet: 2-column grid
+// - Desktop: 3-column masonry layout
+```
+
+### 7.5. Integration with Existing Systems
+
+**Memory Context Integration:**
+
+```typescript
+// Update to frontend/src/contexts/MemoryContext.tsx
+
+// Add engagement tracking to memory context
+interface MemoryContextType {
+  // ... existing properties
+  
+  // New engagement properties
+  currentStreak: number;
+  achievements: Achievement[];
+  recordActivity: (type: ActivityType, metadata?: object) => Promise<void>;
+  checkAchievements: () => Promise<Achievement[]>;
+}
+
+// Activity recording on conversation
+const recordConversationActivity = async (personality: string) => {
+  await engagementService.recordActivity({
+    activity_type: 'conversation',
+    metadata: {
+      personality,
+      timestamp: new Date().toISOString()
+    }
+  });
+  
+  // Check for new achievements
+  const newAchievements = await achievementService.checkForNewUnlocks();
+  if (newAchievements.length > 0) {
+    showAchievementUnlockModal(newAchievements[0]);
+  }
+};
+```
+
+**LandingPage Integration:**
+
+```typescript
+// Update to frontend/src/components/LandingPage.tsx
+
+// Add onboarding check on mount
+useEffect(() => {
+  const checkOnboardingStatus = async () => {
+    if (isAuthenticated) {
+      const onboardingState = await onboardingService.getState();
+      if (onboardingState.status !== 'completed' && !onboardingState.skipped) {
+        setShowOnboarding(true);
+      }
+    }
+  };
+  checkOnboardingStatus();
+}, [isAuthenticated]);
+
+// Add streak counter to header
+<header>
+  {/* ... existing header content */}
+  {isAuthenticated && <StreakCounter streak={currentStreak} />}
+</header>
+```
+
+**Analytics Integration:**
+
+```python
+# Update to backend/services/analytics_service.py
+
+class AnalyticsService:
+    # ... existing methods
+    
+    async def track_engagement_event(self, user_id: str, event: EngagementEvent):
+        """Track engagement-related events for analytics"""
+        
+        event_data = {
+            "user_id": user_id,
+            "event_type": event.type,
+            "event_data": event.data,
+            "timestamp": datetime.now().isoformat(),
+            "session_id": event.session_id
+        }
+        
+        # Store in analytics container
+        await self.db.create_item("analytics", event_data)
+        
+        # Update aggregated metrics
+        await self._update_engagement_metrics(user_id, event)
+        
+        # Check for achievement triggers
+        if event.type in ACHIEVEMENT_TRIGGER_EVENTS:
+            await self.achievement_service.check_and_unlock(user_id, event)
+```
+
+---
+
+## 8. Feature Discovery System
+
+### 8.1. Progressive Feature Revelation
+
+**Overview:**
+A tooltip-based system that introduces features progressively based on user progress, preventing overwhelm while ensuring feature discovery.
+
+**Implementation:**
+
+```typescript
+// frontend/src/components/onboarding/FeatureDiscoveryManager.tsx
+
+interface FeatureDiscoveryState {
+  discoveredFeatures: Set<FeatureId>;
+  currentTooltip: FeatureTooltip | null;
+  queue: FeatureTooltip[];
+}
+
+const FEATURE_DISCOVERY_CONFIG: FeatureDiscoveryRule[] = [
+  {
+    featureId: 'voice_input',
+    trigger: 'after_3rd_conversation',
+    tooltip: {
+      target: '.voice-button',
+      title: 'Try Voice Conversations',
+      description: 'Tap and speak to have a natural conversation with any personality',
+      position: 'bottom'
+    }
+  },
+  {
+    featureId: 'save_insight',
+    trigger: 'first_meaningful_response',
+    tooltip: {
+      target: '.save-insight-button',
+      title: 'Save This Wisdom',
+      description: 'Save meaningful insights to your personal wisdom journal',
+      position: 'left'
+    }
+  },
+  {
+    featureId: 'share',
+    trigger: 'after_5th_conversation',
+    tooltip: {
+      target: '.share-button',
+      title: 'Share Wisdom',
+      description: 'Share profound moments with friends and family',
+      position: 'bottom'
+    }
+  },
+  {
+    featureId: 'explore_personalities',
+    trigger: 'after_first_conversation',
+    tooltip: {
+      target: '.personality-selector',
+      title: 'Explore Other Perspectives',
+      description: 'Discover 25 personalities across 6 wisdom domains',
+      position: 'right'
+    }
+  }
+];
+
+// Tooltip component with spotlight effect
+const FeatureTooltip: React.FC<TooltipProps> = ({ target, title, description, position, onDismiss }) => {
+  return (
+    <>
+      <div className="feature-spotlight-overlay" />
+      <div className={`feature-tooltip feature-tooltip--${position}`} data-target={target}>
+        <h4>{title}</h4>
+        <p>{description}</p>
+        <button onClick={onDismiss}>Got it!</button>
+      </div>
+    </>
+  );
+};
+```
+
+---
+
 ## 9. Performance & Scalability
 
 ### 9.1. Performance Requirements

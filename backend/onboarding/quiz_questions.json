@@ -1,0 +1,377 @@
+{
+  "questions": [
+    {
+      "id": "life_guidance",
+      "text": "When facing a difficult decision, I usually seek...",
+      "order": 1,
+      "options": [
+        {
+          "id": "inner_peace",
+          "text": "Inner peace and spiritual clarity",
+          "icon": "🕉️",
+          "weights": {
+            "spiritual": 3,
+            "philosophical": 1,
+            "psychology": 1
+          },
+          "personality_hints": ["krishna", "buddha", "jesus", "rumi"]
+        },
+        {
+          "id": "logical_analysis",
+          "text": "Logical analysis and evidence",
+          "icon": "🔬",
+          "weights": {
+            "scientific": 3,
+            "philosophical": 1
+          },
+          "personality_hints": ["einstein", "newton", "tesla", "archimedes"]
+        },
+        {
+          "id": "historical_wisdom",
+          "text": "Lessons from great leaders",
+          "icon": "🏛️",
+          "weights": {
+            "leadership": 3,
+            "philosophical": 1
+          },
+          "personality_hints": ["lincoln", "gandhi", "chanakya", "washington"]
+        },
+        {
+          "id": "creative_insight",
+          "text": "Creative and artistic perspectives",
+          "icon": "📚",
+          "weights": {
+            "literary": 3,
+            "philosophical": 1,
+            "scientific": 1
+          },
+          "personality_hints": ["shakespeare", "tagore", "leonardo"]
+        }
+      ]
+    },
+    {
+      "id": "knowledge_style",
+      "text": "I learn best through...",
+      "order": 2,
+      "options": [
+        {
+          "id": "contemplation",
+          "text": "Quiet contemplation and meditation",
+          "icon": "🧘",
+          "weights": {
+            "spiritual": 3,
+            "philosophical": 2
+          },
+          "personality_hints": ["buddha", "lao_tzu", "marcus_aurelius"]
+        },
+        {
+          "id": "experimentation",
+          "text": "Experimentation and discovery",
+          "icon": "🧪",
+          "weights": {
+            "scientific": 3,
+            "leadership": 1
+          },
+          "personality_hints": ["einstein", "tesla", "newton", "archimedes"]
+        },
+        {
+          "id": "dialogue",
+          "text": "Dialogue and asking questions",
+          "icon": "💬",
+          "weights": {
+            "philosophical": 3,
+            "psychology": 2
+          },
+          "personality_hints": ["socrates", "plato", "aristotle", "freud"]
+        },
+        {
+          "id": "stories",
+          "text": "Stories and narratives",
+          "icon": "📖",
+          "weights": {
+            "literary": 3,
+            "spiritual": 1,
+            "leadership": 1
+          },
+          "personality_hints": ["shakespeare", "tagore", "krishna", "jesus"]
+        }
+      ]
+    },
+    {
+      "id": "life_philosophy",
+      "text": "My approach to life challenges is...",
+      "order": 3,
+      "options": [
+        {
+          "id": "acceptance",
+          "text": "Accept what I cannot change with grace",
+          "icon": "🙏",
+          "weights": {
+            "spiritual": 2,
+            "philosophical": 3
+          },
+          "personality_hints": ["buddha", "marcus_aurelius", "lao_tzu"]
+        },
+        {
+          "id": "action",
+          "text": "Take decisive action to change things",
+          "icon": "⚡",
+          "weights": {
+            "leadership": 3,
+            "scientific": 1
+          },
+          "personality_hints": ["chanakya", "lincoln", "gandhi", "tesla"]
+        },
+        {
+          "id": "understanding",
+          "text": "Understand the deeper meaning first",
+          "icon": "🔍",
+          "weights": {
+            "psychology": 3,
+            "philosophical": 2
+          },
+          "personality_hints": ["freud", "socrates", "aristotle"]
+        },
+        {
+          "id": "devotion",
+          "text": "Trust in a higher purpose",
+          "icon": "✨",
+          "weights": {
+            "spiritual": 3,
+            "literary": 1
+          },
+          "personality_hints": ["krishna", "jesus", "rumi", "swami_vivekananda"]
+        }
+      ]
+    },
+    {
+      "id": "inspiration_source",
+      "text": "I feel most inspired by...",
+      "order": 4,
+      "options": [
+        {
+          "id": "nature",
+          "text": "The wonders of nature and universe",
+          "icon": "🌌",
+          "weights": {
+            "scientific": 3,
+            "spiritual": 2
+          },
+          "personality_hints": ["einstein", "leonardo", "tagore", "lao_tzu"]
+        },
+        {
+          "id": "human_potential",
+          "text": "Human potential and achievement",
+          "icon": "🏆",
+          "weights": {
+            "leadership": 3,
+            "psychology": 1
+          },
+          "personality_hints": ["swami_vivekananda", "lincoln", "mlk", "gandhi"]
+        },
+        {
+          "id": "ancient_wisdom",
+          "text": "Ancient wisdom and timeless truths",
+          "icon": "📜",
+          "weights": {
+            "philosophical": 3,
+            "spiritual": 2
+          },
+          "personality_hints": ["confucius", "plato", "aristotle", "buddha"]
+        },
+        {
+          "id": "art_beauty",
+          "text": "Art, poetry, and beauty",
+          "icon": "🎨",
+          "weights": {
+            "literary": 3,
+            "spiritual": 1
+          },
+          "personality_hints": ["shakespeare", "tagore", "rumi", "leonardo"]
+        }
+      ]
+    },
+    {
+      "id": "conversation_style",
+      "text": "In a conversation about life, I prefer...",
+      "order": 5,
+      "options": [
+        {
+          "id": "practical",
+          "text": "Practical advice I can apply today",
+          "icon": "🛠️",
+          "weights": {
+            "leadership": 3,
+            "scientific": 1
+          },
+          "personality_hints": ["chanakya", "franklin", "washington", "aristotle"]
+        },
+        {
+          "id": "philosophical",
+          "text": "Deep philosophical discussions",
+          "icon": "🤔",
+          "weights": {
+            "philosophical": 3,
+            "psychology": 2
+          },
+          "personality_hints": ["socrates", "plato", "marcus_aurelius", "freud"]
+        },
+        {
+          "id": "spiritual",
+          "text": "Spiritual insights and guidance",
+          "icon": "🕊️",
+          "weights": {
+            "spiritual": 3,
+            "literary": 1
+          },
+          "personality_hints": ["krishna", "buddha", "jesus", "rumi"]
+        },
+        {
+          "id": "intellectual",
+          "text": "Intellectually stimulating ideas",
+          "icon": "💡",
+          "weights": {
+            "scientific": 3,
+            "philosophical": 1
+          },
+          "personality_hints": ["einstein", "newton", "tesla", "leonardo"]
+        }
+      ]
+    }
+  ],
+  "domain_descriptions": {
+    "spiritual": "Spiritual wisdom guides you toward inner peace, purpose, and connection with something greater than yourself.",
+    "scientific": "Scientific inquiry helps you understand the world through curiosity, evidence, and wonder.",
+    "philosophical": "Philosophical thinking invites you to question assumptions and seek deeper truths about existence.",
+    "leadership": "Leadership wisdom empowers you to make decisions, inspire others, and create positive change.",
+    "literary": "Literary perspectives illuminate the human experience through stories, poetry, and artistic expression.",
+    "psychology": "Psychological insights help you understand yourself and others on a deeper level."
+  },
+  "personality_profiles": {
+    "krishna": {
+      "match_title": "The Divine Guide",
+      "match_description": "Your responses show a deep desire for spiritual wisdom and inner peace. Krishna's teachings on duty, devotion, and detachment align beautifully with your quest for meaningful guidance.",
+      "first_message_suggestion": "Krishna, how can I find my true purpose while navigating life's challenges?"
+    },
+    "buddha": {
+      "match_title": "The Enlightened Teacher",
+      "match_description": "You seek peace through understanding and letting go. Buddha's path of mindfulness and compassion resonates with your approach to life's difficulties.",
+      "first_message_suggestion": "Buddha, how can I find peace amidst the chaos of daily life?"
+    },
+    "einstein": {
+      "match_title": "The Curious Explorer",
+      "match_description": "Your analytical approach and curiosity about the universe suggest you'd resonate with Einstein's way of exploring life's mysteries through wonder and scientific inquiry.",
+      "first_message_suggestion": "Einstein, how do you maintain curiosity and wonder in your approach to problems?"
+    },
+    "socrates": {
+      "match_title": "The Questioning Mind",
+      "match_description": "You value deep inquiry and aren't afraid to question assumptions. Socrates' method of discovering truth through dialogue matches your intellectual curiosity.",
+      "first_message_suggestion": "Socrates, how can I learn to ask better questions about life?"
+    },
+    "lincoln": {
+      "match_title": "The Principled Leader",
+      "match_description": "You believe in standing up for what's right while maintaining compassion. Lincoln's blend of moral courage and practical wisdom aligns with your values.",
+      "first_message_suggestion": "Lincoln, how did you maintain hope during your darkest hours?"
+    },
+    "gandhi": {
+      "match_title": "The Peaceful Warrior",
+      "match_description": "You believe change comes through principled action and non-violence. Gandhi's approach to transforming the world through inner strength resonates with you.",
+      "first_message_suggestion": "Gandhi, how can I stand firm in my beliefs while remaining peaceful?"
+    },
+    "shakespeare": {
+      "match_title": "The Master Storyteller",
+      "match_description": "You see life as a rich tapestry of human experience. Shakespeare's insights into love, ambition, and the human condition match your appreciation for life's drama.",
+      "first_message_suggestion": "Shakespeare, what can your plays teach us about navigating human relationships?"
+    },
+    "marcus_aurelius": {
+      "match_title": "The Stoic Emperor",
+      "match_description": "You value self-discipline and finding peace in what you can control. Marcus Aurelius' stoic wisdom offers practical tools for your journey.",
+      "first_message_suggestion": "Marcus Aurelius, how can I remain calm when everything around me feels chaotic?"
+    },
+    "jesus": {
+      "match_title": "The Compassionate Teacher",
+      "match_description": "Love, forgiveness, and service to others guide your path. Jesus' teachings on compassion and grace resonate deeply with your heart.",
+      "first_message_suggestion": "Jesus, how can I show more love and compassion to those around me?"
+    },
+    "rumi": {
+      "match_title": "The Mystic Poet",
+      "match_description": "You feel the divine in beauty, love, and poetry. Rumi's ecstatic wisdom speaks to your soul's longing for deeper connection.",
+      "first_message_suggestion": "Rumi, how can I open my heart to experience more love and beauty in life?"
+    },
+    "confucius": {
+      "match_title": "The Wise Elder",
+      "match_description": "You value tradition, respect, and harmonious relationships. Confucius' teachings on virtue and social harmony align with your approach to life.",
+      "first_message_suggestion": "Confucius, what virtues should I cultivate to live a good life?"
+    },
+    "lao_tzu": {
+      "match_title": "The Sage of the Way",
+      "match_description": "You sense wisdom in simplicity and going with the flow. Lao Tzu's teachings on the Tao offer you a path of effortless action.",
+      "first_message_suggestion": "Lao Tzu, how can I learn to flow with life rather than fight against it?"
+    },
+    "tesla": {
+      "match_title": "The Visionary Inventor",
+      "match_description": "You see possibilities where others see limits. Tesla's revolutionary thinking and dedication to innovation match your creative spirit.",
+      "first_message_suggestion": "Tesla, how can I develop my imagination to see new possibilities?"
+    },
+    "newton": {
+      "match_title": "The Natural Philosopher",
+      "match_description": "You seek to understand the fundamental laws that govern our world. Newton's systematic approach to knowledge matches your methodical mind.",
+      "first_message_suggestion": "Newton, how do you approach solving complex problems?"
+    },
+    "chanakya": {
+      "match_title": "The Strategic Master",
+      "match_description": "You value strategic thinking and practical wisdom. Chanakya's insights on leadership and human nature align with your pragmatic approach.",
+      "first_message_suggestion": "Chanakya, what principles should guide my decision-making?"
+    },
+    "freud": {
+      "match_title": "The Mind Explorer",
+      "match_description": "You're fascinated by the depths of human psychology. Freud's exploration of the unconscious mind resonates with your desire for self-understanding.",
+      "first_message_suggestion": "Freud, how can I better understand my own motivations and behaviors?"
+    },
+    "plato": {
+      "match_title": "The Idealist Philosopher",
+      "match_description": "You believe in higher truths and ideal forms. Plato's vision of perfect wisdom and justice speaks to your aspirational nature.",
+      "first_message_suggestion": "Plato, how can I distinguish between appearance and reality?"
+    },
+    "aristotle": {
+      "match_title": "The Systematic Thinker",
+      "match_description": "You appreciate logic, virtue, and the golden mean. Aristotle's practical ethics and comprehensive worldview match your balanced approach.",
+      "first_message_suggestion": "Aristotle, what does it mean to live a virtuous life?"
+    },
+    "tagore": {
+      "match_title": "The Poet Sage",
+      "match_description": "You find truth in beauty and beauty in truth. Tagore's poetic wisdom and celebration of life resonate with your artistic soul.",
+      "first_message_suggestion": "Tagore, how can I find beauty and meaning in everyday life?"
+    },
+    "leonardo": {
+      "match_title": "The Renaissance Mind",
+      "match_description": "You see no boundaries between art and science, creativity and reason. Leonardo's universal genius inspires your multifaceted interests.",
+      "first_message_suggestion": "Leonardo, how can I develop both my artistic and analytical abilities?"
+    },
+    "swami_vivekananda": {
+      "match_title": "The Fearless Teacher",
+      "match_description": "You believe in human potential and the power of faith. Vivekananda's call to arise, awake, and stop not till the goal is reached moves you.",
+      "first_message_suggestion": "Swami Vivekananda, how can I overcome fear and realize my true potential?"
+    },
+    "mlk": {
+      "match_title": "The Dream Keeper",
+      "match_description": "You believe in justice, equality, and the power of dreams. Dr. King's vision of a beloved community resonates with your hope for humanity.",
+      "first_message_suggestion": "Dr. King, how can I work for justice while maintaining love in my heart?"
+    },
+    "washington": {
+      "match_title": "The Principled Founder",
+      "match_description": "You value duty, honor, and building lasting institutions. Washington's example of selfless leadership inspires your civic spirit.",
+      "first_message_suggestion": "Washington, what principles guided you in building something that would last?"
+    },
+    "franklin": {
+      "match_title": "The Practical Sage",
+      "match_description": "You value self-improvement, practicality, and wit. Franklin's blend of wisdom and common sense matches your approach to personal growth.",
+      "first_message_suggestion": "Franklin, what habits should I develop for personal growth?"
+    },
+    "archimedes": {
+      "match_title": "The Eureka Mind",
+      "match_description": "You delight in solving problems and discovering principles. Archimedes' joy of discovery and practical genius resonates with your curious nature.",
+      "first_message_suggestion": "Archimedes, how do you approach solving difficult problems?"
+    }
+  }
+}

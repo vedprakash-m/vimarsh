@@ -134,6 +134,23 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Admin service not available: {e}")
 
+# Import engagement services for activity tracking and achievements
+engagement_service_instance = None
+achievement_service_instance = None
+engagement_available = False
+
+try:
+    from engagement.engagement_service import get_engagement_service
+    from engagement.achievement_service import get_achievement_service
+    engagement_service_instance = get_engagement_service()
+    achievement_service_instance = get_achievement_service()
+    engagement_available = True
+    logger.info("🏆 Engagement and achievement services initialized")
+except ImportError as e:
+    logger.warning(f"⚠️ Engagement services not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Engagement services failed to initialize: {e}")
+
 # Helper functions with database-driven approach
 async def get_personality_list():
     """Get list of all available personalities (database-first approach)"""
@@ -2474,6 +2491,59 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "description": fallback_info["description"]
             }
         
+        # Track engagement and check for achievements (non-blocking)
+        newly_unlocked_achievements = []
+        engagement_data = None
+        if engagement_available and engagement_service_instance and user_id != "anonymous":
+            try:
+                # Record check-in for streak tracking
+                checkin_result = await engagement_service_instance.record_check_in(user_id)
+                
+                # Record conversation activity
+                await engagement_service_instance.record_activity(
+                    user_id=user_id,
+                    activity_type="conversation",
+                    metadata={
+                        "personality_id": personality_id,
+                        "domain": personality_info.get("domain", ""),
+                        "query_length": len(user_query),
+                        "response_length": len(response_text)
+                    }
+                )
+                
+                # Get updated engagement data for achievement checking
+                engagement_data = await engagement_service_instance.get_engagement_data(user_id)
+                
+                if engagement_data and achievement_service_instance:
+                    # Build metrics for achievement checking
+                    stats = engagement_data.get("stats", {})
+                    streaks = engagement_data.get("streaks", {})
+                    
+                    metrics = {
+                        "streak": streaks.get("current_streak", 0),
+                        "total_conversations": stats.get("total_conversations", 0),
+                        "personalities_met": stats.get("personalities_met", []),
+                        "domains_explored": stats.get("domains_explored", []),
+                        "total_insights_saved": stats.get("total_insights_saved", 0),
+                        "total_shares": stats.get("total_shares", 0),
+                        "onboarding_complete": True  # Assume if they're chatting
+                    }
+                    
+                    # Check and unlock achievements
+                    newly_unlocked_achievements = await achievement_service_instance.check_and_unlock_achievements(
+                        user_id=user_id,
+                        metrics=metrics
+                    )
+                    
+                    if newly_unlocked_achievements:
+                        logger.info(f"🏆 {len(newly_unlocked_achievements)} achievements unlocked for {user_id}")
+                
+                logger.info(f"📊 Engagement tracked for {user_id}")
+                
+            except Exception as engagement_error:
+                # Non-blocking - log but don't fail the response
+                logger.warning(f"⚠️ Engagement tracking failed (non-blocking): {engagement_error}")
+        
         # Build final response with transparency about response source
         response = {
             "response": response_text,
@@ -2488,6 +2558,17 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 "ai_generated": response_source not in ["template_fallback", "hardcoded_fallback"]
             }
         }
+        
+        # Add engagement data to response if available
+        if newly_unlocked_achievements:
+            response["achievements_unlocked"] = newly_unlocked_achievements
+        
+        if engagement_data:
+            streaks = engagement_data.get("streaks", {})
+            response["engagement"] = {
+                "current_streak": streaks.get("current_streak", 0),
+                "streak_updated": True
+            }
         
         logger.info(f"✅ {personality_info['name']} response generated successfully")
         
@@ -3434,3 +3515,58 @@ except ImportError as e:
     logger.warning(f"⚠️ Memory API routes not available: {e}")
 except Exception as e:
     logger.warning(f"⚠️ Failed to register memory API routes: {e}")
+
+
+# ==============================================================================
+# ONBOARDING API ROUTE REGISTRATION
+# ==============================================================================
+
+# Register onboarding routes for personalized user onboarding
+try:
+    from onboarding.onboarding_api import register_onboarding_routes
+    register_onboarding_routes(app)
+    logger.info("🎯 Onboarding API routes registered successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Onboarding API routes not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Failed to register onboarding API routes: {e}")
+
+
+# ==============================================================================
+# ENGAGEMENT API ROUTE REGISTRATION
+# ==============================================================================
+
+# Register engagement routes for streaks, achievements, and gamification
+try:
+    from engagement.engagement_api import register_engagement_routes
+    register_engagement_routes(app)
+    logger.info("🏆 Engagement API routes registered successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Engagement API routes not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Failed to register engagement API routes: {e}")
+
+
+# ==============================================================================
+# NOTIFICATION API ROUTE REGISTRATION
+# ==============================================================================
+
+# Register notification routes for push notifications and preferences
+try:
+    from notifications.notification_api import register_notification_routes
+    register_notification_routes(app)
+    logger.info("🔔 Notification API routes registered successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Notification API routes not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Failed to register notification API routes: {e}")
+
+# Register notification timer triggers for scheduled notifications
+try:
+    from notifications.notification_trigger import register_notification_timers
+    register_notification_timers(app)
+    logger.info("⏰ Notification timer triggers registered successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Notification timer triggers not available: {e}")
+except Exception as e:
+    logger.warning(f"⚠️ Failed to register notification timer triggers: {e}")
