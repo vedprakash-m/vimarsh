@@ -73,19 +73,14 @@
       "!src/**/*.d.ts",
       "!src/index.tsx",
       "!src/reportWebVitals.ts",
-      "!src/setupTests.ts",
-      "!src/components/engagement/**",
-      "!src/components/notifications/**",
-      "!src/components/onboarding/**",
-      "!src/contexts/EngagementContext.tsx",
-      "!src/pages/ProgressDashboard.tsx"
+      "!src/setupTests.ts"
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 1.5,
-        "functions": 2.5,
-        "lines": 3.5,
-        "statements": 3.5
+        "branches": 2,
+        "functions": 3,
+        "lines": 4,
+        "statements": 4
       }
     },
     "coverageReporters": [
