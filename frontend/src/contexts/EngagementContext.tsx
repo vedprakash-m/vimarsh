@@ -227,7 +227,7 @@ export const EngagementProvider: React.FC<EngagementProviderProps> = ({
             achievementName: achievement.name,
             category: achievement.category,
             tier: achievement.tier,
-            totalUnlocked: achievementsData?.total_unlocked
+            totalUnlocked: achievementsData?.summary.unlocked
           });
         });
         
