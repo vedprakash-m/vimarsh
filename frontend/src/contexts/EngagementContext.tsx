@@ -226,7 +226,7 @@ export const EngagementProvider: React.FC<EngagementProviderProps> = ({
             achievementId: achievement.id,
             achievementName: achievement.name,
             category: achievement.category,
-            rarity: achievement.rarity,
+            tier: achievement.tier,
             totalUnlocked: achievementsData?.total_unlocked
           });
         });
@@ -273,7 +273,7 @@ export const EngagementProvider: React.FC<EngagementProviderProps> = ({
             achievementId: achievement.id,
             achievementName: achievement.name,
             category: achievement.category,
-            rarity: achievement.rarity
+            tier: achievement.tier
           });
         });
         
