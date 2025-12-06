@@ -409,7 +409,7 @@ const LandingPage: React.FC = () => {
         try {
           const state = await onboardingApi.getOnboardingState(account.homeAccountId);
           // Show onboarding wizard if not completed
-          if (state && state.status !== 'complete') {
+          if (state && !state.is_complete) {
             setShowOnboarding(true);
           }
           setOnboardingChecked(true);
