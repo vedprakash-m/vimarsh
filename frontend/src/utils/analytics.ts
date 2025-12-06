@@ -65,7 +65,7 @@ export const trackAchievementEvent = (
     achievementId?: string;
     achievementName?: string;
     category?: string;
-    rarity?: string;
+    tier?: string;
     progress?: number;
     totalUnlocked?: number;
   }
