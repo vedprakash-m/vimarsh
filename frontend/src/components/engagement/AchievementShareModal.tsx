@@ -149,7 +149,7 @@ const AchievementShareModal: React.FC<AchievementShareModalProps> = ({
         achievementId: achievement.id,
         achievementName: achievement.name,
         category: achievement.category,
-        rarity: achievement.tier
+        tier: achievement.tier
       });
     }
   }, [achievement]);
