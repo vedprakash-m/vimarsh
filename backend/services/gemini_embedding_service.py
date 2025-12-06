@@ -1,12 +1,18 @@
 """
 Gemini API-based Embedding Service
 
-Provides vector embeddings using Google Gemini API instead of sentence-transformers
-to reduce deployment size and eliminate heavy ML dependencies.
+Provides vector embeddings using Google Gemini API with gemini-embedding-001 model.
+Supports Matryoshka Representation Learning (MRL) for flexible dimensionality.
+
+Migration Note (December 2025):
+- Migrated from deprecated text-embedding-004 to gemini-embedding-001
+- Added MRL support with output_dimensionality parameter
+- Added L2 normalization for dimensions < 3072
 """
 
 import os
 import logging
+import math
 from typing import List, Optional, Union
 from dataclasses import dataclass
 
@@ -26,30 +32,39 @@ class EmbeddingResult:
     model: str
     dimension: int
     text_length: int
+    normalized: bool = False
 
 class GeminiEmbeddingService:
     """
-    Gemini API-based embedding service
+    Gemini API-based embedding service using gemini-embedding-001
     
-    Advantages over sentence-transformers:
-    - No heavy ML dependencies (~500MB saved)
-    - Faster cold starts
-    - Consistent with existing Gemini API usage
-    - Scalable cloud-based processing
+    Features:
+    - Matryoshka Representation Learning (MRL) for flexible dimensions
+    - L2 normalization for optimal cosine similarity
+    - Task-type optimization (RETRIEVAL_QUERY, RETRIEVAL_DOCUMENT, SEMANTIC_SIMILARITY)
+    - Higher rate limits and improved quality over text-embedding-004
     """
     
-    def __init__(self, model_name: str = "models/text-embedding-004", api_key: Optional[str] = None, test_mode: bool = False):
+    def __init__(
+        self, 
+        model_name: str = "models/gemini-embedding-001",
+        output_dimensionality: int = 768,
+        api_key: Optional[str] = None, 
+        test_mode: bool = False
+    ):
         """
         Initialize Gemini Embedding Service
         
         Args:
-            model_name: Gemini embedding model to use
+            model_name: Gemini embedding model (default: gemini-embedding-001)
+            output_dimensionality: MRL dimension (128-3072, default: 768 for Cosmos DB compatibility)
             api_key: API key for Gemini (optional, will try to get from environment)
             test_mode: If True, allows initialization without API key for testing
         """
         self.logger = logging.getLogger(__name__)
         self.api_key = api_key
         self.test_mode = test_mode
+        self.output_dimensionality = output_dimensionality
         
         # Try to get API key from various sources if not provided
         if not self.api_key:
@@ -70,11 +85,17 @@ class GeminiEmbeddingService:
                         if unified_config.llm.api_key:
                             self.api_key = unified_config.llm.api_key
                 except Exception:
-                    # Silently continue if unified config not available
                     pass
                         
             except Exception:
-                # Silently continue if config system not available
+                pass
+        
+        # Try to get output dimensionality from environment
+        env_dimensionality = os.getenv('EMBEDDING_OUTPUT_DIMENSIONALITY')
+        if env_dimensionality:
+            try:
+                self.output_dimensionality = int(env_dimensionality)
+            except ValueError:
                 pass
         
         if not self.api_key and not self.test_mode:
@@ -84,7 +105,11 @@ class GeminiEmbeddingService:
         
         self.model_name = model_name
         self.client = None
-        self.dimension = 768  # text-embedding-004 dimension
+        self.dimension = self.output_dimensionality  # MRL allows flexible dimensions
+        
+        # Validate dimensionality range for MRL
+        if self.output_dimensionality < 128 or self.output_dimensionality > 3072:
+            logger.warning(f"⚠️ output_dimensionality {self.output_dimensionality} outside recommended range (128-3072)")
         
         if not GEMINI_AVAILABLE and not self.test_mode:
             logger.error("❌ google-generativeai package not available")
@@ -100,30 +125,55 @@ class GeminiEmbeddingService:
         try:
             genai.configure(api_key=self.api_key)
             self.client = genai
-            logger.info(f"✅ Gemini embedding service initialized with {self.model_name}")
+            logger.info(f"✅ Gemini embedding service initialized with {self.model_name} (dim={self.output_dimensionality})")
         except Exception as e:
             logger.error(f"❌ Failed to initialize Gemini client: {e}")
             raise
     
+    def _normalize_embedding(self, embedding: List[float]) -> List[float]:
+        """
+        L2-normalize embedding vector for accurate cosine similarity.
+        Required when using MRL with dimensions < 3072.
+        
+        Args:
+            embedding: Raw embedding vector
+            
+        Returns:
+            L2-normalized embedding vector
+        """
+        if not embedding:
+            return embedding
+        
+        # Calculate L2 norm
+        norm = math.sqrt(sum(x * x for x in embedding))
+        
+        if norm == 0:
+            return embedding
+        
+        # Normalize
+        return [x / norm for x in embedding]
+    
     def generate_embedding(self, text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> EmbeddingResult:
         """
-        Generate embedding for a single text
+        Generate embedding for a single text using gemini-embedding-001
         
         Args:
             text: Text to embed
-            task_type: Gemini task type (RETRIEVAL_DOCUMENT, RETRIEVAL_QUERY, etc.)
+            task_type: Gemini task type (RETRIEVAL_DOCUMENT, RETRIEVAL_QUERY, SEMANTIC_SIMILARITY)
             
         Returns:
-            EmbeddingResult with embedding vector and metadata
+            EmbeddingResult with normalized embedding vector and metadata
         """
         if self.test_mode:
             # Return mock embedding for test mode
             logger.info("🧪 Generating mock embedding in test mode")
+            mock_embedding = [0.1] * self.dimension
             return EmbeddingResult(
-                embedding=[0.1] * self.dimension,  # Mock 768-dimensional vector
+                embedding=self._normalize_embedding(mock_embedding),
                 model=self.model_name,
                 dimension=self.dimension,
-                text_length=len(text)
+                text_length=len(text),
+                normalized=True
             )
             
         if not self.client:
@@ -133,20 +183,33 @@ class GeminiEmbeddingService:
             # Clean and prepare text
             cleaned_text = self._clean_text(text)
             
+            # Build embed_content parameters
+            embed_params = {
+                "model": self.model_name,
+                "content": cleaned_text,
+                "task_type": task_type
+            }
+            
+            # Add output_dimensionality for MRL if not using native 3072
+            if self.output_dimensionality != 3072:
+                embed_params["output_dimensionality"] = self.output_dimensionality
+            
             # Generate embedding using Gemini API
-            result = self.client.embed_content(
-                model=self.model_name,
-                content=cleaned_text,
-                task_type=task_type
-            )
+            result = self.client.embed_content(**embed_params)
             
             embedding = result['embedding']
+            
+            # L2-normalize for dimensions < 3072 (required for MRL)
+            needs_normalization = self.output_dimensionality < 3072
+            if needs_normalization:
+                embedding = self._normalize_embedding(embedding)
             
             return EmbeddingResult(
                 embedding=embedding,
                 model=self.model_name,
                 dimension=len(embedding),
-                text_length=len(cleaned_text)
+                text_length=len(cleaned_text),
+                normalized=needs_normalization
             )
             
         except Exception as e:
@@ -165,7 +228,7 @@ class GeminiEmbeddingService:
         Returns:
             List of EmbeddingResult objects
         """
-        if not self.client:
+        if not self.client and not self.test_mode:
             raise RuntimeError("Gemini client not initialized")
         
         results = []
@@ -181,12 +244,14 @@ class GeminiEmbeddingService:
                     
             except Exception as e:
                 logger.error(f"❌ Failed to generate embedding for text {i}: {e}")
-                # Return zero vector as fallback
+                # Return zero vector as fallback (normalized)
+                fallback_embedding = self._normalize_embedding([0.0] * self.dimension)
                 fallback_result = EmbeddingResult(
-                    embedding=[0.0] * self.dimension,
+                    embedding=fallback_embedding,
                     model=self.model_name,
                     dimension=self.dimension,
-                    text_length=len(text)
+                    text_length=len(text),
+                    normalized=True
                 )
                 results.append(fallback_result)
         
@@ -205,6 +270,30 @@ class GeminiEmbeddingService:
         """
         return self.generate_embedding(query, task_type="RETRIEVAL_QUERY")
     
+    def generate_document_embedding(self, document: str) -> EmbeddingResult:
+        """
+        Generate embedding optimized for document indexing
+        
+        Args:
+            document: Document text to embed
+            
+        Returns:
+            EmbeddingResult optimized for document retrieval
+        """
+        return self.generate_embedding(document, task_type="RETRIEVAL_DOCUMENT")
+    
+    def generate_similarity_embedding(self, text: str) -> EmbeddingResult:
+        """
+        Generate embedding optimized for semantic similarity comparison
+        
+        Args:
+            text: Text to embed for similarity comparison
+            
+        Returns:
+            EmbeddingResult optimized for semantic similarity
+        """
+        return self.generate_embedding(text, task_type="SEMANTIC_SIMILARITY")
+    
     def _clean_text(self, text: str) -> str:
         """
         Clean and prepare text for embedding generation
@@ -221,7 +310,7 @@ class GeminiEmbeddingService:
         # Remove excessive whitespace
         cleaned = " ".join(text.split())
         
-        # Truncate to Gemini's max length (approx 2048 tokens ~ 8000 chars)
+        # Truncate to Gemini's max length (2048 tokens ~ 8000 chars)
         max_length = 7000  # Conservative limit
         if len(cleaned) > max_length:
             cleaned = cleaned[:max_length] + "..."
@@ -231,31 +320,27 @@ class GeminiEmbeddingService:
     
     def calculate_similarity(self, embedding1: List[float], embedding2: List[float]) -> float:
         """
-        Calculate cosine similarity between two embeddings
+        Calculate cosine similarity between two embeddings.
+        Optimized for pre-normalized embeddings (dot product = cosine similarity).
         
         Args:
-            embedding1: First embedding vector
-            embedding2: Second embedding vector
+            embedding1: First embedding vector (should be normalized)
+            embedding2: Second embedding vector (should be normalized)
             
         Returns:
-            Cosine similarity score (0-1)
+            Cosine similarity score (-1 to 1, typically 0 to 1 for text)
         """
         try:
-            import numpy as np
-            
-            vec1 = np.array(embedding1)
-            vec2 = np.array(embedding2)
-            
-            # Calculate cosine similarity
-            dot_product = np.dot(vec1, vec2)
-            norm1 = np.linalg.norm(vec1)
-            norm2 = np.linalg.norm(vec2)
-            
-            if norm1 == 0 or norm2 == 0:
+            if not embedding1 or not embedding2:
                 return 0.0
             
-            similarity = dot_product / (norm1 * norm2)
-            return max(0.0, min(1.0, similarity))  # Clamp to [0, 1]
+            if len(embedding1) != len(embedding2):
+                logger.warning(f"⚠️ Embedding dimension mismatch: {len(embedding1)} vs {len(embedding2)}")
+                return 0.0
+            
+            # For normalized vectors, dot product = cosine similarity
+            similarity = sum(a * b for a, b in zip(embedding1, embedding2))
+            return max(-1.0, min(1.0, similarity))
             
         except Exception as e:
             logger.error(f"❌ Failed to calculate similarity: {e}")
@@ -265,13 +350,19 @@ class GeminiEmbeddingService:
         """Get information about the current embedding model"""
         return {
             "model_name": self.model_name,
-            "dimension": self.dimension,
+            "native_dimension": 3072,
+            "output_dimension": self.output_dimensionality,
+            "mrl_enabled": self.output_dimensionality != 3072,
+            "normalized": self.output_dimensionality < 3072,
             "provider": "Google Gemini",
             "api_based": True,
+            "mteb_score": 68.17,
+            "supported_task_types": ["RETRIEVAL_QUERY", "RETRIEVAL_DOCUMENT", "SEMANTIC_SIMILARITY"],
             "advantages": [
-                "No heavy dependencies",
-                "Fast cold starts",
-                "Cloud-based scaling",
+                "Matryoshka Representation Learning (MRL)",
+                "Higher MTEB score (68.17)",
+                "Higher rate limits",
+                "Flexible dimensionality",
                 "Consistent with Gemini LLM"
             ]
         }
@@ -279,13 +370,19 @@ class GeminiEmbeddingService:
 # Singleton instance
 _gemini_embedding_service = None
 
-def get_gemini_embedding_service() -> GeminiEmbeddingService:
+def get_gemini_embedding_service(
+    model_name: str = "models/gemini-embedding-001",
+    output_dimensionality: int = 768
+) -> GeminiEmbeddingService:
     """Get singleton instance of Gemini embedding service"""
     global _gemini_embedding_service
     
     if _gemini_embedding_service is None:
         try:
-            _gemini_embedding_service = GeminiEmbeddingService()
+            _gemini_embedding_service = GeminiEmbeddingService(
+                model_name=model_name,
+                output_dimensionality=output_dimensionality
+            )
         except Exception as e:
             logger.error(f"❌ Failed to create Gemini embedding service: {e}")
             raise
@@ -302,7 +399,7 @@ def encode(text: Union[str, List[str]], task_type: str = "RETRIEVAL_DOCUMENT") -
         task_type: Task type for Gemini API
         
     Returns:
-        Single embedding or list of embeddings
+        Single embedding or list of embeddings (normalized)
     """
     service = get_gemini_embedding_service()
     

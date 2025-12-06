@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 CLI Script for Vector Embedding Generation
-Generates embeddings for personality chunks using Google's text-embedding-004 model
+Generates embeddings for personality chunks using Google's gemini-embedding-001 model
+with Matryoshka Representation Learning (MRL) for flexible dimensionality.
 """
 
 import os

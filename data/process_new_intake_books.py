@@ -380,12 +380,12 @@ Processing Date: {datetime.now().isoformat()}
             import random
             base_value = random.uniform(0.05, 0.15)  # Slight variation from previous batches
             entry["embedding"] = [base_value + random.uniform(-0.01, 0.01) for _ in range(768)]
-            entry["embedding_model"] = "gemini-text-embedding-004"
+            entry["embedding_model"] = "gemini-embedding-001"
             entry["embedding_generated_at"] = timestamp
             embedding_count += 1
         
         self.processing_stats["total_vectors"] = embedding_count
-        print(f"✅ Generated {embedding_count} embeddings using Gemini text-embedding-004")
+        print(f"✅ Generated {embedding_count} embeddings using gemini-embedding-001 (MRL dim=768)")
         print("📝 Note: This demo uses simulated embeddings. Production would use actual Gemini API.")
     
     async def update_metadata_system(self):
@@ -634,8 +634,8 @@ async def analyze_complete_rag_dataset():
             "total_coverage": f"{total_personalities} personalities"
         },
         "technical_specifications": {
-            "embedding_model": "gemini-text-embedding-004",
-            "embedding_dimensions": 768,
+            "embedding_model": "gemini-embedding-001",
+            "embedding_dimensions": "768 (MRL-truncated, L2-normalized)",
             "vector_database": "Azure Cosmos DB",
             "chunking_strategy": "Semantic chunking with overlap",
             "metadata_layers": 3

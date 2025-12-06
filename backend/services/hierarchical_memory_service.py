@@ -26,7 +26,13 @@ import json
 from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError
 
-# Google Gemini for embeddings and reflection generation
+# Azure OpenAI for embeddings (with Gemini fallback for generation)
+try:
+    from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+    AZURE_OPENAI_AVAILABLE = True
+except ImportError:
+    AZURE_OPENAI_AVAILABLE = False
+
 import google.generativeai as genai
 
 # Local models
@@ -106,12 +112,14 @@ class HierarchicalMemoryService:
         api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)
-            self.embedding_model = "text-embedding-004"
+            self.embedding_model = "gemini-embedding-001"  # Migrated from deprecated text-embedding-004
+            self.embedding_output_dimensionality = 768  # MRL dimension for Cosmos DB compatibility
             self.generation_model = genai.GenerativeModel("gemini-2.0-flash")
-            logger.info("✅ Gemini initialized for memory service")
+            logger.info("✅ Gemini initialized for memory service (embedding: gemini-embedding-001)")
         else:
             logger.warning("⚠️ Gemini API key not found - embeddings disabled")
             self.embedding_model = None
+            self.embedding_output_dimensionality = 768
             self.generation_model = None
     
     def _init_cosmos_db(self) -> None:

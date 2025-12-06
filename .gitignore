@@ -299,6 +299,11 @@ backend/local.settings.*.json
 app-manifest-update.json
 temp-app-update.json
 
+# Azure OpenAI and AI Service credentials
+*openai*.key
+*azure*openai*.json
+ai-service-*.json
+
 # ===========================
 # React / Frontend Build
 # ===========================
@@ -467,6 +472,11 @@ data/vimarsh_rag_*_status.json
 data/content_statistics.json
 data/test_results.json
 
+# Re-embedding and migration logs
+data/reembedding_*.log
+data/migration_*.log
+data/*_migration_*.log
+
 # Data processing artifacts
 data/*.jsonl
 data/*/*.jsonl
@@ -483,6 +493,9 @@ backend/test_*.json
 backend/*_test_report.*
 backend/*_report.*
 backend/test_data/large_files/
+backend/phase3_test_results.txt
+backend/*_test_results.txt
+backend/*_diagnostics.txt
 
 # Temporary files
 backend/temp/

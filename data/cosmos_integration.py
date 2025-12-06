@@ -36,11 +36,11 @@ except ImportError:
 # Try to import embedding service for vector generation
 try:
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-    from services.gemini_embedding_service import get_gemini_embedding_service
+    from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
     EMBEDDING_AVAILABLE = True
 except ImportError:
     EMBEDDING_AVAILABLE = False
-    print("⚠️ Gemini embedding service not available. Vector search will not work.")
+    print("⚠️ Azure OpenAI embedding service not available. Vector search will not work.")
 
 # Try to import config manager
 try:
@@ -63,21 +63,15 @@ class CosmosDBIntegration:
         self.embedding_service = None
         
     def initialize_embedding_service(self) -> bool:
-        """Initialize the Gemini embedding service for vector generation."""
+        """Initialize the Azure OpenAI embedding service for vector generation."""
         if not EMBEDDING_AVAILABLE:
             logger.warning("⚠️ Embedding service not available - entries will not have vector embeddings")
             return False
             
         try:
-            # Ensure environment variables are loaded
-            api_key = os.getenv('GEMINI_API_KEY')
-            if not api_key:
-                logger.error("❌ GEMINI_API_KEY not found in environment")
-                return False
-                
-            logger.info(f"✅ Gemini embedding service initialized with models/text-embedding-004")
-            self.embedding_service = get_gemini_embedding_service()
-            logger.info("✅ Gemini embedding service initialized")
+            logger.info("🔧 Initializing Azure OpenAI embedding service...")
+            self.embedding_service = AzureOpenAIEmbeddingService()
+            logger.info("✅ Azure OpenAI embedding service initialized (text-embedding-3-large, dim=768)")
             return True
         except Exception as e:
             logger.error(f"❌ Failed to initialize embedding service: {str(e)}")
@@ -229,15 +223,14 @@ class CosmosDBIntegration:
                 
                 for i, (content, entry) in enumerate(zip(batch_contents, batch_entries)):
                     try:
-                        embedding_result = self.embedding_service.generate_embedding(
-                            content, 
-                            task_type="RETRIEVAL_DOCUMENT"
-                        )
+                        # Azure OpenAI embedding service is async
+                        import asyncio
+                        embedding = asyncio.run(self.embedding_service.generate_embedding(content))
                         
-                        if embedding_result.success and embedding_result.embedding:
-                            entry['embedding'] = embedding_result.embedding
-                            entry['embedding_model'] = 'gemini-text-embedding-004'
-                            entry['embedding_dimensions'] = len(embedding_result.embedding)
+                        if embedding:
+                            entry['embedding'] = embedding
+                            entry['embedding_model'] = 'text-embedding-3-large'
+                            entry['embedding_dimensions'] = len(embedding)
                             entry['has_embedding'] = True
                             successful_embeddings += 1
                         else:
@@ -399,8 +392,8 @@ class CosmosDBIntegration:
 ## Vector Embeddings Summary
 - **Entries with embeddings**: {embeddings_count}
 - **Embedding coverage**: {(embeddings_count / len(sacred_entries) * 100):.1f}%
-- **Embedding model**: gemini-text-embedding-004
-- **Vector dimensions**: 768
+- **Embedding model**: gemini-embedding-001 (MRL)
+- **Vector dimensions**: 768 (MRL-truncated, L2-normalized)
 - **Vector search ready**: {'✅ Yes' if embeddings_count > 0 else '❌ No'}
 
 ## Personality Coverage in Database

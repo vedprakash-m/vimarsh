@@ -336,7 +336,7 @@ class EnhancedPDFProcessor:
         # Add embedding if available
         if embedding:
             document["embedding"] = embedding
-            document["embedding_model"] = "gemini-text-embedding-004"
+            document["embedding_model"] = "gemini-embedding-001"
             document["embedding_dimensions"] = len(embedding)
             document["has_embedding"] = True
         else:

@@ -11,8 +11,8 @@
 ## Vector Embeddings Summary
 - **Entries with embeddings**: 0
 - **Embedding coverage**: 0.0%
-- **Embedding model**: gemini-text-embedding-004
-- **Vector dimensions**: 768
+- **Embedding model**: gemini-embedding-001 (MRL)
+- **Vector dimensions**: 768 (MRL-truncated, L2-normalized)
 - **Vector search ready**: ❌ No
 
 ## Personality Coverage in Database

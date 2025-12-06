@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """
-Advanced vector embeddings generator for personality entries in Cosmos DB using Google Gemini.
-This script processes entries that don't have embeddings and generates them using the Gemini API
-with proper rate limiting, error handling, and batch processing.
+Advanced vector embeddings generator for personality entries in Cosmos DB using Azure OpenAI.
+This script processes entries that don't have embeddings and generates them using the
+Azure OpenAI text-embedding-3-large model with proper rate limiting, error handling, and batch processing.
 """
 
 import os
 import logging
 import asyncio
+import sys
 from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
 import time
+
+# Add backend to path for service imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 # Configure logging with proper Unicode handling
 import sys
@@ -48,28 +52,37 @@ def safe_log(logger_func, message: str):
         print(f"Message: {message}")
 
 class AdvancedEmbeddingGenerator:
-    """Handles embedding generation using Google Gemini API with proper error handling and rate limiting."""
+    """Handles embedding generation using Azure OpenAI with Gemini fallback."""
     
     def __init__(self):
-        self.api_key = os.getenv('GEMINI_API_KEY')
-        if not self.api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment variables")
+        # Initialize Azure OpenAI embedding service
+        try:
+            from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+            self.embedding_service = AzureOpenAIEmbeddingService()
+            self.use_azure = True
+            safe_log(logger.info, "✅ Azure OpenAI embedding service initialized")
+        except Exception as e:
+            safe_log(logger.warning, f"Azure OpenAI unavailable, using Gemini fallback: {e}")
+            self.api_key = os.getenv('GEMINI_API_KEY')
+            if not self.api_key:
+                raise ValueError("Neither Azure OpenAI nor GEMINI_API_KEY available")
+            self.use_azure = False
         
-        # Rate limiting configuration - More optimal for production
-        self.requests_per_minute = 50  # Back to more aggressive rate limit
-        self.request_interval = 60.0 / self.requests_per_minute  # 1.2 seconds between requests
+        # Rate limiting configuration
+        self.requests_per_minute = 50
+        self.request_interval = 60.0 / self.requests_per_minute
         self.last_request_time = 0
         
-        # Batch processing configuration - Larger batches for efficiency
-        self.batch_size = 10  # More efficient batch size
-        self.max_retries = 3  # Reasonable retry count
-        self.retry_delay = 2.0  # Standard delay between retries
+        # Batch processing configuration
+        self.batch_size = 10
+        self.max_retries = 3
+        self.retry_delay = 2.0
         
         safe_log(logger.info, f"🤖 Embedding generator initialized with {self.requests_per_minute} requests/minute")
     
     async def generate_embedding(self, text: str, retries: int = 0) -> Optional[List[float]]:
         """
-        Generate embedding for a single text using Gemini API with rate limiting and retry logic.
+        Generate embedding for a single text using Azure OpenAI (primary) or Gemini (fallback).
         
         Args:
             text: Text to generate embedding for
@@ -79,9 +92,16 @@ class AdvancedEmbeddingGenerator:
             List of embedding values or None if failed
         """
         try:
-            import google.generativeai as genai
+            # Try Azure OpenAI first
+            if self.use_azure:
+                try:
+                    embedding = await self.embedding_service.generate_embedding(text)
+                    return embedding
+                except Exception as e:
+                    safe_log(logger.warning, f"Azure OpenAI failed, trying Gemini: {e}")
             
-            # Configure Gemini
+            # Fallback to Gemini
+            import google.generativeai as genai
             genai.configure(api_key=self.api_key)
             
             # Rate limiting
@@ -93,11 +113,12 @@ class AdvancedEmbeddingGenerator:
             
             self.last_request_time = time.time()
             
-            # Generate embedding using text-embedding-004 model
+            # Generate embedding using gemini-embedding-001 model with MRL
             result = genai.embed_content(
-                model="models/text-embedding-004",
+                model="models/gemini-embedding-001",
                 content=text,
-                task_type="retrieval_document"
+                task_type="retrieval_document",
+                output_dimensionality=768  # MRL dimension for Cosmos DB compatibility
             )
             
             embedding = result['embedding']
@@ -171,7 +192,7 @@ class AdvancedEmbeddingGenerator:
                     # Update entry with embedding
                     entry['embedding'] = embedding
                     entry['has_embedding'] = True
-                    entry['embedding_model'] = 'text-embedding-004'
+                    entry['embedding_model'] = 'gemini-embedding-001'
                     entry['embedding_generated_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
                     
                     results['updated_entries'].append(entry)

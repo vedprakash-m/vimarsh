@@ -311,8 +311,8 @@ class MetadataProductionSyncer:
             "personalities_list": list(personality_mappings.keys()),
             "production_validation": {
                 "vector_database_chunks": total_chunks,
-                "embedding_model": "Gemini text-embedding-004",
-                "embedding_dimensions": 768,
+                "embedding_model": "gemini-embedding-001",
+                "embedding_dimensions": "768 (MRL-truncated, L2-normalized)",
                 "production_url": "https://vimarsh.vedprakash.net"
             },
             "data_sources": {

@@ -24,7 +24,14 @@ except ImportError:
     HAS_NUMPY = False
     np = None  # Will cause AttributeError if used, alerting developer
 
-# Optional dependency for vector embeddings - using Gemini API instead of heavy packages
+# Azure OpenAI for embeddings (primary)
+try:
+    from .azure_openai_embedding_service import AzureOpenAIEmbeddingService
+    AZURE_OPENAI_AVAILABLE = True
+except ImportError:
+    AZURE_OPENAI_AVAILABLE = False
+
+# Gemini fallback for embeddings
 try:
     from .gemini_embedding_service import GeminiTransformer
     GEMINI_EMBEDDINGS_AVAILABLE = True
@@ -38,7 +45,7 @@ except ImportError:
             """Return dummy embeddings for CI/CD"""
             if isinstance(texts, str):
                 texts = [texts]
-            # Return dummy 768-dimensional embeddings (Gemini dimension)
+            # Return dummy 768-dimensional embeddings
             import random
             return [[random.random() for _ in range(768)] for _ in texts]
     
@@ -126,9 +133,9 @@ class KnowledgeBaseManager:
         self.embedding_model_name = "gemini-embedding"
         try:
             self.embedding_model = GeminiTransformer(self.embedding_model_name)
-            self.embedding_dim = 768  # Dimension for Gemini text-embedding-004
+            self.embedding_dim = 768  # MRL dimension for gemini-embedding-001 (Cosmos DB compatible)
             if GEMINI_EMBEDDINGS_AVAILABLE:
-                logger.info(f"✅ Initialized Gemini embedding model: {self.embedding_model_name}")
+                logger.info(f"✅ Initialized Gemini embedding model: gemini-embedding-001 (dim={self.embedding_dim})")
             else:
                 logger.warning("⚠️ Using stub embedding model (Gemini API not available)")
         except Exception as e:

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Generate real Gemini embeddings for today's new intake content and load into Cosmos DB.
-This script processes the 541 chunks from today's intake processing and integrates them
-into the existing production RAG system.
+Generate Azure OpenAI embeddings for new intake content and load into Cosmos DB.
+This script processes new chunks from intake processing and integrates them
+into the existing production RAG system using text-embedding-3-large.
 """
 
 import asyncio
@@ -16,7 +16,7 @@ from typing import Dict, List, Any
 import time
 
 # Add the backend directory to Python path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'backend'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 # Load environment variables from .env file in root
 try:
@@ -59,13 +59,25 @@ class ProductionIntegrationService:
             "sources_processed": []
         }
         
-        # Initialize services
+        # Initialize Azure OpenAI embedding service
         try:
-            self.embedding_service = VectorEmbeddingService()
+            from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+            self.embedding_service = AzureOpenAIEmbeddingService()
+            logger.info("✅ Azure OpenAI embedding service initialized")
+        except Exception as e:
+            logger.warning(f"Azure OpenAI unavailable: {e}")
+            try:
+                self.embedding_service = VectorEmbeddingService()
+                logger.info("✅ Fallback to legacy embedding service")
+            except Exception as e2:
+                logger.warning(f"Service initialization warning: {e2}")
+                self.embedding_service = None
+        
+        # Initialize spiritual service if needed
+        try:
             self.spiritual_service = EnhancedSpiritualGuidanceService()
         except Exception as e:
-            logger.warning(f"Service initialization warning: {e}")
-            self.embedding_service = None
+            logger.warning(f"Spiritual service initialization warning: {e}")
             self.spiritual_service = None
 
     async def process_new_intake_content(self):
@@ -200,8 +212,9 @@ class ProductionIntegrationService:
                 import google.generativeai as genai
                 genai.configure(api_key=api_key)
                 
-                embedding_model = "models/text-embedding-004"
-                print(f"✅ Connected to Gemini API with model: {embedding_model}")
+                embedding_model = "models/gemini-embedding-001"  # Migrated from deprecated text-embedding-004
+                embedding_dimensionality = 768  # MRL dimension for Cosmos DB compatibility
+                print(f"✅ Connected to Gemini API with model: {embedding_model} (dim={embedding_dimensionality})")
                 
             except ImportError:
                 print("⚠️ google-generativeai package not installed")
@@ -289,7 +302,7 @@ class ProductionIntegrationService:
             # Generate varied placeholder (not all 0.1)
             base_value = random.uniform(0.05, 0.15)
             entry['embedding'] = [base_value + random.uniform(-0.02, 0.02) for _ in range(768)]
-            entry['embedding_model'] = "gemini-text-embedding-004"
+            entry['embedding_model'] = "gemini-embedding-001"
             entry['embedding_generated_at'] = datetime.now().isoformat()
             entry['embedding_type'] = 'demo_placeholder'
         

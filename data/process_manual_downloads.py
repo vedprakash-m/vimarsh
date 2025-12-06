@@ -245,12 +245,12 @@ The chunking and embedding process would work with the real extracted content.
         for entry in self.processed_entries:
             # Simulate embedding generation
             entry["embedding"] = [0.1] * 768  # Placeholder 768-dimensional vector
-            entry["embedding_model"] = "gemini-text-embedding-004"
+            entry["embedding_model"] = "gemini-embedding-001"
             entry["embedding_generated_at"] = datetime.now().isoformat()
             embedding_count += 1
         
         self.processing_stats["total_vectors"] = embedding_count
-        print(f"✅ Generated {embedding_count} embeddings using Gemini text-embedding-004")
+        print(f"✅ Generated {embedding_count} embeddings using gemini-embedding-001 (MRL dim=768)")
         print("📝 Note: This demo uses placeholder embeddings. Production would use actual Gemini API.")
     
     async def update_metadata_system(self):
@@ -377,7 +377,7 @@ async def analyze_complete_rag_dataset():
     print(f"   - Total embeddings: 3,144 (from previous embedding generation)")
     print(f"   - Original Krishna content: ~2,025 entries")
     print(f"   - Multi-personality content: ~1,119 entries") 
-    print(f"   - Embedding model: Gemini text-embedding-004 (768 dimensions)")
+    print(f"   - Embedding model: gemini-embedding-001 (MRL dim=768, L2-normalized)")
     print(f"   - Embedding completion: 100%")
     
     print(f"\n👥 PERSONALITY COVERAGE:")

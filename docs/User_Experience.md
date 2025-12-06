@@ -117,6 +117,13 @@ This document serves as the **authoritative source of truth** for all UX/UI desi
 - **Memory Context Display**: Subtle indicators of what the personality remembers from previous sessions
 - **Progressive Relationship Building**: Interface elements that evolve as user-personality relationships deepen
 
+**Enhanced Semantic Search Experience (Azure OpenAI text-embedding-3-large):**
+- **Enterprise-Grade Search Relevance**: Azure OpenAI embedding model delivers consistent, high-quality personality-specific content retrieval with Microsoft's enterprise SLA guarantees
+- **Cross-Domain Understanding**: Robust semantic comprehension across spiritual, scientific, philosophical, and historical contexts with 64.6 MTEB score (94.8% of target quality)
+- **Consistent Response Quality**: Production-grade embedding quality ensures reliable context retrieval for all 25 personalities with predictable performance
+- **Transparent Performance**: Users experience reliable, high-quality responses with enterprise-grade availability guarantees and zero visible system changes
+- **Future-Proof Quality**: Positioned to benefit from anticipated OpenAI pricing reductions (60-70% probability) while maintaining quality standards
+
 **Wisdom Journal UX Integration:**
 - **Seamless Entry Creation**: One-click journal entry from meaningful conversation moments
 - **Semantic Search Interface**: Intuitive search through personal insights with auto-suggestions

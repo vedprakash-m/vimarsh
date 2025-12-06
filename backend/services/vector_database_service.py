@@ -153,7 +153,7 @@ class VectorDatabaseService:
                             {
                                 'path': '/embedding',
                                 'dataType': 'float32',
-                                'dimensions': 768,  # Gemini text-embedding-004 dimension
+                                'dimensions': 768,  # MRL dimension for gemini-embedding-001 (Cosmos DB compatible)
                                 'distanceFunction': 'cosine'
                             }
                         ]

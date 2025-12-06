@@ -25,6 +25,10 @@ try:
 except ImportError:
     genai = None
 try:
+    from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+except ImportError:
+    AzureOpenAIEmbeddingService = None
+try:
     import numpy as np
 except ImportError:
     np = None
@@ -39,7 +43,8 @@ except ImportError:
     @dataclass
     class FallbackConfig:
         gemini_generation_model: str = "models/gemini-2.5-flash"
-        gemini_embedding_model: str = "models/text-embedding-004"
+        gemini_embedding_model: str = "models/gemini-embedding-001"
+        embedding_output_dimensionality: int = 768  # MRL dimension for Cosmos DB
     global_ai_config = FallbackConfig()
 
 # Import personality configurations for character limits
@@ -151,28 +156,43 @@ class EnhancedRAGService:
         except Exception as e:
             logger.error(f"❌ Gemini AI configuration failed: {str(e)}")
             raise ValueError(f"Gemini AI initialization failed: {str(e)}")
-        self.embedding_model = global_ai_config.gemini_embedding_model
         self.generation_model = global_ai_config.gemini_generation_model
+        
+        # Initialize Azure OpenAI embedding service
+        try:
+            self.azure_embedding_service = AzureOpenAIEmbeddingService()
+            logger.info("✅ Azure OpenAI embedding service initialized")
+        except Exception as e:
+            logger.warning(f"⚠️ Azure OpenAI embedding service not available: {e}")
+            self.azure_embedding_service = None
         
         # Cache for embeddings to avoid regeneration
         self._embedding_cache: Dict[str, List[float]] = {}
         
-        logger.info("✅ Enhanced RAG Service initialized successfully")
+        logger.info("✅ Enhanced RAG Service initialized successfully with Azure OpenAI embeddings")
     
     async def generate_query_embedding(self, query: str) -> List[float]:
-        """Generate embedding for search query"""
+        """Generate embedding for search query using Azure OpenAI"""
         if query in self._embedding_cache:
             return self._embedding_cache[query]
         
         try:
+            # Use Azure OpenAI for embeddings
+            if self.azure_embedding_service:
+                embedding = await self.azure_embedding_service.generate_embedding(query)
+                if embedding:
+                    self._embedding_cache[query] = embedding
+                    return embedding
+            
+            # Fallback to Gemini if Azure OpenAI not available
             if not genai:
-                logger.warning("⚠️ Gemini AI not available for embeddings")
+                logger.warning("⚠️ No embedding service available")
                 return []
             
             result = genai.embed_content(
-                model=self.embedding_model,
+                model="models/gemini-embedding-001",
                 content=query,
-                task_type="retrieval_query"  # Different task type for queries
+                task_type="retrieval_query"
             )
             embedding = result.get('embedding', [])
             if embedding:

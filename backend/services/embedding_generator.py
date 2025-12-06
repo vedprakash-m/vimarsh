@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Vector Embedding Generation Service
-Generates embeddings for personality chunks using Google's text-embedding-004 model
+Generates embeddings for personality chunks using Azure OpenAI text-embedding-3-large model
+with dimension truncation (3072→768) for Cosmos DB compatibility.
 """
 
 import os
@@ -14,7 +15,14 @@ from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
-import google.generativeai as genai
+
+# Import Azure OpenAI embedding service
+try:
+    from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+    AZURE_OPENAI_AVAILABLE = True
+except ImportError:
+    AZURE_OPENAI_AVAILABLE = False
+    logger.warning("Azure OpenAI embedding service not available, falling back to Gemini")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -36,18 +44,24 @@ class EmbeddingGenerator:
     def __init__(self):
         # Initialize environment variables - use standardized connection string only
         self.cosmos_connection_string = os.getenv("AZURE_COSMOS_CONNECTION_STRING")
-        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         
-        if not self.gemini_api_key:
-            raise ValueError("Required environment variable not set: GEMINI_API_KEY")
-            
         # Check Cosmos DB credentials
         if not self.cosmos_connection_string:
             raise ValueError("Cosmos DB credentials not set. Please set AZURE_COSMOS_CONNECTION_STRING")
         
-        # Configure Gemini AI
-        genai.configure(api_key=self.gemini_api_key)
-        self.embedding_model = "models/text-embedding-004"
+        # Initialize Azure OpenAI embedding service
+        if AZURE_OPENAI_AVAILABLE:
+            try:
+                self.embedding_service = AzureOpenAIEmbeddingService()
+                logger.info("✅ Azure OpenAI embedding service initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Azure OpenAI service: {e}")
+                self.embedding_service = None
+        else:
+            self.embedding_service = None
+            logger.warning("Azure OpenAI embedding service not available")
+        self.embedding_model = "models/gemini-embedding-001"
+        self.embedding_output_dimensionality = 768  # MRL dimension for Cosmos DB compatibility
         
         # Initialize Cosmos DB client
         self.cosmos_client = CosmosClient.from_connection_string(cosmos_connection_string)

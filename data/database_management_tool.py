@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
 Combined Database Management Tool for Vimarsh
-- Cleanup old Krishna entries without proper integration_date
-- Generate embeddings for new personality entries
+- Cleanup old entries without proper integration_date
+- Generate Azure OpenAI embeddings for new personality entries
 - Comprehensive database health management
 """
 
 import os
+import sys
 import logging
 import asyncio
 from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
 import time
+
+# Add backend to path for service imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 # Configure logging
 logging.basicConfig(
@@ -34,7 +38,19 @@ class DatabaseManager:
         self.client = None
         self.database = None
         self.container = None
-        self.api_key = os.getenv('GOOGLE_API_KEY')
+        
+        # Initialize Azure OpenAI embedding service
+        try:
+            from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+            self.embedding_service = AzureOpenAIEmbeddingService()
+            self.use_azure = True
+            logger.info("✅ Azure OpenAI embedding service initialized")
+        except Exception as e:
+            logger.warning(f"Azure OpenAI unavailable, using Gemini fallback: {e}")
+            self.api_key = os.getenv('GOOGLE_API_KEY')
+            if not self.api_key:
+                raise ValueError("Neither Azure OpenAI nor GOOGLE_API_KEY available")
+            self.use_azure = False
         
         # Rate limiting for embeddings
         self.requests_per_minute = 50
@@ -218,11 +234,12 @@ class DatabaseManager:
             
             self.last_request_time = time.time()
             
-            # Generate embedding
+            # Generate embedding using gemini-embedding-001 with MRL
             result = genai.embed_content(
-                model="models/text-embedding-004",
+                model="models/gemini-embedding-001",
                 content=text,
-                task_type="retrieval_document"
+                task_type="retrieval_document",
+                output_dimensionality=768  # MRL dimension for Cosmos DB compatibility
             )
             
             embedding = result['embedding']
@@ -323,7 +340,7 @@ class DatabaseManager:
                             # Update entry
                             entry['embedding'] = embedding
                             entry['has_embedding'] = True
-                            entry['embedding_model'] = 'text-embedding-004'
+                            entry['embedding_model'] = 'gemini-embedding-001'
                             entry['embedding_generated_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
                             
                             # Update in database
