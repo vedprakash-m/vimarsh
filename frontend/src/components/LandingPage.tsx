@@ -1564,11 +1564,13 @@ const LandingPage: React.FC = () => {
       </footer>
 
       {/* Onboarding Wizard for New Users */}
-      {showOnboarding && (
+      {showOnboarding && account && (
         <OnboardingWizard
           open={showOnboarding}
           onClose={() => setShowOnboarding(false)}
-          onComplete={handleOnboardingComplete}
+          userId={account.homeAccountId}
+          userName={account.name}
+          onSelectPersonality={handleOnboardingComplete}
         />
       )}
     </div>
