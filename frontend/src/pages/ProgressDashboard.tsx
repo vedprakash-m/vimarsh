@@ -250,7 +250,7 @@ const ProgressDashboard: React.FC = () => {
               {error}
             </p>
             <button
-              onClick={loadEngagementData}
+              onClick={() => loadEngagementData(userId)}
               style={{
                 marginTop: '1rem',
                 background: '#f97316',
