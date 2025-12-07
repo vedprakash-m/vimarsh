@@ -34,9 +34,9 @@ class AzureOpenAIChatService:
         self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/openai/v1')
         self.api_key = os.getenv('AZURE_OPENAI_CHAT_API_KEY', '')
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
-        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'chatgpt-5-mini')
-        # Use standard API version for ChatGPT-5-mini
-        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-08-01-preview')
+        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'o1-mini')
+        # Use API version that supports o1-series models
+        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-09-01-preview')
         
         # Retry configuration
         self.max_retries = 5
@@ -71,9 +71,9 @@ class AzureOpenAIChatService:
         
         Args:
             messages: List of message dicts with 'role' and 'content'
-            temperature: Randomness (0-2)
-            max_tokens: Maximum response tokens
-            top_p: Nucleus sampling
+            temperature: Randomness (0-2) - NOT used for o1-series models
+            max_tokens: Maximum response tokens (mapped to max_completion_tokens for o1-series)
+            top_p: Nucleus sampling - NOT used for o1-series models
             
         Returns:
             ChatResponse with text and metadata
@@ -86,13 +86,12 @@ class AzureOpenAIChatService:
         
         for attempt in range(self.max_retries):
             try:
-                # ChatGPT-5-mini uses standard max_tokens parameter
+                # O1-series models (o1-preview/o1-mini) require max_completion_tokens
+                # and do NOT support temperature/top_p parameters
                 response = self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=messages,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                    top_p=top_p
+                    max_completion_tokens=max_tokens
                 )
                 
                 response_time = time.time() - start_time
