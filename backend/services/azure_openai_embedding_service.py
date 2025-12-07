@@ -16,7 +16,7 @@ import os
 import logging
 import time
 import statistics
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from dataclasses import dataclass
 
 try:
@@ -327,6 +327,42 @@ class AzureOpenAIEmbeddingService:
         
         logger.info(f"✅ Generated {len(embeddings)} embeddings in {total_batches} batches")
         return embeddings
+    
+    def encode(self, text: Union[str, List[str]]) -> Union[List[float], List[List[float]]]:
+        """
+        Synchronous encode method for compatibility with SentenceTransformer interface.
+        This provides drop-in compatibility for legacy code that uses .encode()
+        
+        Args:
+            text: Single text string or list of texts
+            
+        Returns:
+            Single embedding vector or list of vectors
+        """
+        import asyncio
+        
+        # Handle both single text and batch
+        if isinstance(text, str):
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # If event loop is running, we need to use run_coroutine_threadsafe
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(asyncio.run, self.generate_embedding(text))
+                    return future.result()
+            else:
+                return asyncio.run(self.generate_embedding(text))
+        elif isinstance(text, list):
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(asyncio.run, self.generate_batch_embeddings(text))
+                    return future.result()
+            else:
+                return asyncio.run(self.generate_batch_embeddings(text))
+        else:
+            raise ValueError(f"Invalid input type: {type(text)}")
     
     def get_model_info(self) -> Dict[str, Any]:
         """Get current model configuration info for diagnostics"""

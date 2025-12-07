@@ -129,18 +129,19 @@ class EnhancedRAGService:
         # Azure OpenAI only - Gemini removed after full migration
         logger.info("ℹ️ Using Azure OpenAI for embeddings and chat generation")
         
-        # Initialize Azure OpenAI embedding service
+        # Initialize Azure OpenAI embedding service (REQUIRED)
         try:
             self.azure_embedding_service = AzureOpenAIEmbeddingService()
             logger.info("✅ Azure OpenAI embedding service initialized")
         except Exception as e:
-            logger.warning(f"⚠️ Azure OpenAI embedding service not available: {e}")
-            self.azure_embedding_service = None
+            logger.error(f"❌ Failed to initialize Azure OpenAI embedding service: {e}")
+            logger.error("❌ Required environment variables: AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY")
+            raise ValueError(f"Azure OpenAI embedding service is required: {e}")
         
         # Cache for embeddings to avoid regeneration
         self._embedding_cache: Dict[str, List[float]] = {}
         
-        logger.info("✅ Enhanced RAG Service initialized successfully with Azure OpenAI embeddings")
+        logger.info("✅ Enhanced RAG Service initialized successfully with Azure OpenAI")
     
     async def generate_query_embedding(self, query: str) -> List[float]:
         """Generate embedding for search query using Azure OpenAI"""
@@ -148,20 +149,19 @@ class EnhancedRAGService:
             return self._embedding_cache[query]
         
         try:
-            # Use Azure OpenAI for embeddings
-            if self.azure_embedding_service:
-                embedding = await self.azure_embedding_service.generate_embedding(query)
-                if embedding:
-                    self._embedding_cache[query] = embedding
-                    return embedding
+            # Use Azure OpenAI for embeddings (required service)
+            embedding = await self.azure_embedding_service.generate_embedding(query)
+            if embedding:
+                self._embedding_cache[query] = embedding
+                return embedding
             
-            # No fallback - Azure OpenAI is the only embedding service
-            logger.error("❌ Azure OpenAI embedding service not available")
-            return []
+            # Empty embedding means service failed
+            logger.error("❌ Azure OpenAI embedding service returned empty result")
+            raise ValueError("Failed to generate query embedding from Azure OpenAI")
             
         except Exception as e:
             logger.error(f"❌ Failed to generate query embedding: {e}")
-            return []
+            raise
     
     def cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
         """Calculate cosine similarity between two vectors"""
@@ -534,7 +534,7 @@ RESPONSE REQUIREMENTS:
 Respond now in character:
 """
             
-            # Step 4: Generate response using Azure OpenAI GPT-5-mini
+            # Step 4: Generate response using Azure OpenAI ChatGPT-5-mini
             try:
                 from services.azure_openai_chat_service import get_azure_chat_service
                 

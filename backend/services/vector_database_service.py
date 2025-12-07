@@ -69,7 +69,7 @@ class VectorDocument:
     category: str = "general"
     language: str = "English"
     embedding: Optional[List[float]] = None
-    embedding_model: str = "all-MiniLM-L6-v2"
+    embedding_model: str = "text-embedding-3-large"
     relevance_score: float = 0.0
     created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
@@ -192,18 +192,18 @@ class VectorDatabaseService:
     def _initialize_embedding_model(self):
         """Initialize embedding model for vector generation"""
         try:
-            # Use Gemini API for embeddings instead of sentence-transformers
+            # Use Azure OpenAI for embeddings (production standard)
             import sys
             import os
             sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-            from gemini_embedding_service import GeminiTransformer
+            from azure_openai_embedding_service import AzureOpenAIEmbeddingService
             
-            # Create Gemini-based transformer for drop-in compatibility
-            self.embedding_model = GeminiTransformer('gemini-embedding')
-            logger.info(f"✅ Loaded Gemini embedding service (dimension: {self.embedding_model.service.dimension})")
+            # Initialize Azure OpenAI embedding service
+            self.embedding_model = AzureOpenAIEmbeddingService()
+            logger.info(f"✅ Loaded Azure OpenAI embedding service (text-embedding-3-large, dimension: 768)")
             
         except Exception as e:
-            logger.error(f"❌ Failed to load Gemini embedding service: {e}")
+            logger.error(f"❌ Failed to load Azure OpenAI embedding service: {e}")
             logger.warning("⚠️ Falling back to mock embedding model")
             self.embedding_model = None
     
