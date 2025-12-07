@@ -21,10 +21,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import azure.cosmos.cosmos_client as cosmos_client
 try:
-    import google.generativeai as genai
-except ImportError:
-    genai = None
-try:
     from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
 except ImportError:
     AzureOpenAIEmbeddingService = None
@@ -34,18 +30,8 @@ except ImportError:
     np = None
 from collections import defaultdict
 
-# Import centralized AI model configuration
-try:
-    from config.ai_models import AI_CONFIG as global_ai_config
-except ImportError:
-    # Fallback if config not available
-    from dataclasses import dataclass
-    @dataclass
-    class FallbackConfig:
-        gemini_generation_model: str = "models/gemini-2.5-flash"
-        gemini_embedding_model: str = "models/gemini-embedding-001"
-        embedding_output_dimensionality: int = 768  # MRL dimension for Cosmos DB
-    global_ai_config = FallbackConfig()
+# Azure OpenAI configuration - Gemini removed after full migration
+embedding_output_dimensionality = 768  # Azure OpenAI text-embedding-3-large truncated to 768
 
 # Import personality configurations for character limits
 try:
@@ -120,18 +106,13 @@ class EnhancedRAGService:
         """Initialize the enhanced RAG service"""
         # Environment setup - use standardized connection string
         self.cosmos_connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING', '')
-        self.gemini_api_key = os.getenv('GEMINI_API_KEY', '')
         
         # More graceful error handling for environment variables
         if not self.cosmos_connection_string:
             logger.error("❌ AZURE_COSMOS_CONNECTION_STRING not set")
             raise ValueError("AZURE_COSMOS_CONNECTION_STRING is required")
         
-        if not self.gemini_api_key:
-            logger.error("❌ GEMINI_API_KEY not set")
-            raise ValueError("GEMINI_API_KEY is required")
-        
-        logger.info("✅ Environment variables loaded successfully")
+        logger.info("✅ Cosmos connection string loaded successfully")
         
         # Cosmos DB setup with error handling
         try:
@@ -145,18 +126,8 @@ class EnhancedRAGService:
             logger.error(f"❌ Cosmos DB connection failed: {str(e)}")
             raise ValueError(f"Cosmos DB initialization failed: {str(e)}")
         
-        # Configure Gemini AI with error handling
-        try:
-            if genai:
-                genai.configure(api_key=self.gemini_api_key)
-                logger.info("✅ Gemini AI configured successfully")
-            else:
-                logger.warning("⚠️ Google Generative AI not available, using fallback responses")
-                raise ValueError("Google Generative AI package not available")
-        except Exception as e:
-            logger.error(f"❌ Gemini AI configuration failed: {str(e)}")
-            raise ValueError(f"Gemini AI initialization failed: {str(e)}")
-        self.generation_model = global_ai_config.gemini_generation_model
+        # Azure OpenAI only - Gemini removed after full migration
+        logger.info("ℹ️ Using Azure OpenAI for embeddings and chat generation")
         
         # Initialize Azure OpenAI embedding service
         try:
@@ -184,21 +155,9 @@ class EnhancedRAGService:
                     self._embedding_cache[query] = embedding
                     return embedding
             
-            # Fallback to Gemini if Azure OpenAI not available
-            if not genai:
-                logger.warning("⚠️ No embedding service available")
-                return []
-            
-            result = genai.embed_content(
-                model="models/gemini-embedding-001",
-                content=query,
-                task_type="retrieval_query",
-                output_dimensionality=768  # Match database embeddings dimension
-            )
-            embedding = result.get('embedding', [])
-            if embedding:
-                self._embedding_cache[query] = embedding
-            return embedding
+            # No fallback - Azure OpenAI is the only embedding service
+            logger.error("❌ Azure OpenAI embedding service not available")
+            return []
             
         except Exception as e:
             logger.error(f"❌ Failed to generate query embedding: {e}")
