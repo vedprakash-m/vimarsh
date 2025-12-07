@@ -1,6 +1,7 @@
 """
-Notification Service
+"""Notification Service
 Core service for managing push notification subscriptions and sending notifications
+Integrated with PreferencesService for user notification preferences
 """
 
 import json
@@ -9,6 +10,7 @@ import hashlib
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, asdict
+from zoneinfo import ZoneInfo
 
 logger = logging.getLogger(__name__)
 
@@ -99,21 +101,23 @@ class NotificationService:
     
     Features:
     - Push subscription management
-    - User preference handling
+    - User preference handling (integrated with PreferencesService)
     - Notification scheduling and sending
     - Rate limiting and quiet hours
     """
     
-    def __init__(self, cosmos_client: Optional[Any] = None):
+    def __init__(self, cosmos_client: Optional[Any] = None, preferences_service: Optional[Any] = None):
         """
         Initialize the notification service
         
         Args:
             cosmos_client: Optional Cosmos DB client for persistence
+            preferences_service: Optional PreferencesService for user preferences
         """
         self.cosmos_client = cosmos_client
         self._subscriptions_container = None
-        self._preferences_container = None
+        self._preferences_container = None  # Legacy, kept for backward compatibility
+        self.preferences_service = preferences_service
         
         # VAPID keys would be loaded from environment
         self.vapid_private_key: Optional[str] = None
@@ -274,7 +278,22 @@ class NotificationService:
     # =========================================================================
     
     async def get_preferences(self, user_id: str) -> NotificationPreferences:
-        """Get notification preferences for a user"""
+        """
+        Get notification preferences for a user
+        Fetches from PreferencesService if available, falls back to legacy storage
+        """
+        if self.preferences_service:
+            try:
+                # Get preferences from PreferencesService
+                user_prefs = self.preferences_service.get_preferences(user_id)
+                notif_prefs = user_prefs.get('notification_preferences', {})
+                
+                # Convert to NotificationPreferences format
+                return self._convert_to_notification_preferences(user_id, notif_prefs)
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to get preferences from PreferencesService: {e}")
+        
+        # Fall back to legacy container
         if self._preferences_container:
             try:
                 doc = await self._preferences_container.read_item(
@@ -456,22 +475,31 @@ class NotificationService:
         return hashlib.sha256(endpoint.encode()).hexdigest()[:32]
     
     def _is_quiet_hours(self, prefs: NotificationPreferences) -> bool:
-        """Check if current time is within quiet hours"""
+        """Check if current time is within quiet hours in user's timezone"""
         try:
-            # Get current hour in user's timezone
-            # Simplified - in production would use proper timezone handling
-            now = datetime.now(timezone.utc)
-            current_hour = now.hour
+            # Get current time in user's timezone
+            user_tz = ZoneInfo(prefs.timezone)
+            now = datetime.now(user_tz)
+            current_time = now.time()
             
-            start = prefs.quiet_hours_start
-            end = prefs.quiet_hours_end
-            
-            if start < end:
-                return start <= current_hour < end
+            # Parse quiet hours times (format: "HH:MM")
+            if hasattr(prefs, 'quiet_hours_start') and hasattr(prefs, 'quiet_hours_end'):
+                # Legacy format: integer hours
+                start_hour = prefs.quiet_hours_start
+                end_hour = prefs.quiet_hours_end
+                current_hour = now.hour
+                
+                if start_hour < end_hour:
+                    return start_hour <= current_hour < end_hour
+                else:
+                    # Quiet hours span midnight
+                    return current_hour >= start_hour or current_hour < end_hour
             else:
-                # Quiet hours span midnight
-                return current_hour >= start or current_hour < end
-        except Exception:
+                # New format from PreferencesService: "HH:MM" strings
+                # This will be implemented when preferences are properly integrated
+                return False
+        except Exception as e:
+            logger.warning(f"⚠️ Error checking quiet hours: {e}")
             return False
     
     def _should_send_notification(
@@ -483,11 +511,64 @@ class NotificationService:
         if not prefs.enabled:
             return False
         
+        # Check specific notification type settings
         type_checks = {
             'daily_wisdom': prefs.daily_wisdom_enabled,
             'streak_reminder': prefs.streak_reminders_enabled,
+            'streak_reminders': prefs.streak_reminders_enabled,  # Alternative key
             'achievement': prefs.achievement_notifications_enabled,
+            'achievements': prefs.achievement_notifications_enabled,  # Alternative key
             'weekly_summary': prefs.weekly_summary_enabled,
         }
         
         return type_checks.get(notification_type, True)
+    
+    def _convert_to_notification_preferences(
+        self,
+        user_id: str,
+        notif_prefs: Dict[str, Any]
+    ) -> NotificationPreferences:
+        """
+        Convert notification_preferences from PreferencesService to NotificationPreferences
+        
+        Args:
+            user_id: User identifier
+            notif_prefs: notification_preferences dict from PreferencesService
+            
+        Returns:
+            NotificationPreferences object
+        """
+        # Parse preferred_time (format: "HH:MM")
+        preferred_time = notif_prefs.get('preferred_time', '09:00')
+        hour, minute = 9, 0
+        try:
+            hour, minute = map(int, preferred_time.split(':'))
+        except Exception:
+            pass
+        
+        # Parse quiet hours times
+        quiet_start = notif_prefs.get('quiet_start', '22:00')
+        quiet_end = notif_prefs.get('quiet_end', '07:00')
+        quiet_start_hour, quiet_end_hour = 22, 7
+        try:
+            quiet_start_hour = int(quiet_start.split(':')[0])
+            quiet_end_hour = int(quiet_end.split(':')[0])
+        except Exception:
+            pass
+        
+        # Get notification types
+        types = notif_prefs.get('types', {})
+        
+        return NotificationPreferences(
+            user_id=user_id,
+            enabled=notif_prefs.get('daily_wisdom_enabled', True),
+            daily_wisdom_enabled=types.get('daily_wisdom', True),
+            streak_reminders_enabled=types.get('streak_reminders', True),
+            achievement_notifications_enabled=types.get('achievements', True),
+            weekly_summary_enabled=types.get('weekly_summary', True),
+            preferred_time_hour=hour,
+            preferred_time_minute=minute,
+            timezone=notif_prefs.get('timezone', 'UTC'),
+            quiet_hours_start=quiet_start_hour,
+            quiet_hours_end=quiet_end_hour
+        )

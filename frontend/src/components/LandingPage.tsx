@@ -535,7 +535,7 @@ const LandingPage: React.FC = () => {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              Sign Up
+              Sign In / Sign Up
             </button>
           </nav>
         </div>

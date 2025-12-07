@@ -964,6 +964,595 @@ User State: Wanting to customize experience
 Design Goal: Provide control while maintaining simplicity
 ```
 
+**3.2 Settings Page - Unified Preferences Hub (NEW)**
+
+**Problem Context:**
+Users currently lack a centralized location to manage preferences, discover features, and control their experience. Settings are scattered across multiple interfaces, reducing discoverability and creating friction.
+
+**Solution:** Comprehensive mobile-first Settings page replacing the Archive button with a universal ⚙️ settings icon in the header navigation.
+
+**User Journey: Discovering Settings**
+```
+User Context: Logged in, exploring platform capabilities
+Trigger: User taps ⚙️ settings icon in header (replaces Archive button)
+
+System Response:
+- Navigate to /settings route
+- Display mobile-optimized tab navigation
+- Show My Profile tab by default
+- Smooth transition with Apple-inspired animation
+- Clear visual hierarchy with domain-themed colors
+
+User State: Entering centralized control hub
+Design Goal: Immediate orientation with clear tab structure
+```
+
+**Settings Page Layout (Mobile-First):**
+```
+┌─────────────────────────────────────────────────────┐
+│  ⚙️ Settings                              [✕ Close] │
+├─────────────────────────────────────────────────────┤
+│  [👤 Profile] [✨ Experience] [🔔 Notify] [...more]│  ← Horizontal scroll tabs
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  [Active Tab Content Area]                         │
+│  - Form fields with clear labels                   │
+│  - Toggle switches for binary options              │
+│  - Dropdown selectors for choices                  │
+│  - Help text with contextual guidance             │
+│  - Auto-save with confirmation toasts              │
+│                                                     │
+│  [Action Buttons - Context Specific]               │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**3.2.1 My Profile Tab UX**
+
+**User Journey: Viewing Journey Stats**
+```
+User Action: Opens Settings → My Profile (default)
+System Response:
+- Display user identity (name, email, profile pic from Microsoft Entra ID)
+- Show "Member since" date with visual timeline
+- Present engaging wisdom journey metrics:
+  * Current streak: "🔥 12 days - You're on fire!"
+  * Total conversations: "147 wisdom sessions" (not "queries")
+  * Achievements: Visual badges with unlock dates
+  * Wisdom level: "Level 3 - Devoted Seeker" with progress bar
+  * Domain exploration: Radial chart showing usage across 6 domains
+- Display AI usage transparency section
+- Provide quick access navigation links
+
+User State: Seeing tangible journey progress
+Design Goal: Celebrate achievements, motivate continued engagement
+```
+
+**AI Usage Transparency Component:**
+```
+┌─────────────────────────────────────────────────────┐
+│  💡 Your AI Usage This Month                        │
+│                                                     │
+│  We've covered $2.15 in AI costs for you           │
+│  ✅ Well within limits                              │
+│  📊 Similar to last month                           │
+│                                                     │
+│  [View Detailed Breakdown] ← Optional for power users│
+└─────────────────────────────────────────────────────┘
+```
+
+**Design Principles:**
+- **Non-Technical Language**: "covered costs" not "token consumption"
+- **Positive Framing**: Platform investment in user's wisdom journey
+- **Status Indicators**: Clear visual feedback (✅ good, ⚠️ approaching limit)
+- **Optional Details**: Expandable section for users who want technical data
+
+**Quick Access Navigation:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🎯 Quick Access                                    │
+│                                                     │
+│  [📚 Wisdom Archive] → View past conversations     │
+│  [🧠 Memory Dashboard] → Your personality relationships│
+│  [📈 Progress Dashboard] → Streaks & achievements   │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**3.2.2 Experience Tab UX**
+
+**User Journey: Customizing Conversation Style**
+```
+User Action: Taps Experience tab
+System Response:
+- Show conversation style selector with visual examples
+- Display language preference (English/Hindi)
+- Present formality level options with personality impact explanation
+- Show favorite personalities selection (max 5)
+- Provide appearance controls (theme, text size, animations)
+- Auto-save preferences with toast confirmation
+
+User State: Personalizing wisdom delivery
+Design Goal: Empower users to optimize their learning style
+```
+
+**Conversation Style Selector:**
+```
+┌─────────────────────────────────────────────────────┐
+│  💬 How should personalities respond?               │
+│                                                     │
+│  ○ Brief & Direct                                   │
+│     "Quick answers for specific questions"          │
+│     Example: 2-3 sentence responses                 │
+│                                                     │
+│  ● Balanced (Recommended)                          │
+│     "Moderate depth with helpful context"           │
+│     Example: 4-6 paragraph responses                │
+│                                                     │
+│  ○ Detailed & Deep                                  │
+│     "Comprehensive wisdom with extended exploration"│
+│     Example: Full multi-paragraph discourse         │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Formality Level Impact Explanation:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🎭 Response Formality                              │
+│                                                     │
+│  [Very Formal ▼]                                    │
+│                                                     │
+│  💡 How this affects personalities:                 │
+│  • Spiritual figures use traditional address        │
+│  • Scientists use academic language                 │
+│  • Philosophers employ classical terminology        │
+│                                                     │
+│  Options:                                           │
+│  - Very Formal (maximum respect, traditional)       │
+│  - Respectful & Warm (balanced, recommended)        │
+│  - Friendly (approachable, conversational)          │
+│  - Casual (modern, relaxed tone)                    │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Favorite Personalities Selection:**
+```
+┌─────────────────────────────────────────────────────┐
+│  ⭐ Favorite Personalities (0/5 selected)           │
+│                                                     │
+│  Select up to 5 for quick access in personality    │
+│  selector. Your favorites appear first.            │
+│                                                     │
+│  🕉️ Spiritual                                       │
+│  ☐ Krishna  ☐ Buddha  ☐ Jesus Christ  ☐ Rumi     │
+│                                                     │
+│  🔬 Scientific & Innovation                         │
+│  ☑ Einstein  ☐ Newton  ☐ Tesla  ...               │
+│                                                     │
+│  [Show all domains...]                              │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Appearance Controls:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🎨 Appearance                                      │
+│                                                     │
+│  Theme:  [Auto (System) ▼]                         │
+│  Options: Light / Auto / Dark                       │
+│                                                     │
+│  Text Size:  [○─●─○]  Medium                       │
+│  Preview: "This is how text will appear"           │
+│                                                     │
+│  ☑ Reduce animations (better for slow devices)     │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**3.2.3 Notifications Tab UX**
+
+**User Journey: Configuring Daily Wisdom**
+```
+User Action: Taps Notifications tab
+System Response:
+- Show master toggle for Daily Wisdom feature
+- Display time selection with presets and custom picker
+- Present quiet hours configuration
+- Show granular notification type controls
+- Provide test notification button for verification
+- Display clear permission status
+
+User State: Setting engagement preferences
+Design Goal: Respect user boundaries while driving habit formation
+```
+
+**Daily Wisdom Configuration:**
+```
+┌─────────────────────────────────────────────────────┐
+│  📨 Daily Wisdom                                    │
+│                                                     │
+│  ●───────○ ON                                       │
+│                                                     │
+│  Receive daily inspiration from your wisdom journey│
+│                                                     │
+│  🕐 Preferred Time:  [Morning (7:00 AM) ▼]         │
+│  Presets: Morning 7AM / Midday 12PM / Evening 6PM  │
+│  Or: [Custom time picker]                           │
+│                                                     │
+│  🌍 Timezone: America/Los_Angeles (auto-detected)  │
+│  [Change timezone...]                               │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Quiet Hours Configuration:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🌙 Quiet Hours                                     │
+│                                                     │
+│  ●───────○ Enabled                                  │
+│                                                     │
+│  No notifications during sleep hours                │
+│                                                     │
+│  Start:  [10:00 PM ▼]                              │
+│  End:    [7:00 AM ▼]                               │
+│                                                     │
+│  💡 Notifications paused from 10 PM to 7 AM        │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Notification Types & Test:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🔔 What to Notify About                            │
+│                                                     │
+│  ☑ Daily wisdom quote                              │
+│  ☑ Streak reminders (when you might miss a day)    │
+│  ☑ Achievement unlocks                              │
+│  ☐ Weekly summary email                             │
+│                                                     │
+│  Permission Status: ✅ Enabled                      │
+│                                                     │
+│  [Send Test Notification]                           │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Notification Permission Handling:**
+```
+User Action: Notifications blocked by browser
+System Response:
+- Show clear status: "🚫 Blocked - Enable in browser settings"
+- Provide platform-specific instructions:
+  * iOS: Settings → Safari → Vimarsh → Notifications
+  * Android: Settings → Apps → Vimarsh → Notifications
+  * Desktop: Click 🔒 in address bar → Notifications
+- Display visual guide with screenshots
+- Offer "Show me how" button with step-by-step overlay
+
+User State: Understanding permission requirements
+Design Goal: Clear guidance without technical jargon
+```
+
+**3.2.4 Memory & Privacy Tab UX**
+
+**User Journey: Controlling Personalization**
+```
+User Action: Taps Memory & Privacy tab
+System Response:
+- Display memory feature toggles with explanations
+- Show privacy mode selector (3 tiers)
+- Present data transparency options
+- Provide data management actions (export, clear, retention)
+- Show immediate impact preview when changing settings
+- Confirm destructive actions with warnings
+
+User State: Managing data preferences
+Design Goal: Transparency and control over personalization vs privacy
+```
+
+**Memory Features Configuration:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🧠 Memory Features                                 │
+│                                                     │
+│  These help personalities provide personalized     │
+│  guidance across sessions                           │
+│                                                     │
+│  ☑ Remember my conversations                        │
+│     "Personalities recall previous discussions"     │
+│                                                     │
+│  ☑ Connect insights across personalities            │
+│     "Krishna can reference Einstein conversations"  │
+│                                                     │
+│  ☑ Track my emotional journey                       │
+│     "Understand your mood patterns over time"       │
+│                                                     │
+│  ☑ Suggest topics based on my interests             │
+│     "Recommend relevant wisdom paths"               │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Privacy Mode Selector (Three Tiers):**
+```
+┌─────────────────────────────────────────────────────┐
+│  🔒 Privacy Mode                                    │
+│                                                     │
+│  ● Standard (Recommended)                          │
+│     Full memory for personalized wisdom            │
+│     "Conversations help build tailored guidance"    │
+│                                                     │
+│  ○ Private                                          │
+│     Limited memory, enhanced privacy                │
+│     "Basic context only, reduced personalization"   │
+│                                                     │
+│  ○ Minimal                                          │
+│     No persistent memory                            │
+│     "Fresh start each session, maximum privacy"     │
+│                                                     │
+│  💡 Current: All memory features enabled            │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Data Transparency & Control:**
+```
+┌─────────────────────────────────────────────────────┐
+│  📊 Data & Privacy                                  │
+│                                                     │
+│  ☑ Anonymous analytics (helps improve Vimarsh)     │
+│  ☑ Store my conversations (required for memory)    │
+│  ☐ Share anonymized data for research              │
+│                                                     │
+│  Data Retention: [90 days (default) ▼]            │
+│  Options: 30 / 90 / 180 days / 1 year              │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Data Management Actions:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🗂️ Manage Your Data                                │
+│                                                     │
+│  [📥 Export My Data]                                │
+│  Download all conversations, bookmarks, preferences │
+│  Format: JSON (GDPR compliant)                      │
+│                                                     │
+│  [🗑️ Clear My History]                              │
+│  Start fresh (cannot be undone)                     │
+│  ⚠️ Warning: This deletes all conversation history  │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Data Deletion Confirmation Flow:**
+```
+User Action: Taps "Clear My History"
+System Response:
+1. Show modal: "⚠️ Clear All Conversation History?"
+2. Explain impact:
+   - "This will permanently delete all your conversations"
+   - "Your achievements and progress will be reset"
+   - "Memory features will start fresh"
+   - "This action cannot be undone"
+3. Require explicit confirmation: "Type DELETE to confirm"
+4. Show [Cancel] and [Delete Forever] buttons
+5. On confirmation: Clear data + show success toast
+6. Redirect to fresh conversation interface
+
+User State: Making informed destructive decision
+Design Goal: Prevent accidental data loss with clear warnings
+```
+
+**3.2.5 Account Tab UX**
+
+**User Journey: Managing Account**
+```
+User Action: Taps Account tab
+System Response:
+- Display current plan information (Free Tier)
+- Show subscription details (when premium implemented)
+- Present account security options
+- Provide data portability controls
+- Show destructive account actions with warnings
+
+User State: Reviewing account status and options
+Design Goal: Clear plan visibility, secure controls, safe exits
+```
+
+**Subscription Information (Future Premium Support):**
+```
+┌─────────────────────────────────────────────────────┐
+│  💳 Your Plan                                       │
+│                                                     │
+│  Free Tier                                          │
+│  • 25 personalities across 6 domains                │
+│  • Cross-session memory                             │
+│  • Wisdom archive & progress tracking               │
+│  • Daily wisdom notifications                       │
+│                                                     │
+│  AI Usage: [████████░░] $2.15 / $10 monthly        │
+│                                                     │
+│  [✨ Upgrade to Premium] ← When implemented         │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Account Security:**
+```
+┌─────────────────────────────────────────────────────┐
+│  🔐 Security                                        │
+│                                                     │
+│  Connected with: Microsoft Entra ID                 │
+│  Email: user@example.com                            │
+│                                                     │
+│  [Change Password] ← If not SSO-only                │
+│  [Connected Apps] → Manage integrations             │
+│  [Active Sessions] → View and manage devices        │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Account Actions:**
+```
+┌─────────────────────────────────────────────────────┐
+│  ⚠️ Account Actions                                 │
+│                                                     │
+│  [🚪 Log Out]                                       │
+│  End your current session                           │
+│                                                     │
+│  [🗑️ Delete Account]                                │
+│  Permanently delete all data                        │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Account Deletion Flow:**
+```
+User Action: Taps "Delete Account"
+System Response:
+1. Show full-screen warning modal
+2. Red accent color for danger indication
+3. Explain consequences:
+   - "⚠️ This will permanently delete your account"
+   - "• All conversations and wisdom archive"
+   - "• All achievements and progress"
+   - "• All preferences and settings"
+   - "• Your Microsoft Entra ID connection"
+   - "This action is permanent and cannot be undone"
+4. Require typing "DELETE" to confirm
+5. Show [Cancel] and [Delete My Account Forever] buttons
+6. On confirmation: Process deletion + redirect to landing page
+7. Send confirmation email
+
+User State: Making final account termination decision
+Design Goal: Maximum safety with clear understanding of consequences
+```
+
+**Settings Page Technical UX Requirements:**
+
+**Mobile-First Tab Navigation:**
+```
+Mobile (< 768px):
+- Horizontal scrolling tabs
+- Swipe gestures for tab switching
+- Bottom sheet modal for dropdowns
+- Touch-optimized 44px minimum tap targets
+- Sticky tab bar during scroll
+
+Tablet (768-1024px):
+- Horizontal tabs with all visible
+- Side-by-side form layouts
+- Modal dialogs for confirmations
+
+Desktop (> 1024px):
+- Vertical sidebar navigation (optional)
+- Two-column content layouts
+- Inline dropdowns and pickers
+- Keyboard shortcuts (Tab, Esc, Cmd+S)
+```
+
+**Auto-Save Behavior:**
+```
+User Action: Changes any setting
+System Response:
+- Debounce input for 500ms
+- Show subtle "Saving..." indicator
+- Make API call to PATCH /api/user/preferences
+- Show success toast: "✓ Saved"
+- Update local state optimistically
+- Rollback on error with retry option
+
+User State: Seeing immediate feedback
+Design Goal: Frictionless preference updates without explicit save buttons
+```
+
+**Accessibility Features:**
+```
+Settings Page Accessibility:
+- Full keyboard navigation (Tab, Arrow keys, Enter, Escape)
+- Screen reader announcements for all state changes
+- ARIA labels for all interactive elements
+- Focus indicators meeting WCAG 2.1 AA standards
+- High contrast mode support
+- Text size adjustments apply to Settings page itself
+- Reduce motion respected in all animations
+```
+
+**Settings Page Success Metrics:**
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Settings discovery | 60% within 7 days | Analytics: /settings page visits |
+| Profile tab engagement | 80% of visitors view | Tab switch tracking |
+| Preference customization | 40% modify ≥1 setting | User preferences table changes |
+| Quick Access usage | 30% click through | CTR on Archive/Memory/Progress links |
+| Notification configuration | 50% enable Daily Wisdom | Notification preferences tracking |
+| Privacy settings review | 20% view Memory & Privacy | Tab analytics |
+| AI usage transparency | 15% expand detailed view | Component interaction tracking |
+
+**Integration with Existing Features:**
+
+**Header Navigation Update:**
+```
+Before: [Memory indicator] [Streak] [Archive 📖] [Admin] [Logout]
+After:  [Memory indicator] [Streak] [⚙️ Settings] [Admin] [Logout]
+
+Rationale: Settings icon is more universal and discoverable than Archive button
+Archive link moves to Settings → My Profile → Quick Access section
+```
+
+**Context Provider Integration:**
+```
+Settings page integrates with:
+- AuthProvider: User identity, profile data
+- MemoryProvider: Memory preferences, privacy settings
+- NotificationProvider: Daily wisdom, quiet hours
+- EngagementProvider: Streaks, achievements display
+- PersonalityProvider: Favorite personalities
+```
+
+**Settings State Management:**
+```
+Frontend State:
+- Local state for form inputs (React hooks)
+- Optimistic updates for immediate feedback
+- Error state with retry mechanisms
+- Loading states for async operations
+
+Backend API:
+- GET /api/user/profile - Fetch complete profile with preferences
+- PATCH /api/user/preferences - Partial updates (auto-save)
+- GET /api/user/usage-summary - AI usage stats
+- POST /api/user/export - Data export (async job)
+- DELETE /api/user/account - Soft delete
+
+Database Schema (Cosmos DB user_preferences):
+{
+  user_id: string,
+  experience_preferences: {...},
+  notification_preferences: {...},
+  memory_preferences: {...},
+  updated_at: timestamp
+}
+```
+
+**Design System Consistency:**
+
+All Settings UI elements follow the Apple-inspired design system established in section 3.4:
+- Typography: -apple-system, SF Pro Display font stack
+- Color Palette: Domain-themed accents with neutral base
+- Spacing: 8px grid system for visual rhythm
+- Animation: Subtle, purposeful transitions (150ms ease-in-out)
+- Components: Reusable form elements with consistent styling
+- Feedback: Toast notifications matching existing patterns
+
 #### 🔐 **Microsoft Entra ID Authentication (Current Implementation)**
 
 **Anonymous to Authenticated Journey:**

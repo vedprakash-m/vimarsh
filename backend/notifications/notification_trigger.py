@@ -40,14 +40,7 @@ def get_cosmos_client():
         return None, None
 
 
-def get_notification_service():
-    """Get notification service instance."""
-    try:
-        from notifications.notification_service import NotificationService
-        return NotificationService()
-    except Exception as e:
-        logger.error(f"Failed to get notification service: {e}")
-        return None
+def get_notification_service():\n    \"\"\"Get notification service instance with preferences integration.\"\"\"\n    try:\n        from notifications.notification_service import NotificationService\n        from services.preferences_service import PreferencesService\n        \n        preferences_service = PreferencesService()\n        return NotificationService(preferences_service=preferences_service)\n    except Exception as e:\n        logger.error(f\"Failed to get notification service: {e}\")\n        return None
 
 
 def get_users_for_notification(

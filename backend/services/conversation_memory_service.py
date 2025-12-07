@@ -47,10 +47,21 @@ class ConversationContext:
     personality_preferences: Dict[str, Any]
 
 class ConversationMemoryService:
-    """Service for managing conversation memory and context"""
+    """Service for managing conversation memory and context
     
-    def __init__(self, database_service=None):
-        """Initialize the conversation memory service"""
+    Integrated with PreferencesService to respect user privacy and memory settings:
+    - remember_conversations: Control whether conversations are stored
+    - privacy_mode: Determines memory retrieval behavior
+    - data_retention_days: Automatic cleanup based on retention policy
+    """
+    
+    def __init__(self, database_service=None, preferences_service=None):
+        """Initialize the conversation memory service
+        
+        Args:
+            database_service: Database service for persistence
+            preferences_service: PreferencesService for user preferences
+        """
         # Import Phase 2 database service
         try:
             from services.phase2_database_service import phase2_db_service
@@ -60,11 +71,12 @@ class ConversationMemoryService:
             self.database_service = database_service
             logger.warning("🔶 Phase 2 database service not available, using provided service")
         
+        self.preferences_service = preferences_service
         self.session_cache = {}  # In-memory session cache
         self.context_window_size = 10  # Number of recent messages to consider
         self.max_session_duration = timedelta(hours=4)  # Auto-archive after 4 hours
         
-        logger.info("✅ Conversation Memory Service initialized")
+        logger.info("✅ Conversation Memory Service initialized with preferences integration")
     
     async def start_conversation(
         self, 
@@ -97,6 +109,72 @@ class ConversationMemoryService:
         logger.info(f"🧠 Started conversation {conversation_id} for user {user_id} with {personality_id}")
         return conversation_id
     
+    async def _should_store_message(self, user_id: str) -> bool:
+        """
+        Check if messages should be stored based on user preferences
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            True if messages should be stored, False otherwise
+        """
+        if not self.preferences_service:
+            return True  # Default to storing if no preferences service
+        
+        try:
+            prefs = self.preferences_service.get_preferences(user_id)
+            memory_prefs = prefs.get('memory_preferences', {})
+            
+            # Check remember_conversations setting
+            if not memory_prefs.get('remember_conversations', True):
+                logger.info(f"🔒 User {user_id} has disabled conversation memory")
+                return False
+            
+            # Check privacy_mode - minimal privacy mode disables storage
+            privacy_mode = memory_prefs.get('privacy_mode', 'standard')
+            if privacy_mode == 'minimal':
+                logger.info(f"🔒 User {user_id} has minimal privacy mode - not storing")
+                return False
+            
+            return True
+        except Exception as e:
+            logger.warning(f"⚠️ Error checking preferences, defaulting to store: {e}")
+            return True
+    
+    async def _should_retrieve_context(self, user_id: str) -> Tuple[bool, str]:
+        """
+        Check if conversation context should be retrieved based on user preferences
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            Tuple of (should_retrieve, privacy_mode)
+        """
+        if not self.preferences_service:
+            return True, 'standard'  # Default behavior
+        
+        try:
+            prefs = self.preferences_service.get_preferences(user_id)
+            memory_prefs = prefs.get('memory_preferences', {})
+            
+            # Check privacy_mode
+            privacy_mode = memory_prefs.get('privacy_mode', 'standard')
+            
+            # minimal: No context retrieval at all
+            if privacy_mode == 'minimal':
+                logger.info(f"🔒 User {user_id} has minimal privacy - no context retrieval")
+                return False, privacy_mode
+            
+            # private: Limited context (only current session)
+            # standard: Full context with cross-session memory
+            
+            return True, privacy_mode
+        except Exception as e:
+            logger.warning(f"⚠️ Error checking preferences, defaulting to retrieve: {e}")
+            return True, 'standard'
+    
     async def add_message(
         self,
         conversation_id: str,
@@ -105,8 +183,18 @@ class ConversationMemoryService:
         message_type: str,
         content: str,
         metadata: Optional[Dict[str, Any]] = None
-    ) -> ConversationMessage:
-        """Add a message to the conversation"""
+    ) -> Optional[ConversationMessage]:
+        """Add a message to the conversation
+        
+        Respects user's remember_conversations and privacy_mode settings.
+        Returns None if message should not be stored based on preferences.
+        """
+        
+        # Check if we should store this message
+        should_store = await self._should_store_message(user_id)
+        if not should_store:
+            logger.info(f"🔒 Skipping message storage due to user preferences")
+            return None
         
         message_id = f"msg_{conversation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
         
@@ -162,9 +250,33 @@ class ConversationMemoryService:
     async def get_conversation_context(
         self,
         conversation_id: str,
+        user_id: Optional[str] = None,
         include_system_messages: bool = False
-    ) -> ConversationContext:
-        """Get conversation context for enhanced responses"""
+    ) -> Optional[ConversationContext]:
+        """Get conversation context for enhanced responses
+        
+        Respects user's privacy_mode setting:
+        - minimal: Returns None (no context)
+        - private: Returns limited context (current session only)
+        - standard: Returns full context with history
+        
+        Args:
+            conversation_id: Conversation identifier
+            user_id: User identifier (for preference checking)
+            include_system_messages: Whether to include system messages
+            
+        Returns:
+            ConversationContext or None if blocked by privacy settings
+        """
+        
+        # Check if we should retrieve context
+        if user_id:
+            should_retrieve, privacy_mode = await self._should_retrieve_context(user_id)
+            if not should_retrieve:
+                logger.info(f"🔒 Context retrieval blocked by privacy mode: {privacy_mode}")
+                return None
+        else:
+            privacy_mode = 'standard'
         
         # Get recent messages
         recent_messages = await self._get_recent_messages(
@@ -266,6 +378,43 @@ CURRENT QUERY: {current_query}"""
         
         logger.info(f"🧹 Cleaned up {cleaned_count} old conversations")
         return cleaned_count
+    
+    async def cleanup_by_retention_policy(self, user_id: str) -> int:
+        """
+        Clean up conversations based on user's data retention policy
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            Number of conversations deleted
+        """
+        if not self.preferences_service:
+            return 0
+        
+        try:
+            prefs = self.preferences_service.get_preferences(user_id)
+            memory_prefs = prefs.get('memory_preferences', {})
+            retention_days = memory_prefs.get('data_retention_days', 90)
+            
+            cutoff_date = datetime.now() - timedelta(days=retention_days)
+            
+            # This would need to query the database for old conversations
+            # For now, just clean up cached sessions
+            cleaned_count = 0
+            for conv_id, session_info in list(self.session_cache.items()):
+                if session_info.get('user_id') == user_id:
+                    started_at = session_info.get('started_at', datetime.now())
+                    if started_at < cutoff_date:
+                        await self._archive_conversation(conv_id)
+                        del self.session_cache[conv_id]
+                        cleaned_count += 1
+            
+            logger.info(f"🧹 Cleaned up {cleaned_count} conversations for user {user_id} (retention: {retention_days} days)")
+            return cleaned_count
+        except Exception as e:
+            logger.error(f"❌ Error in retention cleanup: {e}")
+            return 0
     
     # Private helper methods
     

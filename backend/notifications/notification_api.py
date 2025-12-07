@@ -78,9 +78,12 @@ def register_notification_routes(app: func.FunctionApp) -> None:
             # Get user agent for device tracking
             user_agent = req.headers.get('User-Agent')
             
-            # Import service here to avoid circular imports
+            # Import services here to avoid circular imports
             from .notification_service import NotificationService
-            service = NotificationService()
+            from services.preferences_service import PreferencesService
+            
+            preferences_service = PreferencesService()
+            service = NotificationService(preferences_service=preferences_service)
             
             result = await service.subscribe(
                 user_id=user_id,
@@ -138,7 +141,10 @@ def register_notification_routes(app: func.FunctionApp) -> None:
                 pass
             
             from .notification_service import NotificationService
-            service = NotificationService()
+            from services.preferences_service import PreferencesService
+            
+            preferences_service = PreferencesService()
+            service = NotificationService(preferences_service=preferences_service)
             
             result = await service.unsubscribe(
                 user_id=user_id,
@@ -182,7 +188,10 @@ def register_notification_routes(app: func.FunctionApp) -> None:
                 )
             
             from .notification_service import NotificationService
-            service = NotificationService()
+            from services.preferences_service import PreferencesService
+            
+            preferences_service = PreferencesService()
+            service = NotificationService(preferences_service=preferences_service)
             
             prefs = await service.get_preferences(user_id)
             
@@ -256,7 +265,10 @@ def register_notification_routes(app: func.FunctionApp) -> None:
             updates = {k: v for k, v in body.items() if k in allowed_fields}
             
             from .notification_service import NotificationService
-            service = NotificationService()
+            from services.preferences_service import PreferencesService
+            
+            preferences_service = PreferencesService()
+            service = NotificationService(preferences_service=preferences_service)
             
             prefs = await service.update_preferences(user_id, updates)
             
@@ -300,7 +312,10 @@ def register_notification_routes(app: func.FunctionApp) -> None:
                 )
             
             from .notification_service import NotificationService
-            service = NotificationService()
+            from services.preferences_service import PreferencesService
+            
+            preferences_service = PreferencesService()
+            service = NotificationService(preferences_service=preferences_service)
             
             subscriptions = await service.get_user_subscriptions(user_id)
             prefs = await service.get_preferences(user_id)
@@ -350,14 +365,7 @@ def register_notification_routes(app: func.FunctionApp) -> None:
                     mimetype="application/json"
                 )
             
-            from .notification_service import NotificationService
-            from .content_service import ContentService
-            from .notification_templates import NotificationType, render_notification
-            
-            service = NotificationService()
-            content_service = ContentService()
-            
-            # Generate test content
+            from .notification_service import NotificationService\n            from .content_service import ContentService\n            from .notification_templates import NotificationType, render_notification\n            from services.preferences_service import PreferencesService\n            \n            preferences_service = PreferencesService()\n            service = NotificationService(preferences_service=preferences_service)\n            content_service = ContentService()            # Generate test content
             content = content_service.get_daily_wisdom_content(user_id)
             notification = render_notification(NotificationType.DAILY_WISDOM, content)
             

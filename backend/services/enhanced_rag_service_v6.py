@@ -143,6 +143,72 @@ class EnhancedRAGService:
         
         logger.info("✅ Enhanced RAG Service initialized successfully with Azure OpenAI")
     
+    def _get_conversation_style_params(self, user_preferences: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Extract conversation style parameters from user preferences
+        
+        Returns:
+            Dictionary with style and max_chars
+        """
+        default_style = {
+            "style": "balanced",
+            "max_chars": 1000
+        }
+        
+        if not user_preferences:
+            return default_style
+        
+        exp_prefs = user_preferences.get("experience_preferences", {})
+        style = exp_prefs.get("conversation_style", "balanced")
+        
+        # Map style to max_chars
+        style_params = {
+            "brief": {"style": "brief", "max_chars": 500},
+            "balanced": {"style": "balanced", "max_chars": 1000},
+            "detailed": {"style": "detailed", "max_chars": 2000}
+        }
+        
+        return style_params.get(style, default_style)
+    
+    def _get_formality_params(self, user_preferences: Optional[Dict[str, Any]] = None) -> Dict[str, str]:
+        """
+        Extract formality parameters from user preferences
+        
+        Returns:
+            Dictionary with formality level and tone guidance
+        """
+        default_formality = {
+            "level": "respectful",
+            "tone_guidance": "Maintain a respectful and warm tone"
+        }
+        
+        if not user_preferences:
+            return default_formality
+        
+        exp_prefs = user_preferences.get("experience_preferences", {})
+        formality = exp_prefs.get("formality", "respectful")
+        
+        formality_map = {
+            "very_formal": {
+                "level": "very_formal",
+                "tone_guidance": "Use formal, reverent language with titles and honorifics"
+            },
+            "respectful": {
+                "level": "respectful",
+                "tone_guidance": "Maintain a respectful and warm tone"
+            },
+            "friendly": {
+                "level": "friendly",
+                "tone_guidance": "Use friendly, conversational language while maintaining wisdom"
+            },
+            "casual": {
+                "level": "casual",
+                "tone_guidance": "Use relaxed, approachable language like talking to a friend"
+            }
+        }
+        
+        return formality_map.get(formality, default_formality)
+    
     async def generate_query_embedding(self, query: str) -> List[float]:
         """Generate embedding for search query using Azure OpenAI"""
         if query in self._embedding_cache:
@@ -475,11 +541,37 @@ class EnhancedRAGService:
                 retrieval_method="failed"
             )
     
-    async def generate_enhanced_response(self, query: str, personality_id: str, context: str = "") -> EnhancedRAGResponse:
-        """Generate enhanced response using RAG context"""
+    async def generate_enhanced_response(
+        self, 
+        query: str, 
+        personality_id: str, 
+        context: str = "", 
+        user_preferences: Optional[Dict[str, Any]] = None
+    ) -> EnhancedRAGResponse:
+        """
+        Generate enhanced response using RAG context with user preferences
+        
+        Args:
+            query: User's question
+            personality_id: Personality to respond as
+            context: Additional context (optional)
+            user_preferences: User preference settings (optional)
+        """
         try:
-            # Step 1: Retrieve relevant context
-            rag_context = await self.retrieve_context(query, personality_id)
+            # Step 1: Retrieve relevant context (skip if privacy_mode is minimal)
+            should_use_memory = True
+            if user_preferences and user_preferences.get("memory_preferences", {}).get("privacy_mode") == "minimal":
+                should_use_memory = False
+                rag_context = RAGContext(
+                    query=query,
+                    personality_id=personality_id,
+                    relevant_chunks=[],
+                    total_chunks_searched=0,
+                    avg_similarity_score=0.0,
+                    retrieval_method="privacy_disabled"
+                )
+            else:
+                rag_context = await self.retrieve_context(query, personality_id)
             
             # Step 2: Prepare context for generation
             context_passages = []
@@ -489,11 +581,22 @@ class EnhancedRAGService:
                     for chunk in rag_context.relevant_chunks[:3]  # Top 3 chunks
                 ]
             
-            # Step 3: Create enhanced prompt with context and personality-specific instructions
+            # Step 3: Apply user preferences to prompt generation
+            conversation_style = self._get_conversation_style_params(user_preferences)
+            formality_level = self._get_formality_params(user_preferences)
+            
+            # Step 4: Create enhanced prompt with context and personality-specific instructions
             personality_context = self._get_personality_context(personality_id)
-            max_chars = 1000  # Increased to 1000 for comprehensive responses
+            max_chars = conversation_style["max_chars"]  # From user preference
             if personality_id in personality_configs:
-                max_chars = personality_configs[personality_id].max_chars
+                # Use personality default unless overridden by preference
+                default_max = personality_configs[personality_id].max_chars
+                if conversation_style["style"] == "brief":
+                    max_chars = min(default_max, 500)
+                elif conversation_style["style"] == "detailed":
+                    max_chars = min(default_max * 2, 2000)
+                else:  # balanced
+                    max_chars = default_max
             
             if context_passages:
                 context_text = "\n\n".join(context_passages)
@@ -508,6 +611,8 @@ Question: {query}
 
 RESPONSE REQUIREMENTS:
 - Provide a complete, thoughtful response in {max_chars} characters or less
+- Style: {conversation_style["style"]} (adjust depth accordingly)
+- Tone: {formality_level["tone_guidance"]}
 - Be concise while capturing all essential wisdom
 - Maintain your authentic voice and perspective
 - Include practical guidance that directly addresses the question
@@ -526,6 +631,8 @@ Question: {query}
 
 RESPONSE REQUIREMENTS:
 - Provide a complete, thoughtful response in {max_chars} characters or less
+- Style: {conversation_style["style"]} (adjust depth accordingly)
+- Tone: {formality_level["tone_guidance"]}
 - Be concise while capturing all essential wisdom
 - Maintain your authentic voice and perspective
 - Include practical guidance that directly addresses the question

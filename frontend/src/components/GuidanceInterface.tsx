@@ -941,7 +941,20 @@ export default function GuidanceInterface() {
           {selectedPersonality && memoryContext && window.innerWidth > 768 && (
             <div 
               onClick={() => navigate('/memory')}
-              style={{ cursor: 'pointer' }}
+              style={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: 0.9
+              }}
+              title="View your memory profile and relationships"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
             >
               <MemoryIndicator
                 compact={true}
@@ -954,12 +967,57 @@ export default function GuidanceInterface() {
           {window.innerWidth > 480 && (
             <div 
               onClick={() => navigate('/progress')}
-              style={{ cursor: 'pointer' }}
-              title="View your progress"
+              style={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="View your progress, streaks, and achievements"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
             >
               <StreakDisplayContainer compact={true} />
             </div>
           )}
+          
+          {/* Settings Button - Access user settings and preferences */}
+          <button 
+            onClick={() => navigate('/settings')}
+            style={{
+              background: '#f8fafc',
+              border: '1px solid #cbd5e1',
+              color: '#475569',
+              padding: window.innerWidth <= 768 ? '0.5rem' : '0.5rem 0.75rem',
+              borderRadius: '0.5rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'all 0.2s ease',
+              fontSize: '0.85rem',
+              fontWeight: '500',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+            }}
+            title="View your settings and preferences"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#e0e7ff';
+              e.currentTarget.style.borderColor = '#6366f1';
+              e.currentTarget.style.color = '#4338ca';
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 102, 241, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#f8fafc';
+              e.currentTarget.style.borderColor = '#cbd5e1';
+              e.currentTarget.style.color = '#475569';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+            }}
+          >
+            <Settings size={18} />
+            {window.innerWidth > 768 && <span>Settings</span>}
+          </button>
           
           <button 
             onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}

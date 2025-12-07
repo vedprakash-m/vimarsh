@@ -553,6 +553,117 @@ class AnalyticsService:
                 recommendations.append(f"{personality} personality has high error count - check configuration")
         
         return recommendations
+    
+    async def get_ai_usage_summary(self, user_id: str) -> Dict[str, Any]:
+        """
+        Get AI usage summary including costs and limits for user
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            Dictionary with monthly AI usage, costs, limits, and trends
+        """
+        try:
+            # Get current month's usage
+            current_month = datetime.utcnow().strftime("%Y-%m")
+            usage_data = await self._get_monthly_usage(user_id, current_month)
+            
+            # Get previous month for trend comparison
+            previous_month_date = datetime.utcnow().replace(day=1) - timedelta(days=1)
+            previous_month = previous_month_date.strftime("%Y-%m")
+            previous_usage = await self._get_monthly_usage(user_id, previous_month)
+            
+            # Calculate costs (approximate based on tokens)
+            # Gemini 2.5 Flash pricing: ~$0.15 per 1M tokens (input + output combined)
+            monthly_cost = (usage_data.get("total_tokens", 0) / 1_000_000) * 0.15
+            previous_cost = (previous_usage.get("total_tokens", 0) / 1_000_000) * 0.15
+            
+            # Free tier limit
+            free_tier_limit = 10.00  # $10/month
+            
+            # Calculate usage percentage
+            usage_percentage = (monthly_cost / free_tier_limit) * 100 if free_tier_limit > 0 else 0
+            
+            # Determine status
+            if usage_percentage < 50:
+                status = "well_within_limits"
+            elif usage_percentage < 80:
+                status = "moderate"
+            elif usage_percentage < 100:
+                status = "approaching_limit"
+            else:
+                status = "at_limit"
+            
+            # Calculate trend
+            if previous_cost > 0:
+                trend_percentage = ((monthly_cost - previous_cost) / previous_cost) * 100
+            else:
+                trend_percentage = 0
+            
+            summary = {
+                "monthly_cost_usd": round(monthly_cost, 2),
+                "limit_usd": free_tier_limit,
+                "usage_percentage": round(usage_percentage, 1),
+                "status": status,
+                "total_conversations": usage_data.get("conversation_count", 0),
+                "total_tokens": usage_data.get("total_tokens", 0),
+                "trend": {
+                    "previous_month_cost": round(previous_cost, 2),
+                    "change_percentage": round(trend_percentage, 1),
+                    "direction": "up" if trend_percentage > 0 else "down" if trend_percentage < 0 else "stable"
+                },
+                "billing_cycle": {
+                    "start": f"{current_month}-01",
+                    "end": (datetime.utcnow().replace(day=1) + timedelta(days=32)).replace(day=1).strftime("%Y-%m-%d")
+                }
+            }
+            
+            logger.info(f"💰 Retrieved AI usage summary for user {user_id}: ${monthly_cost:.2f}")
+            return summary
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting AI usage summary for user {user_id}: {e}")
+            return {
+                "monthly_cost_usd": 0.0,
+                "limit_usd": 10.0,
+                "usage_percentage": 0.0,
+                "status": "well_within_limits",
+                "total_conversations": 0,
+                "total_tokens": 0,
+                "trend": {
+                    "previous_month_cost": 0.0,
+                    "change_percentage": 0.0,
+                    "direction": "stable"
+                },
+                "billing_cycle": {
+                    "start": datetime.utcnow().strftime("%Y-%m-01"),
+                    "end": (datetime.utcnow().replace(day=1) + timedelta(days=32)).replace(day=1).strftime("%Y-%m-%d")
+                }
+            }
+    
+    async def _get_monthly_usage(self, user_id: str, month: str) -> Dict[str, Any]:
+        """Get usage data for a specific month"""
+        try:
+            # Query analytics events for the month
+            start_date = f"{month}-01T00:00:00Z"
+            end_date = (datetime.strptime(month, "%Y-%m").replace(day=1) + timedelta(days=32)).replace(day=1).strftime("%Y-%m-%dT00:00:00Z")
+            
+            usage = {
+                "conversation_count": 0,
+                "total_tokens": 0
+            }
+            
+            # Note: This would query the analytics database
+            # For now, returning mock data structure
+            # TODO: Implement actual database query when analytics container is ready
+            
+            logger.debug(f"Retrieved usage for {user_id} in {month}")
+            return usage
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting monthly usage: {e}")
+            return {"conversation_count": 0, "total_tokens": 0}
 
 # Global service instance
 analytics_service = AnalyticsService()

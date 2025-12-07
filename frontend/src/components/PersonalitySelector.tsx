@@ -1,11 +1,13 @@
 /**
  * Enhanced Personality Selector Component for Vimarsh
  * Beautiful modal interface for selecting spiritual personalities
+ * Integrates with user preferences to show favorites at the top
  */
 
 import React, { useState } from 'react';
-import { X, Sparkles, Brain } from 'lucide-react';
+import { X, Sparkles, Brain, Star } from 'lucide-react';
 import { Personality } from '../contexts/PersonalityContext';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface PersonalitySelectorProps {
   availablePersonalities: Personality[];
@@ -24,6 +26,10 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
 }) => {
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const { settings } = useSettings();
+
+  // Get favorite personalities from settings
+  const favoritePersonalityIds = settings?.experience_preferences?.favorite_personalities || [];
 
   // Get unique domains from available personalities
   const domains = Array.from(new Set((availablePersonalities || []).map(p => p.domain)));
@@ -35,7 +41,15 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                          personality.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesDomain && matchesSearch;
   }).sort((a, b) => {
-    // Sort alphabetically by display_name, fallback to name
+    // Sort with favorites first, then alphabetically
+    const aIsFavorite = favoritePersonalityIds.includes(a.id);
+    const bIsFavorite = favoritePersonalityIds.includes(b.id);
+    
+    // If one is favorite and other isn't, favorite comes first
+    if (aIsFavorite && !bIsFavorite) return -1;
+    if (!aIsFavorite && bIsFavorite) return 1;
+    
+    // Otherwise, sort alphabetically by display_name, fallback to name
     const nameA = (a.display_name || a.name || '').toLowerCase();
     const nameB = (b.display_name || b.name || '').toLowerCase();
     return nameA.localeCompare(nameB);
@@ -239,10 +253,14 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                 style={{
                   background: isSelected 
                     ? '#fef3e2' 
-                    : '#ffffff',
+                    : favoritePersonalityIds.includes(personality.id)
+                      ? '#fffef5'  // Subtle gold tint for favorites
+                      : '#ffffff',
                   border: isSelected 
                     ? '2px solid #FF6B35' 
-                    : '1px solid #e2e8f0',
+                    : favoritePersonalityIds.includes(personality.id)
+                      ? '2px solid #FFD700'  // Gold border for favorites
+                      : '1px solid #e2e8f0',
                   borderRadius: '1rem',
                   padding: '1.5rem',
                   cursor: 'pointer',
@@ -251,7 +269,9 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '1rem',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+                  boxShadow: favoritePersonalityIds.includes(personality.id)
+                    ? '0 2px 8px rgba(255, 215, 0, 0.15)'  // Gold shadow for favorites
+                    : '0 1px 3px rgba(0, 0, 0, 0.05)'
                 }}
                 onMouseEnter={(e) => {
                   if (!isSelected) {
@@ -308,6 +328,26 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
                     {personality.description}
                   </p>
                 </div>
+
+                {/* Favorite Star */}
+                {favoritePersonalityIds.includes(personality.id) && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '0.75rem',
+                    left: '0.75rem',
+                    width: '1.75rem',
+                    height: '1.75rem',
+                    background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 6px rgba(255, 215, 0, 0.4)',
+                    zIndex: 10
+                  }}>
+                    <Star size={14} fill="#FFFFFF" color="#FFFFFF" strokeWidth={2} />
+                  </div>
+                )}
 
                 {/* Domain Badge */}
                 <div style={{

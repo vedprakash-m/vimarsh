@@ -609,6 +609,177 @@ class EngagementService:
         except Exception as e:
             logger.error(f"❌ Error saving engagement data: {e}")
             raise
+    
+    def get_journey_stats(self, user_id: str) -> Dict[str, Any]:
+        """
+        Get comprehensive journey statistics for user
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            Dictionary with journey stats including streak, conversations, achievements, etc.
+        """
+        try:
+            # Get streak info
+            streak_info = self.get_user_streak(user_id)
+            
+            # Get conversation count
+            conversation_count = self._get_conversation_count(user_id)
+            
+            # Get achievements count (placeholder - will be implemented with achievement system)
+            achievements_count = 0
+            
+            # Calculate wisdom level based on activity
+            wisdom_level = self._calculate_wisdom_level(conversation_count)
+            
+            # Get domain exploration breakdown
+            domain_exploration = self._get_domain_exploration(user_id)
+            
+            stats = {
+                "current_streak": streak_info.get("current_streak", 0),
+                "longest_streak": streak_info.get("longest_streak", 0),
+                "total_conversations": conversation_count,
+                "achievements_unlocked": achievements_count,
+                "wisdom_level": wisdom_level,
+                "domain_exploration": domain_exploration
+            }
+            
+            logger.info(f"📊 Retrieved journey stats for user {user_id}")
+            return stats
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting journey stats for user {user_id}: {e}")
+            return {
+                "current_streak": 0,
+                "longest_streak": 0,
+                "total_conversations": 0,
+                "achievements_unlocked": 0,
+                "wisdom_level": "Seeker",
+                "domain_exploration": {}
+            }
+    
+    def _get_conversation_count(self, user_id: str) -> int:
+        """Get total conversation count for user"""
+        try:
+            if self.container:
+                # Query for all activity records
+                query = "SELECT VALUE COUNT(1) FROM c WHERE c.user_id = @user_id"
+                parameters = [{"name": "@user_id", "value": user_id}]
+                
+                result = list(self.container.query_items(
+                    query=query,
+                    parameters=parameters,
+                    enable_cross_partition_query=True
+                ))
+                
+                return result[0] if result else 0
+            else:
+                # Count from memory store
+                return len([
+                    item for item in self._memory_store.values()
+                    if item.get("user_id") == user_id
+                ])
+                
+        except Exception as e:
+            logger.error(f"❌ Error getting conversation count: {e}")
+            return 0
+    
+    def _calculate_wisdom_level(self, conversation_count: int) -> str:
+        """Calculate wisdom level based on conversation count"""
+        if conversation_count < 5:
+            return "Seeker"
+        elif conversation_count < 20:
+            return "Student"
+        elif conversation_count < 50:
+            return "Practitioner"
+        elif conversation_count < 100:
+            return "Scholar"
+        elif conversation_count < 200:
+            return "Sage"
+        else:
+            return "Master"
+    
+    def _get_domain_exploration(self, user_id: str) -> Dict[str, int]:
+        """Get conversation breakdown by domain"""
+        try:
+            # Initialize domain counts
+            domains = {
+                "spiritual": 0,
+                "philosophical": 0,
+                "leadership": 0,
+                "scientific": 0,
+                "literary": 0,
+                "psychology": 0
+            }
+            
+            if self.container:
+                # Query for personality usage (assuming personality field contains personality_id)
+                query = "SELECT c.personality FROM c WHERE c.user_id = @user_id"
+                parameters = [{"name": "@user_id", "value": user_id}]
+                
+                items = list(self.container.query_items(
+                    query=query,
+                    parameters=parameters,
+                    enable_cross_partition_query=True
+                ))
+                
+                # Map personalities to domains (this is a simplified mapping)
+                personality_domain_map = {
+                    "krishna": "spiritual",
+                    "buddha": "spiritual",
+                    "jesus": "spiritual",
+                    "rumi": "spiritual",
+                    "vivekananda": "spiritual",
+                    "marcus": "philosophical",
+                    "laotzu": "philosophical",
+                    "confucius": "philosophical",
+                    "aristotle": "philosophical",
+                    "plato": "philosophical",
+                    "socrates": "philosophical",
+                    "chanakya": "leadership",
+                    "lincoln": "leadership",
+                    "franklin": "leadership",
+                    "washington": "leadership",
+                    "gandhi": "leadership",
+                    "mlk": "leadership",
+                    "einstein": "scientific",
+                    "newton": "scientific",
+                    "tesla": "scientific",
+                    "archimedes": "scientific",
+                    "davinci": "scientific",
+                    "tagore": "literary",
+                    "shakespeare": "literary",
+                    "freud": "psychology"
+                }
+                
+                # Count domain usage
+                for item in items:
+                    personality = item.get("personality", "").lower()
+                    domain = personality_domain_map.get(personality, "philosophical")
+                    if domain in domains:
+                        domains[domain] += 1
+            else:
+                # Use memory store
+                for item in self._memory_store.values():
+                    if item.get("user_id") == user_id:
+                        personality = item.get("personality", "").lower()
+                        # Simple domain detection (can be enhanced)
+                        if personality:
+                            domains["philosophical"] += 1
+            
+            return domains
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting domain exploration: {e}")
+            return {
+                "spiritual": 0,
+                "philosophical": 0,
+                "leadership": 0,
+                "scientific": 0,
+                "literary": 0,
+                "psychology": 0
+            }
 
 
 # Singleton instance

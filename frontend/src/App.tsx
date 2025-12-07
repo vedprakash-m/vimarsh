@@ -16,6 +16,7 @@ const ShareView = lazy(() => import('./pages/ShareView'));
 const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
 const MemoryDashboard = lazy(() => import('./components/MemoryDashboard'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
+const UserSettings = lazy(() => import('./pages/UserSettings'));
 
 // Memory Dashboard Page Wrapper (handles route-based rendering)
 const MemoryDashboardPage: React.FC = () => {
@@ -189,6 +190,16 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <ProgressDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Settings Page - Protected Route */}
+                  <Route 
+                    path="/settings" 
+                    element={
+                      <ProtectedRoute>
+                        <UserSettings />
                       </ProtectedRoute>
                     } 
                   />

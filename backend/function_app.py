@@ -95,9 +95,13 @@ except Exception as e:
 
 try:
     from services.conversation_memory_service import ConversationMemoryService
-    conversation_memory_service = ConversationMemoryService()
+    from services.preferences_service import PreferencesService
+    
+    # Initialize with preferences service for privacy controls
+    prefs_service = PreferencesService()
+    conversation_memory_service = ConversationMemoryService(preferences_service=prefs_service)
     memory_service_available = True
-    logger.info("✅ Conversation memory service initialized")
+    logger.info("✅ Conversation memory service initialized with preferences integration")
 except ImportError as e:
     logger.warning(f"⚠️ Conversation memory service not available: {e}")
     conversation_memory_service = None
@@ -2328,13 +2332,14 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     personality_id=personality_id
                 )
                 
-                # Get conversation context
+                # Get conversation context (respects privacy_mode from user preferences)
                 context_data = await conversation_memory_service.get_conversation_context(
-                    conversation_id=conversation_id
+                    conversation_id=conversation_id,
+                    user_id=user_id
                 )
                 
-                # Format recent messages as context
-                if hasattr(context_data, 'recent_messages') and context_data.recent_messages:
+                # Format recent messages as context (only if context_data returned)
+                if context_data and hasattr(context_data, 'recent_messages') and context_data.recent_messages:
                     from models.conversation_models import MessageType
                     recent_msgs = []
                     for msg in context_data.recent_messages[-3:]:  # Last 3 messages for context
@@ -2372,11 +2377,21 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 
                 # Only proceed if service was successfully initialized
                 if enhanced_rag_service != "failed":
+                    # Get user preferences if user is authenticated
+                    user_preferences = None
+                    try:
+                        if user_id and user_services_available:
+                            user_preferences = preferences_service.get_preferences(user_id)
+                            logger.debug(f"📋 Retrieved preferences for user {user_id}")
+                    except Exception as pref_error:
+                        logger.warning(f"⚠️ Could not retrieve preferences: {pref_error}")
+                    
                     # Enhanced RAG service handles conversation context internally
                     rag_response = await enhanced_rag_service.generate_enhanced_response(
                         query=user_query,
                         personality_id=personality_id,
-                        context=conversation_context
+                        context=conversation_context,
+                        user_preferences=user_preferences
                     )
                 else:
                     # Service failed to initialize, skip to fallback
@@ -3685,6 +3700,360 @@ except ImportError as e:
     logger.warning(f"⚠️ Engagement API routes not available: {e}")
 except Exception as e:
     logger.warning(f"⚠️ Failed to register engagement API routes: {e}")
+
+
+# ==============================================================================
+# USER SETTINGS API ENDPOINTS
+# ==============================================================================
+
+# Import user services
+try:
+    from services.preferences_service import preferences_service
+    from services.data_export_service import data_export_service
+    from engagement.engagement_service import get_engagement_service
+    from services.analytics_service import analytics_service
+    from auth.authService import verify_token, get_user_from_token
+    
+    user_services_available = True
+    logger.info("✅ User settings services imported successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ User settings services not available: {e}")
+    user_services_available = False
+
+
+@app.route(route="api/user/profile", methods=["GET"])
+async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    GET /api/user/profile
+    Get complete user profile including preferences, journey stats, and AI usage
+    """
+    try:
+        # Verify authentication
+        auth_header = req.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return func.HttpResponse(
+                json.dumps({"error": "Missing or invalid authorization header"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        token = auth_header.replace('Bearer ', '')
+        user_info = get_user_from_token(token)
+        
+        if not user_info:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid or expired token"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        user_id = user_info.get('sub') or user_info.get('oid')
+        if not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Could not extract user ID from token"}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Get user preferences
+        preferences = preferences_service.get_preferences(user_id)
+        
+        # Get journey stats
+        engagement_service = get_engagement_service()
+        journey_stats = engagement_service.get_journey_stats(user_id)
+        
+        # Get AI usage summary
+        ai_usage = await analytics_service.get_ai_usage_summary(user_id)
+        
+        # Combine into profile
+        profile = {
+            "user_id": user_id,
+            "email": user_info.get('preferred_username') or user_info.get('email'),
+            "name": user_info.get('name'),
+            "preferences": {
+                "experience_preferences": preferences.get("experience_preferences"),
+                "notification_preferences": preferences.get("notification_preferences"),
+                "memory_preferences": preferences.get("memory_preferences")
+            },
+            "journey_stats": journey_stats,
+            "ai_usage": ai_usage,
+            "member_since": preferences.get("created_at"),
+            "last_updated": preferences.get("updated_at")
+        }
+        
+        logger.info(f"👤 Retrieved profile for user {user_id}")
+        
+        return func.HttpResponse(
+            json.dumps(profile),
+            status_code=200,
+            mimetype="application/json"
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error getting user profile: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Internal server error", "details": str(e)}),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+
+@app.route(route="api/user/preferences", methods=["PATCH"])
+async def update_user_preferences(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    PATCH /api/user/preferences
+    Update user preferences with validation
+    """
+    try:
+        # Verify authentication
+        auth_header = req.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return func.HttpResponse(
+                json.dumps({"error": "Missing or invalid authorization header"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        token = auth_header.replace('Bearer ', '')
+        user_info = get_user_from_token(token)
+        
+        if not user_info:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid or expired token"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        user_id = user_info.get('sub') or user_info.get('oid')
+        if not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Could not extract user ID from token"}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Parse request body
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid JSON in request body"}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Update preferences with validation
+        try:
+            updated_prefs = preferences_service.update_preferences(
+                user_id=user_id,
+                updates=req_body,
+                validate=True
+            )
+            
+            logger.info(f"✅ Updated preferences for user {user_id}")
+            
+            return func.HttpResponse(
+                json.dumps({
+                    "success": True,
+                    "preferences": {
+                        "experience_preferences": updated_prefs.get("experience_preferences"),
+                        "notification_preferences": updated_prefs.get("notification_preferences"),
+                        "memory_preferences": updated_prefs.get("memory_preferences")
+                    },
+                    "updated_at": updated_prefs.get("updated_at")
+                }),
+                status_code=200,
+                mimetype="application/json"
+            )
+            
+        except ValueError as e:
+            # Validation error
+            return func.HttpResponse(
+                json.dumps({"error": "Validation error", "details": str(e)}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+    except Exception as e:
+        logger.error(f"❌ Error updating user preferences: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Internal server error", "details": str(e)}),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+
+@app.route(route="api/user/usage-summary", methods=["GET"])
+async def get_usage_summary(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    GET /api/user/usage-summary
+    Get detailed AI usage and cost summary
+    """
+    try:
+        # Verify authentication
+        auth_header = req.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return func.HttpResponse(
+                json.dumps({"error": "Missing or invalid authorization header"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        token = auth_header.replace('Bearer ', '')
+        user_info = get_user_from_token(token)
+        
+        if not user_info:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid or expired token"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        user_id = user_info.get('sub') or user_info.get('oid')
+        if not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Could not extract user ID from token"}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Get AI usage summary
+        usage_summary = await analytics_service.get_ai_usage_summary(user_id)
+        
+        logger.info(f"💰 Retrieved usage summary for user {user_id}")
+        
+        return func.HttpResponse(
+            json.dumps(usage_summary),
+            status_code=200,
+            mimetype="application/json"
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error getting usage summary: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Internal server error", "details": str(e)}),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+
+@app.route(route="api/user/export", methods=["POST"])
+async def export_user_data(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    POST /api/user/export
+    Export user data in GDPR-compliant format
+    """
+    try:
+        # Verify authentication
+        auth_header = req.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return func.HttpResponse(
+                json.dumps({"error": "Missing or invalid authorization header"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        token = auth_header.replace('Bearer ', '')
+        user_info = get_user_from_token(token)
+        
+        if not user_info:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid or expired token"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        user_id = user_info.get('sub') or user_info.get('oid')
+        if not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Could not extract user ID from token"}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Export user data
+        export_data = await data_export_service.export_user_data(
+            user_id=user_id,
+            include_metadata=True
+        )
+        
+        logger.info(f"📦 Exported data for user {user_id}")
+        
+        # Return export data as JSON
+        return func.HttpResponse(
+            json.dumps(export_data),
+            status_code=200,
+            mimetype="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename=vimarsh_data_export_{user_id}.json"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error exporting user data: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Internal server error", "details": str(e)}),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+
+@app.route(route="api/user/account", methods=["DELETE"])
+async def delete_user_account(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    DELETE /api/user/account
+    Delete user account and all associated data
+    """
+    try:
+        # Verify authentication
+        auth_header = req.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return func.HttpResponse(
+                json.dumps({"error": "Missing or invalid authorization header"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        token = auth_header.replace('Bearer ', '')
+        user_info = get_user_from_token(token)
+        
+        if not user_info:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid or expired token"}),
+                status_code=401,
+                mimetype="application/json"
+            )
+        
+        user_id = user_info.get('sub') or user_info.get('oid')
+        if not user_id:
+            return func.HttpResponse(
+                json.dumps({"error": "Could not extract user ID from token"}),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Delete all user data
+        deletion_summary = await data_export_service.delete_user_data(user_id)
+        
+        logger.info(f"🗑️ Deleted account for user {user_id}")
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "message": "Account and all associated data deleted successfully",
+                "deletion_summary": deletion_summary
+            }),
+            status_code=200,
+            mimetype="application/json"
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error deleting user account: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Internal server error", "details": str(e)}),
+            status_code=500,
+            mimetype="application/json"
+        )
 
 
 # ==============================================================================

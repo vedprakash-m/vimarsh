@@ -9567,6 +9567,1023 @@ AI Success Rate         | 96.4%             | >95%        | ✅ Achieved
 - **Environment Management**: Single production environment with high availability
 - **Backup & Recovery**: Automated database backups with point-in-time recovery
 
+---
+
+## 21. User Settings & Preferences Management Architecture (NEW)
+
+### 21.1. System Overview
+
+**Purpose**: Provide centralized user preferences management through a comprehensive Settings page accessible via header navigation. This feature consolidates scattered settings (notifications, memory, privacy) into a unified mobile-first interface with 6 specialized tabs.
+
+**Strategic Goals**:
+- Reduce cognitive load through centralized preferences hub
+- Increase feature discoverability (Memory Dashboard, Progress, Archive)
+- Empower users with meaningful control over wisdom journey
+- Support progressive personalization and adaptive UI
+- Build trust through transparent data usage and privacy controls
+
+**Architecture Principles**:
+- Mobile-first responsive design with horizontal scrolling tabs
+- Auto-save with optimistic UI updates and rollback on error
+- Progressive disclosure: simple options visible, advanced tucked away
+- RESTful API design with partial updates support
+- Database-first schema with comprehensive indexing
+- Integration with existing context providers (Auth, Memory, Engagement)
+
+### 21.2. Frontend Architecture
+
+**Component Hierarchy**:
+```
+frontend/src/pages/
+├── UserSettings.tsx                 # Main settings page container
+│   ├── SettingsTabNavigation.tsx   # Horizontal scrolling tab bar
+│   └── Tabs/
+│       ├── MyProfileTab.tsx        # Journey stats, AI usage, quick access
+│       ├── ExperienceTab.tsx       # Conversation style, language, appearance
+│       ├── NotificationsTab.tsx    # Daily wisdom, quiet hours, types
+│       ├── MemoryPrivacyTab.tsx    # Memory features, privacy mode, data control
+│       └── AccountTab.tsx          # Subscription, security, account actions
+│
+frontend/src/components/Settings/
+├── ProfileStats.tsx                # Engagement metrics visualization
+├── AIUsageDisplay.tsx              # Transparent usage with user-friendly language
+├── QuickAccessLinks.tsx            # Links to Archive, Memory, Progress
+├── ConversationStyleSelector.tsx   # Visual style picker with examples
+├── FormalityLevelPicker.tsx        # Formality dropdown with impact explanation
+├── FavoritePersonalities.tsx       # Multi-select with 5-item limit
+├── AppearanceControls.tsx          # Theme, text size, animations
+├── DailyWisdomConfig.tsx           # Master toggle, time picker, timezone
+├── QuietHoursConfig.tsx            # Start/end time pickers
+├── NotificationTypes.tsx           # Granular notification checkboxes
+├── MemoryFeaturesToggle.tsx        # Memory feature checkboxes with explanations
+├── PrivacyModeSelector.tsx         # 3-tier radio buttons (Standard/Private/Minimal)
+├── DataManagement.tsx              # Export, clear history, retention controls
+└── AccountActions.tsx              # Logout, delete account with confirmations
+```
+
+**State Management**:
+```typescript
+// frontend/src/context/SettingsContext.tsx
+interface UserSettings {
+  user_id: string;
+  
+  experience_preferences: {
+    conversation_style: "brief" | "balanced" | "detailed";
+    language: "en" | "hi";
+    formality: "very_formal" | "respectful" | "friendly" | "casual";
+    favorite_personalities: string[]; // max 5
+    theme: "light" | "auto" | "dark";
+    text_size: "small" | "medium" | "large";
+    reduce_animations: boolean;
+  };
+  
+  notification_preferences: {
+    daily_wisdom_enabled: boolean;
+    preferred_time: string; // HH:MM format
+    timezone: string;
+    quiet_hours_enabled: boolean;
+    quiet_start: string; // HH:MM
+    quiet_end: string; // HH:MM
+    types: {
+      daily_wisdom: boolean;
+      streak_reminders: boolean;
+      achievements: boolean;
+      weekly_summary: boolean;
+    };
+  };
+  
+  memory_preferences: {
+    remember_conversations: boolean;
+    connect_insights: boolean;
+    track_emotions: boolean;
+    suggest_topics: boolean;
+    privacy_mode: "standard" | "private" | "minimal";
+    data_retention_days: number;
+    analytics_consent: boolean;
+    research_consent: boolean;
+  };
+  
+  updated_at: string; // ISO timestamp
+}
+
+// Context provider with auto-save
+export const SettingsProvider: React.FC = ({ children }) => {
+  const [settings, setSettings] = useState<UserSettings | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Auto-save debounced to 500ms
+  const debouncedSave = useDebouncedCallback(
+    async (updatedSettings: Partial<UserSettings>) => {
+      try {
+        await api.patchUserPreferences(updatedSettings);
+        toast.success("✓ Saved");
+      } catch (err) {
+        toast.error("Failed to save. Retrying...");
+        // Rollback optimistic update
+        setSettings(prevSettings);
+      }
+    },
+    500
+  );
+  
+  const updateSettings = (updates: Partial<UserSettings>) => {
+    // Optimistic update
+    setSettings(prev => ({ ...prev, ...updates }));
+    debouncedSave(updates);
+  };
+  
+  return (
+    <SettingsContext.Provider value={{ settings, updateSettings, loading, error }}>
+      {children}
+    </SettingsContext.Provider>
+  );
+};
+```
+
+**Routing Configuration**:
+```typescript
+// frontend/src/App.tsx
+import UserSettings from './pages/UserSettings';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Existing routes */}
+        <Route path="/guidance" element={<ProtectedRoute><GuidanceInterface /></ProtectedRoute>} />
+        <Route path="/memory" element={<ProtectedRoute><MemoryDashboard /></ProtectedRoute>} />
+        <Route path="/progress" element={<ProtectedRoute><ProgressDashboard /></ProtectedRoute>} />
+        <Route path="/wisdom/archive" element={<ProtectedRoute><WisdomArchive /></ProtectedRoute>} />
+        
+        {/* NEW: Settings route */}
+        <Route path="/settings" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
+        
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      </Routes>
+    </Router>
+  );
+}
+```
+
+**Header Navigation Update**:
+```typescript
+// frontend/src/components/GuidanceInterface.tsx
+// Replace Archive button with Settings icon
+
+// Before:
+<button onClick={() => navigate('/wisdom/archive')}>
+  <BookOpen className="w-5 h-5" />
+</button>
+
+// After:
+<button onClick={() => navigate('/settings')}>
+  <Settings className="w-5 h-5" />
+</button>
+
+// Archive link now accessible via Settings → My Profile → Quick Access
+```
+
+### 21.3. Backend API Architecture
+
+**API Endpoints**:
+
+```python
+# backend/function_app.py - Settings API endpoints
+
+@app.route(route="user/profile", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Get complete user profile including preferences and journey stats
+    
+    Returns:
+        {
+          "user": {
+            "user_id": "uuid",
+            "name": "string",
+            "email": "string",
+            "profile_picture": "url",
+            "member_since": "ISO timestamp"
+          },
+          "journey_stats": {
+            "current_streak": 12,
+            "total_conversations": 147,
+            "achievements_unlocked": 8,
+            "wisdom_level": "Level 3 - Devoted Seeker",
+            "domain_exploration": {
+              "spiritual": 0.35,
+              "scientific": 0.25,
+              "philosophical": 0.20,
+              "leadership": 0.12,
+              "literary": 0.05,
+              "psychology": 0.03
+            }
+          },
+          "preferences": { /* UserSettings schema */ },
+          "ai_usage": {
+            "monthly_cost": 2.15,
+            "monthly_limit": 10.00,
+            "status": "well_within_limits",
+            "trend": "similar_to_last_month"
+          }
+        }
+    """
+    try:
+        # Validate authentication
+        user_id = get_authenticated_user_id(req)
+        
+        # Fetch user profile from Microsoft Entra ID
+        user_info = await entra_service.get_user_info(user_id)
+        
+        # Fetch journey stats from engagement_tracking container
+        journey_stats = await engagement_service.get_user_stats(user_id)
+        
+        # Fetch preferences from user_preferences container
+        preferences = await preferences_service.get_preferences(user_id)
+        
+        # Fetch AI usage from analytics container
+        ai_usage = await analytics_service.get_monthly_usage(user_id)
+        
+        response = {
+            "user": user_info,
+            "journey_stats": journey_stats,
+            "preferences": preferences,
+            "ai_usage": ai_usage
+        }
+        
+        return func.HttpResponse(
+            json.dumps(response),
+            mimetype="application/json",
+            status_code=200
+        )
+    except UnauthorizedError as e:
+        return func.HttpResponse("Unauthorized", status_code=401)
+    except Exception as e:
+        logger.error(f"Get profile error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to fetch profile"}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="user/preferences", methods=["PATCH"], auth_level=func.AuthLevel.FUNCTION)
+async def update_user_preferences(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Update user preferences (partial updates supported)
+    
+    Request Body:
+        {
+          "experience_preferences": { /* partial or full */ },
+          "notification_preferences": { /* partial or full */ },
+          "memory_preferences": { /* partial or full */ }
+        }
+    
+    Returns:
+        {
+          "success": true,
+          "updated_preferences": { /* complete updated preferences */ }
+        }
+    """
+    try:
+        user_id = get_authenticated_user_id(req)
+        data = req.get_json()
+        
+        # Validate preferences schema
+        validated_prefs = validate_preferences_schema(data)
+        
+        # Update preferences in Cosmos DB (partial update)
+        updated_prefs = await preferences_service.update_preferences(
+            user_id, validated_prefs
+        )
+        
+        # Invalidate relevant caches
+        await cache_service.invalidate_user_cache(user_id)
+        
+        # Log preference changes for analytics
+        await analytics_service.log_preference_change(user_id, validated_prefs)
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "updated_preferences": updated_prefs
+            }),
+            mimetype="application/json",
+            status_code=200
+        )
+    except ValidationError as e:
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=400
+        )
+    except Exception as e:
+        logger.error(f"Update preferences error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to update preferences"}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="user/usage-summary", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+async def get_usage_summary(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Get user-friendly AI usage summary with non-technical language
+    
+    Query Parameters:
+        - detailed (boolean): Include technical breakdown for power users
+    
+    Returns:
+        {
+          "monthly_cost": 2.15,
+          "monthly_limit": 10.00,
+          "status": "well_within_limits" | "approaching_limit" | "at_limit",
+          "trend": "similar_to_last_month" | "slightly_higher" | "much_higher",
+          "detailed_breakdown": { /* if requested */ }
+        }
+    """
+    try:
+        user_id = get_authenticated_user_id(req)
+        include_details = req.params.get("detailed", "false").lower() == "true"
+        
+        usage_data = await analytics_service.get_monthly_usage(user_id)
+        
+        # User-friendly status determination
+        usage_percent = (usage_data["monthly_cost"] / usage_data["monthly_limit"]) * 100
+        
+        if usage_percent < 70:
+            status = "well_within_limits"
+        elif usage_percent < 90:
+            status = "approaching_limit"
+        else:
+            status = "at_limit"
+        
+        # Trend analysis (compare to previous month)
+        trend = await analytics_service.get_usage_trend(user_id)
+        
+        response = {
+            "monthly_cost": round(usage_data["monthly_cost"], 2),
+            "monthly_limit": usage_data["monthly_limit"],
+            "status": status,
+            "trend": trend
+        }
+        
+        if include_details:
+            response["detailed_breakdown"] = await analytics_service.get_detailed_usage(user_id)
+        
+        return func.HttpResponse(
+            json.dumps(response),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        logger.error(f"Usage summary error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to fetch usage"}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="user/export", methods=["POST"], auth_level=func.AuthLevel.FUNCTION)
+async def export_user_data(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Generate comprehensive data export for GDPR compliance
+    
+    Returns:
+        {
+          "job_id": "uuid",
+          "status": "processing",
+          "estimated_completion": "ISO timestamp"
+        }
+    
+    Downloads available at: /api/user/export/{job_id}/download
+    """
+    try:
+        user_id = get_authenticated_user_id(req)
+        
+        # Create async export job
+        job_id = await data_export_service.create_export_job(user_id)
+        
+        return func.HttpResponse(
+            json.dumps({
+                "job_id": job_id,
+                "status": "processing",
+                "estimated_completion": (datetime.utcnow() + timedelta(minutes=5)).isoformat()
+            }),
+            mimetype="application/json",
+            status_code=202  # Accepted
+        )
+    except Exception as e:
+        logger.error(f"Data export error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to start export"}),
+            mimetype="application/json",
+            status_code=500
+        )
+
+
+@app.route(route="user/account", methods=["DELETE"], auth_level=func.AuthLevel.FUNCTION)
+async def delete_user_account(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Soft delete user account with data anonymization
+    
+    Request Body:
+        { "confirmation": "DELETE" }
+    
+    Returns:
+        {
+          "success": true,
+          "message": "Account deleted successfully"
+        }
+    """
+    try:
+        user_id = get_authenticated_user_id(req)
+        data = req.get_json()
+        
+        # Require explicit confirmation
+        if data.get("confirmation") != "DELETE":
+            return func.HttpResponse(
+                json.dumps({"error": "Confirmation required"}),
+                mimetype="application/json",
+                status_code=400
+            )
+        
+        # Soft delete with data anonymization
+        await user_management_service.soft_delete_user(user_id)
+        
+        # Send confirmation email
+        await notification_service.send_account_deletion_confirmation(user_id)
+        
+        # Invalidate all sessions
+        await auth_service.revoke_all_user_sessions(user_id)
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "message": "Account deleted successfully"
+            }),
+            mimetype="application/json",
+            status_code=200
+        )
+    except Exception as e:
+        logger.error(f"Account deletion error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Failed to delete account"}),
+            mimetype="application/json",
+            status_code=500
+        )
+```
+
+### 21.4. Database Schema
+
+**user_preferences Container** (Cosmos DB):
+
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "type": "user_preferences",
+  
+  "experience_preferences": {
+    "conversation_style": "balanced",
+    "language": "en",
+    "formality": "respectful",
+    "favorite_personalities": ["einstein", "krishna", "marcus_aurelius"],
+    "theme": "auto",
+    "text_size": "medium",
+    "reduce_animations": false
+  },
+  
+  "notification_preferences": {
+    "daily_wisdom_enabled": true,
+    "preferred_time": "07:00",
+    "timezone": "America/Los_Angeles",
+    "quiet_hours_enabled": true,
+    "quiet_start": "22:00",
+    "quiet_end": "07:00",
+    "types": {
+      "daily_wisdom": true,
+      "streak_reminders": true,
+      "achievements": true,
+      "weekly_summary": false
+    },
+    "notification_permission_status": "granted"
+  },
+  
+  "memory_preferences": {
+    "remember_conversations": true,
+    "connect_insights": true,
+    "track_emotions": true,
+    "suggest_topics": true,
+    "privacy_mode": "standard",
+    "data_retention_days": 90,
+    "analytics_consent": true,
+    "research_consent": false
+  },
+  
+  "created_at": "2025-01-15T10:00:00Z",
+  "updated_at": "2025-08-17T14:30:00Z",
+  "_rid": "...",
+  "_self": "...",
+  "_etag": "...",
+  "_attachments": "attachments/",
+  "_ts": 1692275400
+}
+```
+
+**Indexing Policy** (Cosmos DB):
+```json
+{
+  "indexingMode": "consistent",
+  "automatic": true,
+  "includedPaths": [
+    { "path": "/user_id/?" },
+    { "path": "/experience_preferences/conversation_style/?" },
+    { "path": "/experience_preferences/language/?" },
+    { "path": "/notification_preferences/daily_wisdom_enabled/?" },
+    { "path": "/memory_preferences/privacy_mode/?" },
+    { "path": "/updated_at/?" }
+  ],
+  "excludedPaths": [
+    { "path": "/*" }
+  ]
+}
+```
+
+**Partition Key**: `/user_id` (ensures user isolation and query efficiency)
+
+**TTL**: No TTL (preferences persist indefinitely unless user deletes account)
+
+### 21.5. Backend Service Layer
+
+**PreferencesService** (backend/services/preferences_service.py):
+
+```python
+# backend/services/preferences_service.py
+
+class PreferencesService:
+    def __init__(self, cosmos_client: CosmosClient):
+        self.container = cosmos_client.get_database_client("vimarsh-db") \
+            .get_container_client("user_preferences")
+        self.logger = logging.getLogger(__name__)
+    
+    async def get_preferences(self, user_id: str) -> Dict[str, Any]:
+        """
+        Fetch user preferences or return defaults
+        """
+        try:
+            query = "SELECT * FROM c WHERE c.user_id = @user_id"
+            params = [{"name": "@user_id", "value": user_id}]
+            
+            items = list(self.container.query_items(
+                query=query,
+                parameters=params,
+                enable_cross_partition_query=False
+            ))
+            
+            if items:
+                return items[0]
+            else:
+                # Return defaults for new users
+                return self._get_default_preferences(user_id)
+        
+        except Exception as e:
+            self.logger.error(f"Get preferences error for {user_id}: {e}")
+            raise
+    
+    async def update_preferences(
+        self, user_id: str, updates: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Update user preferences (partial updates supported)
+        """
+        try:
+            # Fetch existing preferences
+            existing_prefs = await self.get_preferences(user_id)
+            
+            # Merge updates (deep merge for nested objects)
+            merged_prefs = self._deep_merge(existing_prefs, updates)
+            merged_prefs["updated_at"] = datetime.utcnow().isoformat()
+            
+            # Upsert to Cosmos DB
+            result = self.container.upsert_item(merged_prefs)
+            
+            self.logger.info(f"Updated preferences for user {user_id}")
+            return result
+        
+        except Exception as e:
+            self.logger.error(f"Update preferences error for {user_id}: {e}")
+            raise
+    
+    def _get_default_preferences(self, user_id: str) -> Dict[str, Any]:
+        """
+        Return default preferences for new users
+        """
+        return {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "type": "user_preferences",
+            "experience_preferences": {
+                "conversation_style": "balanced",
+                "language": "en",
+                "formality": "respectful",
+                "favorite_personalities": [],
+                "theme": "auto",
+                "text_size": "medium",
+                "reduce_animations": False
+            },
+            "notification_preferences": {
+                "daily_wisdom_enabled": False,
+                "preferred_time": "07:00",
+                "timezone": "UTC",
+                "quiet_hours_enabled": True,
+                "quiet_start": "22:00",
+                "quiet_end": "07:00",
+                "types": {
+                    "daily_wisdom": True,
+                    "streak_reminders": True,
+                    "achievements": True,
+                    "weekly_summary": False
+                },
+                "notification_permission_status": "default"
+            },
+            "memory_preferences": {
+                "remember_conversations": True,
+                "connect_insights": True,
+                "track_emotions": True,
+                "suggest_topics": True,
+                "privacy_mode": "standard",
+                "data_retention_days": 90,
+                "analytics_consent": True,
+                "research_consent": False
+            },
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+    
+    def _deep_merge(self, base: Dict, updates: Dict) -> Dict:
+        """
+        Deep merge updates into base dictionary
+        """
+        result = base.copy()
+        for key, value in updates.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._deep_merge(result[key], value)
+            else:
+                result[key] = value
+        return result
+```
+
+### 21.6. Integration with Existing Systems
+
+**Memory System Integration**:
+```python
+# backend/services/enhanced_service.py
+
+class EnhancedMultiDomainGuidanceService:
+    async def generate_guidance(self, query: str, personality: str, user_id: str):
+        # Fetch user preferences
+        prefs = await self.preferences_service.get_preferences(user_id)
+        
+        # Apply conversation style preference
+        style_modifier = self._get_style_modifier(
+            prefs["experience_preferences"]["conversation_style"]
+        )
+        
+        # Apply formality preference
+        formality_modifier = self._get_formality_modifier(
+            prefs["experience_preferences"]["formality"]
+        )
+        
+        # Check memory preferences before retrieving context
+        if prefs["memory_preferences"]["privacy_mode"] == "minimal":
+            memory_context = None
+        elif prefs["memory_preferences"]["privacy_mode"] == "private":
+            memory_context = await self._get_limited_memory(user_id, personality)
+        else:  # standard
+            memory_context = await self._get_full_memory(user_id, personality)
+        
+        # Generate response with preferences applied
+        response = await self._generate_with_preferences(
+            query, personality, style_modifier, formality_modifier, memory_context
+        )
+        
+        return response
+```
+
+**Notification System Integration**:
+```python
+# backend/notifications/notification_service.py
+
+class NotificationService:
+    async def schedule_daily_wisdom(self, user_id: str):
+        # Fetch notification preferences
+        prefs = await self.preferences_service.get_preferences(user_id)
+        notif_prefs = prefs["notification_preferences"]
+        
+        if not notif_prefs["daily_wisdom_enabled"]:
+            return
+        
+        # Schedule notification respecting quiet hours
+        scheduled_time = self._calculate_next_send_time(
+            notif_prefs["preferred_time"],
+            notif_prefs["timezone"],
+            notif_prefs["quiet_hours_enabled"],
+            notif_prefs["quiet_start"],
+            notif_prefs["quiet_end"]
+        )
+        
+        await self.scheduler.schedule_notification(user_id, scheduled_time)
+```
+
+**Header Navigation Integration**:
+```typescript
+// frontend/src/components/GuidanceInterface.tsx
+
+const GuidanceInterface: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  return (
+    <header className="vimarsh-header">
+      {/* Memory indicator */}
+      <MemoryIndicator />
+      
+      {/* Streak display */}
+      <StreakDisplay />
+      
+      {/* Settings icon (replaces Archive button) */}
+      <button
+        onClick={() => navigate('/settings')}
+        className="header-icon-button"
+        aria-label="Settings"
+      >
+        <Settings className="w-5 h-5" />
+      </button>
+      
+      {/* Admin button (if admin user) */}
+      {user?.isAdmin && (
+        <button
+          onClick={() => navigate('/admin')}
+          className="header-icon-button"
+          aria-label="Admin Dashboard"
+        >
+          <Shield className="w-5 h-5" />
+        </button>
+      )}
+      
+      {/* Logout button */}
+      <button onClick={handleLogout} className="header-icon-button" aria-label="Logout">
+        <LogOut className="w-5 h-5" />
+      </button>
+    </header>
+  );
+};
+```
+
+### 21.7. Performance Requirements
+
+**Frontend Performance Targets**:
+```
+Metric                          | Target          | Measurement Method
+--------------------------------|-----------------|-------------------
+Settings page initial load      | <800ms          | Lighthouse Performance
+Tab switch response time        | <100ms          | React DevTools Profiler
+Auto-save debounce delay        | 500ms           | User preference update latency
+Preference update API call      | <200ms          | Application Insights
+Optimistic UI update            | Immediate       | User perception
+Mobile responsiveness           | <16ms frame     | Chrome DevTools Performance
+Accessibility score             | >95/100         | Lighthouse Accessibility
+```
+
+**Backend Performance Targets**:
+```
+Metric                          | Target          | Measurement Method
+--------------------------------|-----------------|-------------------
+GET /api/user/profile           | <300ms          | Application Insights
+PATCH /api/user/preferences     | <200ms          | Application Insights
+Cosmos DB query latency         | <100ms          | Cosmos DB metrics
+Cache hit rate for preferences  | >80%            | Redis/Azure Cache metrics
+Concurrent user support         | 1000+ users     | Load testing
+API rate limit                  | 100 req/min     | Azure API Management
+```
+
+### 21.8. Testing Strategy
+
+**Unit Tests**:
+```typescript
+// frontend/src/components/__tests__/UserSettings.test.tsx
+
+describe('UserSettings Page', () => {
+  it('renders all 6 tabs', () => {
+    render(<UserSettings />);
+    expect(screen.getByText('My Profile')).toBeInTheDocument();
+    expect(screen.getByText('Experience')).toBeInTheDocument();
+    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Memory & Privacy')).toBeInTheDocument();
+    expect(screen.getByText('Account')).toBeInTheDocument();
+  });
+  
+  it('auto-saves preferences after 500ms', async () => {
+    const mockUpdate = jest.fn();
+    render(<ExperienceTab onUpdate={mockUpdate} />);
+    
+    // Change conversation style
+    fireEvent.click(screen.getByLabelText('Detailed & Deep'));
+    
+    // Wait for debounce
+    await waitFor(() => {
+      expect(mockUpdate).toHaveBeenCalledWith({
+        experience_preferences: { conversation_style: 'detailed' }
+      });
+    }, { timeout: 600 });
+  });
+  
+  it('requires DELETE confirmation for account deletion', async () => {
+    render(<AccountTab />);
+    
+    fireEvent.click(screen.getByText('Delete Account'));
+    
+    // Modal appears
+    expect(screen.getByText('Type DELETE to confirm')).toBeInTheDocument();
+    
+    // Button disabled until confirmation typed
+    const deleteButton = screen.getByText('Delete My Account Forever');
+    expect(deleteButton).toBeDisabled();
+    
+    // Type confirmation
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'DELETE' } });
+    expect(deleteButton).toBeEnabled();
+  });
+});
+```
+
+**Integration Tests**:
+```python
+# backend/tests/test_preferences_api.py
+
+import pytest
+from function_app import app
+
+class TestPreferencesAPI:
+    @pytest.mark.asyncio
+    async def test_get_user_profile_success(self, authenticated_request):
+        req = authenticated_request(user_id="test-user-123")
+        response = await app.get_user_profile(req)
+        
+        assert response.status_code == 200
+        data = json.loads(response.get_body())
+        assert "user" in data
+        assert "journey_stats" in data
+        assert "preferences" in data
+        assert "ai_usage" in data
+    
+    @pytest.mark.asyncio
+    async def test_update_preferences_partial(self, authenticated_request):
+        req = authenticated_request(
+            user_id="test-user-123",
+            body={"experience_preferences": {"conversation_style": "detailed"}}
+        )
+        response = await app.update_user_preferences(req)
+        
+        assert response.status_code == 200
+        data = json.loads(response.get_body())
+        assert data["success"] is True
+        assert data["updated_preferences"]["experience_preferences"]["conversation_style"] == "detailed"
+    
+    @pytest.mark.asyncio
+    async def test_favorite_personalities_limit(self, authenticated_request):
+        # Attempt to save 6 favorites (limit is 5)
+        req = authenticated_request(
+            user_id="test-user-123",
+            body={
+                "experience_preferences": {
+                    "favorite_personalities": ["einstein", "krishna", "marcus", "buddha", "newton", "tesla"]
+                }
+            }
+        )
+        response = await app.update_user_preferences(req)
+        
+        assert response.status_code == 400
+        data = json.loads(response.get_body())
+        assert "maximum 5 favorites" in data["error"].lower()
+```
+
+**End-to-End Tests** (Playwright):
+```typescript
+// e2e/settings.spec.ts
+
+test.describe('Settings Page E2E', () => {
+  test('complete settings configuration flow', async ({ page }) => {
+    // Login
+    await page.goto('/');
+    await page.click('text=Sign In / Sign Up');
+    // Microsoft Entra ID auth flow
+    await page.waitForURL('/guidance');
+    
+    // Navigate to Settings
+    await page.click('button[aria-label="Settings"]');
+    await page.waitForURL('/settings');
+    
+    // My Profile tab (default)
+    await expect(page.locator('text=Your Wisdom Journey')).toBeVisible();
+    await expect(page.locator('text=Current streak')).toBeVisible();
+    
+    // Experience tab
+    await page.click('text=Experience');
+    await page.click('text=Detailed & Deep');
+    await expect(page.locator('text=✓ Saved')).toBeVisible({ timeout: 1000 });
+    
+    // Notifications tab
+    await page.click('text=Notifications');
+    await page.click('input[type="checkbox"]#daily-wisdom');
+    await page.selectOption('select#preferred-time', 'Morning (7:00 AM)');
+    await expect(page.locator('text=✓ Saved')).toBeVisible({ timeout: 1000 });
+    
+    // Memory & Privacy tab
+    await page.click('text=Memory & Privacy');
+    await page.click('input[type="radio"]#privacy-private');
+    await expect(page.locator('text=✓ Saved')).toBeVisible({ timeout: 1000 });
+    
+    // Verify quick access links work
+    await page.click('text=My Profile');
+    await page.click('text=Wisdom Archive');
+    await page.waitForURL('/wisdom/archive');
+  });
+});
+```
+
+### 21.9. Security Considerations
+
+**Authentication & Authorization**:
+- All Settings API endpoints require `auth_level=func.AuthLevel.FUNCTION` (JWT validation)
+- User can only access their own preferences (user_id from JWT claims)
+- Admin users cannot access other users' settings without explicit audit logging
+
+**Data Privacy**:
+- Preferences stored with user_id partition key (isolation guarantee)
+- Privacy mode respected across all services (memory, analytics, notifications)
+- Data retention policy enforced via Cosmos DB TTL and cleanup jobs
+- GDPR compliance: export and delete account functionality
+
+**Input Validation**:
+- Zod schema validation on frontend before submission
+- Backend validates all preference updates against defined schema
+- Favorite personalities limited to 5 items (enforced both frontend and backend)
+- Data retention days must be within allowed range (30-365 days)
+
+**Rate Limiting**:
+```python
+# backend/middleware/rate_limiter.py
+
+@rate_limit(max_requests=100, window_minutes=1)
+async def update_user_preferences(req: func.HttpRequest):
+    # Prevents abuse of auto-save functionality
+    pass
+```
+
+### 21.10. Success Metrics
+
+**Feature Adoption**:
+```
+Metric                               | Target        | Tracking Method
+-------------------------------------|---------------|----------------
+Settings page visits (7-day)         | 60% of users  | Azure Application Insights
+Profile tab engagement               | 80% of visitors| Tab analytics
+Preference customization             | 40% modify ≥1 | Cosmos DB change tracking
+Quick Access CTR                     | 30% click-through| Link click tracking
+Notification configuration           | 50% enable    | Preference field tracking
+Privacy settings review              | 20% view tab  | Tab analytics
+AI usage transparency expansion      | 15% expand    | Component interaction tracking
+```
+
+**User Satisfaction**:
+```
+Metric                               | Target        | Measurement
+-------------------------------------|---------------|----------------
+Settings page usability score        | >4.0/5.0      | In-app survey
+Feature discoverability improvement  | 50% increase  | A/B testing vs control
+Auto-save satisfaction               | >90% positive | User feedback
+Mobile responsiveness rating         | >4.2/5.0      | PWA-specific survey
+```
+
+**Technical Performance**:
+```
+Metric                               | Target        | Monitoring Tool
+-------------------------------------|---------------|----------------
+Settings page load time              | <800ms        | Lighthouse
+Preference update latency            | <200ms        | Application Insights
+Cache hit rate (preferences)         | >80%          | Redis metrics
+API error rate                       | <0.5%         | Application Insights
+Auto-save success rate               | >99%          | Custom telemetry
+```
+
+This comprehensive Settings & Preferences Management architecture provides a centralized, user-friendly interface for managing all aspects of the Vimarsh wisdom journey while maintaining enterprise-grade security, performance, and scalability.
+
+---
+
 This technical specification reflects the current production state of Vimarsh as a mature, scalable, and cost-effective multi-personality wisdom platform serving users globally with enterprise-grade reliability and performance.
 
 ---

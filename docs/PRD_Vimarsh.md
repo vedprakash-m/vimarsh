@@ -753,6 +753,260 @@ Users who become inactive often don't return, representing lost potential for me
 
 ---
 
+### 6.3.9. User Settings & Preferences Management (NEW)
+
+**Problem Addressed:**
+Users lack a centralized location to manage their experience, preferences, and account settings. Current settings are scattered across multiple interfaces (notifications, memory, privacy), making it difficult to discover and customize their Vimarsh journey. This fragmentation creates cognitive overload, reduces user autonomy, and limits personalization opportunities.
+
+**Solution: Unified Mobile-First Settings Hub**
+
+The Settings Page consolidates all user preferences, profile information, and account management into a single, discoverable location accessed via a universal settings icon in the header navigation.
+
+**Strategic Product Goals:**
+1. **Reduce Cognitive Load**: Single destination for all customization needs
+2. **Increase Discoverability**: Make features like Memory Dashboard, Progress, and Archive more visible
+3. **Empower Users**: Provide meaningful control over their wisdom journey
+4. **Build Trust**: Transparent data usage and privacy controls
+5. **Drive Engagement**: Usage insights that motivate continued interaction
+6. **Support Adoption**: Familiar pattern (every app has Settings) reduces friction
+
+**Core Feature Requirements:**
+
+**6.3.9.1. My Profile Tab** (User Identity & Journey Stats)
+
+**Account Information** (Read-only from Microsoft Entra ID):
+- Display name, email, profile picture
+- Member since date
+- Account status (Free/Premium tiers for future)
+
+**Your Wisdom Journey** (User-Friendly Engagement Metrics):
+- Current streak with fire emoji visualization
+- Total conversations (not "queries" - user-friendly language)
+- Achievements unlocked with visual badges
+- Wisdom level (e.g., "Level 3 - Devoted Seeker")
+- Domain exploration progress visualization
+
+**AI Usage Transparency** (Non-Technical, Value-Focused):
+- Monthly AI usage presented as "covered cost" (e.g., "$2.15 covered for you this month")
+- Usage trend: "Similar to last month" or "Slightly higher than usual"
+- Status indicator: "✅ Well within limits" vs "⚠️ Approaching limit"
+- Optional detailed breakdown link (for power users only)
+- Clear messaging: Frame as platform investment in user's wisdom journey
+
+**Quick Access Navigation:**
+- Direct links to Wisdom Archive (past conversations & bookmarks)
+- Memory Dashboard (relationship states with personalities)
+- Progress Dashboard (streaks, achievements, levels)
+
+**6.3.9.2. Experience Tab** (Conversation Preferences)
+
+**Conversation Style** (How personalities respond):
+- **Brief & Direct**: Quick answers for specific questions
+- **Balanced**: Moderate depth with context (default, recommended)
+- **Detailed & Deep**: Comprehensive wisdom with extended exploration
+- Visual examples showing difference in response length/depth
+
+**Response Preferences**:
+- **Language**: English / Hindi dropdown (affects personality responses)
+- **Formality**: Dropdown with options
+  - Very Formal (maximum respect, traditional address)
+  - Respectful & Warm (balanced, recommended)
+  - Friendly (approachable, conversational)
+  - Casual (modern, relaxed tone)
+
+**Favorite Personalities** (Max 5 for prioritization):
+- Checkbox list of all 25 personalities grouped by domain
+- Selected personalities appear first in personality selector
+- Help text: "Select personalities you visit most often for quick access"
+
+**Appearance** (Visual Preferences):
+- Theme: Light / Auto / Dark (with system sync)
+- Text size: Small / Medium (default) / Large with live preview
+- Reduce animations checkbox (accessibility/preference)
+
+**6.3.9.3. Notifications Tab** (Engagement Preferences)
+
+**Daily Wisdom** (Main engagement driver):
+- Master toggle: On/Off with clear value proposition
+- Time selection: Dropdown with presets (Morning 7AM, Midday 12PM, Evening 6PM) or custom time picker
+- Timezone: Auto-detect with manual override dropdown
+
+**Quiet Hours** (Respect user boundaries):
+- Enable/disable toggle
+- Start time (default: 10:00 PM)
+- End time (default: 7:00 AM)
+- Help text: "No notifications during sleep hours"
+
+**Notification Types** (Granular control):
+- ✅ Daily wisdom quote (checked by default)
+- ✅ Streak reminders (when you might miss a day - checked by default)
+- ✅ Achievement unlocks (checked by default)
+- ⬜ Weekly summary email (opt-in)
+
+**Test Controls**:
+- "Send Test Notification" button for verification
+- Clear permission status display ("Enabled" / "Blocked - Enable in browser settings")
+
+**6.3.9.4. Memory & Privacy Tab** (Data Control)
+
+**Memory Features** (Personalization controls):
+- ✅ Remember my conversations across sessions (default on)
+- ✅ Connect insights across different personalities (default on)
+- ✅ Track my emotional journey (default on)
+- ✅ Suggest topics based on my interests (default on)
+
+**Privacy Mode** (Three tiers matching existing MemorySettingsPanel):
+- ○ **Standard** (default): Full memory features for personalized wisdom
+  - "Your conversations help build personalized guidance tailored to your journey"
+- ○ **Private**: Limited memory, enhanced privacy
+  - "Basic context only, reduced personalization for more privacy"
+- ○ **Minimal**: No persistent memory
+  - "Fresh start each session, maximum privacy"
+
+**Data & Privacy Transparency**:
+- ✅ Anonymous analytics (helps improve Vimarsh - default on)
+- ✅ Store my conversations (required for memory features)
+- ⬜ Share anonymized data for research (opt-in)
+
+**Data Management Actions**:
+- **Export My Data**: Download all conversations, bookmarks, preferences (GDPR compliance)
+- **Clear My History**: Start fresh (with confirmation dialog)
+- **Data Retention**: Dropdown selector (30 days / 90 days (default) / 180 days / 1 year)
+
+**6.3.9.5. Account Tab** (Account Management)
+
+**Subscription Information** (Future Premium Tier Support):
+- Current plan: Free Tier (with feature list)
+- AI usage: "$2.15 / $10 monthly credit" with progress bar
+- Upgrade CTA: "Upgrade to Premium →" (when implemented)
+
+**Account Security**:
+- Change password button (if not SSO only)
+- Connected apps: Manage vedprakash.net integrations
+- Active sessions: View and manage devices
+
+**Data Portability**:
+- Download all data button (comprehensive export)
+- Import data option (for migration scenarios)
+
+**Account Actions**:
+- **Delete Account**: Prominent warning, requires confirmation
+  - Warning: "This will permanently delete all your conversations, progress, and preferences"
+  - Confirmation step: Type "DELETE" to confirm
+- **Log Out**: Standard logout action
+
+**Design Principles for Settings:**
+
+1. **Mobile-First**: Horizontal scrolling tabs optimized for touch
+2. **Progressive Disclosure**: Simple options visible, advanced tucked away
+3. **Clear Labeling**: No technical jargon (tokens → covered costs, queries → conversations)
+4. **Immediate Feedback**: Changes save automatically with confirmation toast
+5. **Contextual Help**: Inline help text explaining impact of each setting
+6. **Safe Defaults**: Pre-selected options that work for 80% of users
+7. **Reversible Actions**: Easy undo/reset except for destructive actions
+8. **Accessibility**: Full keyboard navigation, screen reader support
+
+**Technical Requirements:**
+
+**Frontend**:
+- New route: `/settings` (protected, requires authentication)
+- Tab-based navigation component (6 tabs: Profile, Experience, Notifications, Memory & Privacy, Quick Access, Account)
+- Integration with existing context providers (Auth, Memory, Notifications)
+- Form state management with auto-save (debounced 500ms)
+- Optimistic UI updates with error rollback
+- Mobile-responsive with horizontal tab scrolling
+
+**Backend**:
+- `GET /api/user/profile` - Fetch complete user profile with preferences
+- `PATCH /api/user/preferences` - Update user preferences (partial updates)
+- `GET /api/user/usage-summary` - Get user-friendly usage statistics
+- `POST /api/user/export` - Generate data export (async job)
+- `DELETE /api/user/account` - Soft delete with data anonymization
+
+**Database Schema Updates** (Cosmos DB user_preferences container):
+```javascript
+{
+  user_id: string,
+  experience_preferences: {
+    conversation_style: "brief" | "balanced" | "detailed",
+    language: "en" | "hi",
+    formality: "very_formal" | "respectful" | "friendly" | "casual",
+    favorite_personalities: string[], // max 5
+    theme: "light" | "auto" | "dark",
+    text_size: "small" | "medium" | "large",
+    reduce_animations: boolean
+  },
+  notification_preferences: {
+    daily_wisdom_enabled: boolean,
+    preferred_time: string, // HH:MM format
+    timezone: string,
+    quiet_hours_enabled: boolean,
+    quiet_start: string, // HH:MM
+    quiet_end: string, // HH:MM
+    types: {
+      daily_wisdom: boolean,
+      streak_reminders: boolean,
+      achievements: boolean,
+      weekly_summary: boolean
+    }
+  },
+  memory_preferences: {
+    remember_conversations: boolean,
+    connect_insights: boolean,
+    track_emotions: boolean,
+    suggest_topics: boolean,
+    privacy_mode: "standard" | "private" | "minimal",
+    data_retention_days: number,
+    analytics_consent: boolean,
+    research_consent: boolean
+  },
+  updated_at: timestamp
+}
+```
+
+**Success Metrics:**
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Settings page discovery | 60% of users visit within 7 days | Analytics tracking |
+| Profile customization | 40% users modify at least 1 preference | User preferences table |
+| Quick Access usage | 30% use links to Archive/Memory/Progress | Click-through tracking |
+| Privacy control engagement | 20% review privacy settings | Settings tab analytics |
+| Feature discoverability | 50% increase in Memory Dashboard visits | Referral source tracking |
+
+**User Stories:**
+
+1. **As a new user**, I want to see my journey stats and progress, so I feel motivated to continue engaging
+2. **As a privacy-conscious user**, I want to control what data is remembered, so I feel safe using the platform
+3. **As a mobile user**, I want easy access to past conversations, so I can review and share wisdom on-the-go
+4. **As a multilingual user**, I want to change language preferences, so I can learn in my preferred language
+5. **As a returning user**, I want to see my AI usage transparently, so I understand platform costs and limits
+6. **As a power user**, I want to customize conversation depth, so responses match my learning style
+7. **As a forgetful user**, I want streak reminders and quiet hours, so I stay engaged without disruption
+
+**Integration with Existing Features:**
+
+- **Onboarding**: Capture initial preferences during wizard, pre-populate Settings
+- **Memory Dashboard**: Link from Quick Access, respect privacy settings
+- **Progress Dashboard**: Link from Quick Access, show achievements in Profile
+- **Wisdom Archive**: Link from Quick Access, respect data retention settings
+- **Notifications**: Consolidate existing notification UI into Settings
+- **Header Navigation**: Replace scattered buttons with single ⚙️ Settings icon
+- **Admin Panel**: Track Settings page usage and preference distributions
+
+**Competitive Differentiation:**
+
+Unlike generic chatbots, Vimarsh's Settings page:
+- Frames AI usage as "investment in your wisdom journey" (positive framing)
+- Connects preferences to personality authenticity (formality affects historical accuracy)
+- Links settings to cross-session memory (transparent about personalization)
+- Provides domain-specific customization (favorite personalities by field)
+- Offers granular privacy controls (respecting cultural sensitivities around data)
+
+This Settings infrastructure positions Vimarsh for future premium tiers, enterprise features, and advanced personalization while maintaining current simplicity and focus.
+
+---
+
 ### 6.4. User Acquisition Strategy:
 
 **Educational Institutions:**
