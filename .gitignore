@@ -141,6 +141,11 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# Test scripts with credentials (never commit these)
+scripts/test_azure_openai_prod.py
+scripts/diagnose_production_rag.py
+scripts/check_azure_config.sh
+
 # ===========================
 # Node.js / JavaScript
 # ===========================

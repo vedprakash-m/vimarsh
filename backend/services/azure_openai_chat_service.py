@@ -7,7 +7,7 @@ import os
 import time
 import logging
 from typing import List, Dict, Any, Optional
-from openai import AzureOpenAI
+from openai import OpenAI
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -31,11 +31,12 @@ class AzureOpenAIChatService:
         self.test_mode = test_mode
         
         # Configuration
-        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/')
+        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/openai/v1')
         self.api_key = os.getenv('AZURE_OPENAI_CHAT_API_KEY', '')
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
         self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-5-mini')
-        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-06-01')
+        # Use 2024-02-15-preview for gpt-5-mini/o1-mini compatibility
+        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-02-15-preview')
         
         # Retry configuration
         self.max_retries = 5
@@ -48,10 +49,9 @@ class AzureOpenAIChatService:
                 raise ValueError("AZURE_OPENAI_CHAT_API_KEY is required")
             
             try:
-                self.client = AzureOpenAI(
+                self.client = OpenAI(
                     api_key=self.api_key,
-                    api_version=self.api_version,
-                    azure_endpoint=self.endpoint
+                    base_url=self.endpoint
                 )
                 logger.info(f"✅ Azure OpenAI Chat service initialized: {self.deployment_name}")
             except Exception as e:
