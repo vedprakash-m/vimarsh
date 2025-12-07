@@ -20,12 +20,12 @@ from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 
 try:
-    from openai import AzureOpenAI
+    from openai import OpenAI
     from openai import OpenAIError, RateLimitError, APIError
     AZURE_OPENAI_AVAILABLE = True
 except ImportError:
     AZURE_OPENAI_AVAILABLE = False
-    AzureOpenAI = None
+    OpenAI = None
     OpenAIError = Exception
     RateLimitError = Exception
     APIError = Exception
@@ -140,10 +140,23 @@ class AzureOpenAIEmbeddingService:
         self.dimensions = dimensions
         
         # Get configuration from environment or parameters
-        self.endpoint = endpoint or os.getenv('AZURE_OPENAI_ENDPOINT', '')
-        self.api_key = api_key or os.getenv('AZURE_OPENAI_API_KEY', '')
+        # Support both AZURE_OPENAI_* and AZURE_OPENAI_EMBEDDING_* naming conventions
+        self.endpoint = (
+            endpoint or 
+            os.getenv('AZURE_OPENAI_ENDPOINT', '') or 
+            os.getenv('AZURE_OPENAI_EMBEDDING_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/openai/v1')
+        )
+        self.api_key = (
+            api_key or 
+            os.getenv('AZURE_OPENAI_API_KEY', '') or 
+            os.getenv('AZURE_OPENAI_EMBEDDING_API_KEY', '')
+        )
         self.deployment_name = deployment_name or os.getenv('AZURE_OPENAI_EMBEDDING_DEPLOYMENT', 'vimarsh-embedding-large')
-        self.api_version = api_version or os.getenv('AZURE_OPENAI_API_VERSION', '2024-08-01-preview')
+        self.api_version = (
+            api_version or 
+            os.getenv('AZURE_OPENAI_API_VERSION', '') or 
+            os.getenv('AZURE_OPENAI_EMBEDDING_API_VERSION', '2024-08-01-preview')
+        )
         
         # Validate configuration
         if not self.test_mode:
@@ -174,10 +187,10 @@ class AzureOpenAIEmbeddingService:
     def _initialize_client(self):
         """Initialize Azure OpenAI client"""
         try:
-            self.client = AzureOpenAI(
-                azure_endpoint=self.endpoint,
+            self.client = OpenAI(
+                base_url=self.endpoint,
                 api_key=self.api_key,
-                api_version=self.api_version
+                default_headers={"api-version": self.api_version}
             )
             logger.info(f"✅ Azure OpenAI embedding service initialized")
             logger.info(f"   Deployment: {self.deployment_name}")
