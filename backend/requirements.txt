@@ -17,7 +17,7 @@ cryptography==41.0.7
 
 # AI/ML Libraries (Essential only)
 google-generativeai==0.7.2  # For generation model (Gemini 2.5 Flash)
-openai>=1.10.0  # For Azure OpenAI embeddings (text-embedding-3-large)
+openai>=1.54.0  # For Azure OpenAI chat and embeddings (supports max_completion_tokens for o1-series)
 numpy>=1.21.0  # Required for vector similarity calculations (lightweight)
 
 # Content Sourcing Dependencies

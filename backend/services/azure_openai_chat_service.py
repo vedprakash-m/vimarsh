@@ -1,5 +1,5 @@
 """
-Azure OpenAI Chat Service for ChatGPT-5-mini
+Azure OpenAI Chat Service for GPT-5-mini and other chat models
 Handles chat completion with retry logic and error handling
 """
 
@@ -24,7 +24,7 @@ class ChatResponse:
 
 
 class AzureOpenAIChatService:
-    """Azure OpenAI ChatGPT-5-mini chat service with retry logic"""
+    """Azure OpenAI chat service with retry logic for GPT models"""
     
     def __init__(self, test_mode: bool = False):
         """Initialize Azure OpenAI chat service"""
@@ -34,9 +34,8 @@ class AzureOpenAIChatService:
         self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/openai/v1')
         self.api_key = os.getenv('AZURE_OPENAI_CHAT_API_KEY', '')
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
-        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'o1-mini')
-        # Use API version that supports o1-series models
-        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-09-01-preview')
+        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-5-mini')
+        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-02-15-preview')
         
         # Retry configuration
         self.max_retries = 5
@@ -71,9 +70,9 @@ class AzureOpenAIChatService:
         
         Args:
             messages: List of message dicts with 'role' and 'content'
-            temperature: Randomness (0-2) - NOT used for o1-series models
-            max_tokens: Maximum response tokens (mapped to max_completion_tokens for o1-series)
-            top_p: Nucleus sampling - NOT used for o1-series models
+            temperature: Randomness (0-2) for response generation
+            max_tokens: Maximum output tokens (mapped to max_output_tokens for Azure OpenAI)
+            top_p: Nucleus sampling parameter
             
         Returns:
             ChatResponse with text and metadata
@@ -86,12 +85,13 @@ class AzureOpenAIChatService:
         
         for attempt in range(self.max_retries):
             try:
-                # O1-series models (o1-preview/o1-mini) require max_completion_tokens
-                # and do NOT support temperature/top_p parameters
+                # Azure OpenAI Chat Completions API uses max_output_tokens
                 response = self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=messages,
-                    max_completion_tokens=max_tokens
+                    max_output_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p
                 )
                 
                 response_time = time.time() - start_time
@@ -131,7 +131,7 @@ class AzureOpenAIChatService:
     def _generate_test_response(self, messages: List[Dict[str, str]]) -> ChatResponse:
         """Generate test response for unit testing"""
         return ChatResponse(
-            text="This is a test response from Azure OpenAI ChatGPT-5-mini",
+            text="This is a test response from Azure OpenAI GPT-5-mini",
             model=self.model_name,
             tokens_used=100,
             finish_reason="stop",
@@ -140,7 +140,7 @@ class AzureOpenAIChatService:
     
     def calculate_cost(self, tokens: int) -> float:
         """
-        Calculate cost for ChatGPT-5-mini
+        Calculate cost for GPT-5-mini
         Pricing: $0.69/1M tokens (approximate)
         
         Args:

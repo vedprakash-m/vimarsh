@@ -534,7 +534,7 @@ RESPONSE REQUIREMENTS:
 Respond now in character:
 """
             
-            # Step 4: Generate response using Azure OpenAI ChatGPT-5-mini
+            # Step 4: Generate response using Azure OpenAI GPT-5-mini
             try:
                 from services.azure_openai_chat_service import get_azure_chat_service
                 
