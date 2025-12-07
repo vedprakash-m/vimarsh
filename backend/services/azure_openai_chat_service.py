@@ -31,11 +31,11 @@ class AzureOpenAIChatService:
         self.test_mode = test_mode
         
         # Configuration
-        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/')
+        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com')
         self.api_key = os.getenv('AZURE_OPENAI_CHAT_API_KEY', '')
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
         self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-5-mini')
-        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-02-15-preview')
+        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-08-01-preview')
         
         # Retry configuration
         self.max_retries = 5
@@ -71,7 +71,7 @@ class AzureOpenAIChatService:
         Args:
             messages: List of message dicts with 'role' and 'content'
             temperature: Randomness (0-2) for response generation
-            max_tokens: Maximum output tokens (mapped to max_output_tokens for Azure OpenAI)
+            max_tokens: Maximum output tokens (mapped to max_completion_tokens for GPT-5-mini)
             top_p: Nucleus sampling parameter
             
         Returns:
@@ -85,13 +85,12 @@ class AzureOpenAIChatService:
         
         for attempt in range(self.max_retries):
             try:
-                # Standard OpenAI chat completions API
+                # GPT-5-mini: only supports max_completion_tokens, temperature=1, no top_p
                 response = self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=messages,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                    top_p=top_p
+                    max_completion_tokens=max_tokens,
+                    temperature=1  # GPT-5-mini only supports temperature=1
                 )
                 
                 response_time = time.time() - start_time

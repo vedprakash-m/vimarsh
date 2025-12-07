@@ -88,9 +88,23 @@ class LLMService:
             try:
                 # Try to get personalities from database using async in sync context
                 import asyncio
-                loop = asyncio.new_event_loop()
+                
+                # Check if event loop is already running (Azure Functions context)
                 try:
-                    asyncio.set_event_loop(loop)
+                    loop = asyncio.get_running_loop()
+                    # Loop is running - cannot use run_until_complete
+                    # This is expected in Azure Functions - use hardcoded personalities
+                    self.logger.info("ℹ️ Running in async context, using hardcoded personalities")
+                    self.personalities = self._get_hardcoded_personalities()
+                    return
+                except RuntimeError:
+                    # No running loop - safe to create new one
+                    pass
+                
+                # Create and use new event loop
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
                     database_personalities = loop.run_until_complete(
                         self.database_personality_service.get_all_personalities()
                     )
