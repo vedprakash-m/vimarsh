@@ -575,13 +575,24 @@ RESPONSE REQUIREMENTS:
 Respond now in character:
 """
             
-            # Step 4: Generate response using Gemini
+            # Step 4: Generate response using Azure OpenAI GPT-5-mini
             try:
-                model = genai.GenerativeModel(self.generation_model)
-                response = model.generate_content(enhanced_prompt)
+                from services.azure_openai_chat_service import get_azure_chat_service
                 
-                if response and response.text:
-                    content = response.text.strip()
+                chat_service = get_azure_chat_service()
+                messages = [
+                    {"role": "system", "content": "You are a helpful AI assistant embodying historical personalities."},
+                    {"role": "user", "content": enhanced_prompt}
+                ]
+                
+                chat_response = chat_service.generate_response(
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=2000
+                )
+                
+                if chat_response and chat_response.text:
+                    content = chat_response.text.strip()
                     
                     # Log response length for monitoring
                     max_chars = 1000  # Increased to 1000 for comprehensive responses
@@ -603,27 +614,29 @@ Respond now in character:
                         rag_context=rag_context,
                         confidence_score=confidence_score,
                         content_backed=content_backed,
-                        response_source="enhanced_rag_gemini",
+                        response_source="enhanced_rag_azure_openai",
                         metadata={
                             "chunks_used": len(rag_context.relevant_chunks),
                             "avg_similarity": rag_context.avg_similarity_score,
                             "retrieval_method": rag_context.retrieval_method,
-                            "citations": rag_context.citations
+                            "citations": rag_context.citations,
+                            "model": chat_response.model,
+                            "tokens_used": chat_response.tokens_used
                         }
                     )
                     
-                    logger.info(f"✅ Generated enhanced RAG response: {len(content)} chars, confidence: {confidence_score:.3f}")
+                    logger.info(f"✅ Generated enhanced RAG response: {len(content)} chars, confidence: {confidence_score:.3f}, tokens: {chat_response.tokens_used}")
                     return enhanced_response
                     
                 else:
-                    raise Exception("No response generated from Gemini")
+                    raise Exception("No response generated from Azure OpenAI")
                     
             except Exception as generation_error:
                 logger.error(f"❌ Response generation failed: {generation_error}")
                 
-                # Check if it's a quota exceeded error
+                # Check if it's a quota/rate limit error
                 error_str = str(generation_error).lower()
-                if "quota" in error_str or "429" in error_str:
+                if "quota" in error_str or "429" in error_str or "rate" in error_str:
                     fallback_content = f"I'm currently experiencing high demand and have temporarily reached my AI processing capacity. As {personality_id}, I'd be happy to provide you with traditional wisdom instead. Please try again later or ask a simpler question."
                     error_type = "quota_exceeded"
                 else:
