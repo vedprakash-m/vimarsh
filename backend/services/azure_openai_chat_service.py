@@ -7,7 +7,7 @@ import os
 import time
 import logging
 from typing import List, Dict, Any, Optional
-from openai import OpenAI
+from openai import AzureOpenAI
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class AzureOpenAIChatService:
         self.test_mode = test_mode
         
         # Configuration
-        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/openai/v1')
+        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com/')
         self.api_key = os.getenv('AZURE_OPENAI_CHAT_API_KEY', '')
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
         self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-5-mini')
@@ -48,10 +48,10 @@ class AzureOpenAIChatService:
                 raise ValueError("AZURE_OPENAI_CHAT_API_KEY is required")
             
             try:
-                self.client = OpenAI(
+                self.client = AzureOpenAI(
+                    azure_endpoint=self.endpoint,
                     api_key=self.api_key,
-                    base_url=self.endpoint,
-                    default_headers={"api-version": self.api_version}
+                    api_version=self.api_version
                 )
                 logger.info(f"✅ Azure OpenAI Chat service initialized: {self.deployment_name}")
             except Exception as e:
@@ -85,11 +85,11 @@ class AzureOpenAIChatService:
         
         for attempt in range(self.max_retries):
             try:
-                # Azure OpenAI Chat Completions API uses max_output_tokens
+                # Standard OpenAI chat completions API
                 response = self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=messages,
-                    max_output_tokens=max_tokens,
+                    max_tokens=max_tokens,
                     temperature=temperature,
                     top_p=top_p
                 )
