@@ -57,16 +57,18 @@ class AdvancedEmbeddingGenerator:
     def __init__(self):
         # Initialize Azure OpenAI embedding service
         try:
-            from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
+            from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService, validate_embedding
             self.embedding_service = AzureOpenAIEmbeddingService()
+            self.validate_embedding = validate_embedding
             self.use_azure = True
-            safe_log(logger.info, "✅ Azure OpenAI embedding service initialized")
+            safe_log(logger.info, "✅ Azure OpenAI embedding service initialized with validation")
         except Exception as e:
             safe_log(logger.warning, f"Azure OpenAI unavailable, using Gemini fallback: {e}")
             self.api_key = os.getenv('GEMINI_API_KEY')
             if not self.api_key:
                 raise ValueError("Neither Azure OpenAI nor GEMINI_API_KEY available")
             self.use_azure = False
+            self.validate_embedding = None
         
         # Rate limiting configuration
         self.requests_per_minute = 50
@@ -123,11 +125,23 @@ class AdvancedEmbeddingGenerator:
             
             embedding = result['embedding']
             
-            # Validate embedding
+            # Validate embedding (basic check)
             if not embedding or len(embedding) == 0:
                 raise ValueError("Empty embedding received")
             
-            logger.debug(f"✅ Generated embedding with {len(embedding)} dimensions")
+            # Perform comprehensive validation if available
+            if self.validate_embedding:
+                try:
+                    self.validate_embedding(embedding, expected_dimensions=768)
+                except ValueError as ve:
+                    raise ValueError(f"Embedding validation failed: {ve}")
+            else:
+                # Basic validation for Gemini fallback
+                non_zero = sum(1 for v in embedding if v != 0)
+                if non_zero == 0:
+                    raise ValueError("Embedding contains all zeros - corrupted!")
+            
+            logger.debug(f"✅ Generated and validated embedding with {len(embedding)} dimensions")
             return embedding
             
         except Exception as e:

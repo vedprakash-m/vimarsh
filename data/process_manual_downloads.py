@@ -239,18 +239,18 @@ The chunking and embedding process would work with the real extracted content.
         print("-" * 40)
         
         # For this demo, we'll simulate embedding generation
-        # In production, this would use the actual Gemini embedding service
+        # In production, this would use the actual Azure OpenAI embedding service
         
         embedding_count = 0
         for entry in self.processed_entries:
             # Simulate embedding generation
             entry["embedding"] = [0.1] * 768  # Placeholder 768-dimensional vector
-            entry["embedding_model"] = "gemini-embedding-001"
+            entry["embedding_model"] = "text-embedding-3-large"
             entry["embedding_generated_at"] = datetime.now().isoformat()
             embedding_count += 1
         
         self.processing_stats["total_vectors"] = embedding_count
-        print(f"✅ Generated {embedding_count} embeddings using gemini-embedding-001 (MRL dim=768)")
+        print(f"✅ Generated {embedding_count} embeddings using text-embedding-3-large (Azure OpenAI, 768 dims)")
         print("📝 Note: This demo uses placeholder embeddings. Production would use actual Gemini API.")
     
     async def update_metadata_system(self):

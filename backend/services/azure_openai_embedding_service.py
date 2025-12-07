@@ -15,6 +15,7 @@ Strategic Migration (December 2025):
 import os
 import logging
 import time
+import statistics
 from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 
@@ -30,6 +31,66 @@ except ImportError:
     APIError = Exception
 
 logger = logging.getLogger(__name__)
+
+
+def validate_embedding(
+    embedding: List[float], 
+    expected_dimensions: int = 768, 
+    min_non_zero_percentage: float = 0.13
+) -> bool:
+    """
+    Validate that embedding contains real values and is not corrupted.
+    
+    Args:
+        embedding: Embedding vector to validate
+        expected_dimensions: Expected embedding dimension (default: 768)
+        min_non_zero_percentage: Minimum percentage of non-zero values (default: 13%)
+        
+    Returns:
+        True if embedding is valid, False if corrupted or suspicious
+        
+    Raises:
+        ValueError: If validation fails with detailed error message
+    """
+    # Check if embedding exists
+    if not embedding:
+        raise ValueError("Embedding is None or empty")
+    
+    # Check dimension
+    if len(embedding) != expected_dimensions:
+        raise ValueError(
+            f"Invalid embedding dimension: {len(embedding)} (expected {expected_dimensions})"
+        )
+    
+    # Count non-zero values
+    non_zero_count = sum(1 for v in embedding if v != 0)
+    non_zero_percentage = non_zero_count / len(embedding)
+    
+    if non_zero_count == 0:
+        raise ValueError("Embedding contains all zeros - no actual embedding data!")
+    
+    if non_zero_percentage < min_non_zero_percentage:
+        raise ValueError(
+            f"Embedding has only {non_zero_count}/{len(embedding)} non-zero values "
+            f"({non_zero_percentage:.1%} < {min_non_zero_percentage:.1%}) - likely corrupted"
+        )
+    
+    # Check average magnitude
+    avg_magnitude = statistics.mean([abs(v) for v in embedding])
+    if avg_magnitude < 0.001:
+        raise ValueError(
+            f"Embedding average magnitude too low: {avg_magnitude:.6f} - likely corrupted"
+        )
+    
+    # Check for reasonable value range (normalized embeddings should be ~[-1, 1])
+    max_value = max([abs(v) for v in embedding])
+    if max_value > 2.0:
+        logger.warning(
+            f"⚠️  Embedding has unusually high values (max: {max_value:.3f}). "
+            "Expected normalized range ~[-1, 1]"
+        )
+    
+    return True
 
 @dataclass
 class EmbeddingResult:
@@ -162,9 +223,12 @@ class AzureOpenAIEmbeddingService:
                 # Azure OpenAI automatically L2-normalizes embeddings
                 embedding = response.data[0].embedding
                 
-                if len(embedding) != self.dimensions:
-                    logger.error(f"❌ Unexpected embedding dimension: {len(embedding)} (expected {self.dimensions})")
-                    raise ValueError(f"Embedding dimension mismatch: {len(embedding)} != {self.dimensions}")
+                # Validate embedding before returning
+                try:
+                    validate_embedding(embedding, expected_dimensions=self.dimensions)
+                except ValueError as e:
+                    logger.error(f"❌ Embedding validation failed: {e}")
+                    raise
                 
                 return embedding
                 
@@ -228,6 +292,15 @@ class AzureOpenAIEmbeddingService:
                 )
                 
                 batch_embeddings = [data.embedding for data in response.data]
+                
+                # Validate all embeddings in batch
+                for idx, emb in enumerate(batch_embeddings):
+                    try:
+                        validate_embedding(emb, expected_dimensions=self.dimensions)
+                    except ValueError as e:
+                        logger.error(f"❌ Embedding validation failed for batch item {idx}: {e}")
+                        raise
+                
                 embeddings.extend(batch_embeddings)
                 
                 # Rate limiting: 100K tokens/min = ~100 docs/min with 1K tokens each

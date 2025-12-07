@@ -192,7 +192,8 @@ class EnhancedRAGService:
             result = genai.embed_content(
                 model="models/gemini-embedding-001",
                 content=query,
-                task_type="retrieval_query"
+                task_type="retrieval_query",
+                output_dimensionality=768  # Match database embeddings dimension
             )
             embedding = result.get('embedding', [])
             if embedding:
@@ -256,6 +257,42 @@ class EnhancedRAGService:
         
         return personality_contexts.get(personality_id, f"You are {personality_id} providing thoughtful guidance and wisdom.")
 
+    def _normalize_personality_id(self, personality_id: str) -> List[str]:
+        """
+        Generate possible personality ID variations to handle database inconsistencies.
+        Returns a list of possible matches in order of preference.
+        """
+        variations = [personality_id]  # Start with exact match
+        
+        # Map of common variations
+        name_mappings = {
+            'abraham_lincoln': ['Lincoln', 'abraham_lincoln'],
+            'albert_einstein': ['Einstein', 'albert_einstein'],
+            'buddha': ['Buddha', 'buddha'],
+            'jesus_christ': ['Jesus Christ', 'jesus_christ'],
+            'marcus_aurelius': ['Marcus Aurelius', 'marcus_aurelius'],
+            'lao_tzu': ['Lao Tzu', 'lao_tzu'],
+            'nikola_tesla': ['Tesla', 'nikola_tesla'],
+            'isaac_newton': ['Newton', 'isaac_newton'],
+            'confucius': ['Confucius', 'confucius'],
+            'rumi': ['Rumi', 'rumi'],
+            'chanakya': ['Chanakya', 'chanakya'],
+            'mahatma_gandhi': ['mahatma_gandhi', 'gandhi'],
+            'william_shakespeare': ['william_shakespeare', 'William Shakespeare'],
+            'rabindranath_tagore': ['rabindranath_tagore', 'Rabindranath Tagore'],
+            'sigmund_freud': ['sigmund_freud', 'Sigmund Freud']
+        }
+        
+        if personality_id in name_mappings:
+            return name_mappings[personality_id]
+        
+        # Try Title Case version
+        title_case = personality_id.replace('_', ' ').title()
+        if title_case not in variations:
+            variations.append(title_case)
+        
+        return variations
+
     async def vector_search(self, query: str, personality_id: str, top_k: int = 5) -> List[ContentChunk]:
         """Perform vector similarity search"""
         try:
@@ -265,16 +302,27 @@ class EnhancedRAGService:
                 logger.warning("⚠️ Failed to generate query embedding, falling back to keyword search")
                 return await self.keyword_search(query, personality_id, top_k)
             
-            # Query for chunks with embeddings for the specific personality
+            # Try multiple personality ID variations to handle database inconsistencies
+            personality_variations = self._normalize_personality_id(personality_id)
+            
+            # Query for chunks with embeddings, trying multiple personality IDs and both field names
             cosmos_query = '''
-            SELECT c.id, c.personality, c.content, c.source, c.source_metadata, c.domain,
+            SELECT c.id, c.personality_id, c.personality, c.content, c.source, c.source_metadata, c.domain,
                    c.embedding, c.source_type, c.chunk_metadata
             FROM c 
-            WHERE c.personality = @personality_id 
+            WHERE (c.personality_id IN (@p1, @p2, @p3) OR c.personality IN (@p1, @p2, @p3))
             AND IS_DEFINED(c.embedding)
             '''
             
-            parameters: List[Dict[str, Any]] = [{"name": "@personality_id", "value": personality_id}]
+            # Pad variations to ensure we have 3 parameters
+            while len(personality_variations) < 3:
+                personality_variations.append(personality_variations[0])
+            
+            parameters: List[Dict[str, Any]] = [
+                {"name": "@p1", "value": personality_variations[0]},
+                {"name": "@p2", "value": personality_variations[1]},
+                {"name": "@p3", "value": personality_variations[2]}
+            ]
             
             chunks = list(self.container.query_items(
                 query=cosmos_query,
@@ -313,7 +361,7 @@ class EnhancedRAGService:
                         
                         chunk = ContentChunk(
                             id=chunk_data['id'],
-                            personality_id=chunk_data['personality'],  # Using the correct field name
+                            personality_id=chunk_data.get('personality_id', personality_id),  # Support both field names
                             content=content,
                             source=source_ref,
                             token_count=len(content.split()),  # Rough estimate
@@ -354,15 +402,26 @@ class EnhancedRAGService:
             # Simple keyword matching in content fields (supporting both field names)
             query_terms = query.lower().split()
             
+            # Try multiple personality ID variations
+            personality_variations = self._normalize_personality_id(personality_id)
+            
             cosmos_query = '''
-            SELECT c.id, c.personality_id, c.content, c.chunk_text, c.source, c.source_metadata, c.domain,
+            SELECT c.id, c.personality_id, c.personality, c.content, c.chunk_text, c.source, c.source_metadata, c.domain,
                    c.source_type, c.chunk_metadata
             FROM c 
-            WHERE c.personality_id = @personality_id 
+            WHERE (c.personality_id IN (@p1, @p2, @p3) OR c.personality IN (@p1, @p2, @p3))
             AND IS_DEFINED(c.embedding)
             '''
             
-            parameters: List[Dict[str, Any]] = [{"name": "@personality_id", "value": personality_id}]
+            # Pad variations to ensure we have 3 parameters
+            while len(personality_variations) < 3:
+                personality_variations.append(personality_variations[0])
+            
+            parameters: List[Dict[str, Any]] = [
+                {"name": "@p1", "value": personality_variations[0]},
+                {"name": "@p2", "value": personality_variations[1]},
+                {"name": "@p3", "value": personality_variations[2]}
+            ]
             
             chunks = list(self.container.query_items(
                 query=cosmos_query,

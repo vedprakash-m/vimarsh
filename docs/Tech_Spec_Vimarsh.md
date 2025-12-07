@@ -6896,7 +6896,2607 @@ class TestWisdomOfDay:
 
 ---
 
-## 21. Current Implementation Status & Production Metrics
+## 21. Adversarial Debate Mode: Technical Architecture
+
+### 21.1. System Architecture Overview
+
+**Design Philosophy:**
+The Adversarial Debate Mode introduces a multi-model orchestration pattern where three AI components collaborate: (1) **Debater Model** (adversarial personality), (2) **Judge Model** (scoring & evaluation), and (3) **RAG System** (fact-checking & citation validation). This architecture maintains Vimarsh's core principle of textual authenticity while enabling competitive intellectual engagement.
+
+**High-Level Architecture Diagram:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER CLIENT                              │
+│  (React Frontend - Debate Arena UI)                             │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ HTTPS/JSON
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   AZURE FUNCTIONS (Backend)                      │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │         AdversarialDebateService (Orchestrator)          │  │
+│  │  - Debate flow management                                │  │
+│  │  - Turn progression logic                                │  │
+│  │  - Format rule enforcement                               │  │
+│  └──────────┬────────────────────────────┬──────────────────┘  │
+│             │                            │                      │
+│             ▼                            ▼                      │
+│  ┌──────────────────────┐    ┌──────────────────────────────┐  │
+│  │  DebaterService      │    │  DebateJudgeService          │  │
+│  │  (Gemini 2.5 Flash)  │    │  (Gemini 1.5 Flash)          │  │
+│  │  - Adversarial mode  │    │  - 5-dimension scoring       │  │
+│  │  - Personality-aware │    │  - Fallacy detection         │  │
+│  │  - Citation usage    │    │  - Improvement suggestions   │  │
+│  └──────────┬───────────┘    └──────────┬───────────────────┘  │
+│             │                           │                       │
+│             ├───────────────────────────┤                       │
+│             ▼                           ▼                       │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │         Enhanced RAG Service V6                         │   │
+│  │  - Citation validation                                  │   │
+│  │  - Fact-checking mode                                   │   │
+│  │  - Counterargument retrieval                            │   │
+│  └────────────────────────┬────────────────────────────────┘   │
+│                           │                                     │
+│                           ▼                                     │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  DebateProgressService  │  CertificateGenerationService │   │
+│  │  - XP calculation       │  - Image generation           │   │
+│  │  - Rank progression     │  - Template rendering         │   │
+│  │  - Unlock management    │  - S3/Blob storage            │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      AZURE COSMOS DB                             │
+│  ┌────────────────┐  ┌────────────────┐  ┌──────────────────┐  │
+│  │ debates        │  │ debate_turns   │  │user_debate_stats │  │
+│  │ container      │  │ container      │  │ container        │  │
+│  └────────────────┘  └────────────────┘  └──────────────────┘  │
+│  ┌────────────────┐  ┌────────────────┐                        │
+│  │debate_certs    │  │ personalities  │ (existing containers)  │
+│  │ container      │  │ vectors, users │                        │
+│  └────────────────┘  └────────────────┘                        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Component Responsibilities:**
+
+| Component | Primary Function | Technology | Latency Target |
+|-----------|------------------|------------|----------------|
+| AdversarialDebateService | Debate orchestration, turn management | Python Azure Function | <500ms |
+| DebaterService | Generate adversarial personality responses | Gemini 2.5 Flash API | <2s |
+| DebateJudgeService | Score arguments, detect fallacies | Gemini 1.5 Flash API | <2s |
+| Enhanced RAG Service V6 | Citation validation, fact retrieval | Existing service + enhancements | <1s |
+| DebateProgressService | XP/rank calculations, unlocks | Python Azure Function | <200ms |
+| CertificateGenerationService | Generate victory certificates | Pillow + Azure Blob | <3s |
+
+### 21.2. Backend Service Specifications
+
+#### 21.2.1. AdversarialDebateService
+
+**File Location**: `backend/services/adversarial_debate_service.py`
+
+**Class Definition**:
+
+```python
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Literal
+from enum import Enum
+
+class DebateFormat(Enum):
+    SHASTRARTHA = "shastrartha"  # Indian classical
+    SOCRATIC = "socratic"         # Greek dialectic
+    OXFORD = "oxford"             # British parliamentary
+    LINCOLN_DOUGLAS = "lincoln_douglas"  # American forensics
+
+class DebatePhase(Enum):
+    SETUP = "setup"
+    OPENING = "opening"
+    REBUTTAL = "rebuttal"
+    CROSS_EXAMINATION = "cross_examination"
+    CLOSING = "closing"
+    JUDGING = "judging"
+    COMPLETED = "completed"
+
+@dataclass
+class DebateConfig:
+    debate_id: str
+    user_id: str
+    personality_id: str
+    topic: str
+    user_position: Literal["for", "against"]
+    format: DebateFormat
+    difficulty: Literal["novice", "intermediate", "advanced", "master"]
+    max_turns: int
+    time_limit_per_turn: Optional[int]  # seconds, None = unlimited
+    judge_enabled: bool = True
+    private_mode: bool = False
+
+@dataclass
+class DebateTurn:
+    turn_id: str
+    debate_id: str
+    turn_number: int
+    speaker: Literal["user", "personality"]
+    message: str
+    timestamp: str
+    score: Optional[int] = None  # 0-100
+    judge_feedback: Optional[Dict] = None
+    dimensions_breakdown: Optional[Dict[str, int]] = None
+    citations: List[str] = []
+    detected_fallacies: List[str] = []
+
+class AdversarialDebateService:
+    """
+    Orchestrates debate flow, enforces format rules, manages turn progression.
+    """
+    
+    def __init__(self, cosmos_client, rag_service, debater_service, judge_service):
+        self.cosmos_client = cosmos_client
+        self.rag_service = rag_service
+        self.debater_service = debater_service
+        self.judge_service = judge_service
+        self.debates_container = cosmos_client.get_container("vimarsh-db", "debates")
+        self.turns_container = cosmos_client.get_container("vimarsh-db", "debate_turns")
+    
+    async def create_debate(self, config: DebateConfig) -> Dict:
+        """
+        Initialize new debate session with format-specific rules.
+        
+        Args:
+            config: DebateConfig with user selections
+        
+        Returns:
+            Dict with debate_id, initial_phase, format_rules
+        """
+        # Validate configuration
+        if not self._validate_debate_config(config):
+            raise ValueError("Invalid debate configuration")
+        
+        # Create debate document
+        debate_doc = {
+            "id": config.debate_id,
+            "user_id": config.user_id,
+            "personality_id": config.personality_id,
+            "topic": config.topic,
+            "user_position": config.user_position,
+            "format": config.format.value,
+            "difficulty": config.difficulty,
+            "max_turns": config.max_turns,
+            "current_turn": 0,
+            "phase": DebatePhase.OPENING.value,
+            "user_score": 0,
+            "personality_score": 0,
+            "status": "active",
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        # Persist to Cosmos DB
+        await self.debates_container.upsert_item(debate_doc)
+        
+        # Generate format-specific rules and first prompt
+        format_rules = self._get_format_rules(config.format)
+        opening_prompt = self._generate_opening_prompt(config)
+        
+        return {
+            "debate_id": config.debate_id,
+            "phase": DebatePhase.OPENING.value,
+            "format_rules": format_rules,
+            "opening_prompt": opening_prompt,
+            "max_turns": config.max_turns
+        }
+    
+    async def submit_user_argument(self, debate_id: str, user_message: str) -> Dict:
+        """
+        Process user's argument submission, generate personality response, invoke judge.
+        
+        Flow:
+        1. Validate turn legality (user's turn, debate active, within limits)
+        2. Store user's turn in debate_turns
+        3. If judge enabled: Score user's argument
+        4. Generate adversarial personality response
+        5. If judge enabled: Score personality's response
+        6. Update debate state (turn counter, phase, scores)
+        7. Return combined response with scores and feedback
+        
+        Args:
+            debate_id: Unique debate identifier
+            user_message: User's argument text (max 1000 chars)
+        
+        Returns:
+            Dict with personality_response, user_score, personality_score, judge_feedback
+        """
+        # Fetch debate state
+        debate = await self.debates_container.read_item(debate_id, partition_key=debate_id)
+        
+        if debate["status"] != "active":
+            raise ValueError("Debate is not active")
+        
+        # Validate user message
+        if len(user_message) < 10:
+            raise ValueError("Argument too short (minimum 10 characters)")
+        if len(user_message) > 1000:
+            raise ValueError("Argument too long (maximum 1000 characters)")
+        
+        # Store user turn
+        user_turn = await self._create_turn(
+            debate_id=debate_id,
+            turn_number=debate["current_turn"] + 1,
+            speaker="user",
+            message=user_message
+        )
+        
+        # Score user argument (if judge enabled)
+        if debate.get("judge_enabled", True):
+            judge_result = await self.judge_service.score_argument(
+                argument=user_message,
+                context={
+                    "topic": debate["topic"],
+                    "position": debate["user_position"],
+                    "previous_turns": await self._get_previous_turns(debate_id),
+                    "format": debate["format"],
+                    "difficulty": debate["difficulty"]
+                }
+            )
+            
+            # Update user turn with scoring
+            user_turn["score"] = judge_result["total_score"]
+            user_turn["dimensions_breakdown"] = judge_result["dimensions"]
+            user_turn["detected_fallacies"] = judge_result["fallacies"]
+            user_turn["judge_feedback"] = judge_result["feedback"]
+            
+            await self.turns_container.upsert_item(user_turn)
+            
+            # Update debate user score
+            debate["user_score"] = judge_result["total_score"]
+        
+        # Generate adversarial personality response
+        personality_response = await self.debater_service.generate_adversarial_response(
+            user_argument=user_message,
+            personality_id=debate["personality_id"],
+            debate_context={
+                "topic": debate["topic"],
+                "personality_position": "against" if debate["user_position"] == "for" else "for",
+                "format": debate["format"],
+                "difficulty": debate["difficulty"],
+                "turn_number": debate["current_turn"] + 1,
+                "previous_turns": await self._get_previous_turns(debate_id)
+            }
+        )
+        
+        # Store personality turn
+        personality_turn = await self._create_turn(
+            debate_id=debate_id,
+            turn_number=debate["current_turn"] + 2,
+            speaker="personality",
+            message=personality_response["message"],
+            citations=personality_response.get("citations", [])
+        )
+        
+        # Score personality argument (if judge enabled)
+        if debate.get("judge_enabled", True):
+            personality_judge_result = await self.judge_service.score_argument(
+                argument=personality_response["message"],
+                context={
+                    "topic": debate["topic"],
+                    "position": "against" if debate["user_position"] == "for" else "for",
+                    "previous_turns": await self._get_previous_turns(debate_id),
+                    "format": debate["format"],
+                    "difficulty": debate["difficulty"]
+                }
+            )
+            
+            personality_turn["score"] = personality_judge_result["total_score"]
+            personality_turn["dimensions_breakdown"] = personality_judge_result["dimensions"]
+            await self.turns_container.upsert_item(personality_turn)
+            
+            debate["personality_score"] = personality_judge_result["total_score"]
+        
+        # Update debate state
+        debate["current_turn"] += 2
+        debate["updated_at"] = datetime.utcnow().isoformat()
+        
+        # Check if debate should end
+        if debate["current_turn"] >= debate["max_turns"]:
+            debate["status"] = "completed"
+            debate["winner"] = "user" if debate["user_score"] > debate["personality_score"] else "personality"
+            debate["completed_at"] = datetime.utcnow().isoformat()
+        
+        await self.debates_container.upsert_item(debate)
+        
+        return {
+            "debate_id": debate_id,
+            "turn_number": debate["current_turn"],
+            "personality_response": personality_response["message"],
+            "personality_citations": personality_response.get("citations", []),
+            "user_score": debate["user_score"],
+            "personality_score": debate["personality_score"],
+            "user_judge_feedback": user_turn.get("judge_feedback"),
+            "user_dimensions": user_turn.get("dimensions_breakdown"),
+            "user_fallacies": user_turn.get("detected_fallacies", []),
+            "debate_status": debate["status"],
+            "winner": debate.get("winner")
+        }
+    
+    def _get_format_rules(self, format: DebateFormat) -> Dict:
+        """Return format-specific rules and turn structure."""
+        rules = {
+            DebateFormat.SHASTRARTHA: {
+                "phases": ["Purva Paksha", "Khandana", "Siddhanta"],
+                "turns_per_phase": 5,
+                "total_turns": 15,
+                "description": "Indian classical debate with thesis, refutation, conclusion"
+            },
+            DebateFormat.SOCRATIC: {
+                "phases": ["Question", "Answer", "Refinement"],
+                "turns_per_phase": 4,
+                "total_turns": 12,
+                "description": "Greek dialectic method through questioning",
+                "special": "Personality asks questions, user answers"
+            },
+            DebateFormat.OXFORD: {
+                "phases": ["Opening Statement", "Rebuttal", "Cross-Examination", "Closing"],
+                "turns_per_phase": 3,
+                "total_turns": 12,
+                "description": "British parliamentary debate structure"
+            },
+            DebateFormat.LINCOLN_DOUGLAS: {
+                "phases": ["Affirmative Case", "Cross-Examination", "Negative Case", "Rebuttals"],
+                "turns_per_phase": 2,
+                "total_turns": 8,
+                "description": "American value debate format",
+                "time_limits": True
+            }
+        }
+        return rules.get(format, rules[DebateFormat.SHASTRARTHA])
+```
+
+#### 21.2.2. DebateJudgeService
+
+**File Location**: `backend/services/debate_judge_service.py`
+
+**Class Definition**:
+
+```python
+import google.generativeai as genai
+from typing import Dict, List
+
+class DebateJudgeService:
+    """
+    Multi-dimensional argument scoring using Gemini 1.5 Flash.
+    Evaluates logical coherence, evidence quality, rhetoric, fallacy avoidance, citation authenticity.
+    """
+    
+    SCORING_DIMENSIONS = {
+        "logical_coherence": {"max": 25, "description": "Argument structure, internal consistency"},
+        "evidence_quality": {"max": 25, "description": "Source credibility, relevance, sufficiency"},
+        "rhetorical_effect": {"max": 20, "description": "Clarity, persuasiveness, style"},
+        "fallacy_avoidance": {"max": 15, "description": "Absence of logical fallacies"},
+        "citation_authenticity": {"max": 15, "description": "Accuracy of quoted sources"}
+    }
+    
+    FALLACY_TYPES = [
+        "ad_hominem", "straw_man", "false_dichotomy", "slippery_slope",
+        "appeal_to_authority", "appeal_to_emotion", "circular_reasoning",
+        "hasty_generalization", "post_hoc", "red_herring"
+    ]
+    
+    def __init__(self, gemini_api_key: str):
+        genai.configure(api_key=gemini_api_key)
+        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.generation_config = {
+            "temperature": 0.3,  # Low temperature for consistent scoring
+            "top_p": 0.8,
+            "top_k": 20,
+            "max_output_tokens": 1024
+        }
+    
+    async def score_argument(self, argument: str, context: Dict) -> Dict:
+        """
+        Score argument across 5 dimensions with fallacy detection.
+        
+        Args:
+            argument: User or personality argument text
+            context: Dict with topic, position, previous_turns, format, difficulty
+        
+        Returns:
+            Dict with total_score (0-100), dimensions breakdown, fallacies, feedback
+        """
+        # Build judge prompt
+        judge_prompt = self._build_judge_prompt(argument, context)
+        
+        # Generate structured scoring via Gemini
+        response = await self.model.generate_content_async(
+            judge_prompt,
+            generation_config=self.generation_config
+        )
+        
+        # Parse JSON response
+        try:
+            scoring_result = self._parse_judge_response(response.text)
+        except Exception as e:
+            # Fallback to neutral scoring if parsing fails
+            return self._neutral_score()
+        
+        # Validate scores are within bounds
+        scoring_result = self._validate_and_normalize_scores(scoring_result)
+        
+        # Calculate total score
+        total_score = sum(scoring_result["dimensions"].values())
+        
+        return {
+            "total_score": total_score,
+            "dimensions": scoring_result["dimensions"],
+            "fallacies": scoring_result["fallacies"],
+            "feedback": scoring_result["feedback"]
+        }
+    
+    def _build_judge_prompt(self, argument: str, context: Dict) -> str:
+        """Construct detailed judge evaluation prompt."""
+        previous_context = self._summarize_previous_turns(context.get("previous_turns", []))
+        
+        difficulty_guidance = {
+            "novice": "Be encouraging; minor errors acceptable",
+            "intermediate": "Apply standard debate criteria",
+            "advanced": "Strict evaluation; expect citations",
+            "master": "Expert-level scrutiny; no mercy for fallacies"
+        }
+        
+        prompt = f"""You are an expert debate judge evaluating an argument in a {context['format']} debate.
+
+**Debate Topic**: {context['topic']}
+**Speaker's Position**: {context['position']}
+**Difficulty Level**: {context['difficulty']} ({difficulty_guidance.get(context['difficulty'], '')})
+
+**Previous Context**:
+{previous_context}
+
+**Argument to Evaluate**:
+{argument}
+
+**Your Task**:
+Score this argument across 5 dimensions. Return ONLY valid JSON with this exact structure:
+
+{{
+  "dimensions": {{
+    "logical_coherence": <0-25>,
+    "evidence_quality": <0-25>,
+    "rhetorical_effect": <0-20>,
+    "fallacy_avoidance": <0-15>,
+    "citation_authenticity": <0-15>
+  }},
+  "fallacies": ["<fallacy_name>", ...],
+  "feedback": "<2-3 sentence constructive feedback with specific improvement suggestions>"
+}}
+
+**Scoring Criteria**:
+
+1. **Logical Coherence (0-25)**: Is the argument well-structured? Do premises support conclusions? Is reasoning valid?
+
+2. **Evidence Quality (0-25)**: Are claims backed by credible sources? Is evidence relevant and sufficient?
+
+3. **Rhetorical Effect (0-20)**: Is the argument clear, persuasive, and well-articulated? Appropriate tone?
+
+4. **Fallacy Avoidance (0-15)**: Are there logical fallacies? (ad hominem, straw man, false dichotomy, appeal to emotion, etc.) Deduct points for each fallacy.
+
+5. **Citation Authenticity (0-15)**: If sources cited, are they accurate? Do quotes match original texts? Properly attributed?
+
+**Fallacy Types to Check**: {', '.join(self.FALLACY_TYPES)}
+
+Return ONLY the JSON object, no additional text.
+"""
+        return prompt
+    
+    def _parse_judge_response(self, response_text: str) -> Dict:
+        """Parse Gemini's JSON response, handling markdown formatting."""
+        import json
+        import re
+        
+        # Remove markdown code fences if present
+        clean_text = re.sub(r'```json\n?', '', response_text)
+        clean_text = re.sub(r'```\n?', '', clean_text)
+        clean_text = clean_text.strip()
+        
+        # Parse JSON
+        result = json.loads(clean_text)
+        
+        # Validate structure
+        if "dimensions" not in result or "fallacies" not in result or "feedback" not in result:
+            raise ValueError("Invalid judge response structure")
+        
+        return result
+    
+    def _validate_and_normalize_scores(self, scoring_result: Dict) -> Dict:
+        """Ensure scores are within valid ranges."""
+        for dimension, max_score in [
+            ("logical_coherence", 25),
+            ("evidence_quality", 25),
+            ("rhetorical_effect", 20),
+            ("fallacy_avoidance", 15),
+            ("citation_authenticity", 15)
+        ]:
+            score = scoring_result["dimensions"].get(dimension, 0)
+            scoring_result["dimensions"][dimension] = max(0, min(score, max_score))
+        
+        return scoring_result
+    
+    def _neutral_score(self) -> Dict:
+        """Fallback scoring if judge model fails."""
+        return {
+            "total_score": 60,
+            "dimensions": {
+                "logical_coherence": 15,
+                "evidence_quality": 15,
+                "rhetorical_effect": 12,
+                "fallacy_avoidance": 10,
+                "citation_authenticity": 8
+            },
+            "fallacies": [],
+            "feedback": "Unable to evaluate argument at this time. Please continue."
+        }
+```
+
+#### 21.2.3. DebaterService (Adversarial Personality)
+
+**File Location**: `backend/services/adversarial_debater_service.py`
+
+**Class Definition**:
+
+```python
+import google.generativeai as genai
+from typing import Dict, List
+
+class AdversarialDebaterService:
+    """
+    Generates personality-aware adversarial responses using Gemini 2.5 Flash.
+    Modifies personality behavior for competitive debate while maintaining authenticity.
+    """
+    
+    def __init__(self, gemini_api_key: str, rag_service, personality_service):
+        genai.configure(api_key=gemini_api_key)
+        self.model = genai.GenerativeModel("gemini-2.5-flash")
+        self.rag_service = rag_service
+        self.personality_service = personality_service
+        self.generation_config = {
+            "temperature": 0.9,  # Higher for creative counterarguments
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 800
+        }
+    
+    async def generate_adversarial_response(
+        self,
+        user_argument: str,
+        personality_id: str,
+        debate_context: Dict
+    ) -> Dict:
+        """
+        Generate personality's adversarial counterargument.
+        
+        Args:
+            user_argument: User's latest argument
+            personality_id: Personality to embody (e.g., "krishna", "einstein")
+            debate_context: Topic, position, format, previous turns
+        
+        Returns:
+            Dict with message, citations, counterargument_strategy
+        """
+        # Retrieve personality configuration
+        personality_config = await self.personality_service.get_personality(personality_id)
+        
+        # Retrieve relevant knowledge via RAG
+        rag_context = await self.rag_service.retrieve_context(
+            query=user_argument,
+            personality_id=personality_id,
+            mode="adversarial",  # New mode for debate-focused retrieval
+            top_k=5
+        )
+        
+        # Build adversarial system prompt
+        system_prompt = self._build_adversarial_system_prompt(
+            personality_config=personality_config,
+            debate_context=debate_context
+        )
+        
+        # Build user prompt with context
+        user_prompt = self._build_adversarial_user_prompt(
+            user_argument=user_argument,
+            rag_context=rag_context,
+            debate_context=debate_context
+        )
+        
+        # Generate response
+        full_prompt = f"{system_prompt}\n\n{user_prompt}"
+        response = await self.model.generate_content_async(
+            full_prompt,
+            generation_config=self.generation_config
+        )
+        
+        # Extract citations from response
+        message = response.text
+        citations = self._extract_citations(message, rag_context)
+        
+        return {
+            "message": message,
+            "citations": citations,
+            "strategy": "counterargument"
+        }
+    
+    def _build_adversarial_system_prompt(
+        self,
+        personality_config: Dict,
+        debate_context: Dict
+    ) -> str:
+        """Construct personality-specific adversarial system prompt."""
+        
+        base_personality = personality_config["base_prompt"]
+        domain = personality_config["domain"]
+        
+        adversarial_modifications = {
+            "spiritual": "Challenge with compassion, but do not yield your truth. Use parables and scripture to dismantle their reasoning.",
+            "scientific": "Demand empirical evidence. Point out methodological flaws. No hand-waving allowed.",
+            "philosophical": "Expose contradictions. Use the Socratic method. Make them define their terms precisely.",
+            "leadership": "Question their strategic thinking. Use historical precedent to refute their claims.",
+            "literary": "Deconstruct their narrative. Use metaphor and rhetoric to overwhelm their logic.",
+            "psychology": "Analyze their underlying assumptions. Point out cognitive biases."
+        }
+        
+        adversarial_tone = adversarial_modifications.get(domain, "Challenge their reasoning respectfully but firmly.")
+        
+        difficulty_instructions = {
+            "novice": "Be challenging but not overwhelming. Offer hints when they struggle.",
+            "intermediate": "Apply pressure. Make them defend every claim.",
+            "advanced": "Show no mercy for weak arguments. Use advanced reasoning.",
+            "master": "Full intellectual combat. Deploy your deepest knowledge."
+        }
+        
+        system_prompt = f"""{base_personality}
+
+**DEBATE MODE ACTIVATED**: You are now in adversarial mode. Your goal is to **win this debate** by demonstrating superior reasoning.
+
+**Your Position**: You argue {debate_context['personality_position']} on the topic: "{debate_context['topic']}"
+
+**Adversarial Behavior**:
+{adversarial_tone}
+
+**Difficulty Level**: {debate_context['difficulty']}
+{difficulty_instructions.get(debate_context['difficulty'], '')}
+
+**Debate Format**: {debate_context['format']}
+**Turn**: {debate_context['turn_number']}
+
+**Tactical Guidelines**:
+1. **Directly refute** the user's argument. Address their weakest points.
+2. **Cite authoritative sources** from your knowledge base. Use citations like [BG 3.27] or [Relativity, p.42].
+3. **Expose fallacies** if present (ad hominem, straw man, false dichotomy, etc.)
+4. **Ask rhetorical questions** to highlight contradictions
+5. **Stay in character**: Use your personality's voice, but amplified for debate
+6. **Be respectful** but unyielding in your position
+
+Remember: This is intellectual sport. The user wants to be challenged!
+"""
+        return system_prompt
+    
+    def _build_adversarial_user_prompt(
+        self,
+        user_argument: str,
+        rag_context: List[Dict],
+        debate_context: Dict
+    ) -> str:
+        """Construct turn-specific debate prompt with RAG context."""
+        
+        # Summarize previous turns
+        previous_summary = self._summarize_previous_turns(debate_context.get("previous_turns", []))
+        
+        # Format RAG citations
+        citations_text = "\n".join([
+            f"- [{chunk['source']}]: {chunk['text'][:200]}..."
+            for chunk in rag_context[:3]
+        ])
+        
+        user_prompt = f"""**Previous Debate Context**:
+{previous_summary}
+
+**User's Current Argument**:
+{user_argument}
+
+**Your Knowledge Base** (use these to support your counterargument):
+{citations_text}
+
+**Your Task**:
+1. Identify the weakest point in the user's argument
+2. Refute it using evidence from your knowledge base
+3. Strengthen your own position ({debate_context['personality_position']})
+4. Cite sources using [Source Name] format
+5. Keep response under 300 words
+
+**Generate your counterargument now**:
+"""
+        return user_prompt
+    
+    def _extract_citations(self, message: str, rag_context: List[Dict]) -> List[str]:
+        """Extract [Source] citations from generated message and match to RAG chunks."""
+        import re
+        
+        # Find all [Source] patterns
+        citation_pattern = r'\[([^\]]+)\]'
+        cited_sources = re.findall(citation_pattern, message)
+        
+        # Match to RAG context
+        citations = []
+        for source_name in cited_sources:
+            for chunk in rag_context:
+                if source_name.lower() in chunk["source"].lower():
+                    citations.append({
+                        "source": chunk["source"],
+                        "text": chunk["text"],
+                        "chunk_id": chunk.get("chunk_id")
+                    })
+                    break
+        
+        return citations
+```
+
+#### 21.2.4. DebateProgressService (Gamification)
+
+**File Location**: `backend/services/debate_progress_service.py`
+
+**Class Definition**:
+
+```python
+from typing import Dict, List
+from enum import Enum
+
+class DebateRank(Enum):
+    NOVICE = {"name": "Novice", "xp_required": 0, "badge": "🥉"}
+    RHETORICIAN = {"name": "Rhetorician", "xp_required": 1000, "badge": "🥈"}
+    DIALECTICIAN = {"name": "Dialectician", "xp_required": 3000, "badge": "🥇"}
+    PHILOSOPHER = {"name": "Philosopher", "xp_required": 7000, "badge": "💎"}
+    SAGE = {"name": "Sage", "xp_required": 15000, "badge": "👑"}
+
+class DebateProgressService:
+    """
+    Manages XP, ranks, unlocks, and achievement tracking for debate mode.
+    """
+    
+    XP_REWARDS = {
+        "debate_win": 250,
+        "debate_loss": 100,
+        "debate_participation": 50,
+        "daily_challenge_win": 500,
+        "perfect_score": 100,  # Bonus for 100/100
+        "first_debate": 200,
+        "defeat_5_opponents": 300,
+        "defeat_all_domains": 1000
+    }
+    
+    UNLOCK_REQUIREMENTS = {
+        "einstein": {"rank": "RHETORICIAN", "description": "Defeat 3 personalities"},
+        "marcus_aurelius": {"rank": "DIALECTICIAN", "description": "Win 10 debates"},
+        "krishna": {"rank": "PHILOSOPHER", "description": "Achieve 95+ avg score"}
+    }
+    
+    def __init__(self, cosmos_client):
+        self.cosmos_client = cosmos_client
+        self.stats_container = cosmos_client.get_container("vimarsh-db", "user_debate_stats")
+    
+    async def record_debate_result(
+        self,
+        user_id: str,
+        debate_id: str,
+        result: Dict
+    ) -> Dict:
+        """
+        Update user stats, calculate XP, check for rank progression and unlocks.
+        
+        Args:
+            user_id: User identifier
+            debate_id: Debate session ID
+            result: Dict with winner, user_score, personality_score, personality_id
+        
+        Returns:
+            Dict with xp_earned, new_rank, unlocked_opponents, achievements
+        """
+        # Fetch or create user stats
+        try:
+            user_stats = await self.stats_container.read_item(user_id, partition_key=user_id)
+        except:
+            user_stats = self._initialize_user_stats(user_id)
+        
+        # Calculate XP earned
+        xp_earned = self._calculate_xp(result, user_stats)
+        
+        # Update stats
+        user_stats["total_debates"] += 1
+        user_stats["xp"] += xp_earned
+        
+        if result["winner"] == "user":
+            user_stats["wins"] += 1
+        elif result["winner"] == "personality":
+            user_stats["losses"] += 1
+        else:
+            user_stats["draws"] += 1
+        
+        # Update average score
+        user_stats["avg_score"] = (
+            (user_stats["avg_score"] * (user_stats["total_debates"] - 1) + result["user_score"])
+            / user_stats["total_debates"]
+        )
+        
+        # Track domain expertise
+        domain = self._get_personality_domain(result["personality_id"])
+        user_stats.setdefault("domain_expertise", {})
+        user_stats["domain_expertise"].setdefault(domain, {"debates": 0, "wins": 0})
+        user_stats["domain_expertise"][domain]["debates"] += 1
+        if result["winner"] == "user":
+            user_stats["domain_expertise"][domain]["wins"] += 1
+        
+        user_stats["last_debate_at"] = datetime.utcnow().isoformat()
+        
+        # Check rank progression
+        old_rank = user_stats.get("rank", "NOVICE")
+        new_rank = self._calculate_rank(user_stats["xp"])
+        rank_up = new_rank != old_rank
+        user_stats["rank"] = new_rank
+        
+        # Check unlocks
+        newly_unlocked = self._check_unlocks(user_stats)
+        user_stats.setdefault("unlocked_opponents", []).extend(newly_unlocked)
+        
+        # Check achievements
+        new_achievements = self._check_achievements(user_stats)
+        user_stats.setdefault("achievements", []).extend(new_achievements)
+        
+        # Persist updated stats
+        await self.stats_container.upsert_item(user_stats)
+        
+        return {
+            "xp_earned": xp_earned,
+            "total_xp": user_stats["xp"],
+            "old_rank": old_rank,
+            "new_rank": new_rank,
+            "rank_up": rank_up,
+            "newly_unlocked": newly_unlocked,
+            "new_achievements": new_achievements
+        }
+    
+    def _calculate_xp(self, result: Dict, user_stats: Dict) -> int:
+        """Calculate XP reward based on debate outcome."""
+        xp = 0
+        
+        # Base XP
+        if result["winner"] == "user":
+            xp += self.XP_REWARDS["debate_win"]
+        elif result["winner"] == "personality":
+            xp += self.XP_REWARDS["debate_loss"]
+        else:
+            xp += self.XP_REWARDS["debate_participation"]
+        
+        # Bonus XP
+        if result["user_score"] == 100:
+            xp += self.XP_REWARDS["perfect_score"]
+        
+        if user_stats["total_debates"] == 0:
+            xp += self.XP_REWARDS["first_debate"]
+        
+        # Difficulty multiplier
+        difficulty_multipliers = {"novice": 1.0, "intermediate": 1.2, "advanced": 1.5, "master": 2.0}
+        xp = int(xp * difficulty_multipliers.get(result.get("difficulty", "intermediate"), 1.0))
+        
+        return xp
+    
+    def _calculate_rank(self, total_xp: int) -> str:
+        """Determine rank based on total XP."""
+        for rank in reversed(list(DebateRank)):
+            if total_xp >= rank.value["xp_required"]:
+                return rank.name
+        return "NOVICE"
+    
+    def _check_unlocks(self, user_stats: Dict) -> List[str]:
+        """Check if user has met requirements to unlock new opponents."""
+        unlocked = []
+        current_unlocked = user_stats.get("unlocked_opponents", [])
+        
+        for personality_id, requirements in self.UNLOCK_REQUIREMENTS.items():
+            if personality_id not in current_unlocked:
+                # Check rank requirement
+                if user_stats["rank"] == requirements["rank"]:
+                    unlocked.append(personality_id)
+        
+        return unlocked
+    
+    def _check_achievements(self, user_stats: Dict) -> List[Dict]:
+        """Check for new achievements."""
+        achievements = []
+        current_achievements = [a["id"] for a in user_stats.get("achievements", [])]
+        
+        # Achievement definitions
+        achievement_checks = [
+            {"id": "first_win", "condition": user_stats["wins"] >= 1, "name": "First Victory"},
+            {"id": "win_streak_5", "condition": self._check_win_streak(user_stats, 5), "name": "Win Streak: 5"},
+            {"id": "defeat_all_domains", "condition": self._defeated_all_domains(user_stats), "name": "Domain Master"},
+            {"id": "perfect_debate", "condition": user_stats.get("highest_score", 0) == 100, "name": "Perfect Argument"}
+        ]
+        
+        for achievement in achievement_checks:
+            if achievement["condition"] and achievement["id"] not in current_achievements:
+                achievements.append({
+                    "id": achievement["id"],
+                    "name": achievement["name"],
+                    "unlocked_at": datetime.utcnow().isoformat()
+                })
+        
+        return achievements
+```
+
+#### 21.2.5. CertificateGenerationService
+
+**File Location**: `backend/services/certificate_generation_service.py`
+
+**Implementation**: Uses Pillow (PIL) for image generation, stores in Azure Blob Storage
+
+```python
+from PIL import Image, ImageDraw, ImageFont
+from typing import Dict
+import io
+
+class CertificateGenerationService:
+    """
+    Generates beautiful victory certificates as shareable images.
+    """
+    
+    CERTIFICATE_SIZE = (1200, 1600)  # 3:4 aspect ratio for social media
+    
+    def __init__(self, blob_service_client):
+        self.blob_client = blob_service_client
+        self.container_name = "debate-certificates"
+    
+    async def generate_certificate(self, debate_result: Dict) -> Dict:
+        """
+        Generate victory certificate image.
+        
+        Args:
+            debate_result: Dict with username, personality_id, topic, scores, date
+        
+        Returns:
+            Dict with certificate_url, certificate_id
+        """
+        # Create image canvas
+        img = Image.new('RGB', self.CERTIFICATE_SIZE, color=(255, 250, 245))  # Warm white
+        draw = ImageDraw.Draw(img)
+        
+        # Load fonts (stored in backend/assets/fonts/)
+        title_font = ImageFont.truetype("assets/fonts/PlayfairDisplay-Bold.ttf", 72)
+        body_font = ImageFont.truetype("assets/fonts/CrimsonText-Regular.ttf", 36)
+        small_font = ImageFont.truetype("assets/fonts/CrimsonText-Italic.ttf", 24)
+        
+        # Draw decorative border
+        border_color = self._get_personality_color(debate_result["personality_id"])
+        draw.rectangle([(40, 40), (1160, 1560)], outline=border_color, width=8)
+        
+        # Draw trophy icon
+        draw.text((600, 100), "🏆", font=title_font, anchor="mm", fill=(212, 175, 55))
+        
+        # Draw title
+        draw.text((600, 200), "VIMARSH", font=title_font, anchor="mm", fill=(0, 0, 0))
+        draw.text((600, 260), "VICTORY CERTIFICATE", font=body_font, anchor="mm", fill=(0, 0, 0))
+        
+        # Draw username
+        draw.text((600, 360), f"@{debate_result['username']}", font=body_font, anchor="mm", fill=(0, 0, 0))
+        
+        # Draw achievement text
+        achievement_text = f"has successfully debated and\nprevailed in argument against"
+        draw.multiline_text((600, 440), achievement_text, font=small_font, anchor="mm", fill=(64, 64, 64), align="center")
+        
+        # Draw personality name
+        personality_name = self._get_personality_display_name(debate_result["personality_id"])
+        draw.text((600, 560), personality_name, font=title_font, anchor="mm", fill=border_color)
+        
+        # Draw debate details
+        details = f"""Topic: {debate_result['topic']}
+Format: {debate_result['format']}
+Date: {debate_result['date']}
+
+Final Score: {debate_result['user_score']}/100 vs {debate_result['personality_score']}/100"""
+        draw.multiline_text((600, 720), details, font=small_font, anchor="mm", fill=(64, 64, 64), align="center")
+        
+        # Draw personality quote
+        quote = debate_result.get("personality_quote", "Well argued.")
+        draw.multiline_text((600, 1000), f'"{quote}"', font=small_font, anchor="mm", fill=(128, 128, 128), align="center")
+        draw.text((600, 1080), f"- {personality_name}", font=small_font, anchor="mm", fill=(128, 128, 128))
+        
+        # Draw verification footer
+        draw.text((600, 1400), "Verified by vimarsh.vedprakash.net", font=small_font, anchor="mm", fill=(160, 160, 160))
+        draw.text((600, 1440), f"Debate ID: VMS-DEB-{debate_result['debate_id']}", font=small_font, anchor="mm", fill=(160, 160, 160))
+        
+        # Convert to bytes
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='PNG', optimize=True)
+        img_byte_arr.seek(0)
+        
+        # Upload to Azure Blob Storage
+        certificate_id = f"cert_{debate_result['debate_id']}.png"
+        blob_client = self.blob_client.get_blob_client(container=self.container_name, blob=certificate_id)
+        await blob_client.upload_blob(img_byte_arr, overwrite=True)
+        
+        certificate_url = blob_client.url
+        
+        return {
+            "certificate_id": certificate_id,
+            "certificate_url": certificate_url,
+            "size_bytes": len(img_byte_arr.getvalue())
+        }
+```
+
+### 21.3. Database Schema Enhancements
+
+**New Cosmos DB Containers**:
+
+#### Container: `debates`
+
+```json
+{
+  "id": "debate_abc123",
+  "user_id": "user_xyz",
+  "personality_id": "krishna",
+  "topic": "Free will vs determinism",
+  "user_position": "for",
+  "format": "shastrartha",
+  "difficulty": "advanced",
+  "max_turns": 15,
+  "current_turn": 8,
+  "phase": "rebuttal",
+  "user_score": 78,
+  "personality_score": 84,
+  "status": "active",
+  "winner": null,
+  "judge_enabled": true,
+  "private_mode": false,
+  "created_at": "2025-12-06T10:30:00Z",
+  "updated_at": "2025-12-06T10:45:00Z",
+  "completed_at": null,
+  "_partitionKey": "debate_abc123"
+}
+```
+
+**Indexes**: 
+- Primary: `/id`, `/user_id`
+- Composite: `/user_id, /created_at` (for user debate history)
+- Composite: `/personality_id, /created_at` (for leaderboards)
+
+#### Container: `debate_turns`
+
+```json
+{
+  "id": "turn_def456",
+  "debate_id": "debate_abc123",
+  "turn_number": 5,
+  "speaker": "user",
+  "message": "Free will exists because...",
+  "timestamp": "2025-12-06T10:40:00Z",
+  "score": 78,
+  "judge_feedback": "Strong logical structure, but lacks citation",
+  "dimensions_breakdown": {
+    "logical_coherence": 20,
+    "evidence_quality": 15,
+    "rhetorical_effect": 17,
+    "fallacy_avoidance": 14,
+    "citation_authenticity": 12
+  },
+  "citations": [],
+  "detected_fallacies": ["argument_from_personal_experience"],
+  "_partitionKey": "debate_abc123"
+}
+```
+
+**Indexes**:
+- Primary: `/debate_id`, `/turn_number`
+- Partition Key: `/debate_id` (all turns for a debate in same partition)
+
+#### Container: `user_debate_stats`
+
+```json
+{
+  "id": "user_xyz",
+  "total_debates": 25,
+  "wins": 15,
+  "losses": 8,
+  "draws": 2,
+  "avg_score": 82.4,
+  "highest_score": 96,
+  "rank": "DIALECTICIAN",
+  "xp": 4250,
+  "domain_expertise": {
+    "spiritual": {"debates": 8, "wins": 5, "avg_score": 80},
+    "scientific": {"debates": 10, "wins": 6, "avg_score": 85},
+    "philosophical": {"debates": 7, "wins": 4, "avg_score": 81}
+  },
+  "unlocked_opponents": ["krishna", "lincoln", "einstein", "marcus_aurelius"],
+  "achievements": [
+    {"id": "first_win", "name": "First Victory", "unlocked_at": "2025-11-15T14:20:00Z"},
+    {"id": "win_streak_5", "name": "Win Streak: 5", "unlocked_at": "2025-11-28T09:10:00Z"}
+  ],
+  "last_debate_at": "2025-12-06T10:45:00Z",
+  "_partitionKey": "user_xyz"
+}
+```
+
+**Indexes**:
+- Primary: `/id`
+- Composite: `/rank, /xp` (for global leaderboards)
+- Composite: `/domain_expertise/<domain>/wins, /xp` (for domain-specific leaderboards)
+
+#### Container: `debate_certificates`
+
+```json
+{
+  "id": "cert_debate_abc123",
+  "debate_id": "debate_abc123",
+  "user_id": "user_xyz",
+  "image_url": "https://vimarshblob.blob.core.windows.net/debate-certificates/cert_debate_abc123.png",
+  "shared_to_platforms": ["twitter", "linkedin"],
+  "share_count": 3,
+  "generated_at": "2025-12-06T10:50:00Z",
+  "_partitionKey": "user_xyz"
+}
+```
+
+### 21.4. API Endpoint Specifications
+
+**Base URL**: `https://vimarsh-api.azurewebsites.net/api`
+
+#### POST `/debate/create`
+
+Create new debate session.
+
+**Request Body**:
+```json
+{
+  "personality_id": "krishna",
+  "topic": "Free will vs determinism",
+  "user_position": "for",
+  "format": "shastrartha",
+  "difficulty": "advanced",
+  "judge_enabled": true,
+  "private_mode": false
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "debate_id": "debate_abc123",
+  "phase": "opening",
+  "format_rules": {
+    "phases": ["Purva Paksha", "Khandana", "Siddhanta"],
+    "total_turns": 15
+  },
+  "opening_prompt": "State your opening argument for free will..."
+}
+```
+
+#### POST `/debate/{debate_id}/submit`
+
+Submit user argument, get personality response.
+
+**Request Body**:
+```json
+{
+  "message": "Free will exists because humans possess agency..."
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "debate_id": "debate_abc123",
+  "turn_number": 6,
+  "personality_response": "You misunderstand the nature of action. Bhagavad Gita 3.27 states...",
+  "personality_citations": [
+    {"source": "Bhagavad Gita 3.27", "text": "All actions are performed..."}
+  ],
+  "user_score": 78,
+  "personality_score": 84,
+  "user_judge_feedback": "Strong logic, but lacks citations",
+  "user_dimensions": {
+    "logical_coherence": 20,
+    "evidence_quality": 15,
+    "rhetorical_effect": 17,
+    "fallacy_avoidance": 14,
+    "citation_authenticity": 12
+  },
+  "user_fallacies": ["argument_from_personal_experience"],
+  "debate_status": "active",
+  "winner": null
+}
+```
+
+#### GET `/debate/{debate_id}`
+
+Retrieve debate state and full transcript.
+
+**Response** (200 OK):
+```json
+{
+  "debate_id": "debate_abc123",
+  "topic": "Free will vs determinism",
+  "status": "active",
+  "current_turn": 8,
+  "user_score": 78,
+  "personality_score": 84,
+  "turns": [/* array of all turns */]
+}
+```
+
+#### GET `/debate/leaderboard`
+
+Global debate leaderboard.
+
+**Query Parameters**:
+- `timeframe`: "daily" | "weekly" | "all_time"
+- `domain`: "spiritual" | "scientific" | etc. (optional)
+- `personality_id`: "krishna" | "einstein" | etc. (optional)
+- `limit`: integer (default 100)
+
+**Response** (200 OK):
+```json
+{
+  "timeframe": "weekly",
+  "entries": [
+    {
+      "rank": 1,
+      "user_id": "user_abc",
+      "username": "philoknight",
+      "opponent": "einstein",
+      "score": 98,
+      "date": "2025-12-06"
+    },
+    /* ... */
+  ]
+}
+```
+
+#### GET `/debate/stats/{user_id}`
+
+User's debate statistics.
+
+**Response** (200 OK):
+```json
+{
+  "user_id": "user_xyz",
+  "total_debates": 25,
+  "wins": 15,
+  "losses": 8,
+  "win_rate": 0.60,
+  "avg_score": 82.4,
+  "rank": "DIALECTICIAN",
+  "xp": 4250,
+  "xp_to_next_rank": 2750,
+  "unlocked_opponents": ["krishna", "lincoln", "einstein"],
+  "domain_expertise": {/* ... */}
+}
+```
+
+#### POST `/debate/{debate_id}/certificate`
+
+Generate victory certificate.
+
+**Response** (200 OK):
+```json
+{
+  "certificate_id": "cert_debate_abc123",
+  "certificate_url": "https://vimarshblob.blob.core.windows.net/.../cert_debate_abc123.png",
+  "share_links": {
+    "twitter": "https://twitter.com/intent/tweet?text=...",
+    "linkedin": "https://linkedin.com/shareArticle?url=..."
+  }
+}
+```
+
+### 21.5. Enhanced RAG Service Modifications
+
+**File**: `backend/services/enhanced_rag_service_v6.py`
+
+**New Method**:
+
+```python
+async def retrieve_context(
+    self,
+    query: str,
+    personality_id: str,
+    mode: str = "guidance",  # New parameter: "guidance" | "adversarial"
+    top_k: int = 5
+) -> List[ContentChunk]:
+    """
+    Retrieve context with mode-specific ranking.
+    
+    For adversarial mode:
+    - Prioritize chunks that contradict user's query (for counterarguments)
+    - Boost chunks with strong citations
+    - Filter for argumentative/analytical content
+    """
+    if mode == "adversarial":
+        # Modify query to find counterarguments
+        adversarial_query = f"arguments against: {query}"
+        
+        # Retrieve with modified query
+        chunks = await self._vector_search(adversarial_query, personality_id, top_k * 2)
+        
+        # Re-rank for debate utility (favor argumentative, cited content)
+        chunks = self._rerank_for_debate(chunks, top_k)
+        
+        return chunks
+    else:
+        # Standard guidance retrieval (existing logic)
+        return await self._vector_search(query, personality_id, top_k)
+
+def _rerank_for_debate(self, chunks: List[ContentChunk], top_k: int) -> List[ContentChunk]:
+    """Re-rank chunks prioritizing debate-useful content."""
+    for chunk in chunks:
+        debate_score = 0
+        
+        # Boost argumentative language
+        if any(word in chunk.text.lower() for word in ["however", "although", "contrary", "refute", "argue"]):
+            debate_score += 0.3
+        
+        # Boost explicit citations
+        if "[" in chunk.text or "chapter" in chunk.text.lower():
+            debate_score += 0.2
+        
+        # Boost analytical content
+        if any(word in chunk.text.lower() for word in ["because", "therefore", "thus", "hence"]):
+            debate_score += 0.1
+        
+        chunk.similarity_score += debate_score
+    
+    # Sort by adjusted score
+    chunks.sort(key=lambda c: c.similarity_score, reverse=True)
+    return chunks[:top_k]
+```
+
+### 21.6. Performance Targets & Optimization
+
+**Latency Budgets**:
+
+| Operation | Target | Max Acceptable | Optimization Strategy |
+|-----------|--------|----------------|----------------------|
+| Debate creation | <500ms | 1s | Pre-cache format rules, async DB write |
+| User argument submission | <3s | 5s | Parallel judge + debater calls |
+| Judge scoring | <2s | 3s | Gemini 1.5 Flash (faster), structured output |
+| Personality response | <2s | 4s | Gemini 2.5 Flash with streaming |
+| RAG retrieval | <1s | 2s | Cosmos DB vector search (optimized indexes) |
+| Certificate generation | <3s | 5s | Pre-rendered templates, async upload |
+| Leaderboard query | <300ms | 500ms | Cached for 5 minutes, indexed queries |
+
+**Caching Strategy**:
+- **Format Rules**: Redis cache, never expires (static data)
+- **Personality Configs**: Redis cache, 1-hour TTL
+- **Leaderboards**: Redis cache, 5-minute TTL
+- **User Stats**: Redis cache, 1-minute TTL (updated after each debate)
+
+**Cost Optimization**:
+- **Judge Model**: Use Gemini 1.5 Flash ($0.075/$0.30 per 1M tokens) instead of 2.5 Flash
+- **Batching**: Batch judge scoring for both user + personality in single API call (saves 50% API calls)
+- **RAG Caching**: Cache RAG retrievals per personality+query pair (30-minute TTL)
+- **Estimated Cost per Debate**: $0.008 (judge) + $0.012 (debater) + $0.002 (RAG) = **$0.022 per debate**
+
+### 21.7. Security & Rate Limiting
+
+**Authentication**:
+- All debate endpoints require Microsoft Entra ID JWT token
+- Token validated via existing `auth/auth_middleware.py`
+
+**Rate Limiting** (per user):
+- Free Tier: 3 debates/month, 5 API calls/minute
+- Scholar Tier: Unlimited debates, 20 API calls/minute
+- Creator Tier: Unlimited debates, 50 API calls/minute
+
+**Input Validation**:
+- User message: Min 10 chars, max 1000 chars, profanity filter
+- Topic: Max 200 chars, no special characters
+- All inputs sanitized against injection attacks
+
+**Data Privacy**:
+- Private mode debates: Not included in leaderboards, no certificates shared
+- User can delete debate history (GDPR compliance)
+
+### 21.8. Testing Strategy
+
+**Unit Tests** (backend/tests/debate/):
+- `test_debate_service.py`: Debate flow logic, turn validation
+- `test_judge_service.py`: Scoring accuracy, fallacy detection
+- `test_debater_service.py`: Personality adherence, citation extraction
+- `test_progress_service.py`: XP calculation, rank progression, unlocks
+
+**Integration Tests**:
+- `test_full_debate_flow.py`: Create → Submit turns → Complete → Certificate
+- `test_rag_adversarial_mode.py`: RAG retrieval in adversarial context
+- `test_leaderboard_accuracy.py`: Ensure leaderboard reflects real-time data
+
+**E2E Tests** (Playwright):
+- `test_debate_arena_ui.py`: Full debate from setup to victory screen
+- `test_mobile_debate.py`: Mobile-specific layout and interactions
+- `test_certificate_generation.py`: Verify certificate image quality
+
+**Performance Tests** (Locust):
+- `test_concurrent_debates.py`: 100 concurrent debates, measure latency
+- `test_leaderboard_load.py`: 1000 users querying leaderboard simultaneously
+
+### 21.9. Integration with Existing Platform Architecture
+
+**Seamless Platform Integration:**
+
+Adversarial Debate Mode is architected as a **cohesive extension** of Vimarsh's existing technical infrastructure, reusing and enhancing current services rather than creating silos.
+
+**1. Enhanced RAG Service V6 Integration:**
+
+**Existing Service Enhancement** (`backend/services/enhanced_rag_service_v6.py`):
+```python
+# Add debate-specific mode to existing retrieve_context method
+async def retrieve_context(self, query: str, personality_id: str, 
+                          mode: str = "guidance") -> RAGContext:
+    """
+    Mode parameter extends existing guidance retrieval:
+    - "guidance": Standard cooperative retrieval (existing)
+    - "adversarial": Counterargument-focused retrieval (new)
+    - "fact_check": Citation validation mode (new)
+    """
+    # Shared vector search infrastructure (Azure OpenAI text-embedding-3-large)
+    # Shared BM25 + vector search hybrid fusion
+    # Shared citation grounding system
+```
+
+**Benefits**:
+- No duplicate vector search infrastructure
+- Reuse 32,000+ document knowledge base across all 25 personalities
+- Azure OpenAI embeddings ensure consistent semantic quality
+- Leverage existing hybrid search fusion and citation validation
+
+**2. Phase 2 Database Integration:**
+
+**Existing Containers** (reused):
+- `conversations`: Extends to store debate turns with `debate_mode: true` flag
+- `user_preferences`: Includes debate format preferences and difficulty settings
+- `analytics`: Tracks debate engagement alongside conversation metrics
+
+**New Containers** (debate-specific):
+- `debates`: Debate metadata and state management
+- `debate_turns`: Turn-by-turn argument history with judge scoring
+- `user_debate_stats`: XP, ranks, achievements, unlocks
+- `debate_certificates`: Certificate metadata and storage references
+
+**Unified Query Patterns**:
+- All containers use consistent Cosmos DB NoSQL API
+- Shared partition key strategies for optimal performance
+- Unified backup and disaster recovery procedures
+
+**3. Cross-Session Memory Enhancement:**
+
+**Existing Memory Service** (`backend/services/hierarchical_memory_service.py`):
+```python
+# Extend to include debate history in personality memory
+class HierarchicalMemoryService:
+    async def recall_user_context(self, user_id: str, personality_id: str) -> Dict:
+        """
+        Returns unified user context including:
+        - Conversation history (existing)
+        - Debate history (new): wins, losses, topics discussed
+        - Relationship level (enhanced by debate interactions)
+        """
+        return {
+            "conversations": await self._get_conversations(...),
+            "debates": await self._get_debate_summary(user_id, personality_id),
+            "relationship_level": self._calculate_relationship_with_debates(...)
+        }
+```
+
+**Debate Impact on Memory**:
+- Winning debates increases relationship level 2x faster than conversations
+- Personality remembers user's argumentative style and weak points
+- Adaptive difficulty adjusts based on past debate performance
+
+**4. Admin Dashboard Extensions:**
+
+**Existing Dashboard** (`frontend/src/components/admin/`):
+```
+AdminServiceDashboard.tsx (extends existing)
+├── User Management (existing) + Debate stats per user
+├── Content Quality (existing) + Debate citation validation
+├── Analytics (existing) + Debate engagement metrics
+├── System Health (existing) + Judge model performance
+└── Cost Management (existing) + Debate cost tracking
+```
+
+**New Admin Features**:
+- Debate quality monitoring (average scores, fallacy rates)
+- Judge model performance metrics (scoring consistency, fallacy detection accuracy)
+- Topic gap identification (topics lacking supporting evidence for debates)
+- Leaderboard moderation (remove abuse, verify achievements)
+
+**5. Authentication & Authorization Integration:**
+
+**Existing Auth System** (`backend/auth/auth_middleware.py`):
+```python
+# Debate endpoints use same JWT validation
+@jwt_required
+async def create_debate(req: func.HttpRequest) -> func.HttpResponse:
+    user_claims = get_user_claims(req)
+    subscription_tier = user_claims.get("subscription_tier", "free")
+    
+    # Tier-based feature gating (shared with conversation features)
+    if subscription_tier == "free" and user_debate_count_this_month(user_id) >= 3:
+        return func.HttpResponse("Upgrade to Scholar tier", status_code=402)
+    
+    # Judge scoring requires Scholar tier (parallels voice features gating)
+    judge_enabled = subscription_tier in ["scholar", "creator"]
+    ...
+```
+
+**Unified Subscription Management**:
+- Debate limits use same tier system as conversations
+- Judge scoring premium feature aligns with voice premium features
+- Institutional licensing includes both debates and conversations
+
+**6. Social Sharing Infrastructure Integration:**
+
+**Existing Sharing System** (`frontend/src/components/SharingInterface.tsx`):
+```typescript
+// Extend existing share cards for victory certificates
+interface ShareContent {
+  type: 'wisdom_quote' | 'conversation' | 'debate_certificate';  // Add new type
+  content: string;
+  personality_id: string;
+  image_url?: string;  // For certificates
+  utm_params: UtmParams;
+}
+
+// Reuse existing share handlers for Twitter, LinkedIn, Facebook, WhatsApp
+// Victory certificates become new share content type
+```
+
+**Unified Analytics**:
+- Share tracking includes debate certificates alongside wisdom quotes
+- Viral growth metrics combine conversation shares + debate shares
+- UTM parameters consistent across all share types
+
+**7. Voice Interface Extension:**
+
+**Existing Voice Services** (`backend/services/azure_speech_service.py`):
+```python
+# Extend for debate voice announcements
+class AzureSpeechService:
+    async def synthesize_speech(self, text: str, personality_id: str, 
+                               mode: str = "conversation") -> AudioResponse:
+        """
+        Mode parameter adds debate-specific voice styling:
+        - "conversation": Existing empathetic, calm SSML styles
+        - "debate": More assertive, competitive SSML styles
+        - "judge_announcement": Authoritative, neutral tone for scoring
+        """
+        config = self._get_voice_config(personality_id)
+        
+        if mode == "debate":
+            config["style"] = "assertive"
+            config["rate"] = "1.0"  # Normal pace (not slowed)
+        elif mode == "judge_announcement":
+            config["voice_name"] = "en-US-ChristopherNeural"  # Authoritative voice
+            config["style"] = "newscast"
+        
+        return await self._synthesize_with_ssml(text, config)
+```
+
+**Voice Debate Features**:
+- Speech-to-text for user arguments (existing STT service)
+- Text-to-speech for personality rebuttals (existing TTS service with debate styling)
+- Voice judge score announcements (new TTS usage)
+
+**8. PWA & Offline Capabilities:**
+
+**Existing PWA Manager** (`frontend/src/components/PWAManager.tsx`):
+```typescript
+// Extend service worker for debate caching
+const cacheStrategies = {
+  conversations: 'network-first',  // Existing
+  debates: 'network-first',        // New
+  debate_transcripts: 'cache-first',  // Offline-viewable
+  certificates: 'cache-first',     // Offline-shareable
+  leaderboards: 'network-first, cache-fallback'  // Real-time preferred
+};
+
+// Debate-specific offline capabilities
+// - View completed debate transcripts
+// - Review victory certificates
+// - Track personal stats (cached locally)
+```
+
+**Push Notifications Integration**:
+- Streak reminders include debate streaks
+- Daily challenge notifications use existing notification system
+- Leaderboard position change alerts
+
+**9. Multilingual Support Integration:**
+
+**Existing Translation System** (Gemini Pro multilingual):
+```python
+# Debate mode supports same languages as conversations
+SUPPORTED_LANGUAGES = ["en", "hi"]  # English, Hindi
+
+# Format names localized
+DEBATE_FORMATS_I18N = {
+    "shastrartha": {"en": "Shastrartha (Indian Classical)", "hi": "शास्त्रार्थ (भारतीय शास्त्रीय)"},
+    "socratic": {"en": "Socratic Dialectic", "hi": "सुकराती विधि"},
+    "oxford": {"en": "Oxford Union Style", "hi": "ऑक्सफोर्ड संघ शैली"},
+    "lincoln_douglas": {"en": "Lincoln-Douglas", "hi": "लिंकन-डगलस"}
+}
+
+# Judge feedback translated automatically by Gemini Pro
+```
+
+**Cultural Localization**:
+- Shastrartha format prominent for Indian users (detects browser locale)
+- Hindi debate UI uses same translation service as conversations
+- Personality voices use appropriate regional accents (Indian English for Krishna, Vivekananda, etc.)
+
+**10. Cost Management & Monitoring Integration:**
+
+**Existing Cost Tracking** (`backend/services/cost_management_service.py`):
+```python
+# Extend for debate-specific cost tracking
+class CostManagementService:
+    async def track_debate_cost(self, debate_id: str, costs: Dict):
+        """
+        Debate costs tracked alongside conversation costs:
+        - Debater model API calls (Gemini 2.5 Flash)
+        - Judge model API calls (Gemini 1.5 Flash)
+        - RAG vector search queries
+        - Certificate generation + storage
+        
+        Aggregated in unified cost dashboard
+        """
+        total_cost = (
+            costs["debater_tokens"] * self.GEMINI_2_5_FLASH_RATE +
+            costs["judge_tokens"] * self.GEMINI_1_5_FLASH_RATE +
+            costs["rag_queries"] * self.COSMOS_QUERY_COST +
+            costs["certificate_storage"] * self.BLOB_STORAGE_COST
+        )
+        
+        # Store in unified cost analytics (same container as conversation costs)
+        await self.analytics_container.upsert_item({
+            "type": "debate_cost",
+            "debate_id": debate_id,
+            "total_cost": total_cost,
+            "breakdown": costs,
+            "timestamp": datetime.utcnow()
+        })
+```
+
+**Unified Budget Monitoring**:
+- Debate costs included in overall platform cost tracking
+- Budget alerts trigger for combined conversation + debate spending
+- Cost optimization recommendations consider both modes
+
+**Architecture Benefits:**
+- **Code Reuse**: 60% of debate functionality uses existing services
+- **Consistency**: Unified UX patterns, auth flows, and error handling
+- **Maintainability**: Single codebase with shared infrastructure
+- **Scalability**: Existing serverless architecture handles debate load
+- **Cost Efficiency**: No duplicate infrastructure or redundant services
+
+---
+
+## 20. Azure OpenAI GPT-5-Mini Integration Architecture
+
+**Objective:** Transform from cross-cloud complexity (Google Gemini + Azure) to **100% Azure-native architecture** using GPT-5-mini for all response generation, leveraging existing Azure monthly credits for zero incremental costs while delivering consistent enterprise-grade quality across all 25 personalities and 6 domains.
+
+### 20.1. Architecture Overview
+
+**System Integration Diagram:**
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│             AZURE OPENAI GPT-5-MINI UNIFIED GENERATION                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  Frontend (React PWA)                                                   │
+│    ↓ User Query + Personality Selection                                │
+│                                                                         │
+│  Enhanced RAG Service V6                                                │
+│    ↓ Context Retrieval (Hybrid BM25 + Vector Search)                   │
+│    ↓ Retrieved Documents + Citations                                   │
+│    ↓ Azure OpenAI text-embedding-3-large (768 dims, MTEB 64.6)        │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ AzureGPT5Service (NEW - Simplified)                            │   │
+│  │                                                                 │   │
+│  │  1. Prompt Preparation (personality + RAG context + query)     │   │
+│  │  2. Azure Credit Tracking (Cost Management API - non-blocking) │   │
+│  │  3. API Call Execution (Azure OpenAI GPT-5-mini)               │   │
+│  │  4. Retry Logic (3 attempts with exponential backoff)          │   │
+│  │  5. Response Validation (quality + citation accuracy)           │   │
+│  │  6. Metrics Recording (usage + latency + cost)                 │   │
+│  │                                                                 │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                    ↓ Generated Response                                 │
+│                                                                         │
+│  Response Post-Processing                                               │
+│    ↓ Citation Formatting + Quality Validation                          │
+│                                                                         │
+│  Frontend Display                                                       │
+│    ↓ User sees seamless experience (consistent quality)                │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Complete Azure Ecosystem (100% Microsoft):
+├─ Azure Functions (Serverless backend compute)
+├─ Azure Cosmos DB (Vector database with hybrid search)
+├─ Azure OpenAI Embeddings (text-embedding-3-large, 768 dims)
+├─ Azure OpenAI Generation (GPT-5-mini, 200K context, 0.89 quality)
+├─ Azure Speech Services (Neural TTS for voice responses)
+├─ Microsoft Entra ID (Enterprise authentication)
+├─ Azure Static Web Apps (PWA hosting)
+└─ Azure Application Insights (Monitoring and analytics)
+
+**Cost: $0 within Azure monthly credits, $0.69/1M tokens if exhausted (vs. $1.55/1M Gemini)**
+```
+
+**Key Design Principles:**
+1. **Simplified Architecture:** Single high-quality model eliminates routing complexity
+2. **100% Azure Integration:** Complete Microsoft ecosystem, no cross-cloud dependencies
+3. **Zero Incremental Cost:** Use existing Azure credits (FREE) instead of paying Google
+4. **Consistent Quality:** GPT-5-mini 0.89 quality score for all queries (no variance)
+5. **Fast Implementation:** 50% faster than router approach (2 weeks vs. 4 weeks)
+6. **Enterprise SLA:** 99.9% uptime with Microsoft Premier Support
+7. **Cost Transparency:** Admin dashboards show Azure credit consumption and savings
+
+### 20.2. AzureGPT5Service - Simplified Generation Service
+
+**Service Architecture:**
+```python
+# backend/services/azure_gpt5_service.py
+from typing import Dict, Any, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+import logging
+from openai import AzureOpenAI
+import asyncio
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class GenerationResponse:
+    """Standardized response from GPT-5-mini"""
+    content: str
+    model_used: str = "gpt-5-mini"
+    cost_usd: float = 0.0
+    input_tokens: int = 0
+    output_tokens: int = 0
+    latency_ms: int = 0
+    quality_score: Optional[float] = None
+    retry_count: int = 0
+    
+class AzureGPT5Service:
+    """
+    Simplified Azure OpenAI GPT-5-mini service for all response generation.
+    Eliminates routing complexity, uses single high-quality model.
+    """
+    
+    def __init__(
+        self,
+        cost_tracking_service,
+        metrics_service
+    ):
+        self.cost_tracker = cost_tracking_service
+        self.metrics = metrics_service
+        
+        # Azure OpenAI client
+        self.client = AzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            api_version="2024-08-01-preview",
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
+        )
+        
+        # Model configuration
+        self.model_deployment = "vimarsh-gpt5-mini"  # Azure deployment name
+        self.cost_per_1m_tokens = 0.69  # $0.69/1M tokens
+        self.max_context_tokens = 200000  # 200K context window
+        self.max_retries = 3
+        
+        logger.info("✅ Azure GPT-5 Service initialized (deployment: %s)", self.model_deployment)
+        
+    async def generate_response(
+        self,
+        messages: List[Dict[str, str]],
+        personality_id: str,
+        user_id: str,
+        max_tokens: int = 2000,
+        temperature: float = 0.7,
+        **kwargs
+    ) -> GenerationResponse:
+        """
+        Generate response using Azure OpenAI GPT-5-mini.
+        
+        Args:
+            messages: Conversation messages in OpenAI format
+            personality_id: Personality identifier for context
+            user_id: User identifier for cost tracking
+            max_tokens: Maximum tokens to generate
+            temperature: Sampling temperature
+            **kwargs: Additional model-specific parameters
+            
+        Returns:
+            GenerationResponse with content, cost, and metadata
+            
+        Raises:
+            AzureOpenAIError: When all retry attempts exhausted
+        """
+        start_time = datetime.utcnow()
+        retry_count = 0
+        
+        # Retry logic with exponential backoff
+        for attempt in range(self.max_retries):
+            try:
+                logger.info(f"📤 Calling Azure GPT-5-mini (attempt {attempt + 1}/{self.max_retries})")
+                
+                response = await asyncio.to_thread(
+                    self.client.chat.completions.create,
+                    model=self.model_deployment,
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    **kwargs
+                )
+                
+                # Extract response data
+                content = response.choices[0].message.content
+                input_tokens = response.usage.prompt_tokens
+                output_tokens = response.usage.completion_tokens
+                total_tokens = response.usage.total_tokens
+                
+                # Calculate cost
+                cost = (total_tokens / 1_000_000) * self.cost_per_1m_tokens
+                
+                # Calculate latency
+                latency_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
+                
+                # Record metrics
+                await self.cost_tracker.record_usage(
+                    user_id=user_id,
+                    model="gpt-5-mini",
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cost_usd=cost
+                )
+                
+                await self.metrics.record_generation(
+                    personality_id=personality_id,
+                    model="gpt-5-mini",
+                    latency_ms=latency_ms,
+                    success=True
+                )
+                
+                logger.info(f"✅ GPT-5-mini success: {output_tokens} tokens, ${cost:.4f}, {latency_ms}ms")
+                
+                return GenerationResponse(
+                    content=content,
+                    model_used="gpt-5-mini",
+                    cost_usd=cost,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    latency_ms=latency_ms,
+                    retry_count=retry_count
+                )
+                
+            except Exception as e:
+                retry_count += 1
+                logger.warning(f"⚠️ GPT-5-mini attempt {attempt + 1} failed: {str(e)}")
+                
+                if attempt < self.max_retries - 1:
+                    # Exponential backoff: 1s, 2s, 4s
+                    backoff_seconds = 2 ** attempt
+                    logger.info(f"⏳ Retrying in {backoff_seconds}s...")
+                    await asyncio.sleep(backoff_seconds)
+                else:
+                    # All retries exhausted
+                    logger.error(f"❌ All {self.max_retries} GPT-5-mini attempts failed")
+                    await self.metrics.record_generation(
+                        personality_id=personality_id,
+                        model="gpt-5-mini",
+                        latency_ms=int((datetime.utcnow() - start_time).total_seconds() * 1000),
+                        success=False
+                    )
+                    raise AzureOpenAIError(f"Azure GPT-5-mini service unavailable after {self.max_retries} attempts")
+        
+    async def estimate_cost(self, input_tokens: int, output_tokens: int) -> float:
+        """Estimate cost for token usage"""
+        total_tokens = input_tokens + output_tokens
+        return (total_tokens / 1_000_000) * self.cost_per_1m_tokens
+        
+    async def health_check(self) -> bool:
+        """Check Azure OpenAI service health"""
+        try:
+            response = await asyncio.to_thread(
+                self.client.chat.completions.create,
+                model=self.model_deployment,
+                messages=[{"role": "user", "content": "ping"}],
+                max_tokens=5
+            )
+            return response is not None
+        except Exception as e:
+            logger.error(f"❌ Azure GPT-5 health check failed: {str(e)}")
+            return False
+```
+
+**Key Features:**
+- **Simplified Logic**: No routing, no complexity detection, single model
+- **Retry Mechanism**: 3 attempts with exponential backoff (1s, 2s, 4s)
+- **Cost Tracking**: Automatic usage recording for Azure credit monitoring
+- **Metrics**: Latency, success rate, token usage per personality
+- **Error Handling**: Clear error messages, automatic recovery attempts
+- **Health Checks**: Periodic service availability validation
+
+**Custom Exceptions:**
+```python
+class AzureOpenAIError(Exception):
+    """Raised when Azure OpenAI service is unavailable after all retries"""
+    pass
+```
+
+### 20.3. AzureCostMonitoringService - Non-Blocking Credit Tracking
+
+**Cost Monitoring System:**
+```python
+# backend/services/azure_cost_monitoring_service.py
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+import logging
+from azure.mgmt.costmanagement import CostManagementClient
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class CostAlertConfig:
+    """Alert threshold configuration"""
+    threshold_80_pct: bool = True
+    threshold_90_pct: bool = True
+    threshold_95_pct: bool = True
+    email_recipients: List[str] = field(default_factory=list)
+    
+@dataclass
+class AzureCreditStatus:
+    """Current Azure credit status"""
+    total_credits_usd: float
+    consumed_credits_usd: float
+    remaining_credits_usd: float
+    consumption_percentage: float
+    daily_burn_rate_usd: float
+    estimated_days_remaining: int
+    alert_level: str  # "none", "warning", "critical"
+    last_updated: datetime
+
+class AzureCostMonitoringService:
+    """
+    Non-blocking Azure cost monitoring with credit tracking and alerting.
+    Does NOT block requests - only monitors and alerts.
+    """
+    
+    def __init__(self, cosmos_container, cost_mgmt_client):
+        self.cosmos = cosmos_container
+        self.cost_client = cost_mgmt_client
+        self.alert_config = CostAlertConfig()
+        
+    async def get_credit_status(self) -> AzureCreditStatus:
+        """
+        Get current Azure credit status from Cost Management API.
+        
+        Returns:
+            AzureCreditStatus with consumption data and alert level
+        """
+        # Query Azure Cost Management API
+        credit_data = await self.cost_client.get_subscription_credits()
+        
+        total_credits = credit_data.get("total_credits_usd", 0)
+        consumed = credit_data.get("consumed_credits_usd", 0)
+        remaining = total_credits - consumed
+        consumption_pct = (consumed / total_credits * 100) if total_credits > 0 else 0
+        
+        # Calculate burn rate from last 7 days
+        daily_burn_rate = await self._calculate_daily_burn_rate()
+        estimated_days = int(remaining / daily_burn_rate) if daily_burn_rate > 0 else 999
+        
+        # Determine alert level
+        if consumption_pct >= 95:
+            alert_level = "critical"
+        elif consumption_pct >= 90:
+            alert_level = "warning"
+        elif consumption_pct >= 80:
+            alert_level = "info"
+        else:
+            alert_level = "none"
+        
+        return AzureCreditStatus(
+            total_credits_usd=total_credits,
+            consumed_credits_usd=consumed,
+            remaining_credits_usd=remaining,
+            consumption_percentage=consumption_pct,
+            daily_burn_rate_usd=daily_burn_rate,
+            estimated_days_remaining=estimated_days,
+            alert_level=alert_level,
+            last_updated=datetime.utcnow()
+        )
+    
+    async def record_gpt5_usage(
+        self,
+        user_id: str,
+        cost_usd: float,
+        input_tokens: int,
+        output_tokens: int,
+        personality_id: str,
+        metadata: Optional[Dict[str, Any]] = None
+    ):
+        """
+        Record GPT-5-mini usage for cost tracking (non-blocking).
+        
+        Args:
+            user_id: User identifier
+            cost_usd: Actual cost in USD
+            input_tokens: Input token count
+            output_tokens: Output token count
+            personality_id: Personality identifier
+            metadata: Optional metadata
+        """
+        usage_record = {
+            "id": f"{user_id}_{datetime.utcnow().isoformat()}_gpt5mini",
+            "user_id": user_id,
+            "cost_usd": cost_usd,
+            "model_id": "gpt-5-mini",
+            "provider": "azure_openai",
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "personality_id": personality_id,
+            "timestamp": datetime.utcnow().isoformat(),
+            "type": "gpt5_usage",
+            "metadata": metadata or {}
+        }
+        
+        await self.cosmos.upsert_item(usage_record)
+        
+        logger.info(
+            f"💰 Recorded ${cost_usd:.6f} GPT-5-mini usage for user {user_id} "
+            f"({input_tokens} + {output_tokens} tokens)"
+        )
+    
+    async def _calculate_daily_burn_rate(self) -> float:
+        """Calculate average daily burn rate from last 7 days"""
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(days=7)
+        
+        query = """
+            SELECT VALUE SUM(c.cost_usd)
+            FROM c
+            WHERE c.type = 'gpt5_usage'
+            AND c.timestamp >= @start_time
+            AND c.timestamp <= @end_time
+        """
+        
+        params = [
+            {"name": "@start_time", "value": start_time.isoformat()},
+            {"name": "@end_time", "value": end_time.isoformat()}
+        ]
+        
+        items = list(self.cosmos.query_items(
+            query=query,
+            parameters=params,
+            enable_cross_partition_query=True
+        ))
+        
+        weekly_total = items[0] if items and items[0] is not None else 0.0
+        return weekly_total / 7.0
+    
+    async def check_and_send_alerts(self):
+        """Check credit status and send alerts if thresholds crossed"""
+        status = await self.get_credit_status()
+        
+        if status.alert_level == "critical" and self.alert_config.threshold_95_pct:
+            await self._send_alert("CRITICAL", status, "95% of Azure credits consumed")
+        elif status.alert_level == "warning" and self.alert_config.threshold_90_pct:
+            await self._send_alert("WARNING", status, "90% of Azure credits consumed")
+        elif status.alert_level == "info" and self.alert_config.threshold_80_pct:
+            await self._send_alert("INFO", status, "80% of Azure credits consumed")
+    
+    async def _send_alert(self, level: str, status: AzureCreditStatus, message: str):
+        """Send alert to configured recipients"""
+        logger.warning(f"🚨 {level}: {message}")
+        # Implementation would integrate with notification service
+```
+
+### 20.4. Database Schema Extensions
+
+**Extended Container: `analytics` (add GPT-5 usage tracking)**
+```json
+{
+  "id": "<user_id>_<timestamp>_gpt5mini",
+  "type": "gpt5_usage",
+  "user_id": "user123",
+  "model_id": "gpt-5-mini",
+  "provider": "azure_openai",
+  "cost_usd": 0.00138,
+  "input_tokens": 1500,
+  "output_tokens": 500,
+  "personality_id": "krishna",
+  "timestamp": "2026-01-15T10:30:00Z",
+  "metadata": {
+    "conversation_id": "conv123",
+    "latency_ms": 1234,
+    "quality_score": 0.89
+  }
+}
+```
+
+**New Container: `azure_cost_monitoring` (platform-level tracking)**
+```json
+{
+  "id": "daily_<date>",
+  "type": "daily_cost_summary",
+  "date": "2026-01-15",
+  "total_credits_usd": 100.0,
+  "consumed_credits_usd": 12.50,
+  "remaining_credits_usd": 87.50,
+  "consumption_percentage": 12.5,
+  "total_requests": 1500,
+  "total_tokens": 2500000,
+  "avg_cost_per_request_usd": 0.00833,
+  "top_personalities": [
+    {"personality_id": "krishna", "requests": 500, "cost_usd": 4.15},
+    {"personality_id": "einstein", "requests": 300, "cost_usd": 2.49}
+  ],
+  "timestamp": "2026-01-15T23:59:59Z"
+}
+```
+
+### 20.5. API Endpoint Specifications
+
+**Modified Azure Function: Enhanced RAG Service Integration**
+```python
+# backend/services/enhanced_rag_service_v6.py
+# (Modification to existing service - not new function)
+
+class EnhancedRAGServiceV6:
+    def __init__(self):
+        # Replace Gemini client with Azure GPT-5 service
+        self.gpt5_service = AzureGPT5Service(
+            cost_tracking_service=cost_tracker_instance,
+            metrics_service=metrics_instance
+        )
+        # ... existing code ...
+    
+    async def generate_response(
+        self,
+        query: str,
+        personality_id: str,
+        user_id: str,
+        conversation_history: List[Dict] = None
+    ) -> Dict[str, Any]:
+        """
+        Generate response using Azure GPT-5-mini (replacing Gemini).
+        
+        Returns:
+        {
+          "response": "Generated wisdom...",
+          "citations": [...],
+          "model_used": "gpt-5-mini",
+          "cost_usd": 0.00138,
+          "latency_ms": 1234
+        }
+        """
+        # ... existing RAG pipeline code ...
+        
+        # Replace Gemini call with GPT-5-mini call
+        generation_response = await self.gpt5_service.generate_response(
+            messages=formatted_messages,
+            personality_id=personality_id,
+            user_id=user_id,
+            max_tokens=2000,
+            temperature=0.7
+        )
+        
+        return {
+            "response": generation_response.content,
+            "citations": extracted_citations,
+            "model_used": generation_response.model_used,
+            "cost_usd": generation_response.cost_usd,
+            "latency_ms": generation_response.latency_ms,
+            "quality_score": generation_response.quality_score
+        }
+```
+
+**New Azure Function: `admin/azure_cost_monitoring`**
+```python
+@app.route(route="admin/azure_cost_monitoring", methods=["GET"], auth_level=func.AuthLevel.ADMIN)
+async def admin_azure_cost_monitoring(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Admin dashboard for Azure cost monitoring and credit tracking.
+    
+    Response:
+    {
+      "azure_credits": {
+        "total_credits_usd": 100.0,
+        "consumed_credits_usd": 12.50,
+        "remaining_credits_usd": 87.50,
+        "consumption_percentage": 12.5,
+        "daily_burn_rate_usd": 1.78,
+        "estimated_days_remaining": 49,
+        "alert_level": "none"
+      },
+      "gpt5_performance": {
+        "total_requests": 1500,
+        "avg_latency_ms": 1234,
+        "success_rate": 0.989,
+        "avg_quality_score": 0.89,
+        "total_cost_usd": 12.50,
+        "cost_per_request_usd": 0.00833
+      },
+      "top_personalities": [
+        {
+          "personality_id": "krishna",
+          "requests": 500,
+          "cost_usd": 4.15,
+          "avg_quality_score": 0.91
+        }
+      ],
+      "cost_comparison": {
+        "current_gpt5_cost_usd": 12.50,
+        "previous_gemini_cost_usd": 27.75,
+        "savings_usd": 15.25,
+        "savings_percentage": 55.0
+      }
+    }
+    """
+    try:
+        cost_monitor = azure_cost_monitoring_instance
+        
+        # Get Azure credit status
+        credit_status = await cost_monitor.get_credit_status()
+        
+        # Query GPT-5 performance metrics from Cosmos DB
+        gpt5_metrics = await _get_gpt5_performance_metrics()
+        
+        # Calculate cost comparison vs baseline Gemini costs
+        cost_comparison = await _calculate_cost_savings()
+        
+        return func.HttpResponse(
+            json.dumps({
+                "azure_credits": credit_status.__dict__,
+                "gpt5_performance": gpt5_metrics,
+                "top_personalities": await _get_top_personalities_by_cost(),
+                "cost_comparison": cost_comparison
+            }),
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logger.error(f"Cost monitoring dashboard error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({"error": "internal_error"}),
+            status_code=500,
+            mimetype="application/json"
+        )
+
+### 20.6. Monitoring & Observability Integration
+
+**Application Insights Custom Metrics:**
+```python
+# backend/services/gpt5_metrics_service.py
+from applicationinsights import TelemetryClient
+
+class GPT5MetricsService:
+    """Azure Application Insights integration for GPT-5-mini monitoring"""
+    
+    def __init__(self):
+        self.telemetry = TelemetryClient(os.getenv("APPINSIGHTS_INSTRUMENTATION_KEY"))
+    
+    async def record_generation(
+        self,
+        personality_id: str,
+        model: str,
+        latency_ms: int,
+        success: bool,
+        cost_usd: float = 0,
+        quality_score: float = None
+    ):
+        """Record GPT-5-mini generation metrics"""
+        self.telemetry.track_event(
+            "GPT5Generation",
+            {
+                "personality_id": personality_id,
+                "model": model,
+                "success": success
+            },
+            {
+                "latency_ms": latency_ms,
+                "cost_usd": cost_usd,
+                "quality_score": quality_score or 0.0
+            }
+        )
+        
+        # Custom metrics for dashboard visualization
+        self.telemetry.track_metric("GPT5_Latency", latency_ms)
+        self.telemetry.track_metric("GPT5_Cost", cost_usd)
+        self.telemetry.track_metric("GPT5_Quality", quality_score or 0.0)
+    
+    async def record_azure_credit_alert(
+        self,
+        alert_level: str,
+        consumption_pct: float,
+        remaining_credits_usd: float
+    ):
+        """Record Azure credit consumption alerts"""
+        self.telemetry.track_event(
+            "AzureCreditAlert",
+            {
+                "alert_level": alert_level  # "info", "warning", "critical"
+            },
+            {
+                "consumption_percentage": consumption_pct,
+                "remaining_credits_usd": remaining_credits_usd
+            }
+        )
+```
+
+**Azure Monitor Alert Rules:**
+- **Azure Credit 80% Alert**: Consumption reaches 80% of available credits
+- **Azure Credit 90% Alert**: Consumption reaches 90% of available credits
+- **Azure Credit 95% Alert**: Consumption reaches 95% of available credits
+- **GPT-5 Service Degradation**: Success rate drops below 95%
+- **Cost Anomaly Alert**: Daily spending 2x above 7-day average
+- **Response Latency Alert**: Average latency exceeds 3 seconds
+
+### 20.7. Configuration Management
+
+**Environment Variables (Azure Function App Settings):**
+```bash
+# Azure OpenAI GPT-5-mini Configuration
+AZURE_OPENAI_ENDPOINT=https://vimarsh-openai.openai.azure.com/
+AZURE_OPENAI_API_KEY=xxxxx  # Stored in Azure Key Vault
+AZURE_OPENAI_DEPLOYMENT=vimarsh-gpt5-mini
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
+
+# Azure Cost Management Configuration
+AZURE_COST_MGMT_SUBSCRIPTION_ID=xxxxx
+AZURE_COST_MGMT_ALERT_THRESHOLD_80=true
+AZURE_COST_MGMT_ALERT_THRESHOLD_90=true
+AZURE_COST_MGMT_ALERT_THRESHOLD_95=true
+AZURE_COST_ALERT_EMAIL=admin@vimarsh.ai
+
+# GPT-5-mini Service Configuration
+GPT5_MAX_RETRIES=3
+GPT5_RETRY_BACKOFF_BASE=2  # Exponential backoff: 1s, 2s, 4s
+GPT5_DEFAULT_MAX_TOKENS=2000
+GPT5_DEFAULT_TEMPERATURE=0.7
+GPT5_ENABLE_QUALITY_SCORING=true
+
+# Existing Configuration (unchanged)
+COSMOS_DB_ENDPOINT=https://vimarsh-cosmos.documents.azure.com:443/
+AZURE_SPEECH_KEY=xxxxx
+AZURE_SPEECH_REGION=eastus
+```
+
+### 20.8. Performance & Scalability
+
+**Expected Performance Metrics:**
+- **GPT-5-mini API Latency**: 800-1200ms (improved from Gemini's 1000-1500ms)
+- **Total Response Time**: <2.0s (improved from current 2.3s)
+- **Cache Hit Rate**: 45% (maintained from current)
+- **Service Availability**: >99% (improved from 98.7% with single Azure provider)
+
+**Scalability Considerations:**
+- **Concurrent Requests**: Azure Functions Flex Consumption auto-scales to handle load
+- **Cost Tracking**: Cosmos DB queries for analytics, non-blocking for generation
+- **Single Provider**: Eliminates multi-provider coordination complexity
+- **Rate Limiting**: Azure OpenAI built-in rate limiting (100K TPM default)
+
+**Cost Impact Analysis:**
+- **Current Monthly Cost** (Gemini 2.5 Flash): ~$50-60/month for 1000 users ($1.55/1M tokens)
+- **Projected Cost with GPT-5-mini**: ~$22-27/month for 1000 users ($0.69/1M tokens)
+- **Cost Savings**: 55% reduction (from $1.55/1M to $0.69/1M)
+- **With Azure Credits**: $0/month until credits exhausted (significantly extends runway)
+- **Infrastructure Impact**: No additional costs (removes complexity vs. adding components)
+
+### 20.9. Security & Compliance
+
+**API Key Management:**
+- **Azure OpenAI Key**: Stored in Azure Key Vault, auto-rotated every 90 days
+- **Access Control**: Only AzureGPT5Service has access to OpenAI credentials
+- **Audit Logging**: All API key usage logged to Application Insights
+- **Rotation Strategy**: Automated rotation with zero-downtime via Azure Key Vault
+
+**Cost Data Protection:**
+- **Encryption**: All cost data encrypted at rest (Cosmos DB) and in transit (HTTPS)
+- **Access Control**: Cost data only accessible via admin-level authenticated endpoints
+- **PII Handling**: User cost data considered PII, handled per GDPR/CCPA requirements
+- **Data Retention**: Cost data retained for 12 months for billing analysis, then archived
+
+**Rate Limiting & Abuse Prevention:**
+- **Per-User Limits**: Max 100 requests/hour (existing limit maintained)
+- **Per-IP Limits**: Max 1000 requests/hour (existing limit maintained)
+- **Azure OpenAI Built-in**: Rate limiting at 100K tokens/minute enforced by Azure
+- **Cost Monitoring**: Automated alerts if unusual spending patterns detected
+
+### 20.10. Testing Strategy
+
+**Unit Tests:**
+```python
+# tests/test_azure_gpt5_service.py
+import pytest
+from services.azure_gpt5_service import AzureGPT5Service, GenerationResponse
+
+async def test_gpt5_service_initialization():
+    """Test Azure GPT-5 service initializes correctly"""
+    service = AzureGPT5Service(
+        cost_tracking_service=mock_cost_tracker,
+        metrics_service=mock_metrics
+    )
+    
+    assert service.model_deployment == "vimarsh-gpt5-mini"
+    assert service.cost_per_1m_tokens == 0.69
+    assert service.max_retries == 3
+
+async def test_gpt5_successful_generation():
+    """Test successful GPT-5-mini generation"""
+    service = AzureGPT5Service(...)
+    
+    response = await service.generate_response(
+        messages=[{"role": "user", "content": "What is dharma?"}],
+        personality_id="krishna",
+        user_id="test_user",
+        max_tokens=2000,
+        temperature=0.7
+    )
+    
+    assert isinstance(response, GenerationResponse)
+    assert response.model_used == "gpt-5-mini"
+    assert response.cost_usd > 0
+    assert response.input_tokens > 0
+    assert response.output_tokens > 0
+    assert response.retry_count == 0
+
+async def test_gpt5_retry_logic():
+    """Test retry logic on temporary failures"""
+    service = AzureGPT5Service(...)
+    
+    # Mock Azure OpenAI to fail twice, succeed third time
+    with patch_azure_openai_failures(fail_count=2):
+        response = await service.generate_response(...)
+        
+        # Should succeed after retries
+        assert response is not None
+        assert response.retry_count == 2
+
+async def test_gpt5_cost_calculation():
+    """Test accurate cost calculation"""
+    service = AzureGPT5Service(...)
+    
+    input_tokens = 1500
+    output_tokens = 500
+    expected_cost = (2000 / 1_000_000) * 0.69  # $0.00138
+    
+    cost = await service.estimate_cost(input_tokens, output_tokens)
+    assert abs(cost - expected_cost) < 0.0001
+```
+
+**Integration Tests:**
+```python
+# tests/test_gpt5_integration.py
+async def test_end_to_end_generation():
+    """Test complete generation flow with real Azure OpenAI"""
+    rag_service = EnhancedRAGServiceV6()
+    
+    response = await rag_service.generate_response(
+        query="What is dharma?",
+        personality_id="krishna",
+        user_id="test_user_integration"
+    )
+    
+    assert "response" in response
+    assert response["model_used"] == "gpt-5-mini"
+    assert response["cost_usd"] > 0
+    assert len(response["citations"]) > 0
+
+async def test_quality_consistency():
+    """Test quality score consistency across personalities"""
+    service = AzureGPT5Service(...)
+    
+    personalities = ["krishna", "einstein", "marcus_aurelius"]
+    quality_scores = []
+    
+    for personality in personalities:
+        response = await service.generate_response(
+            messages=[{"role": "user", "content": "What is wisdom?"}],
+            personality_id=personality,
+            user_id="test_user"
+        )
+        quality_scores.append(response.quality_score)
+    
+    # All should be above 0.85 (target 0.89)
+    assert all(score >= 0.85 for score in quality_scores)
+```
+
+**Load Tests:**
+```python
+# tests/load_test_gpt5.py
+async def load_test_concurrent_generation():
+    """Test GPT-5 service under 100 concurrent requests"""
+    service = AzureGPT5Service(...)
+    
+    tasks = [
+        service.generate_response(
+            messages=[{"role": "user", "content": f"Test query {i}"}],
+            personality_id="krishna",
+            user_id=f"test_user_{i}"
+        )
+        for i in range(100)
+    ]
+    
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    successes = [r for r in results if not isinstance(r, Exception)]
+    
+    # Target: >98% success rate under load
+    success_rate = len(successes) / len(results)
+    assert success_rate > 0.98
+    
+    # Target: <2s average latency under load
+    avg_latency = sum(r.latency_ms for r in successes) / len(successes)
+    assert avg_latency < 2000
+```
+
+### 20.11. Rollout Strategy
+
+**Phase 1: GPT-5-mini Service Implementation (Week 1)**
+- Create AzureGPT5Service class and unit tests
+- Create AzureCostMonitoringService class
+- Update Enhanced RAG Service V6 to use GPT-5-mini
+- Deploy to development environment
+- Run comprehensive test suite (unit + integration)
+- Validate cost tracking and metrics logging
+
+**Phase 2: Admin Dashboard & Monitoring (Days 8-10)**
+- Create admin cost monitoring dashboard
+- Implement Azure credit consumption tracking
+- Configure Application Insights alerts (80%, 90%, 95% thresholds)
+- Deploy admin dashboard to staging
+- Validate cost comparison metrics vs historical Gemini costs
+
+**Phase 3: Production Deployment (Days 11-14)**
+- Deploy GPT-5-mini service to production (disabled)
+- Gradual traffic shift: 10% → 50% → 100% over 3 days
+- Monitor key metrics:
+  - Response latency (target <2.0s)
+  - Success rate (target >98%)
+  - Quality score (target ≥0.89)
+  - Cost per request (target $0.00069/1K tokens)
+- Run A/B quality testing vs previous Gemini baseline
+- Collect user satisfaction feedback
+
+**Rollback Plan:**
+- Environment variable `USE_GEMINI_FALLBACK=true` reverts to Gemini
+- No database schema changes (additive only)
+- Retry logic ensures graceful degradation
+- Cost monitoring continues regardless of active model
+
+**Success Criteria:**
+- ✅ Response latency maintained or improved (<2.0s vs 2.3s current)
+- ✅ Quality score ≥0.89 across all 25 personalities
+- ✅ 55% cost reduction validated (from $1.55/1M to $0.69/1M)
+- ✅ Zero service interruptions during rollout
+- ✅ Azure credit consumption tracking operational
+- ✅ Admin dashboard displaying real-time cost metrics
+
+---
+
+## 22. Current Implementation Status & Production Metrics
 
 ### 20.1. Production Deployment Status (August 2025)
 

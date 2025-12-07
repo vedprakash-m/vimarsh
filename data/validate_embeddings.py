@@ -3,7 +3,7 @@
 Embedding Validation Script
 
 Validates that all embeddings in Cosmos DB have been properly migrated
-to gemini-embedding-001 with correct dimensionality and normalization.
+to text-embedding-3-large (Azure OpenAI) with correct dimensionality and normalization.
 
 Usage:
     python validate_embeddings.py              # Full validation
@@ -40,7 +40,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Expected configuration
-EXPECTED_MODEL = "gemini-embedding-001"
+EXPECTED_MODEL = "text-embedding-3-large"
 EXPECTED_DIMENSION = 768
 
 

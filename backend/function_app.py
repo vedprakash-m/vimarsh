@@ -574,6 +574,146 @@ async def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             headers=get_cors_headers()
         )
 
+@app.route(route="health/embeddings", methods=["GET"])
+async def health_embeddings_endpoint(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Health check for embedding quality across all personalities.
+    Validates that embeddings exist and contain real values (not all zeros).
+    """
+    try:
+        import statistics
+        from azure.cosmos import CosmosClient
+        import os
+        
+        # Get Cosmos DB connection
+        connection_string = os.getenv('AZURE_COSMOS_CONNECTION_STRING')
+        if not connection_string:
+            return func.HttpResponse(
+                json.dumps({
+                    "status": "error",
+                    "message": "AZURE_COSMOS_CONNECTION_STRING not configured"
+                }),
+                status_code=500,
+                headers=get_cors_headers()
+            )
+        
+        cosmos_client = CosmosClient.from_connection_string(connection_string)
+        database = cosmos_client.get_database_client('vimarsh-multi-personality')
+        container = database.get_container_client('personality_vectors')
+        
+        # All personalities to check
+        all_personalities = [
+            'krishna', 'buddha', 'jesus_christ', 'rumi', 'swami_vivekananda',
+            'marcus_aurelius', 'lao_tzu', 'confucius', 'aristotle', 'plato', 'socrates',
+            'chanakya', 'abraham_lincoln', 'benjamin_franklin', 'george_washington', 
+            'mahatma_gandhi', 'martin_luther_king_jr',
+            'albert_einstein', 'isaac_newton', 'nikola_tesla', 'archimedes', 'leonardo_da_vinci',
+            'rabindranath_tagore', 'william_shakespeare',
+            'sigmund_freud'
+        ]
+        
+        # Alternative name mappings
+        name_variations = {
+            'buddha': ['buddha', 'Buddha'],
+            'jesus_christ': ['jesus_christ', 'Jesus Christ', 'Jesus'],
+            'rumi': ['rumi', 'Rumi'],
+            'marcus_aurelius': ['marcus_aurelius', 'Marcus Aurelius'],
+            'lao_tzu': ['lao_tzu', 'Lao Tzu'],
+            'confucius': ['confucius', 'Confucius'],
+            'chanakya': ['chanakya', 'Chanakya'],
+            'abraham_lincoln': ['abraham_lincoln', 'Lincoln'],
+            'albert_einstein': ['albert_einstein', 'Einstein'],
+            'isaac_newton': ['isaac_newton', 'Newton'],
+            'nikola_tesla': ['nikola_tesla', 'Tesla']
+        }
+        
+        results = {
+            "status": "healthy",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "total_personalities": len(all_personalities),
+            "healthy_embeddings": 0,
+            "zero_embeddings": 0,
+            "missing_embeddings": 0,
+            "personalities": {}
+        }
+        
+        for personality in all_personalities:
+            variations = name_variations.get(personality, [personality])
+            
+            # Try to find documents with embeddings
+            found = False
+            for var in variations:
+                query = f"SELECT TOP 1 c.embedding FROM c WHERE (c.personality_id = '{var}' OR c.personality = '{var}') AND IS_DEFINED(c.embedding)"
+                try:
+                    items = list(container.query_items(query=query, enable_cross_partition_query=True))
+                    if items:
+                        emb = items[0].get('embedding', [])
+                        if emb and len(emb) == 768:
+                            found = True
+                            non_zero = sum(1 for v in emb if v != 0)
+                            
+                            if non_zero == 0:
+                                results["personalities"][personality] = {
+                                    "status": "zero_embedding",
+                                    "non_zero_count": 0,
+                                    "dimension": 768
+                                }
+                                results["zero_embeddings"] += 1
+                                results["status"] = "degraded"
+                            elif non_zero < 100:  # Less than 13% non-zero
+                                results["personalities"][personality] = {
+                                    "status": "suspicious",
+                                    "non_zero_count": non_zero,
+                                    "dimension": 768,
+                                    "warning": "Very few non-zero values"
+                                }
+                                results["healthy_embeddings"] += 1
+                            else:
+                                avg_mag = statistics.mean([abs(v) for v in emb])
+                                results["personalities"][personality] = {
+                                    "status": "healthy",
+                                    "non_zero_count": non_zero,
+                                    "dimension": 768,
+                                    "avg_magnitude": round(avg_mag, 6)
+                                }
+                                results["healthy_embeddings"] += 1
+                            break
+                except Exception as e:
+                    logger.warning(f"Query error for {var}: {e}")
+            
+            if not found:
+                results["personalities"][personality] = {
+                    "status": "missing",
+                    "message": "No documents with embeddings found"
+                }
+                results["missing_embeddings"] += 1
+                results["status"] = "degraded"
+        
+        # Set overall status
+        if results["zero_embeddings"] > 0 or results["missing_embeddings"] > 0:
+            results["status"] = "degraded"
+            results["recommendation"] = f"Re-embed {results['zero_embeddings']} personalities with zero embeddings"
+        
+        status_code = 200 if results["status"] == "healthy" else 503
+        
+        return func.HttpResponse(
+            json.dumps(results, indent=2),
+            status_code=status_code,
+            headers=get_cors_headers()
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Embeddings health check failed: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "status": "error",
+                "message": str(e),
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }),
+            status_code=500,
+            headers=get_cors_headers()
+        )
+
 @app.route(route="personalities/active", methods=["GET"])
 async def get_active_personalities(req: func.HttpRequest) -> func.HttpResponse:
     """Get list of active personalities with enhanced filtering"""

@@ -156,8 +156,8 @@ class EnhancedMetadataProductionSyncer:
             "personalities_list": active_personalities,
             "production_validation": {
                 "vector_database_chunks": production_data['total_chunks'],
-                "embedding_model": "gemini-embedding-001",
-                "embedding_dimensions": "768 (MRL-truncated, L2-normalized)",
+                "embedding_model": "text-embedding-3-large",
+                "embedding_dimensions": "768 (Azure OpenAI, truncated from 3072, L2-normalized)",
                 "production_url": "https://vimarsh.vedprakash.net",
                 "cosmos_db_container": "personality-vectors",
                 "last_upload_date": "2025-07-29"

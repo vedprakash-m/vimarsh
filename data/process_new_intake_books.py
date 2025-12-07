@@ -370,7 +370,7 @@ Processing Date: {datetime.now().isoformat()}
         print("-" * 40)
         
         # For this demo, we'll simulate embedding generation
-        # In production, this would use the actual Gemini embedding service
+        # In production, this would use the actual Azure OpenAI embedding service
         
         embedding_count = 0
         timestamp = datetime.now().isoformat()
@@ -380,13 +380,13 @@ Processing Date: {datetime.now().isoformat()}
             import random
             base_value = random.uniform(0.05, 0.15)  # Slight variation from previous batches
             entry["embedding"] = [base_value + random.uniform(-0.01, 0.01) for _ in range(768)]
-            entry["embedding_model"] = "gemini-embedding-001"
+            entry["embedding_model"] = "text-embedding-3-large"
             entry["embedding_generated_at"] = timestamp
             embedding_count += 1
         
         self.processing_stats["total_vectors"] = embedding_count
-        print(f"✅ Generated {embedding_count} embeddings using gemini-embedding-001 (MRL dim=768)")
-        print("📝 Note: This demo uses simulated embeddings. Production would use actual Gemini API.")
+        print(f"✅ Generated {embedding_count} embeddings using text-embedding-3-large (Azure OpenAI, 768 dims)")
+        print("📝 Note: This demo uses simulated embeddings. Production would use actual Azure OpenAI API.")
     
     async def update_metadata_system(self):
         """Update the existing metadata system with new sources"""

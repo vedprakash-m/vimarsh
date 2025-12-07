@@ -1899,6 +1899,950 @@ Contextual Navigation:
 
 ---
 
+## 6.5. Adversarial Debate Mode: UX Specifications
+
+### 6.5.1. Design Vision & User Psychology
+
+**Core UX Principle**: Transform passive wisdom consumption into active intellectual combat. The interface must communicate:
+- **Challenge & Competition**: Visual tension through contrasting panels, score meters, and countdown timers
+- **Intellectual Rigor**: Academic styling with debate format badges, citation indicators, and judge annotations
+- **Progress & Mastery**: Gamified elements (XP bars, rank badges, victory certificates) that reward learning
+- **Authentic Personality**: Maintain domain-specific theming even in adversarial mode (spiritual personalities remain reverent, scientists remain empirical)
+
+**Psychological Goals:**
+1. **Flow State Activation**: Real-time scoring creates immediate feedback loops essential for "flow"
+2. **Ego Investment**: Score displays and victory mechanics engage competitive drive without toxicity
+3. **Growth Mindset**: Frame losses as "learning opportunities" with constructive judge feedback
+4. **Social Proof**: Leaderboards and shareable certificates provide external validation
+
+### 6.5.2. Debate Mode Entry Points & Activation
+
+#### Entry Point 1: Personality Profile Card Enhancement
+
+**Current State**: Personality cards show domain, expertise, voice availability
+**Enhancement**: Add "Challenge Mode" toggle
+
+```
+┌────────────────────────────────────────────┐
+│  🕉️ KRISHNA                                │
+│  Lord of Dharma & Divine Wisdom            │
+├────────────────────────────────────────────┤
+│  Domain: Spiritual                         │
+│  Style: Compassionate, Philosophical       │
+│  Knowledge Base: 2,025 documents           │
+│                                            │
+│  Conversation Mode:                        │
+│  ○ Guidance (Cooperative)                  │
+│  ◉ Debate (Adversarial) 🥊                 │
+│                                            │
+│  [Start Conversation →]                    │
+└────────────────────────────────────────────┘
+```
+
+**Interaction**:
+- Radio button toggle with subtle animation
+- Debate mode shows 🥊 icon and red accent color
+- Tooltip on hover: "Challenge Krishna to test your reasoning against divine wisdom"
+
+#### Entry Point 2: Dedicated Debate Arena Tab
+
+**Navigation Enhancement**:
+Add new top-level navigation item between "Personalities" and "Wisdom Journal"
+
+```
+Navigation Bar:
+[Home] [Personalities] [🥊 Debate Arena] [Wisdom Journal] [Profile]
+                          └─ New addition
+```
+
+**Debate Arena Landing Page**:
+```
+┌────────────────────────────────────────────┐
+│  🥊 DEBATE ARENA                           │
+│  "Test your mind against history's greatest"│
+├────────────────────────────────────────────┤
+│                                            │
+│  Your Debate Stats:                        │
+│  Rank: Rhetorician (Tier 3)              │
+│  XP: 2,847 / 3,000 → Dialectician         │
+│  W-L Record: 12-8 (60%)                   │
+│                                            │
+│  ┌──────────────────────────────────────┐ │
+│  │  💡 DAILY CHALLENGE                  │ │
+│  │  Defend: "AI regulation is necessary"│ │
+│  │  Opponent: Isaac Asimov              │ │
+│  │  Expires: 14h 23m                    │ │
+│  │  [Accept Challenge →]                │ │
+│  └──────────────────────────────────────┘ │
+│                                            │
+│  Choose Your Opponent:                     │
+│  ┌─────────┬─────────┬─────────┬─────────┐│
+│  │Krishna  │Lincoln  │Einstein │Marcus   ││
+│  │🔓 Unlkd │🔓 Unlkd │🔒 Rank 3│🔒 Rank 3││
+│  │  [⚔️]   │  [⚔️]   │ Locked  │ Locked  ││
+│  └─────────┴─────────┴─────────┴─────────┘│
+│                                            │
+│  [🏆 Leaderboards] [📜 My Debates]        │
+└────────────────────────────────────────────┘
+```
+
+**Design System Integration**:
+- Debate Arena uses "combative" design theme: sharp angles, high contrast
+- Red accent color (#DC2626) replaces default orange (#F97316)
+- Locked opponents shown with padlock icon + rank requirement
+
+#### Entry Point 3: Contextual Debate Prompt
+
+**Trigger**: After 3+ cooperative conversation turns with any personality
+**Display**: Subtle banner slides down from top
+
+```
+┌────────────────────────────────────────────┐
+│  💭 Think you understand Krishna's perspective?  │
+│  [Challenge to Debate] [Maybe Later]       │
+└────────────────────────────────────────────┘
+```
+
+**Interaction**:
+- Dismissible with "X" or "Maybe Later"
+- If clicked, transition to Debate Setup Modal
+- Remembers dismissal for 7 days (don't re-show)
+
+### 6.5.3. Debate Setup Modal: Configuration Interface
+
+**Modal Trigger**: From any entry point, show debate configuration screen
+
+```
+┌───────────────────────────────────────────────────────┐
+│  ⚔️ DEBATE SETUP                             [Close ✕] │
+├───────────────────────────────────────────────────────┤
+│                                                       │
+│  Opponent:                                            │
+│  ┌────────────────────────────────────────────────┐  │
+│  │  🕉️ Krishna    Spiritual Domain              ▼│  │
+│  └────────────────────────────────────────────────┘  │
+│  Krishna has defeated 87% of challengers. Are you    │
+│  ready?                                               │
+│                                                       │
+│  Debate Topic:                                        │
+│  ○ Suggested: "Is free will an illusion?"            │
+│  ○ Custom: [Enter your topic...]                     │
+│                                                       │
+│  Your Position:                                       │
+│  ◉ For free will exists                              │
+│  ○ Against free will is illusion                     │
+│                                                       │
+│  Debate Format:                                       │
+│  ┌────────────────────────────────────────────────┐  │
+│  │  Shastrartha (Indian Classical)              ▼│  │
+│  └────────────────────────────────────────────────┘  │
+│  📖 3 phases: Purva Paksha → Khandana → Siddhanta   │
+│     5 turns per side, 15 turns total                 │
+│                                                       │
+│  Difficulty:                                          │
+│  [●○○○○] Novice    Easy challenges, gentle scoring   │
+│  [●●●○○] Advanced  Historical rigor, strict judging  │
+│  [●●●●●] Master    No mercy, expert-level arguments  │
+│                                                       │
+│  Features:                                            │
+│  ☑ Real-time Judge Scoring (Scholar tier)           │
+│  ☑ Victory Certificate on win                        │
+│  ☐ Private mode (not on leaderboard)                 │
+│                                                       │
+│  [Cancel]                     [Begin Debate →]       │
+└───────────────────────────────────────────────────────┘
+```
+
+**Design Specifications**:
+- **Modal Width**: 600px on desktop, full-screen on mobile
+- **Opponent Dropdown**: Shows personality avatar, domain badge, win rate stat
+- **Format Dropdown**: Shows 4 formats (Shastrartha, Socratic, Oxford, Lincoln-Douglas) with brief descriptions
+- **Difficulty Slider**: 5-dot visual with hover explanations
+- **Feature Checkboxes**: Grayed out if user lacks required subscription tier
+- **Begin Button**: Prominent, uses domain-specific color (Krishna → sacred saffron)
+
+**Validation**:
+- Topic required (minimum 5 characters)
+- Position selection required
+- Format selection required
+- Show tooltip if premium features selected but user is free tier: "Upgrade to Scholar to unlock judge scoring"
+
+### 6.5.4. Main Debate Interface: Split-Panel Arena
+
+**Layout Architecture**:
+Desktop (1920x1080): 50/50 split for user and personality sides
+Tablet (768px): Vertical stack, personality response above, user input below
+Mobile (375px): Single column, scroll to see personality responses
+
+#### Desktop Debate Arena Layout
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  ⚔️ DEBATE: Free Will vs Determinism        [Pause] [Forfeit] [✕]   │
+├────────────────────┬────────────────────────────────────────────────┤
+│  YOU  Score: 78/100│  🕉️ KRISHNA  Score: 92/100                     │
+├────────────────────┼────────────────────────────────────────────────┤
+│                    │                                                 │
+│  Turn 3 of 15      │  Phase: Khandana (Refutation)                  │
+│  Position: For     │  Time: 2m 14s                                  │
+│                    │                                                 │
+│  Your Argument:    │  Krishna's Response:                           │
+│  ───────────────   │  ───────────────────────────────────────────   │
+│  [Scroll history]  │  "You argue humans perceive choice, but the    │
+│                    │  Bhagavad Gita 3.27 reveals: 'Prakrti alone    │
+│  "Free will exists │  performs all actions. Deluded by ego, one     │
+│  because I feel    │  thinks: I am the doer.' Your feeling of       │
+│  agency in my      │  agency is the very delusion I caution         │
+│  choices..."       │  against. 🔗 [BG 3.27]                         │
+│                    │                                                 │
+│  Judge Feedback:   │  You have not addressed my citation. How do    │
+│  ┌──────────────┐  │  you reconcile subjective experience with      │
+│  │ Logical: 18/25│  │  the Gunas (material modes) that govern       │
+│  │ Evidence: 15/25│ │  action?"                                      │
+│  │ Rhetoric: 16/20│ │                                                 │
+│  │ Fallacy: 14/15│  │  [Scroll for earlier responses]               │
+│  │ Citation: 15/15│ │                                                 │
+│  └──────────────┘  │                                                 │
+│                    │                                                 │
+│  ⚠️ Detected:      │                                                 │
+│  Argument from     │                                                 │
+│  personal experience│                                                │
+│                    │                                                 │
+│  💡 Suggested:     │                                                 │
+│  Cite neuroscience │                                                 │
+│  or philosophy     │                                                 │
+│                    │                                                 │
+├────────────────────┴────────────────────────────────────────────────┤
+│  Your Next Argument:                                                 │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │  [Type your response to Krishna's argument...]             🎤│   │
+│  │                                                                │   │
+│  │                                                                │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+│  💡 Tip: Address Krishna's BG 3.27 citation directly               │
+│  [Submit Argument →]                               Character: 0/1000 │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Design System Details**:
+
+**Panel Division**:
+- **User Side (Left)**: White background (#FFFFFF), blue accent (#007AFF)
+- **Personality Side (Right)**: Domain-colored subtle gradient (Krishna → soft saffron #FFF7ED)
+- **Divider**: 2px solid line with subtle shadow to create depth
+
+**Score Display**:
+- **Typography**: SF Pro Display Bold, 32px
+- **Color Coding**: 0-40 (red), 41-70 (orange), 71-85 (yellow), 86-100 (green)
+- **Animation**: Pulse effect on score increase, shake on score decrease
+
+**Turn Counter**:
+- **Position**: Top left of user panel
+- **Format**: "Turn X of Y" with progress ring (SVG)
+- **Color**: Fills with personality accent as debate progresses
+
+**Message Bubbles**:
+- **User Messages**: Right-aligned, blue background (#007AFF), white text
+- **Personality Messages**: Left-aligned, personality-colored background, dark text
+- **Citations**: Inline link with 📖 icon, opens citation modal on click
+- **Timestamp**: Small gray text below each message
+
+**Judge Feedback Panel**:
+- **Position**: Bottom of user side, sticky (always visible)
+- **Dimensions**: 280px wide, 200px tall
+- **Update Trigger**: Appears/updates after each user submission
+- **Visualization**: Horizontal bars for each dimension (Logical, Evidence, etc.)
+- **Animation**: Bars fill left-to-right with smooth easing
+
+**Input Area**:
+- **Height**: 120px (expandable to 240px with content)
+- **Character Limit**: 1000 characters (encourages conciseness)
+- **Voice Input**: 🎤 icon in top-right, triggers speech-to-text
+- **Submit Button**: Prominent, disabled until user types > 10 characters
+
+### 6.5.5. Real-Time Score Visualization
+
+**Score Meter Component** (appears at top of each panel):
+
+```
+User Side:
+┌───────────────────────────────────┐
+│  YOU                       78/100 │
+│  ████████████████████░░░░░░░░░░░  │
+│  ↑ +3  Addressed citation         │
+└───────────────────────────────────┘
+
+Krishna Side:
+┌───────────────────────────────────┐
+│  🕉️ KRISHNA                92/100 │
+│  ████████████████████████████░░░░  │
+│  ↑ +5  Strong counterargument     │
+└───────────────────────────────────┘
+```
+
+**Micro-interactions**:
+- **Score Change Animation**: Number counts up/down over 0.5s with easing
+- **Bar Fill Animation**: Progress bar animates to new value over 0.8s
+- **Delta Indicator**: Shows "+3" or "-2" in green/red for 3 seconds after change
+- **Reason Tag**: Brief explanation ("Addressed citation") fades in below score
+
+**Judge Feedback Dimensions Breakdown**:
+
+```
+┌──────────────────────────────────────┐
+│  JUDGE ANALYSIS                      │
+├──────────────────────────────────────┤
+│  Logical Coherence      18/25       │
+│  ████████████████████░░░░░           │
+│                                      │
+│  Evidence Quality       15/25       │
+│  ███████████████░░░░░░░░░░           │
+│                                      │
+│  Rhetorical Effect      16/20       │
+│  ████████████████████░░░░            │
+│                                      │
+│  Fallacy Avoidance      14/15       │
+│  ████████████████████████░           │
+│                                      │
+│  Citation Auth          15/15       │
+│  ████████████████████████████        │
+│                                      │
+│  ⚠️  Detected Fallacy:               │
+│  Argument from personal experience   │
+│                                      │
+│  💡 Suggested Improvement:           │
+│  Cite neuroscience studies on        │
+│  volition or philosophical arguments │
+│  (e.g., compatibilism)               │
+└──────────────────────────────────────┘
+```
+
+**Interaction**:
+- Click on any dimension bar → Expand tooltip with detailed scoring rationale
+- Fallacy detected → Red warning badge with Wikipedia link for fallacy explanation
+- Suggested improvement → Actionable, specific guidance (not generic "do better")
+
+### 6.5.6. Debate Format-Specific UI Adaptations
+
+#### Shastrartha (Indian Classical) Format UI
+
+**Phase Indicators**:
+```
+┌────────────────────────────────────┐
+│  PHASE 1: PURVA PAKSHA             │
+│  (Presentation of Position)         │
+│  ●●●○○  Progress: 3/5 turns        │
+└────────────────────────────────────┘
+```
+
+**Special Features**:
+- **Sanskrit Terms**: Display with transliteration and tooltip (hover for English)
+- **Mandala Progress**: Circular progress indicator inspired by rangoli patterns
+- **Shloka Quoting**: If personality cites Sanskrit verse, show Devanagari with translation
+
+#### Socratic Dialectic Format UI
+
+**Role Reversal**: Personality asks questions, user must answer
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Socrates's Question (Turn 4 of 10):                    │
+│  "You claim justice is giving each what they deserve.   │
+│  But if a friend borrows your sword and goes mad,       │
+│  do you return it because he 'deserves' what is his?"   │
+│                                                          │
+│  Your Answer:                                            │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │  [Defend your definition or admit contradiction...] │ │
+│  └────────────────────────────────────────────────────┘ │
+│                                                          │
+│  ⚠️ Tip: Socrates values consistent definitions over    │
+│     complex arguments. Be precise.                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Special Scoring**: Penalize inconsistency heavily; reward admission of ignorance
+
+#### Oxford Union Style Format UI
+
+**Phase Badges**:
+```
+┌─────────────────────────────────────┐
+│  📢 CROSS-EXAMINATION PHASE          │
+│  You may now question Krishna's     │
+│  opening statement directly          │
+└─────────────────────────────────────┘
+```
+
+**Special Features**:
+- **Audience Polling** (simulated): Shows 52% For, 48% Against meter
+- **Time Limits**: Countdown timer per turn (2 minutes)
+- **Speaking Order**: Visual indicator of who speaks next
+
+### 6.5.7. Citation Modal & Fact-Checking UI
+
+**Citation Click Interaction**:
+When user or personality cites a source (e.g., "Bhagavad Gita 3.27"), clicking opens modal
+
+```
+┌───────────────────────────────────────────────┐
+│  📖 CITATION: Bhagavad Gita 3.27     [Close ✕]│
+├───────────────────────────────────────────────┤
+│                                               │
+│  Source: Bhagavad Gita, Chapter 3, Verse 27  │
+│  Personality: Krishna                         │
+│                                               │
+│  Original Sanskrit:                           │
+│  "प्रकृतेः क्रियमाणानि गुणैः कर्माणि सर्वशः ।│
+│   अहंकारविमूढात्मा कर्ताहमिति मन्यते ॥"     │
+│                                               │
+│  Transliteration:                             │
+│  "prakṛteḥ kriyamāṇāni guṇaiḥ karmāṇi        │
+│   sarvaśaḥ ahaṁkāra-vimūḍhātmā kartāham      │
+│   iti manyate"                                │
+│                                               │
+│  Translation:                                 │
+│  "All actions are performed by the modes of   │
+│  material nature. But the soul deluded by     │
+│  ego thinks: 'I am the doer.'"               │
+│                                               │
+│  Context: Krishna explains to Arjuna that     │
+│  human agency is illusory; actions arise from │
+│  the three Gunas (sattva, rajas, tamas).     │
+│                                               │
+│  [Read Full Chapter →] [Add to Wisdom Journal]│
+└───────────────────────────────────────────────┘
+```
+
+**Design Specifications**:
+- **Modal Width**: 500px on desktop, 90% width on mobile
+- **Typography**: Devanagari font for Sanskrit (Noto Sans Devanagari), serif for English
+- **Layout**: Vertical stack with clear section dividers
+- **Interaction**: Click outside modal or [Close ✕] to dismiss
+
+**User Citation Validation**:
+If user claims "Krishna said X" and it's unverifiable:
+
+```
+┌───────────────────────────────────────────────┐
+│  ⚠️ CITATION CHALLENGE                        │
+├───────────────────────────────────────────────┤
+│  Krishna challenges your claim:               │
+│  "I find no record of saying: 'Desire is the  │
+│  root of all suffering.' You may be confusing │
+│  me with Buddha. Cite your source or withdraw │
+│  the claim."                                  │
+│                                               │
+│  Impact: -10 Citation Authenticity score      │
+│                                               │
+│  [Provide Source] [Withdraw Claim]            │
+└───────────────────────────────────────────────┘
+```
+
+### 6.5.8. Debate Conclusion & Victory/Loss Screens
+
+**End Condition Triggers**:
+1. All turns completed (e.g., 15/15 for Shastrartha)
+2. User forfeits by clicking [Forfeit] button
+3. Time limit exceeded (if format has time constraints)
+
+#### Victory Screen (User Score > Personality Score)
+
+```
+┌──────────────────────────────────────────────────────┐
+│                                                      │
+│              🏆 VICTORY! 🏆                           │
+│                                                      │
+│  You have successfully defended your position        │
+│  against Krishna and demonstrated strong reasoning!  │
+│                                                      │
+│  ┌────────────────────────────────────────────────┐ │
+│  │  FINAL SCORES                                  │ │
+│  │  ────────────────────────────────────────────  │ │
+│  │  YOU:     87/100  ████████████████████████░░░  │ │
+│  │  KRISHNA: 84/100  ███████████████████████░░░░  │ │
+│  └────────────────────────────────────────────────┘ │
+│                                                      │
+│  🎯 YOUR PERFORMANCE BREAKDOWN:                      │
+│  • Logical Coherence: 23/25  (Excellent)            │
+│  • Evidence Quality: 20/25   (Strong)                │
+│  • Rhetorical Effect: 18/20  (Very Good)             │
+│  • Fallacy Avoidance: 13/15  (Good)                  │
+│  • Citation Authenticity: 13/15 (Good)               │
+│                                                      │
+│  💎 REWARDS:                                         │
+│  • +250 XP → Progress to Dialectician               │
+│  • Victory Certificate unlocked                      │
+│  • New achievement: "Defeated a Divine"              │
+│                                                      │
+│  KRISHNA'S PARTING WISDOM:                           │
+│  "You have argued well, though your path to truth    │
+│  differs from mine. As the Gita teaches: 'Better is │
+│  one's own dharma, though imperfect.' (BG 3.35)"    │
+│                                                      │
+│  [View Certificate] [Share Victory] [New Debate]     │
+└──────────────────────────────────────────────────────┘
+```
+
+**Design System**:
+- **Background**: Gradient from personality color to gold (#FFD700)
+- **Trophy Animation**: Trophy icon bounces in with confetti burst
+- **Score Comparison**: Side-by-side bars with highlight on user's higher score
+- **Personality Quote**: Maintains respectful tone even in defeat
+- **CTAs**: Three clear next actions (certificate, share, rematch)
+
+#### Loss Screen (User Score < Personality Score)
+
+```
+┌──────────────────────────────────────────────────────┐
+│                                                      │
+│              📚 LEARNING MOMENT                       │
+│                                                      │
+│  Krishna's reasoning prevailed this time.            │
+│  Every debate is an opportunity to sharpen your mind.│
+│                                                      │
+│  ┌────────────────────────────────────────────────┐ │
+│  │  FINAL SCORES                                  │ │
+│  │  ────────────────────────────────────────────  │ │
+│  │  YOU:     72/100  █████████████████░░░░░░░░░░  │ │
+│  │  KRISHNA: 91/100  ████████████████████████████░│ │
+│  └────────────────────────────────────────────────┘ │
+│                                                      │
+│  🎯 AREAS FOR IMPROVEMENT:                           │
+│  • ⚠️ Evidence Quality: 14/25 - Cite more sources   │
+│  • ⚠️ Fallacy Avoidance: 9/15 - Avoid ad hominem    │
+│  • ✓ Logical Coherence: 20/25 - Strong structure    │
+│  • ✓ Rhetorical Effect: 16/20 - Clear expression    │
+│  • ✓ Citation Auth: 13/15 - Accurate references     │
+│                                                      │
+│  💡 RECOMMENDED NEXT STEPS:                          │
+│  1. Review Krishna's arguments in [Debate Transcript]│
+│  2. Study logical fallacies in [Learning Center]     │
+│  3. Practice with easier opponent: [Rumi]            │
+│                                                      │
+│  💰 CONSOLATION REWARD:                              │
+│  • +100 XP for participation                         │
+│  • Debate recorded in your history                   │
+│                                                      │
+│  [View Transcript] [Try Again] [Choose New Opponent]│
+└──────────────────────────────────────────────────────┘
+```
+
+**Design System**:
+- **Background**: Muted personality color (no gold gradient)
+- **Icon**: 📚 book instead of trophy (emphasizes learning)
+- **Framing**: "Learning Moment" not "Defeat" (growth mindset language)
+- **Feedback**: Constructive with specific action items
+- **Reward**: Still award XP to avoid demotivation
+- **CTAs**: Encourage immediate retry or skill development
+
+### 6.5.9. Victory Certificate Generation & Sharing
+
+**Certificate Design Template**:
+
+```
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│                    🏆 VIMARSH 🏆                           │
+│               VICTORY CERTIFICATE                         │
+│                                                           │
+│  ═══════════════════════════════════════════════════     │
+│                                                           │
+│         [Username: @intellectualknight]                   │
+│                                                           │
+│            has successfully debated and                   │
+│           prevailed in argument against                   │
+│                                                           │
+│              🕉️ KRISHNA                                    │
+│         Lord of Dharma & Divine Wisdom                    │
+│                                                           │
+│  Topic: Free Will vs Determinism                          │
+│  Format: Shastrartha (Indian Classical)                   │
+│  Date: December 6, 2025                                   │
+│                                                           │
+│  Final Score: 87/100 vs 84/100                            │
+│                                                           │
+│  Distinguished Performance:                               │
+│  • Logical Coherence: 23/25                               │
+│  • Evidence Quality: 20/25                                │
+│  • Rhetorical Mastery: 18/20                              │
+│                                                           │
+│  "You have argued with clarity of purpose.                │
+│   May your intellect continue to illuminate truth."       │
+│                                - Krishna                   │
+│                                                           │
+│  ═══════════════════════════════════════════════════     │
+│                                                           │
+│         Verified by vimarsh.vedprakash.net               │
+│         Debate ID: VMS-DEB-2025-001847                    │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+**Technical Specifications**:
+- **Format**: PNG image, 1200x1600px (3:4 aspect ratio for social media)
+- **Typography**: Playfair Display for headers, Crimson Text for body
+- **Color Scheme**: Personality domain color as accent (Krishna → saffron gradient)
+- **Watermark**: Subtle Vimarsh logo in background
+- **QR Code**: Bottom right corner links to debate transcript (public if user allows)
+
+**Share Modal**:
+
+```
+┌─────────────────────────────────────────────┐
+│  🎉 SHARE YOUR VICTORY                      │
+├─────────────────────────────────────────────┤
+│                                             │
+│  [Certificate Preview Image]                │
+│                                             │
+│  Caption (editable):                        │
+│  ┌─────────────────────────────────────┐   │
+│  │ I just defeated AI Krishna in a     │   │
+│  │ debate on free will! Final score:   │   │
+│  │ 87-84. Think you can do better?     │   │
+│  │ Try at vimarsh.vedprakash.net 🏆     │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  Share to:                                  │
+│  [🐦 Twitter] [💼 LinkedIn] [📘 Facebook]   │
+│  [📋 Copy Link] [⬇️ Download PNG]           │
+│                                             │
+│  Visibility:                                │
+│  ◉ Public (appears on leaderboard)          │
+│  ○ Private (link share only)                │
+│                                             │
+│  [Cancel]               [Share Now →]       │
+└─────────────────────────────────────────────┘
+```
+
+**Social Media Optimization**:
+- **Twitter**: Auto-shortened link with UTM tracking, @vimarsh mention
+- **LinkedIn**: Professional framing: "Sharpening my critical thinking skills with AI-powered debates"
+- **Facebook**: Detailed post with debate topic and personality description
+- **All Platforms**: Include #IntellectualChallenge #Vimarsh hashtags
+
+### 6.5.10. Leaderboard & Competitive Features UI
+
+**Global Leaderboard Screen**:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  🏆 DEBATE LEADERBOARDS                                    │
+├────────────────────────────────────────────────────────────┤
+│  Timeframe: [Daily ▼] [Weekly] [All-Time]                 │
+│  Domain: [All Domains ▼] [Spiritual] [Scientific] ...     │
+│                                                            │
+│  ┌────────────────────────────────────────────────────┐   │
+│  │  Rank  User            Opponent    Score    Date   │   │
+│  │  ────  ────────────    ────────    ─────    ────   │   │
+│  │  🥇 1  @philoknight    Einstein    98/100   Dec 6  │   │
+│  │  🥈 2  @logicmaster    Socrates    96/100   Dec 6  │   │
+│  │  🥉 3  @debatepro      Lincoln     94/100   Dec 5  │   │
+│  │     4  @thinker42      Marcus A    93/100   Dec 6  │   │
+│  │     5  @argueforgood   Chanakya    92/100   Dec 5  │   │
+│  │    ...                                             │   │
+│  │    47  You             Krishna     87/100   Dec 6  │   │
+│  │    ...                                             │   │
+│  └────────────────────────────────────────────────────┘   │
+│                                                            │
+│  🎯 Your Best Scores:                                      │
+│  • Krishna: 87/100 (#47 globally)                         │
+│  • Lincoln: 82/100 (#103 globally)                        │
+│  • Rumi: 79/100 (#156 globally)                           │
+│                                                            │
+│  💡 Climb the ranks: Beat Einstein (locked at Rank 3)     │
+│                                                            │
+│  [Filter by Opponent ▼] [View My Debates]                 │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Design Specifications**:
+- **Rank Indicators**: Gold/Silver/Bronze medals for top 3, numbers for rest
+- **Your Position**: Highlighted row with subtle background color
+- **Scrollable Table**: Virtualized scrolling for performance (handles 10,000+ entries)
+- **Opponent Filtering**: Dropdown shows personality avatars + names
+- **Time Filtering**: Daily (24h), Weekly (7d), All-Time
+
+**Daily Challenge Widget** (on Debate Arena home):
+
+```
+┌──────────────────────────────────────────────┐
+│  💡 TODAY'S DEBATE CHALLENGE                  │
+├──────────────────────────────────────────────┤
+│  Topic: "AI regulation is necessary for safety"│
+│  Opponent: Isaac Asimov 🤖                    │
+│  Defend: [For] or [Against]                   │
+│  Expires in: 14h 23m ⏰                        │
+│                                              │
+│  🏆 Today's Top Score: 94/100 by @aiethicist │
+│  👥 Participants: 127 users                   │
+│                                              │
+│  Rewards:                                     │
+│  • Daily Champion badge (top score)          │
+│  • +500 XP bonus                              │
+│  • Featured on homepage                       │
+│                                              │
+│  [Accept Challenge →]                         │
+└──────────────────────────────────────────────┘
+```
+
+**Interaction**:
+- Challenge resets at midnight UTC
+- Topic selected by admin or trending current events
+- Opponent rotation ensures variety (different domain each day)
+- Leaderboard updates in real-time as users complete challenge
+
+### 6.5.11. Integration with Existing Platform UX
+
+**Cohesive User Experience Design:**
+
+Adversarial Debate Mode is designed as a **seamless enhancement** to Vimarsh's existing UX, not a separate application. All debate interfaces maintain consistency with the platform's Apple-inspired design system while introducing "competitive" visual elements.
+
+**1. Domain-Specific Theming Preservation:**
+- **Spiritual Debates**: Maintain sacred aesthetics with lotus patterns, saffron accents, and reverent typography even in adversarial mode
+- **Scientific Debates**: Use clean, laboratory-inspired interfaces with equation support and diagram capabilities
+- **Leadership Debates**: Employ authoritative design with government seal motifs and document-style formatting
+- **Philosophical Debates**: Integrate classical column elements and contemplative color palettes
+- **Debate Arena UI** adapts personality-specific themes dynamically based on selected opponent
+
+**2. PWA Integration:**
+- **Offline Debate Transcripts**: Users can review completed debates without internet connection
+- **Installation Prompts**: Victory screen triggers PWA install banner ("Add to Home Screen to track your debate progress")
+- **Push Notifications**: Debate streak reminders, daily challenge alerts, and leaderboard position changes
+- **App Icon Badge**: Shows unread judge feedback or pending daily challenges
+
+**3. Voice Interface Extension:**
+- **Voice Debate Mode**: Users can participate in debates entirely through speech
+- **Real-Time Transcription**: Speech-to-text displays user arguments as they speak
+- **Judge Audio Announcements**: Personality-matched Azure Neural voices read score updates
+- **Accessibility**: Voice debates reduce barriers for users with visual or motor impairments
+
+**4. Memory & Personalization Integration:**
+- **Debate Memory**: Cross-session conversation memory includes debate history
+- **Adaptive Difficulty**: System adjusts personality challenge level based on past debate performance
+- **Personality Recommendations**: After cooperative conversation, system suggests debate as next step
+- **Relationship Deepening**: Winning debates against personality increases relationship level faster
+
+**5. Wisdom Journal Synergy:**
+- **One-Click Save**: "Add to Journal" button on compelling arguments (user's or personality's)
+- **Debate Insights**: Journal entry types include "Debate Lesson" with special formatting
+- **Semantic Search**: Find previous debates on similar topics using Azure OpenAI embeddings
+- **Reflection Prompts**: Journal suggests reflection questions based on debate weaknesses
+
+**6. Admin Dashboard Extensions:**
+- **Debate Analytics**: Admin panel shows debate completion rates, average scores, popular topics
+- **Quality Monitoring**: Track judge model performance and citation validation accuracy
+- **Content Gap Identification**: Identify topics where personalities lack supporting evidence
+- **User Progression Tracking**: Monitor user skill development across debate dimensions
+
+**7. Social Sharing Enhancement:**
+- **Certificate Cards**: Victory certificates use existing share card infrastructure
+- **Debate Highlights**: Generate quote cards from best debate moments
+- **Transcript Sharing**: Social-optimized debate transcript snippets with personality branding
+- **Viral Mechanics**: Shared content includes "Challenge [Personality] yourself" CTA
+
+**8. Authentication & Privacy:**
+- **Microsoft Entra ID SSO**: Seamless login for institutional debate club accounts
+- **Privacy Controls**: Users choose debate visibility (public leaderboard vs. private history)
+- **Role-Based Access**: Teachers can monitor student debate performance via admin dashboard
+- **Data Export**: Users can download all debate transcripts for portfolio/resume use
+
+**9. Multilingual Consistency:**
+- **Hindi Debate Support**: All debate UI, format names, and judge feedback available in Hindi
+- **Cultural Localization**: Shastrartha format prominently featured for Indian users
+- **Translation Quality**: Gemini Pro ensures accurate debate argument translation
+- **Regional Personality Voices**: Indian personalities use Indian English neural voices
+
+**10. Progressive Feature Discovery:**
+- **Contextual Tips**: After 3+ conversations, tooltip suggests "Try Debate Mode for intellectual challenge"
+- **Format Tutorials**: First-time debate users see quick format explanation overlays
+- **Judge Feedback Guidance**: Tooltips explain scoring dimensions on first debate
+- **Gamification Onboarding**: Streak system and badges explained through progressive disclosure
+
+**Unified Navigation Flow:**
+```
+Landing Page → Personality Selector → Conversation Mode ⇄ Debate Mode
+                                           ↓
+                     Wisdom Journal ← Debate Insights
+                                           ↓
+                     Progress Dashboard → Debate Stats
+                                           ↓
+                     Leaderboards & Social Sharing
+```
+
+**Design System Consistency:**
+- **Typography**: SF Pro (system font) maintained across debate interfaces
+- **Color Palette**: Apple system colors with debate-specific accent (red #DC2626 for adversarial)
+- **Spacing**: 8px base grid system preserved in all debate UI components
+- **Animations**: Consistent easing functions and duration with existing platform animations
+- **Accessibility**: WCAG 2.1 AA compliance maintained for all debate features
+
+**Mobile-First Responsive Adaptations:**
+- **Debate Arena**: Vertical stack layout on mobile (<768px)
+- **Score Meters**: Compact horizontal bars replace large side panels
+- **Input Area**: Expandable textarea that grows with typing
+- **Judge Feedback**: Collapsible panel accessible via floating action button
+- **Gesture Support**: Swipe to view personality responses, long-press for citation modal
+
+**Expected UX Impact:**
+- **Session Duration**: Debates increase average session from 5-8 minutes to 15-20 minutes
+- **Feature Discovery**: Debate mode boosts exploration of voice, memory, and journal features
+- **User Retention**: Gamification and competitive elements increase 7-day retention by projected 40%
+- **Premium Conversion**: Judge scoring feature drives 15% conversion to Scholar tier
+- **Social Amplification**: Certificate sharing increases organic signups by estimated 25%
+
+### 6.5.12. Debate History & Transcript Viewer
+
+**My Debates Screen**:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  📜 MY DEBATES                                              │
+├────────────────────────────────────────────────────────────┤
+│  Filters: [All] [Wins] [Losses] [In Progress]              │
+│  Sort by: [Recent ▼] [Highest Score] [Opponent]           │
+│                                                            │
+│  ┌────────────────────────────────────────────────────┐   │
+│  │  Dec 6, 2025   VICTORY  Score: 87/100            │   │
+│  │  🕉️ Krishna - Free Will vs Determinism            │   │
+│  │  Format: Shastrartha  •  15 turns                 │   │
+│  │  [View Transcript] [Share] [Rematch]              │   │
+│  └────────────────────────────────────────────────────┘   │
+│                                                            │
+│  ┌────────────────────────────────────────────────────┐   │
+│  │  Dec 5, 2025   LEARNING  Score: 72/100           │   │
+│  │  🔬 Einstein - Science & Ethics                    │   │
+│  │  Format: Oxford Union  •  12 turns                │   │
+│  │  [View Transcript] [Analyze] [Improve]            │   │
+│  └────────────────────────────────────────────────────┘   │
+│                                                            │
+│  ┌────────────────────────────────────────────────────┐   │
+│  │  Dec 4, 2025   IN PROGRESS                        │   │
+│  │  🏛️ Lincoln - Civil Liberties in Wartime          │   │
+│  │  Format: Lincoln-Douglas  •  6/8 turns            │   │
+│  │  [Resume Debate]                                   │   │
+│  └────────────────────────────────────────────────────┘   │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Transcript Viewer Modal**:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  📜 DEBATE TRANSCRIPT                             [Close ✕] │
+├────────────────────────────────────────────────────────────┤
+│  Debate: Free Will vs Determinism                          │
+│  Date: December 6, 2025                                    │
+│  Opponent: 🕉️ Krishna                                       │
+│  Format: Shastrartha (Indian Classical)                    │
+│  Final Score: You 87/100, Krishna 84/100                   │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │  Turn 1 - Purva Paksha (Your Opening)              │ │
+│  │  ──────────────────────────────────────────────────  │ │
+│  │  You (2:14 PM):                                     │ │
+│  │  "Free will exists because humans possess the       │ │
+│  │  ability to make conscious choices that alter       │ │
+│  │  outcomes. Neuroscience supports this view..."      │ │
+│  │                                                      │ │
+│  │  Judge Score: 75/100                                │ │
+│  │  • Logical: 19/25  • Evidence: 17/25               │ │
+│  │  • Rhetoric: 16/20 • Fallacy: 13/15                │ │
+│  │  • Citation: 10/15                                  │ │
+│  │  Feedback: Strong opening but lacks citations      │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │  Turn 2 - Purva Paksha (Krishna's Opening)         │ │
+│  │  ──────────────────────────────────────────────────  │ │
+│  │  Krishna (2:15 PM):                                 │ │
+│  │  "You misunderstand the nature of action. Bhagavad │ │
+│  │  Gita 3.27 states: 'All actions are performed by   │ │
+│  │  the modes of material nature...'"                  │ │
+│  │  🔗 [BG 3.27]                                        │ │
+│  │                                                      │ │
+│  │  Judge Score: 88/100                                │ │
+│  │  [View full turn analysis...]                       │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                            │
+│  [Scroll for all 15 turns...]                             │
+│                                                            │
+│  [⬇️ Download PDF] [🔗 Share Link] [📊 Performance Report] │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Design Features**:
+- **Turn-by-turn breakdown**: Each turn expandable/collapsible
+- **Citation Links**: All source references clickable → opens citation modal
+- **Judge Annotations**: Inline feedback preserved from original debate
+- **Export Options**: PDF download, public link sharing (if user allows)
+
+### 6.5.12. Mobile-Specific Debate UX Adaptations
+
+**Vertical Layout** (375px width):
+
+```
+┌──────────────────────────────────┐
+│  ⚔️ DEBATE                   [≡] │
+│  Free Will vs Determinism        │
+├──────────────────────────────────┤
+│  🕉️ KRISHNA                       │
+│  Score: 92/100  ███████████████░ │
+│  Turn 3/15   Phase: Khandana     │
+├──────────────────────────────────┤
+│  Krishna's Response:             │
+│  ────────────────────────────    │
+│  "You argue humans perceive      │
+│  choice, but the Bhagavad Gita   │
+│  3.27 reveals: 'Prakrti alone    │
+│  performs all actions...'        │
+│  🔗 [BG 3.27]                     │
+│                                  │
+│  [Scroll to see full response]   │
+├──────────────────────────────────┤
+│  YOU                              │
+│  Score: 78/100  ██████████████░░ │
+├──────────────────────────────────┤
+│  Your Turn:                       │
+│  ┌────────────────────────────┐  │
+│  │ [Type response...]      🎤 │  │
+│  └────────────────────────────┘  │
+│  [Submit →]        Characters: 0 │
+├──────────────────────────────────┤
+│  Judge Feedback:         [Show ▾]│
+└──────────────────────────────────┘
+```
+
+**Mobile Optimizations**:
+- **Single Column**: Personality on top, user input on bottom
+- **Collapsible Panels**: Judge feedback hidden by default (expand on tap)
+- **Sticky Input**: Input area stays fixed at bottom while scrolling personality responses
+- **Swipe Gestures**: Swipe left/right to view previous turns
+- **Voice Priority**: 🎤 icon prominent for easier voice input on mobile
+
+### 6.5.13. Accessibility Considerations for Debate Mode
+
+**Screen Reader Support**:
+- **ARIA Labels**: All score meters labeled "User debate score: 78 out of 100"
+- **Live Regions**: Score updates announced via aria-live="polite"
+- **Keyboard Navigation**: Tab through judge feedback dimensions, Enter to expand tooltips
+
+**Visual Accessibility**:
+- **High Contrast Mode**: Score meters use patterns + colors (not just colors)
+- **Font Sizing**: All text respects user's browser font size preferences
+- **Color Blind Friendly**: Red/green score indicators supplemented with icons (↑↓)
+
+**Motor Accessibility**:
+- **Large Touch Targets**: All buttons minimum 44x44px
+- **Voice Input Alternative**: 🎤 icon enables hands-free argument submission
+- **Keyboard Shortcuts**: 
+  - `Ctrl+Enter` to submit argument
+  - `Ctrl+?` to show judge feedback
+  - `Esc` to exit debate (with confirmation)
+
+---
+
 ## 7. Accessibility & Inclusivity
 
 ### 7.1. Universal Design Features
@@ -3280,6 +4224,383 @@ Emergency Control Styling:
 - **Emergency Access**: Super admin controls for critical situations
 
 This administrative interface ensures comprehensive cost management and user oversight while maintaining the spiritual integrity and user experience quality of the Vimarsh platform.
+
+---
+
+## 11. Azure OpenAI GPT-5-Mini Cost Monitoring UX
+
+### 11.1. User-Facing Experience Philosophy
+
+**Design Principle**: **"Invisible Excellence, Complete Simplicity"**
+
+Azure OpenAI GPT-5-mini powers all response generation, replacing Google Gemini 2.5 Flash with a higher-quality, lower-cost model using existing Azure credits. Users experience improved response quality with zero visible changes, while admins gain powerful visibility into Azure credit consumption and 55% cost savings compared to previous Gemini usage.
+
+**Core UX Requirements**:
+- **Zero Learning Curve**: Users never know model changed - conversation just works perfectly with improved quality
+- **Single Model Simplicity**: GPT-5-mini handles all queries (no routing complexity)
+- **Optional Transparency**: Power users can optionally see "GPT-5-mini (Azure OpenAI)" in tooltips
+- **Continuous Service**: Azure credits used first (FREE), then automatic pay-as-you-go at 55% savings vs Gemini
+- **Cost Visibility for Admins**: Real-time Azure credit tracking with savings comparison dashboard
+
+### 11.2. Standard User Experience (Zero Visible Changes)
+
+**Normal Conversation Flow**:
+```
+User Types Question → GPT-5-mini Generation → Response Generated → Seamless Experience
+       ↓                        ↓ (invisible)              ↓                    ↓
+  "What is gratitude?"    [Azure OpenAI GPT-5-mini]  "Gratitude is..."    User continues
+  "Explain quantum..."    [Azure OpenAI GPT-5-mini]  "Quantum theory..." User continues
+```
+
+**User Experience Characteristics**:
+- **Identical Interface**: No UI changes to conversation interface - looks exactly the same
+- **Improved Quality**: Responses now achieve consistent 0.89 quality score (target >4.5/5 rating)
+- **Faster Responses**: Average 2.0s response time (improved from 2.3s)
+- **Consistent Tone**: Personality voices perfectly preserved with single high-quality model
+- **Uninterrupted Flow**: Model change completely transparent to users
+- **Free with Azure Credits**: Users benefit from 55% cost savings without any visible changes
+
+**Success Criterion**: User surveys show 0% awareness of Gemini → GPT-5-mini migration
+
+### 11.3. Azure Credit Exhaustion Behavior UX
+
+**Scenario**: Azure monthly credits exhausted (rare, typically happens in months 6-12 of annual grant)
+
+**User Interface Elements**:
+
+**No User Notification Required** (Automatic Pay-As-You-Go):
+```
+User experience: IDENTICAL - no visible changes
+Backend behavior: Continue using GPT-5-mini with pay-as-you-go billing
+Admin dashboard: Alert "Azure credits exhausted, using pay-as-you-go ($0.69/1M tokens)"
+Cost impact: Still 55% cheaper than previous Gemini costs
+```
+
+**Why No User Notification**:
+- Service continues uninterrupted at same quality level
+- Response time remains identical (~2.0 seconds)
+- Personality voices perfectly preserved
+- Still 55% cheaper than previous Gemini costs ($0.69/1M vs $1.55/1M)
+- Users benefit from seamless reliability without unnecessary technical details
+
+**Admin Alert Specifications**:
+- **Placement**: Admin dashboard only, not visible to end users
+- **Color**: Soft blue information banner (#EBF8FF) with cost comparison
+- **Typography**: Inter Regular, 14px showing cost comparison
+- **Frequency**: Daily summary email to admins when using pay-as-you-go
+- **Content**: "Azure credits exhausted. Using pay-as-you-go at $0.69/1M tokens (still 55% cheaper than Gemini baseline)"
+
+**Admin Dashboard Alert**:
+```
+┌─────────────────────────────────────────────────┐
+│ ℹ️  Azure Credits Exhausted - Pay-As-You-Go    │
+│                                                 │
+│ Azure OpenAI GPT-5-mini now using pay-as-you-go│
+│ billing at $0.69 per 1M tokens.                │
+│                                                 │
+│ Cost Comparison:                                │
+│ • Current rate: $0.69/1M tokens                │
+│ • Previous Gemini: $1.55/1M tokens             │
+│ • Savings: 55% lower cost maintained           │
+│                                                 │
+│ User Impact: ZERO - service continues normally │
+│                                                 │
+│ [View Cost Trends] [Download Report]           │
+└─────────────────────────────────────────────────┘
+```
+
+**Service Continuity**:
+- **Zero Interruption**: Users experience no service disruption
+- **Cost Efficiency**: Still significantly cheaper than previous Gemini baseline
+- **Quality Maintained**: Same 0.89 quality score across all queries
+- **Transparent Billing**: Admin dashboard shows exact pay-as-you-go costs
+
+### 11.4. Azure OpenAI Service Unavailable Error UX
+
+**Scenario**: Azure OpenAI GPT-5-mini service temporarily unavailable (extremely rare, <0.1% of requests)
+
+**Error Modal Interface**:
+```
+┌─────────────────────────────────────────────────┐
+│ ⏱️  Temporary Service Unavailability            │
+│                                                 │
+│ Our AI services are temporarily unavailable.   │
+│ This is very rare and typically resolves       │
+│ within a few moments.                          │
+│                                                 │
+│ What You Can Do:                                │
+│ • Wait 1-2 minutes and try your question again │
+│ • Browse your Wisdom Journal for saved insights│
+│ • Explore a different personality              │
+│                                                 │
+│ Estimated Recovery: ~2 minutes                 │
+│                                                 │
+│ [Try Again] [View Wisdom Journal] [Close]      │
+└─────────────────────────────────────────────────┘
+```
+
+**Error UX Best Practices**:
+- **No Technical Jargon**: Avoid "model failure," "API limits," "rate exceeded"
+- **User-Centric Framing**: Present as platform popularity, not technical limitation
+- **Actionable Guidance**: Provide specific wait time and alternative actions
+- **Graceful Tone**: Maintain Vimarsh's calm, wise tone even during errors
+- **Follow-Up**: Show countdown timer for retry availability
+
+**Alternative Actions UX**:
+- **Wisdom Journal**: Quick access button to browse saved insights
+- **Personality Switch**: Suggest trying less-busy personality (if available)
+- **Offline Mode**: If PWA, allow browsing cached conversations
+- **Status Page**: Link to live system status dashboard
+
+### 11.5. Power User & Developer Transparency
+
+**AI Details Tooltip (Optional Feature)**:
+```
+Hover over response → Show small info icon → Tooltip appears:
+
+┌─────────────────────────────────────────┐
+│ 🤖 AI Details (Advanced)                │
+│                                         │
+│ Model: GPT-5-mini (Azure OpenAI)       │
+│ Response Time: 1.9s                     │
+│ Tokens: 1500 input + 500 output        │
+│ Cost: FREE (Azure Credits)             │
+│ Quality Score: 0.89                     │
+│                                         │
+│ [Hide Details]                          │
+└─────────────────────────────────────────┘
+```
+
+**Developer Settings Panel**:
+```
+User Profile → Settings → Advanced → Developer Mode
+
+┌─────────────────────────────────────────┐
+│ 🔧 Developer Options                    │
+│                                         │
+│ ☑ Show AI model details in responses   │
+│ ☑ Display token usage and costs        │
+│ ☑ Enable Azure credit usage tracking   │
+│ ☑ Show response quality scores         │
+│ ☐ Display detailed performance metrics │
+│                                         │
+│ [Save Preferences]                      │
+└─────────────────────────────────────────┘
+```
+
+**User Benefits**:
+- **Cost Transparency**: Technical users see "FREE with Azure credits" messaging
+- **Performance Visibility**: Response time and token usage displayed
+- **Quality Awareness**: Users see consistent 0.89 quality score across all queries
+- **Zero-Cost Awareness**: Power users appreciate 55% cost savings vs previous Gemini
+
+### 11.6. Admin Dashboard - Azure Cost Monitoring Tab
+
+**Dashboard Layout**:
+```
+┌─ Admin Dashboard ────────────────────────────────────┐
+├─ [System] [Users] [Content] [Azure Cost Monitoring]──┤
+│                                                       │
+│  Azure OpenAI GPT-5-mini Cost Analytics              │
+│  ══════════════════════════════════════               │
+│                                                       │
+│  💰 Azure Credit Consumption (ZERO OUT-OF-POCKET)   │
+│  ┌─────────────────────────────────────────┐        │
+│  │ Current Month: 42% of Azure credits     │        │
+│  │ Yesterday: 1.8% credits used            │        │
+│  │ Daily Burn Rate: $1.85/day               │        │
+│  │ Estimated Days Remaining: 49 days        │        │
+│  │ Monthly Savings vs Gemini: $127.45      │        │
+│  └─────────────────────────────────────────┘        │
+│                                                       │
+│  🎯 GPT-5-mini Performance & Quality                 │
+│  ┌───────────────────────────────────────────┐      │
+│  │ Total Requests: 1,245 this month         │      │
+│  │ Avg Response Time: 1.9s                   │      │
+│  │ Success Rate: 98.9%                       │      │
+│  │ Avg Quality Score: 0.89 (consistent)      │      │
+│  │ Cost per Request: $0.00138               │      │
+│  └───────────────────────────────────────────┘      │
+│                                                       │
+│  📊 Top Personalities by Cost                        │
+│  ┌───────────────────────────────────────────┐      │
+│  │ Krishna: 500 requests, $0.69              │      │
+│  │ Einstein: 300 requests, $0.41             │      │
+│  │ Marcus Aurelius: 245 requests, $0.34      │      │
+│  └───────────────────────────────────────────┘      │
+│                                                       │
+│  ✅ Status: Azure OpenAI operational (FREE credits) │
+│                                                       │
+└───────────────────────────────────────────────────────┘
+```
+
+**Azure Credit Budget Management**:
+```
+Azure Credit Tracking Panel:
+┌──────────────────────────────────────────────┐
+│ 💳 Azure Monthly Credit Allocation          │
+│                                              │
+│ Total Credits: $100  [Configure]            │
+│ Used This Month: 42% ($42.00)               │
+│ Remaining: 58% ($58.00)                     │
+│ Projected End-of-Month: 78% usage           │
+│                                              │
+│ Alert Thresholds:                            │
+│ • 80% of credits  [Email Admin] ✅          │
+│ • 90% of credits  [Slack + Email] ✅        │
+│ • 95% of credits  [Critical Alert] ✅       │
+│                                              │
+│ Pay-As-You-Go (when credits exhausted):     │
+│ Status: Not activated this month            │
+│ Rate: $0.69/1M tokens (55% cheaper)         │
+│ Would-be cost without Azure: $254.90        │
+│                                              │
+│ [Download Cost Report] [View History]       │
+└──────────────────────────────────────────────┘
+```
+
+**Cost Comparison Panel**:
+```
+Historical Cost Analysis:
+┌──────────────────────────────────────────────┐
+│ 📈 Cost Savings Trend                        │
+│                                              │
+│ Previous Month (Gemini 2.5 Flash):          │
+│ • Total Cost: $254.90                       │
+│ • Cost per 1M tokens: $1.55                 │
+│                                              │
+│ Current Month (GPT-5-mini):                  │
+│ • Total Cost: $0.00 (using Azure credits)   │
+│ • Cost per 1M tokens: $0.69 (55% savings)   │
+│ • Monthly Savings: $127.45                  │
+│                                              │
+│ Year-to-Date Savings: $1,529.40             │
+│                                              │
+│ [Export Savings Report] [View Chart]        │
+└──────────────────────────────────────────────┘
+```
+
+**Admin Visual Design Elements**:
+- **Color Coding**: Green (Azure credits available), Yellow (80%+ credits), Blue (Pay-as-you-go active)
+- **Real-Time Updates**: Live Azure credit consumption with WebSocket updates
+- **Historical Charts**: Line graphs showing daily credit consumption over 30 days
+- **Cost Savings Dashboard**: Month-over-month comparison showing 55% savings
+- **Export Functions**: Download CSV reports for Azure cost analysis and budget planning
+
+### 11.7. Mobile-Optimized Azure Cost Monitoring UX
+
+**Mobile Admin Dashboard**:
+- **Swipeable Cards**: Azure credit metrics in card format for thumb navigation
+- **Progressive Disclosure**: Collapsed sections expand to show cost trends and personality breakdowns
+- **Touch-Optimized Controls**: Larger buttons (44px min) for credit threshold adjustments
+- **Native Notifications**: Push alerts when Azure credits reach 80%, 90%, 95% thresholds
+- **Offline Capability**: PWA caches last-known Azure credit status for offline viewing
+
+### 11.8. Accessibility Considerations
+
+**Screen Reader Announcements**:
+```
+When Azure credits exhausted (pay-as-you-go active):
+"Information: Service continues normally. No user action required."
+
+When Azure OpenAI fails:
+"Alert: AI services temporarily unavailable. Please wait approximately 2 minutes 
+before trying again. Alternative actions are available in the dialog."
+```
+
+**Keyboard Navigation**:
+- **Tab Order**: Admin dashboard charts focusable, navigable with arrows
+- **Escape Key**: Closes modals and returns focus to dashboard
+- **Arrow Keys**: Navigate through Azure credit history and model distribution charts
+
+**Visual Indicators**:
+- **High Contrast**: Azure credit alerts use WCAG AAA contrast ratios
+- **Color Independence**: Icons and text convey credit status, not just color
+- **Focus Indicators**: Clear 2px blue outline on focused elements
+
+### 11.9. Trust & Transparency Framework
+
+**User Trust Building**:
+- **Cost Transparency**: Admins see "FREE with Azure credits" vs "55% cheaper than previous costs"
+- **Quality Assurance**: GPT-5-mini maintains consistent 0.89 quality across all queries
+- **Zero Surprises**: Users experience zero disruption during Gemini → GPT-5-mini migration
+- **Optional Visibility**: Power users can see model details and performance metrics
+
+**Brand Positioning**:
+- **Cost-Intelligent Platform**: 55% cost savings while improving response quality
+- **Enterprise-Grade**: 100% Azure-native architecture (OpenAI, Cosmos DB, Functions, Entra ID)
+- **Technical Excellence**: Single high-quality model eliminates routing complexity
+- **User-First**: Improved performance (2.0s vs 2.3s) with zero user-visible changes
+
+### 11.10. UX Success Metrics
+
+**User Satisfaction Metrics**:
+
+| Metric | Baseline | Target | Measurement |
+|--------|----------|--------|-------------|
+| **User Awareness of Model Change** | N/A | 0% notice | Post-conversation surveys |
+| **Response Quality Consistency** | 4.3/5 (Gemini) | ≥0.89 quality | Quality score across all GPT-5-mini responses |
+| **Response Latency** | 2.3s (Gemini) | <2.0s | Average response time with GPT-5-mini |
+| **Power User Tooltip Usage** | N/A | 10-20% | Optional AI details views |
+
+**Admin Usability Metrics**:
+
+| Metric | Baseline | Target | Measurement |
+|--------|----------|--------|-------------|
+| **Time to Review Azure Credits** | N/A | <1 minute | Admin dashboard load and comprehension |
+| **Azure Credit Alert Actionability** | N/A | >90% | Admins review within 1 hour of 80% alert |
+| **Dashboard Load Time** | N/A | <1 second | Real-time Azure cost analytics |
+| **Cost Report Export Usage** | N/A | >50% of admins | Monthly cost savings report downloads |
+
+**Business Impact Metrics**:
+
+| Metric | Baseline | Target | Measurement |
+|--------|----------|--------|-------------|
+| **Monthly Cost Savings** | $254.90 (Gemini) | 55% reduction | Azure GPT-5-mini vs Gemini baseline |
+| **Azure Credit Utilization** | 0% | 95%+ | Maximize existing credits before pay-as-you-go |
+| **Pay-As-You-Go Frequency** | N/A | <5% of months | Emergency-only usage after credits exhausted |
+| **Support Tickets re: Quality** | Baseline | <0.5% of users | Confidence in GPT-5-mini quality |
+
+### 11.11. Design System Integration
+
+**Apple-Inspired Visual Language for Azure Cost Monitoring**:
+
+**Color Palette**:
+```
+Azure Credit Status Colors:
+- Credits Available: #34C759 (Apple Green)
+- 80% Credits Used: #FF9500 (Apple Orange)  
+- 95% Credits Used: #FF3B30 (Apple Red)
+- Pay-As-You-Go Active: #007AFF (Apple Blue)
+- Service Unavailable: #FF2D55 (Apple Pink)
+```
+
+**Typography**:
+```
+Admin Dashboard:
+- Heading: SF Pro Display Bold, 18px
+- Body: SF Pro Text Regular, 14px
+- Metrics: SF Pro Text Medium, 20px (tabular numerals)
+- FREE emphasis: SF Pro Text Bold, 16px (#34C759)
+```
+
+**Animation**:
+```
+Credit Chart Updates: 400ms ease-in-out
+Modal Fade-In: 200ms ease-in-out
+Threshold Alerts: Smooth color transitions (500ms)
+Model Distribution Pie Chart: 600ms ease-out
+```
+
+**Spacing**:
+```
+Dashboard Cards: 20px padding
+Modal Padding: 24px all sides
+Button Spacing: 12px gap between actions
+Chart Grid: 16px gap on mobile, 24px on desktop
+```
+
+This UX design ensures that Vimarsh's Azure OpenAI GPT-5-mini migration operates completely transparently for users (zero visible changes, improved quality) while providing powerful Azure credit visibility and 55% cost savings insights for administrators, all within the cohesive Apple-inspired design language.
 
 ---
 
