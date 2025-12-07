@@ -51,7 +51,8 @@ class AzureOpenAIChatService:
             try:
                 self.client = OpenAI(
                     api_key=self.api_key,
-                    base_url=self.endpoint
+                    base_url=self.endpoint,
+                    default_headers={"api-version": self.api_version}
                 )
                 logger.info(f"✅ Azure OpenAI Chat service initialized: {self.deployment_name}")
             except Exception as e:
