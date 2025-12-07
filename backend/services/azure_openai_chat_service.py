@@ -72,7 +72,7 @@ class AzureOpenAIChatService:
         Args:
             messages: List of message dicts with 'role' and 'content'
             temperature: Randomness (0-2)
-            max_tokens: Maximum response tokens
+            max_tokens: Maximum response tokens (mapped to max_completion_tokens for o1-mini)
             top_p: Nucleus sampling
             
         Returns:
@@ -86,12 +86,11 @@ class AzureOpenAIChatService:
         
         for attempt in range(self.max_retries):
             try:
+                # o1-mini models use max_completion_tokens instead of max_tokens
                 response = self.client.chat.completions.create(
                     model=self.deployment_name,
                     messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    top_p=top_p
+                    max_completion_tokens=max_tokens
                 )
                 
                 response_time = time.time() - start_time
