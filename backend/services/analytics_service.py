@@ -16,7 +16,7 @@ try:
         DailyAnalyticsSummary, model_to_dict, 
         dict_to_model, generate_analytics_id
     )
-    from services.database_service import database_service  # Updated import
+    from services.database_service import db_service  # Import global instance
     from services.cache_service import CacheService
 except ImportError as e:
     logging.warning(f"Import warning in analytics_service: {e}")
@@ -25,6 +25,7 @@ except ImportError as e:
     EventType = None
     PersonalityUsageStats = None
     DailyAnalyticsSummary = None
+    db_service = None
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ class AnalyticsService:
     
     def __init__(self):
         """Initialize analytics service"""
-        self.db_service = database_service  # Updated to use global instance
+        self.db_service = db_service  # Use global instance
         self.cache_service = CacheService() if 'CacheService' in globals() else None
         
         # Local storage for development
