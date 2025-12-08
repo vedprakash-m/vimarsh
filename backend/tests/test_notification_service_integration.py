@@ -24,8 +24,16 @@ class TestNotificationServiceIntegration:
         """Create mock Cosmos DB client"""
         client = Mock()
         database = Mock()
-        subscriptions_container = Mock()
-        preferences_container = Mock()
+        subscriptions_container = AsyncMock()
+        preferences_container = AsyncMock()
+        
+        # Make async methods return AsyncMock
+        subscriptions_container.upsert_item = AsyncMock()
+        subscriptions_container.read_item = AsyncMock()
+        subscriptions_container.query_items = AsyncMock(return_value=[])
+        
+        preferences_container.upsert_item = AsyncMock()
+        preferences_container.read_item = AsyncMock()
         
         client.get_database_client.return_value = database
         database.get_container_client.side_effect = [

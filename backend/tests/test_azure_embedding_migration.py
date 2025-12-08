@@ -169,7 +169,7 @@ class TestRAGIntegration:
             service = EnhancedRAGService()
             
             # Verify service has embedding capability
-            assert hasattr(service, 'embedding_service') or hasattr(service, 'azure_openai_embedding_service')
+            assert hasattr(service, 'azure_embedding_service'), "EnhancedRAGService should have azure_embedding_service attribute"
         except (ImportError, ValueError) as e:
             pytest.skip(f"Enhanced RAG Service not available or missing config: {e}")
 

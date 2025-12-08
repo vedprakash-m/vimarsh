@@ -64,7 +64,16 @@ class GeminiEmbeddingService:
         self.logger = logging.getLogger(__name__)
         self.api_key = api_key
         self.test_mode = test_mode
-        self.output_dimensionality = output_dimensionality
+        
+        # Try to get output dimensionality from environment only if using default
+        env_dimensionality = os.getenv('EMBEDDING_OUTPUT_DIMENSIONALITY')
+        if env_dimensionality and output_dimensionality == 768:
+            try:
+                self.output_dimensionality = int(env_dimensionality)
+            except ValueError:
+                self.output_dimensionality = output_dimensionality
+        else:
+            self.output_dimensionality = output_dimensionality
         
         # Try to get API key from various sources if not provided
         if not self.api_key:
@@ -88,14 +97,6 @@ class GeminiEmbeddingService:
                     pass
                         
             except Exception:
-                pass
-        
-        # Try to get output dimensionality from environment
-        env_dimensionality = os.getenv('EMBEDDING_OUTPUT_DIMENSIONALITY')
-        if env_dimensionality:
-            try:
-                self.output_dimensionality = int(env_dimensionality)
-            except ValueError:
                 pass
         
         if not self.api_key and not self.test_mode:
