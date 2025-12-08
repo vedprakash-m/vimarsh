@@ -365,7 +365,16 @@ def register_notification_routes(app: func.FunctionApp) -> None:
                     mimetype="application/json"
                 )
             
-            from .notification_service import NotificationService\n            from .content_service import ContentService\n            from .notification_templates import NotificationType, render_notification\n            from services.preferences_service import PreferencesService\n            \n            preferences_service = PreferencesService()\n            service = NotificationService(preferences_service=preferences_service)\n            content_service = ContentService()            # Generate test content
+            from .notification_service import NotificationService
+            from .content_service import ContentService
+            from .notification_templates import NotificationType, render_notification
+            from services.preferences_service import PreferencesService
+            
+            preferences_service = PreferencesService()
+            service = NotificationService(preferences_service=preferences_service)
+            content_service = ContentService()
+            
+            # Generate test content
             content = content_service.get_daily_wisdom_content(user_id)
             notification = render_notification(NotificationType.DAILY_WISDOM, content)
             

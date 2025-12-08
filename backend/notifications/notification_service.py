@@ -1,5 +1,5 @@
 """
-"""Notification Service
+Notification Service
 Core service for managing push notification subscriptions and sending notifications
 Integrated with PreferencesService for user notification preferences
 """

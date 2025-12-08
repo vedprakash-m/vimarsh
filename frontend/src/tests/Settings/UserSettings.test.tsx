@@ -52,11 +52,12 @@ const mockPreferences = {
 jest.mock('../../contexts/SettingsContext', () => ({
   SettingsProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   useSettings: () => ({
+    settings: mockPreferences,
     profile: mockProfile,
-    preferences: mockPreferences,
-    updatePreferences: mockUpdatePreferences,
-    isLoading: false,
-    isSaving: false,
+    loading: false,
+    error: null,
+    updateSettings: mockUpdatePreferences,
+    refreshProfile: jest.fn(),
   }),
 }));
 

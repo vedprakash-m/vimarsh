@@ -24,6 +24,7 @@ except ImportError as e:
     UserAnalyticsEvent = None
     EventType = None
     PersonalityUsageStats = None
+    DailyAnalyticsSummary = None
 
 logger = logging.getLogger(__name__)
 

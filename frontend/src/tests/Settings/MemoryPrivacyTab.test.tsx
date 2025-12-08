@@ -28,12 +28,14 @@ const mockPreferences = {
 
 jest.mock('../../contexts/SettingsContext', () => ({
   useSettings: () => ({
+    settings: mockPreferences,
     profile: null,
-    preferences: mockPreferences,
-    updatePreferences: mockUpdatePreferences,
-    exportData: mockExportData,
-    clearHistory: mockClearHistory,
+    loading: false,
+    error: null,
+    updateSettings: mockUpdatePreferences,
+    refreshProfile: jest.fn(),
   }),
+  SettingsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 describe('MemoryPrivacyTab', () => {

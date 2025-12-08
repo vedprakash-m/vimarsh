@@ -35,11 +35,14 @@ const mockUsageSummary = {
 
 jest.mock('../../contexts/SettingsContext', () => ({
   useSettings: () => ({
+    settings: null,
     profile: mockProfile,
-    usageSummary: mockUsageSummary,
-    logout: mockLogout,
-    deleteAccount: mockDeleteAccount,
+    loading: false,
+    error: null,
+    updateSettings: jest.fn(),
+    refreshProfile: jest.fn(),
   }),
+  SettingsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock useNavigate from react-router-dom
