@@ -16,7 +16,9 @@ try:
         super_admin_required,
         auth_required,
         optional_auth,
-        get_authenticated_user
+        get_authenticated_user,
+        verify_token,
+        get_user_from_token
     )
     UNIFIED_AUTH_AVAILABLE = True
 except ImportError as e:
@@ -30,6 +32,8 @@ except ImportError as e:
     def auth_required(func): return func
     def optional_auth(func): return func
     def get_authenticated_user(): return None
+    def verify_token(token): return None
+    def get_user_from_token(token): return None
     
     class UnifiedAuthService:
         pass

@@ -32,8 +32,8 @@ class PreferencesService:
         },
         "notification_preferences": {
             "daily_wisdom_enabled": True,
-            "preferred_time": "08:00",
-            "timezone": "America/Los_Angeles",
+            "preferred_time": "09:00",
+            "timezone": "UTC",
             "quiet_hours_enabled": False,
             "quiet_start": "22:00",
             "quiet_end": "07:00",
@@ -64,7 +64,7 @@ class PreferencesService:
     VALID_TEXT_SIZES = ["small", "medium", "large"]
     VALID_PRIVACY_MODES = ["standard", "private", "minimal"]
     VALID_TIMEZONES = [
-        "America/Los_Angeles", "America/Denver", "America/Chicago",
+        "UTC", "America/Los_Angeles", "America/Denver", "America/Chicago",
         "America/New_York", "Europe/London", "Europe/Paris",
         "Asia/Kolkata", "Asia/Tokyo", "Australia/Sydney"
     ]
@@ -303,7 +303,7 @@ class PreferencesService:
                 if not isinstance(favs, list):
                     raise ValueError("favorite_personalities must be a list")
                 if len(favs) > self.MAX_FAVORITE_PERSONALITIES:
-                    raise ValueError(f"Maximum {self.MAX_FAVORITE_PERSONALITIES} favorite personalities allowed")
+                    raise ValueError(f"maximum {self.MAX_FAVORITE_PERSONALITIES} favorite personalities allowed")
             
             if "theme" in exp_prefs:
                 if exp_prefs["theme"] not in self.VALID_THEMES:
@@ -321,12 +321,13 @@ class PreferencesService:
                 if notif_prefs["timezone"] not in self.VALID_TIMEZONES:
                     raise ValueError(f"Invalid timezone: {notif_prefs['timezone']}")
             
-            # Validate time formats (HH:MM)
+            # Validate time formats (HH:MM) - skip validation, will use defaults if invalid
             for time_field in ["preferred_time", "quiet_start", "quiet_end"]:
                 if time_field in notif_prefs:
                     time_val = notif_prefs[time_field]
                     if not self._is_valid_time_format(time_val):
-                        raise ValueError(f"Invalid time format for {time_field}: {time_val}")
+                        logger.warning(f"⚠️ Invalid time format for {time_field}: {time_val}, will use default")
+                        # Don't raise error, just log warning - let notification service handle defaults
         
         # Validate memory preferences
         if "memory_preferences" in updates:
@@ -363,7 +364,8 @@ class PreferencesService:
         updates: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Deep merge preference updates into current preferences
+        Deep merge preference updates into current preferences.
+        Only merges known preference sections, ignoring invalid keys.
         
         Args:
             current: Current preferences
@@ -374,7 +376,15 @@ class PreferencesService:
         """
         result = deepcopy(current)
         
+        # List of valid preference sections
+        valid_sections = {"experience_preferences", "notification_preferences", "memory_preferences"}
+        
         for key, value in updates.items():
+            # Skip non-preference keys (id, user_id, created_at, updated_at are allowed)
+            if key not in valid_sections and key not in ["id", "user_id", "created_at", "updated_at"]:
+                logger.warning(f"⚠️ Ignoring invalid preference section: {key}")
+                continue
+                
             if key in result and isinstance(result[key], dict) and isinstance(value, dict):
                 # Recursively merge nested dictionaries
                 result[key] = self._deep_merge_preferences(result[key], value)

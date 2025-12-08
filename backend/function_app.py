@@ -3712,13 +3712,16 @@ try:
     from services.data_export_service import data_export_service
     from engagement.engagement_service import get_engagement_service
     from services.analytics_service import analytics_service
-    from auth.authService import verify_token, get_user_from_token
+    from auth import verify_token, get_user_from_token
     
     user_services_available = True
     logger.info("✅ User settings services imported successfully")
 except ImportError as e:
     logger.warning(f"⚠️ User settings services not available: {e}")
     user_services_available = False
+    # Provide fallback implementations
+    def verify_token(token): return None
+    def get_user_from_token(token): return None
 
 
 @app.route(route="api/user/profile", methods=["GET"])

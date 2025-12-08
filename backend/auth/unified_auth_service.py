@@ -640,6 +640,56 @@ def get_authenticated_user_sync(req: HttpRequest) -> Optional[AuthenticatedUser]
     """Get authenticated user from request (sync version for tests)"""
     return auth_service.authenticate_request_sync(req)
 
+def verify_token(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Verify and decode a JWT token (synchronous version for function_app.py).
+    
+    Args:
+        token: JWT token string
+        
+    Returns:
+        Decoded token payload if valid, None otherwise
+    """
+    try:
+        # Use the auth service to validate the token
+        import asyncio
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        # Validate token using auth service
+        user = loop.run_until_complete(auth_service._validate_token(token))
+        
+        if user:
+            # Return user info as dict for backward compatibility
+            return {
+                "sub": user.id,
+                "oid": user.id,
+                "email": user.email,
+                "preferred_username": user.email,
+                "name": user.name,
+                "roles": [role.value for role in user.roles]
+            }
+        return None
+    except Exception as e:
+        logger.error(f"❌ Token verification error: {e}")
+        return None
+
+def get_user_from_token(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Extract user information from a JWT token.
+    Alias for verify_token for backward compatibility.
+    
+    Args:
+        token: JWT token string
+        
+    Returns:
+        User information dict if valid, None otherwise
+    """
+    return verify_token(token)
+
 # Backward compatibility decorators for existing code
 def admin_required(func: Callable) -> Callable:
     """Backward compatibility decorator for admin_required"""
