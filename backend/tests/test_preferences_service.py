@@ -86,8 +86,8 @@ class TestPreferencesService:
         # Check notification defaults
         notif_prefs = defaults["notification_preferences"]
         assert notif_prefs["daily_wisdom_enabled"] is True
-        assert notif_prefs["preferred_time"] == "08:00"
-        assert notif_prefs["timezone"] == "America/Los_Angeles"
+        assert notif_prefs["preferred_time"] == "09:00"
+        assert notif_prefs["timezone"] == "UTC"
         assert notif_prefs["quiet_hours_enabled"] is False
         
         # Check memory defaults

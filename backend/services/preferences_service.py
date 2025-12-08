@@ -303,7 +303,7 @@ class PreferencesService:
                 if not isinstance(favs, list):
                     raise ValueError("favorite_personalities must be a list")
                 if len(favs) > self.MAX_FAVORITE_PERSONALITIES:
-                    raise ValueError(f"maximum {self.MAX_FAVORITE_PERSONALITIES} favorite personalities allowed")
+                    raise ValueError(f"favorite_personalities: maximum {self.MAX_FAVORITE_PERSONALITIES} allowed")
             
             if "theme" in exp_prefs:
                 if exp_prefs["theme"] not in self.VALID_THEMES:
