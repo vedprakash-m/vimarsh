@@ -361,33 +361,37 @@ class PreferencesService:
     def _deep_merge_preferences(
         self,
         current: Dict[str, Any],
-        updates: Dict[str, Any]
+        updates: Dict[str, Any],
+        is_top_level: bool = True
     ) -> Dict[str, Any]:
         """
         Deep merge preference updates into current preferences.
-        Only merges known preference sections, ignoring invalid keys.
+        Only filters invalid sections at top level.
         
         Args:
             current: Current preferences
             updates: Updates to merge
+            is_top_level: Whether this is the top-level call (filters sections)
             
         Returns:
             Merged preferences
         """
         result = deepcopy(current)
         
-        # List of valid preference sections
+        # List of valid preference sections (only checked at top level)
         valid_sections = {"experience_preferences", "notification_preferences", "memory_preferences"}
         
         for key, value in updates.items():
-            # Skip non-preference keys (id, user_id, created_at, updated_at are allowed)
-            if key not in valid_sections and key not in ["id", "user_id", "created_at", "updated_at"]:
-                logger.warning(f"⚠️ Ignoring invalid preference section: {key}")
-                continue
+            # Only filter invalid sections at top level
+            if is_top_level:
+                # Skip non-preference keys (id, user_id, created_at, updated_at are allowed)
+                if key not in valid_sections and key not in ["id", "user_id", "created_at", "updated_at"]:
+                    logger.warning(f"⚠️ Ignoring invalid preference section: {key}")
+                    continue
                 
             if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                # Recursively merge nested dictionaries
-                result[key] = self._deep_merge_preferences(result[key], value)
+                # Recursively merge nested dictionaries (not top level anymore)
+                result[key] = self._deep_merge_preferences(result[key], value, is_top_level=False)
             else:
                 # Overwrite with new value
                 result[key] = value

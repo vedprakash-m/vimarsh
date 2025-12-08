@@ -3722,6 +3722,10 @@ except ImportError as e:
     # Provide fallback implementations
     def verify_token(token): return None
     def get_user_from_token(token): return None
+    preferences_service = None
+    data_export_service = None
+    def get_engagement_service(): return None
+    analytics_service = None
 
 
 @app.route(route="api/user/profile", methods=["GET"])
