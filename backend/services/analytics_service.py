@@ -11,21 +11,35 @@ import json
 from collections import defaultdict, Counter
 
 try:
-    from models.vimarsh_models import (
-        UserAnalyticsEvent, EventType, PersonalityUsageStats, 
-        DailyAnalyticsSummary, model_to_dict, 
-        dict_to_model, generate_analytics_id
-    )
     from services.database_service import db_service  # Import global instance
     from services.cache_service import CacheService
 except ImportError as e:
     logging.warning(f"Import warning in analytics_service: {e}")
-    # Mock classes for testing
-    UserAnalyticsEvent = None
-    EventType = None
-    PersonalityUsageStats = None
-    DailyAnalyticsSummary = None
     db_service = None
+    CacheService = None
+
+# Analytics service is simplified - these models don't exist yet
+# Using basic types instead
+UserAnalyticsEvent = None
+EventType = None
+PersonalityUsageStats = None
+DailyAnalyticsSummary = None
+
+# Helper functions that were from models.vimarsh_models
+def model_to_dict(obj):
+    """Convert model to dict"""
+    if obj is None:
+        return {}
+    return obj.__dict__ if hasattr(obj, '__dict__') else obj
+
+def dict_to_model(data, model_class):
+    """Convert dict to model"""
+    return data  # Just return dict for now
+
+def generate_analytics_id():
+    """Generate analytics ID"""
+    from datetime import datetime
+    return f"analytics_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
 
 logger = logging.getLogger(__name__)
 
