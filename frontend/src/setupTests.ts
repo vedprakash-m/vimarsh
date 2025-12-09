@@ -189,3 +189,106 @@ jest.mock('./context/AuthContext', () => ({
   useAuth: () => mockAuthValue,
   AuthProvider: ({ children }: { children: React.ReactNode }) => children
 }));
+
+// Mock SettingsContext globally for all tests
+const mockSettings = {
+  user_id: 'test-user-123',
+  experience_preferences: {
+    conversation_style: 'balanced',
+    language: 'en',
+    formality: 'respectful',
+    favorite_personalities: ['krishna', 'buddha'],
+    theme: 'auto',
+    text_size: 'medium',
+    reduce_animations: false
+  },
+  notification_preferences: {
+    daily_wisdom_enabled: true,
+    preferred_time: '09:00',
+    timezone: 'UTC',
+    quiet_hours_enabled: false,
+    quiet_start: '22:00',
+    quiet_end: '07:00',
+    types: {
+      daily_wisdom: true,
+      streak_reminders: true,
+      achievements: true,
+      weekly_summary: false
+    }
+  },
+  memory_preferences: {
+    remember_conversations: true,
+    connect_insights: true,
+    track_emotions: false,
+    suggest_topics: true,
+    privacy_mode: 'standard',
+    data_retention_days: 90,
+    analytics_consent: true,
+    research_consent: false
+  },
+  updated_at: '2024-01-01T00:00:00Z'
+};
+
+const mockProfile = {
+  user: {
+    user_id: 'test-user-123',
+    email: 'test@vimarsh.app',
+    name: 'Test User',
+    member_since: '2024-01-01T00:00:00Z'
+  },
+  journey_stats: {
+    current_streak: 14,
+    total_conversations: 87,
+    achievements_unlocked: 5,
+    wisdom_level: 'Seeker',
+    domain_exploration: {
+      spiritual: 45,
+      scientific: 12,
+      philosophical: 20,
+      leadership: 8,
+      literary: 2,
+      psychology: 0
+    }
+  },
+  preferences: mockSettings,
+  ai_usage: {
+    monthly_cost: 2.34,
+    monthly_limit: 10.00,
+    status: 'well_within_limits',
+    trend: 'similar_to_last_month'
+  }
+};
+
+jest.mock('./contexts/SettingsContext', () => ({
+  useSettings: () => ({
+    settings: mockSettings,
+    profile: mockProfile,
+    loading: false,
+    error: null,
+    updateSettings: jest.fn().mockResolvedValue(undefined),
+    refreshProfile: jest.fn().mockResolvedValue(undefined)
+  }),
+  SettingsProvider: ({ children }: { children: React.ReactNode }) => children
+}));
+
+// Mock PersonalityContext globally for all tests
+const mockPersonalities = [
+  { id: 'krishna', name: 'Krishna', domain: 'spiritual', era: 'Ancient', shortBio: 'Divine teacher' },
+  { id: 'buddha', name: 'Buddha', domain: 'spiritual', era: 'Ancient', shortBio: 'Enlightened one' },
+  { id: 'socrates', name: 'Socrates', domain: 'philosophical', era: 'Ancient', shortBio: 'Greek philosopher' },
+  { id: 'einstein', name: 'Albert Einstein', domain: 'scientific', era: 'Modern', shortBio: 'Physicist' },
+  { id: 'lincoln', name: 'Abraham Lincoln', domain: 'leadership', era: 'Modern', shortBio: 'US President' },
+  { id: 'shakespeare', name: 'William Shakespeare', domain: 'literary', era: 'Renaissance', shortBio: 'Playwright' },
+  { id: 'freud', name: 'Sigmund Freud', domain: 'psychology', era: 'Modern', shortBio: 'Psychoanalyst' }
+];
+
+jest.mock('./contexts/PersonalityContext', () => ({
+  usePersonality: () => ({
+    currentPersonality: mockPersonalities[0],
+    availablePersonalities: mockPersonalities,
+    setCurrentPersonality: jest.fn(),
+    loading: false,
+    error: null
+  }),
+  PersonalityProvider: ({ children }: { children: React.ReactNode }) => children
+}));

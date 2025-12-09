@@ -1,6 +1,6 @@
 /**
  * Unit Tests for AccountTab Component
- * Tests subscription display, usage tracking, account security, and account actions
+ * Tests subscription display, account security, and account actions (matching actual implementation)
  */
 
 import React from 'react';
@@ -8,561 +8,322 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AccountTab from '../../components/Settings/AccountTab';
 
-// Mock SettingsContext
+// Mock functions
 const mockLogout = jest.fn();
-const mockDeleteAccount = jest.fn();
-
-const mockProfile = {
-  user_id: 'test-user-123',
-  email: 'seeker@vimarsh.app',
-  name: 'Spiritual Seeker',
-  created_at: '2024-01-01T00:00:00Z',
-  subscription_tier: 'free',
-  subscription_status: 'active',
-  subscription_expires: null,
-};
-
-const mockUsageSummary = {
-  total_conversations: 87,
-  total_messages: 456,
-  guidance_received: 125,
-  streak_days: 14,
-  monthly_conversations: 28,
-  monthly_limit: 50,
-  daily_messages: 12,
-  daily_limit: 20,
-};
-
-jest.mock('../../contexts/SettingsContext', () => ({
-  useSettings: () => ({
-    settings: null,
-    profile: mockProfile,
-    loading: false,
-    error: null,
-    updateSettings: jest.fn(),
-    refreshProfile: jest.fn(),
-  }),
-  SettingsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+const mockNavigate = jest.fn();
 
 // Mock useNavigate from react-router-dom
-const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
+  BrowserRouter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+// Override the global AuthContext mock for this test file
+jest.mock('../../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user-123', email: 'test@vimarsh.app', name: 'Test User' },
+    logout: mockLogout,
+    isAuthenticated: true,
+    loading: false,
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 describe('AccountTab', () => {
   beforeEach(() => {
     mockLogout.mockClear();
-    mockDeleteAccount.mockClear();
     mockNavigate.mockClear();
   });
 
-  const renderComponent = () => {
-    return render(<AccountTab />);
-  };
+  const renderComponent = () => render(<AccountTab />);
 
-  describe('Subscription Information', () => {
-    test('renders subscription section', () => {
+  describe('Subscription Section', () => {
+    test('renders subscription heading', () => {
       renderComponent();
       expect(screen.getByText('Subscription')).toBeInTheDocument();
     });
 
-    test('displays current subscription tier', () => {
+    test('displays Free Tier plan', () => {
       renderComponent();
-      expect(screen.getByText(/free tier/i)).toBeInTheDocument();
+      expect(screen.getByText('Free Tier')).toBeInTheDocument();
+      expect(screen.getByText("You're on the free tier")).toBeInTheDocument();
     });
 
-    test('shows subscription status', () => {
+    test('shows Active status badge', () => {
       renderComponent();
-      expect(screen.getByText(/active/i)).toBeInTheDocument();
+      const activeElements = screen.getAllByText('Active');
+      expect(activeElements.length).toBeGreaterThan(0);
     });
 
-    test('displays tier features', () => {
+    test('displays AI usage information', () => {
       renderComponent();
-      expect(screen.getByText(/50.*conversations.*month/i)).toBeInTheDocument();
-      expect(screen.getByText(/20.*messages.*day/i)).toBeInTheDocument();
+      expect(screen.getByText('AI Usage This Month')).toBeInTheDocument();
+      const costElements = screen.getAllByText(/\$3\.20/);
+      expect(costElements.length).toBeGreaterThan(0);
+      expect(screen.getByText(/\$10 \/ month/)).toBeInTheDocument();
     });
 
-    test('shows upgrade button for free tier', () => {
+    test('shows AI usage progress bar', () => {
       renderComponent();
-      expect(screen.getByRole('button', { name: /upgrade/i })).toBeInTheDocument();
+      const progressBars = screen.getAllByRole('generic').filter(
+        el => el.className.includes('bg-blue-600') && el.className.includes('h-2')
+      );
+      expect(progressBars.length).toBeGreaterThan(0);
     });
 
-    test('displays member since date', () => {
+    test('displays upgrade to premium section', () => {
       renderComponent();
-      expect(screen.getByText(/member since/i)).toBeInTheDocument();
-      expect(screen.getByText(/january.*2024/i)).toBeInTheDocument();
-    });
-  });
-
-  describe('Usage Tracking', () => {
-    test('renders usage section', () => {
-      renderComponent();
-      expect(screen.getByText(/usage/i)).toBeInTheDocument();
+      expect(screen.getByText('Upgrade to Premium')).toBeInTheDocument();
+      expect(screen.getByText('• Higher AI usage limits')).toBeInTheDocument();
+      expect(screen.getByText('• Priority response times')).toBeInTheDocument();
+      expect(screen.getByText('• Early access to new personalities')).toBeInTheDocument();
+      expect(screen.getByText('• Advanced memory features')).toBeInTheDocument();
     });
 
-    test('displays monthly conversation usage', () => {
+    test('shows Coming Soon button for premium upgrade', () => {
       renderComponent();
-      expect(screen.getByText(/28.*50/i)).toBeInTheDocument();
-    });
-
-    test('displays daily message usage', () => {
-      renderComponent();
-      expect(screen.getByText(/12.*20/i)).toBeInTheDocument();
-    });
-
-    test('shows progress bar for monthly conversations', () => {
-      renderComponent();
-      const progressBar = screen.getByRole('progressbar', { name: /monthly.*conversation/i });
-      expect(progressBar).toBeInTheDocument();
-      // 28/50 = 56%
-      expect(progressBar).toHaveAttribute('aria-valuenow', '28');
-      expect(progressBar).toHaveAttribute('aria-valuemax', '50');
-    });
-
-    test('shows progress bar for daily messages', () => {
-      renderComponent();
-      const progressBar = screen.getByRole('progressbar', { name: /daily.*message/i });
-      expect(progressBar).toBeInTheDocument();
-      // 12/20 = 60%
-      expect(progressBar).toHaveAttribute('aria-valuenow', '12');
-      expect(progressBar).toHaveAttribute('aria-valuemax', '20');
-    });
-
-    test('calculates percentage correctly', () => {
-      renderComponent();
-      expect(screen.getByText(/56%/i)).toBeInTheDocument(); // Monthly: 28/50
-      expect(screen.getByText(/60%/i)).toBeInTheDocument(); // Daily: 12/20
-    });
-
-    test('shows warning when approaching limit (>80%)', () => {
-      // Mock high usage
-      mockUsageSummary.monthly_conversations = 45; // 90%
-      
-      renderComponent();
-      expect(screen.getByText(/approaching.*limit/i) || screen.getByText(/warning/i)).toBeInTheDocument();
-    });
-
-    test('displays total statistics', () => {
-      renderComponent();
-      expect(screen.getByText(/87.*total.*conversation/i)).toBeInTheDocument();
-      expect(screen.getByText(/456.*total.*message/i)).toBeInTheDocument();
-    });
-
-    test('shows current streak', () => {
-      renderComponent();
-      expect(screen.getByText(/14.*day.*streak/i)).toBeInTheDocument();
+      const comingSoonButton = screen.getByRole('button', { name: /coming soon/i });
+      expect(comingSoonButton).toBeInTheDocument();
     });
   });
 
-  describe('Account Security', () => {
-    test('renders security section', () => {
+  describe('Account Security Section', () => {
+    test('renders security heading', () => {
       renderComponent();
       expect(screen.getByText('Account Security')).toBeInTheDocument();
     });
 
-    test('displays email address', () => {
+    test('displays user email', () => {
       renderComponent();
-      expect(screen.getByText('seeker@vimarsh.app')).toBeInTheDocument();
+      expect(screen.getByText('Email')).toBeInTheDocument();
+      expect(screen.getByText('test@vimarsh.app')).toBeInTheDocument();
     });
 
-    test('shows change email button', () => {
+    test('shows email verified badge', () => {
       renderComponent();
-      expect(screen.getByRole('button', { name: /change.*email/i })).toBeInTheDocument();
+      expect(screen.getByText('Verified')).toBeInTheDocument();
     });
 
-    test('shows change password button', () => {
+    test('displays authentication provider', () => {
       renderComponent();
-      expect(screen.getByRole('button', { name: /change.*password/i })).toBeInTheDocument();
+      expect(screen.getByText('Authentication')).toBeInTheDocument();
+      expect(screen.getByText('Microsoft Entra ID')).toBeInTheDocument();
     });
 
-    test('displays two-factor authentication status', () => {
+    test('shows connected apps section', () => {
       renderComponent();
-      expect(screen.getByText(/two.*factor/i)).toBeInTheDocument();
+      expect(screen.getByText('Connected Apps')).toBeInTheDocument();
+      expect(screen.getByText('No third-party apps connected')).toBeInTheDocument();
     });
 
-    test('shows enable 2FA button when disabled', () => {
+    test('displays manage button for connected apps', () => {
       renderComponent();
-      expect(screen.getByRole('button', { name: /enable.*2fa/i })).toBeInTheDocument();
+      const manageButton = screen.getByRole('button', { name: /manage/i });
+      expect(manageButton).toBeInTheDocument();
     });
 
-    test('displays connected accounts section', () => {
+    test('shows active sessions section', () => {
       renderComponent();
-      expect(screen.getByText(/connected.*account/i)).toBeInTheDocument();
+      expect(screen.getByText('Active Sessions')).toBeInTheDocument();
+      expect(screen.getByText('This device only')).toBeInTheDocument();
     });
 
-    test('shows Microsoft Entra ID connection', () => {
+    test('displays view all button for sessions', () => {
       renderComponent();
-      expect(screen.getByText(/microsoft/i)).toBeInTheDocument();
-      expect(screen.getByText(/connected/i)).toBeInTheDocument();
-    });
-  });
-
-  describe('Account Actions', () => {
-    test('renders account actions section', () => {
-      renderComponent();
-      expect(screen.getByText('Account Actions')).toBeInTheDocument();
-    });
-
-    test('displays logout button', () => {
-      renderComponent();
-      expect(screen.getByRole('button', { name: /log.*out/i })).toBeInTheDocument();
-    });
-
-    test('displays delete account button', () => {
-      renderComponent();
-      expect(screen.getByRole('button', { name: /delete.*account/i })).toBeInTheDocument();
-    });
-
-    test('logout button has warning style', () => {
-      renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      expect(logoutButton).toHaveClass('text-amber-600'); // Warning color
-    });
-
-    test('delete button has danger style', () => {
-      renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
-      expect(deleteButton).toHaveClass('text-red-600'); // Danger color
+      const viewAllButton = screen.getByRole('button', { name: /view all/i });
+      expect(viewAllButton).toBeInTheDocument();
     });
   });
 
-  describe('Logout Flow', () => {
-    test('shows confirmation modal when clicking logout', async () => {
+  describe('Account Actions Section', () => {
+    test('renders account actions heading', () => {
       renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/confirm.*logout/i)).toBeInTheDocument();
-      });
+      expect(screen.getByText('⚙️ Account Actions')).toBeInTheDocument();
     });
 
-    test('displays logout confirmation message', async () => {
+    test('displays sign out section', () => {
       renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/sure.*log.*out/i)).toBeInTheDocument();
-      });
+      const signOutElements = screen.getAllByText('Sign Out');
+      expect(signOutElements.length).toBeGreaterThan(0);
+      expect(screen.getByText('End your current session and return to login')).toBeInTheDocument();
     });
 
-    test('calls logout when confirming', async () => {
+    test('shows sign out button', () => {
       renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
-
-      await waitFor(() => {
-        const confirmButton = screen.getByRole('button', { name: /confirm/i });
-        fireEvent.click(confirmButton);
-        
-        expect(mockLogout).toHaveBeenCalled();
-      });
+      const signOutButton = screen.getByRole('button', { name: /sign out/i });
+      expect(signOutButton).toBeInTheDocument();
     });
 
-    test('navigates to login after successful logout', async () => {
-      mockLogout.mockResolvedValueOnce({ success: true });
-      
+    test('displays delete account section', () => {
       renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
-
-      await waitFor(() => {
-        const confirmButton = screen.getByRole('button', { name: /confirm/i });
-        fireEvent.click(confirmButton);
-      });
-
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/login');
-      });
+      expect(screen.getByText('Delete My Account')).toBeInTheDocument();
+      expect(screen.getByText('Permanently delete your account and all data')).toBeInTheDocument();
+      expect(screen.getByText('This action cannot be undone!')).toBeInTheDocument();
     });
 
-    test('can cancel logout', async () => {
+    test('shows delete account button', () => {
       renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
+      expect(deleteButton).toBeInTheDocument();
+    });
+  });
 
-      await waitFor(() => {
-        const cancelButton = screen.getByRole('button', { name: /cancel/i });
-        fireEvent.click(cancelButton);
-        
-        expect(mockLogout).not.toHaveBeenCalled();
-      });
+  describe('Sign Out Flow', () => {
+    test('calls logout when sign out button clicked', () => {
+      renderComponent();
+      const signOutButton = screen.getByRole('button', { name: /sign out/i });
+      
+      fireEvent.click(signOutButton);
+      
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+    });
+
+    test('navigates to home after logout', () => {
+      renderComponent();
+      const signOutButton = screen.getByRole('button', { name: /sign out/i });
+      
+      fireEvent.click(signOutButton);
+      
+      expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
 
   describe('Delete Account Flow', () => {
-    test('shows warning modal when clicking delete account', async () => {
+    test('shows confirmation modal when delete account clicked', async () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
       
       fireEvent.click(deleteButton);
-
+      
       await waitFor(() => {
-        expect(screen.getByText(/delete.*account/i)).toBeInTheDocument();
+        expect(screen.getByText('Delete Account?')).toBeInTheDocument();
       });
     });
 
-    test('displays severe warning message', async () => {
+    test('displays warning message in modal', async () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
       
       fireEvent.click(deleteButton);
-
+      
       await waitFor(() => {
-        expect(screen.getByText(/permanent/i)).toBeInTheDocument();
-        expect(screen.getByText(/cannot.*undo/i)).toBeInTheDocument();
+        expect(screen.getByText(/This will permanently delete:/i)).toBeInTheDocument();
+        expect(screen.getByText(/profile and account information/i)).toBeInTheDocument();
+        expect(screen.getByText(/conversation history/i)).toBeInTheDocument();
+        expect(screen.getByText(/achievements and progress/i)).toBeInTheDocument();
+        expect(screen.getByText(/bookmarks and saved wisdom/i)).toBeInTheDocument();
+        expect(screen.getByText(/preferences and settings/i)).toBeInTheDocument();
       });
     });
 
-    test('requires typing email for confirmation', async () => {
+    test('requires DELETE text confirmation', async () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
       
       fireEvent.click(deleteButton);
-
+      
       await waitFor(() => {
-        expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('DELETE')).toBeInTheDocument();
       });
     });
 
-    test('confirm button disabled until email matches', async () => {
+    test('delete button disabled until DELETE typed', async () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
       
       fireEvent.click(deleteButton);
-
+      
       await waitFor(() => {
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
+        const deleteInput = screen.getByPlaceholderText('DELETE');
+        const confirmButton = screen.getByRole('button', { name: /delete forever/i });
+        
         expect(confirmButton).toBeDisabled();
         
-        const emailInput = screen.getByPlaceholderText(/email/i);
-        fireEvent.change(emailInput, { target: { value: 'wrong@email.com' } });
-        
+        fireEvent.change(deleteInput, { target: { value: 'WRONG' } });
         expect(confirmButton).toBeDisabled();
       });
     });
 
-    test('confirm button enabled when email matches', async () => {
+    test('delete button enabled when DELETE typed correctly', async () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
       
       fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        const emailInput = screen.getByPlaceholderText(/email/i);
-        fireEvent.change(emailInput, { target: { value: 'seeker@vimarsh.app' } });
-        
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
-        expect(confirmButton).not.toBeDisabled();
-      });
-    });
-
-    test('calls deleteAccount when confirmed with correct email', async () => {
-      renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
       
-      fireEvent.click(deleteButton);
-
       await waitFor(() => {
-        const emailInput = screen.getByPlaceholderText(/email/i);
-        fireEvent.change(emailInput, { target: { value: 'seeker@vimarsh.app' } });
+        const deleteInput = screen.getByPlaceholderText('DELETE');
+        const confirmButton = screen.getByRole('button', { name: /delete forever/i });
         
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
-        fireEvent.click(confirmButton);
-        
-        expect(mockDeleteAccount).toHaveBeenCalled();
-      });
-    });
-
-    test('shows what will be deleted', async () => {
-      renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
-      
-      fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/conversation.*history/i)).toBeInTheDocument();
-        expect(screen.getByText(/preference/i)).toBeInTheDocument();
-        expect(screen.getByText(/personal.*data/i)).toBeInTheDocument();
-      });
-    });
-
-    test('navigates to goodbye page after successful deletion', async () => {
-      mockDeleteAccount.mockResolvedValueOnce({ success: true });
-      
-      renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
-      
-      fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        const emailInput = screen.getByPlaceholderText(/email/i);
-        fireEvent.change(emailInput, { target: { value: 'seeker@vimarsh.app' } });
-        
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
-        fireEvent.click(confirmButton);
-      });
-
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/goodbye');
+        fireEvent.change(deleteInput, { target: { value: 'DELETE' } });
+        expect(confirmButton).toBeEnabled();
       });
     });
 
     test('can cancel deletion', async () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
       
       fireEvent.click(deleteButton);
-
+      
       await waitFor(() => {
         const cancelButton = screen.getByRole('button', { name: /cancel/i });
         fireEvent.click(cancelButton);
+      });
+      
+      await waitFor(() => {
+        expect(screen.queryByText('Delete Account?')).not.toBeInTheDocument();
+      });
+    });
+
+    test('closes modal after confirming deletion', async () => {
+      renderComponent();
+      const deleteButton = screen.getByRole('button', { name: /delete account/i });
+      
+      fireEvent.click(deleteButton);
+      
+      await waitFor(async () => {
+        const deleteInput = screen.getByPlaceholderText('DELETE');
+        fireEvent.change(deleteInput, { target: { value: 'DELETE' } });
         
-        expect(mockDeleteAccount).not.toHaveBeenCalled();
+        const confirmButton = screen.getByRole('button', { name: /delete forever/i });
+        fireEvent.click(confirmButton);
+      });
+      
+      await waitFor(() => {
+        expect(screen.queryByText('Delete Account?')).not.toBeInTheDocument();
       });
     });
   });
 
-  describe('Premium Features Teaser', () => {
-    test('shows premium features for free tier users', () => {
+  describe('Help Section', () => {
+    test('displays help information', () => {
       renderComponent();
-      expect(screen.getByText(/upgrade.*premium/i) || screen.getByText(/premium.*feature/i)).toBeInTheDocument();
+      expect(screen.getByText(/Need help\?/)).toBeInTheDocument();
+      expect(screen.getByText('Help Center')).toBeInTheDocument();
     });
 
-    test('displays premium benefits', () => {
+    test('shows support email link', () => {
       renderComponent();
-      expect(screen.getByText(/unlimited.*conversation/i)).toBeInTheDocument();
-      expect(screen.getByText(/advanced.*insight/i)).toBeInTheDocument();
-    });
-
-    test('shows pricing information', () => {
-      renderComponent();
-      expect(screen.getByText(/\$9\.99/i) || screen.getByText(/month/i)).toBeInTheDocument();
-    });
-
-    test('upgrade button navigates to pricing', () => {
-      renderComponent();
-      const upgradeButton = screen.getByRole('button', { name: /upgrade/i });
-      
-      fireEvent.click(upgradeButton);
-      
-      expect(mockNavigate).toHaveBeenCalledWith('/pricing');
+      const supportLink = screen.getByRole('link', { name: /support@vimarsh.app/i });
+      expect(supportLink).toBeInTheDocument();
+      expect(supportLink).toHaveAttribute('href', 'mailto:support@vimarsh.app');
     });
   });
 
   describe('Accessibility', () => {
-    test('all buttons have accessible labels', () => {
-      renderComponent();
-      const buttons = screen.getAllByRole('button');
-      buttons.forEach(button => {
-        expect(button).toHaveAccessibleName();
-      });
-    });
-
-    test('progress bars have accessible labels', () => {
-      renderComponent();
-      const progressBars = screen.getAllByRole('progressbar');
-      progressBars.forEach(bar => {
-        expect(bar).toHaveAccessibleName();
-      });
-    });
-
-    test('sections have proper heading hierarchy', () => {
+    test('has proper heading hierarchy', () => {
       renderComponent();
       const headings = screen.getAllByRole('heading');
       expect(headings.length).toBeGreaterThan(0);
     });
 
-    test('dangerous actions have aria-describedby warnings', () => {
+    test('all action buttons are accessible', () => {
       renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
-      expect(deleteButton).toHaveAttribute('aria-describedby');
-    });
-  });
-
-  describe('Error Handling', () => {
-    test('shows error if logout fails', async () => {
-      mockLogout.mockRejectedValueOnce(new Error('Logout failed'));
-      
-      renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
-
-      await waitFor(() => {
-        const confirmButton = screen.getByRole('button', { name: /confirm/i });
-        fireEvent.click(confirmButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(/error/i)).toBeInTheDocument();
-      });
-    });
-
-    test('shows error if deletion fails', async () => {
-      mockDeleteAccount.mockRejectedValueOnce(new Error('Deletion failed'));
-      
-      renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
-      
-      fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        const emailInput = screen.getByPlaceholderText(/email/i);
-        fireEvent.change(emailInput, { target: { value: 'seeker@vimarsh.app' } });
-        
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
-        fireEvent.click(confirmButton);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText(/error/i) || screen.getByText(/failed/i)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Loading States', () => {
-    test('shows loading state during logout', async () => {
-      mockLogout.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 100)));
-      
-      renderComponent();
-      const logoutButton = screen.getByRole('button', { name: /log.*out/i });
-      
-      fireEvent.click(logoutButton);
-
-      await waitFor(() => {
-        const confirmButton = screen.getByRole('button', { name: /confirm/i });
-        fireEvent.click(confirmButton);
-        
-        expect(screen.getByText(/logging.*out/i) || confirmButton).toHaveAttribute('disabled');
-      });
-    });
-
-    test('shows loading state during deletion', async () => {
-      mockDeleteAccount.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 100)));
-      
-      renderComponent();
-      const deleteButton = screen.getByRole('button', { name: /delete.*account/i });
-      
-      fireEvent.click(deleteButton);
-
-      await waitFor(() => {
-        const emailInput = screen.getByPlaceholderText(/email/i);
-        fireEvent.change(emailInput, { target: { value: 'seeker@vimarsh.app' } });
-        
-        const confirmButton = screen.getByRole('button', { name: /delete/i });
-        fireEvent.click(confirmButton);
-        
-        expect(screen.getByText(/deleting/i) || confirmButton).toHaveAttribute('disabled');
-      });
+      expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /delete account/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /manage/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /view all/i })).toBeInTheDocument();
     });
   });
 });

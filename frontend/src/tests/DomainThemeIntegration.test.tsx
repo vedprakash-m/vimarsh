@@ -13,6 +13,9 @@ import userEvent from '@testing-library/user-event';
 import { PersonalityProvider, usePersonality } from '../contexts/PersonalityContext';
 import { DomainThemeManager } from '../components/DomainThemeManager';
 
+// Unmock PersonalityContext for this integration test - we want the real implementation
+jest.unmock('../contexts/PersonalityContext');
+
 // Mock fetch to prevent API calls in tests
 global.fetch = jest.fn(() =>
   Promise.resolve({
