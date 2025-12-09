@@ -384,12 +384,20 @@ class TestSendNotification(TestNotificationServiceIntegration):
         sample_user_id
     ):
         """Test that notifications respect daily rate limits"""
-        # Create preferences with rate limit reached
+        # Get current hour to avoid quiet hours
+        current_hour = datetime.now().hour
+        # Set quiet hours to a 1-hour window that's not the current hour
+        quiet_start = (current_hour + 2) % 24
+        quiet_end = (current_hour + 3) % 24
+        
+        # Create preferences with rate limit reached and quiet hours set to avoid current time
         prefs = NotificationPreferences(
             user_id=sample_user_id,
             enabled=True,
             max_notifications_per_day=3,
-            notifications_sent_today=3
+            notifications_sent_today=3,
+            quiet_hours_start=quiet_start,
+            quiet_hours_end=quiet_end
         )
         
         # Mock methods
