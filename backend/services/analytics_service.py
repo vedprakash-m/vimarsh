@@ -681,5 +681,21 @@ class AnalyticsService:
             logger.error(f"❌ Error getting monthly usage: {e}")
             return {"conversation_count": 0, "total_tokens": 0}
 
-# Global service instance
-analytics_service = AnalyticsService()
+# Lazy instantiation - only create when first accessed
+_analytics_service_instance = None
+
+def get_analytics_service():
+    """Get or create the global analytics service instance"""
+    global _analytics_service_instance
+    if _analytics_service_instance is None:
+        _analytics_service_instance = AnalyticsService()
+    return _analytics_service_instance
+
+# For backwards compatibility, create a property-like accessor
+class _AnalyticsServiceProxy:
+    def __getattr__(self, name):
+        return getattr(get_analytics_service(), name)
+    def __call__(self, *args, **kwargs):
+        return get_analytics_service()(*args, **kwargs)
+
+analytics_service = _AnalyticsServiceProxy()

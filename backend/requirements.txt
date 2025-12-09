@@ -16,7 +16,7 @@ PyJWT[crypto]==2.8.0
 cryptography==41.0.7
 
 # AI/ML Libraries (Essential only)
-google-generativeai==0.7.2  # For generation model (Gemini 2.5 Flash)
+# Migrated from Google Gemini to Azure OpenAI (ChatGPT-4o mini)
 openai>=1.54.0  # For Azure OpenAI chat and embeddings (supports max_completion_tokens for o1-series)
 numpy>=1.21.0  # Required for vector similarity calculations (lightweight)
 

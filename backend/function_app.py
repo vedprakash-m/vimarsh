@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 # Import centralized AI model configuration
 try:
     from config.ai_models import AI_CONFIG
-    gemini_model = AI_CONFIG.gemini_generation_model
+    azure_chat_deployment = AI_CONFIG.azure_openai_chat_deployment
 except ImportError:
     # Fallback if config not available  
-    gemini_model = "models/gemini-2.5-flash"
+    azure_chat_deployment = "vimarsh-chat-gpt5mini"
 
 # Create the function app FIRST - this ensures it's available before imports
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -300,7 +300,8 @@ async def diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         # Test 1: Environment Variables
         required_vars = [
             'AZURE_COSMOS_CONNECTION_STRING',
-            'GEMINI_API_KEY', 
+            'AZURE_OPENAI_ENDPOINT',
+            'AZURE_OPENAI_API_KEY',
             'AZURE_COSMOS_DATABASE_NAME',
             'AZURE_COSMOS_CONTAINER_NAME'
         ]
@@ -318,10 +319,10 @@ async def diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         # Test 2: Package Imports
         import_test = {}
         try:
-            import google.generativeai as genai
-            import_test["google_generativeai"] = "available"
+            from openai import AzureOpenAI
+            import_test["azure_openai"] = "available"
         except ImportError as e:
-            import_test["google_generativeai"] = f"missing: {str(e)}"
+            import_test["azure_openai"] = f"missing: {str(e)}"
         
         try:
             import azure.cosmos.cosmos_client as cosmos_client
@@ -356,27 +357,36 @@ async def diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         
         diagnostic_results["tests"]["cosmos_db"] = cosmos_test
         
-        # Test 4: Gemini API
-        gemini_test = {"status": "unknown", "error": None}
+        # Test 4: Azure OpenAI Chat API
+        azure_openai_test = {"status": "unknown", "error": None}
         try:
-            api_key = os.getenv('GEMINI_API_KEY')
-            if api_key:
-                import google.generativeai as genai
-                genai.configure(api_key=api_key)
-                model = genai.GenerativeModel(gemini_model)
-                response = model.generate_content("Hello")
-                if response and response.text:
-                    gemini_test["status"] = "working"
-                    gemini_test["response_sample"] = response.text[:100]
+            endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
+            api_key = os.getenv('AZURE_OPENAI_API_KEY')
+            if endpoint and api_key:
+                from openai import AzureOpenAI
+                client = AzureOpenAI(
+                    azure_endpoint=endpoint,
+                    api_key=api_key,
+                    api_version="2024-08-01-preview"
+                )
+                response = client.chat.completions.create(
+                    model=azure_chat_deployment,
+                    messages=[{"role": "user", "content": "Hello"}],
+                    max_tokens=50
+                )
+                if response and response.choices:
+                    azure_openai_test["status"] = "working"
+                    azure_openai_test["deployment"] = azure_chat_deployment
+                    azure_openai_test["response_sample"] = response.choices[0].message.content[:100]
                 else:
-                    gemini_test["status"] = "no_response"
+                    azure_openai_test["status"] = "no_response"
             else:
-                gemini_test["status"] = "no_api_key"
+                azure_openai_test["status"] = "no_credentials"
         except Exception as e:
-            gemini_test["status"] = "failed"
-            gemini_test["error"] = str(e)
+            azure_openai_test["status"] = "failed"
+            azure_openai_test["error"] = str(e)
         
-        diagnostic_results["tests"]["gemini_api"] = gemini_test
+        diagnostic_results["tests"]["azure_openai_chat"] = azure_openai_test
         
         # Test 5: Enhanced RAG Service
         rag_test = {"status": "unknown", "error": None}
@@ -394,16 +404,16 @@ async def diagnostic_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         env_ok = len(env_test["missing"]) == 0
         imports_ok = all("available" in status for status in import_test.values())
         cosmos_ok = cosmos_test["status"] == "connected"
-        gemini_ok = gemini_test["status"] == "working"
+        azure_openai_ok = azure_openai_test["status"] == "working"
         rag_ok = rag_test["status"] == "initialized"
         
         diagnostic_results["summary"] = {
             "environment_variables": "pass" if env_ok else "fail",
             "package_imports": "pass" if imports_ok else "fail", 
             "cosmos_db": "pass" if cosmos_ok else "fail",
-            "gemini_api": "pass" if gemini_ok else "fail",
+            "azure_openai_chat": "pass" if azure_openai_ok else "fail",
             "enhanced_rag_service": "pass" if rag_ok else "fail",
-            "overall_status": "pass" if all([env_ok, imports_ok, cosmos_ok, gemini_ok, rag_ok]) else "fail"
+            "overall_status": "pass" if all([env_ok, imports_ok, cosmos_ok, azure_openai_ok, rag_ok]) else "fail"
         }
         
         return func.HttpResponse(

@@ -11,7 +11,7 @@ import os
 import logging
 import time
 import asyncio
-import google.generativeai as genai
+from openai import AzureOpenAI
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
@@ -53,20 +53,33 @@ class LLMService:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.api_key = os.environ.get('GEMINI_API_KEY')
-        self.is_configured = bool(self.api_key)  # Check if API key is available
+        
+        # Azure OpenAI configuration (migrated from Gemini)
+        self.azure_endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT', os.environ.get('AZURE_OPENAI_CHAT_ENDPOINT', ''))
+        self.azure_api_key = os.environ.get('AZURE_OPENAI_API_KEY', os.environ.get('AZURE_OPENAI_CHAT_API_KEY', ''))
+        self.azure_deployment = os.environ.get('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
+        self.is_configured = bool(self.azure_endpoint and self.azure_api_key)
         
         # Initialize database personality service
         self.database_personality_service = None
         self.database_available = False
         self._initialize_database_service()
         
-        # Initialize Gemini model if configured
+        # Initialize Azure OpenAI client if configured
         if self.is_configured:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            try:
+                self.client = AzureOpenAI(
+                    azure_endpoint=self.azure_endpoint,
+                    api_key=self.azure_api_key,
+                    api_version="2024-08-01-preview"
+                )
+                self.logger.info(f"✅ Azure OpenAI client initialized with deployment: {self.azure_deployment}")
+            except Exception as e:
+                self.logger.error(f"❌ Failed to initialize Azure OpenAI client: {e}")
+                self.client = None
+                self.is_configured = False
         else:
-            self.model = None
+            self.client = None
             
         self._initialize_personalities()
     
@@ -500,7 +513,7 @@ Response:"""
                 
                 # Use asyncio.wait_for for timeout handling
                 response = await asyncio.wait_for(
-                    self._generate_gemini_response(prompt),
+                    self._generate_azure_openai_response(prompt, max_tokens=config.max_chars),
                     timeout=config.timeout_seconds
                 )
                 
@@ -558,7 +571,7 @@ Response:"""
                 await asyncio.sleep(1 * (attempt + 1))  # Progressive backoff
                 
             except Exception as e:
-                logger.error(f"❌ Gemini API call failed for {personality_id} (attempt {attempt + 1}): {e}")
+                logger.error(f"❌ Azure OpenAI API call failed for {personality_id} (attempt {attempt + 1}): {e}")
                 if attempt == config.max_retries:  # Last attempt
                     return SpiritualResponse(
                         content=f"{config.greeting_style}, I am experiencing difficulties accessing my wisdom. Please try your question again shortly.",
@@ -571,16 +584,36 @@ Response:"""
                 # Wait before retry
                 await asyncio.sleep(1 * (attempt + 1))  # Progressive backoff
     
-    async def _generate_gemini_response(self, prompt: str):
-        """Generate response from Gemini API with async wrapper"""
-        if not self.model:
-            raise RuntimeError("Gemini model not configured")
-        # Wrap the synchronous Gemini call in an async context
-        return await asyncio.get_event_loop().run_in_executor(
-            None, 
-            self.model.generate_content, 
-            prompt
-        )
+    async def _generate_azure_openai_response(self, prompt: str, max_tokens: int = 8192):
+        """Generate response from Azure OpenAI with async wrapper"""
+        if not self.client:
+            raise RuntimeError("Azure OpenAI client not configured")
+        
+        try:
+            response = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.client.chat.completions.create(
+                    model=self.azure_deployment,
+                    messages=[
+                        {"role": "system", "content": "You are a wise spiritual guide providing thoughtful, compassionate guidance."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=max_tokens,
+                    temperature=0.7,
+                    top_p=0.95
+                )
+            )
+            
+            # Create a response object similar to Gemini's format
+            class AzureResponse:
+                def __init__(self, text):
+                    self.text = text
+            
+            return AzureResponse(response.choices[0].message.content)
+            
+        except Exception as e:
+            self.logger.error(f"❌ Azure OpenAI API error: {e}")
+            raise
     
     def get_available_personalities(self) -> List[Dict[str, Any]]:
         """Get list of available personalities with their metadata"""
