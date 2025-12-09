@@ -568,6 +568,13 @@ jobs:
       run: |
         pip install aiohttp pyyaml
 
+    - name: ⏳ Wait for Functions App Initialization
+      run: |
+        echo "⏳ Waiting 3 minutes for Azure Functions Flex to fully initialize..."
+        echo "📝 Flex Consumption apps require significant cold start time after deployment"
+        sleep 180
+        echo "✅ Wait complete, starting health checks"
+
     - name: 🏥 Comprehensive Health Check
       run: |
         echo "🏥 Running comprehensive post-deployment health check..."

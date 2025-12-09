@@ -91,13 +91,14 @@ class PostDeploymentValidator:
         start_time = time.time()
         backend_url = self.config[self.environment]["backend_url"]
         
-        # Retry configuration for Azure Functions cold start
-        max_retries = 3
-        base_timeout = 30
+        # Retry logic for backend health check
+        # Increased for Azure Functions Flex cold start (can take 2-3 minutes)
+        max_retries = 5
+        base_timeout = 60
         
         for attempt in range(max_retries):
             try:
-                timeout = base_timeout + (attempt * 30)  # Increase timeout on retries
+                timeout = base_timeout + (attempt * 45)  # Increase timeout on retries (60s, 105s, 150s, 195s, 240s)
                 print(f"🔄 Attempting backend health check (attempt {attempt + 1}/{max_retries}, timeout: {timeout}s)")
                 
                 async with session.get(f"{backend_url}/api/health", timeout=timeout) as response:
@@ -123,8 +124,8 @@ class PostDeploymentValidator:
                     elif response.status == 404:
                         # 404 suggests Functions app may be restarting or routes not loaded yet
                         if attempt < max_retries - 1:
-                            print(f"⚠️ Backend returned 404 (app may be starting), waiting 30s before retry...")
-                            await asyncio.sleep(30)  # Longer wait for app startup
+                            print(f"⚠️ Backend returned 404 (app may be starting), waiting 45s before retry...")
+                            await asyncio.sleep(45)  # Longer wait for Flex Consumption cold start
                             continue
                         else:
                             return HealthCheckResult(
@@ -194,12 +195,13 @@ class PostDeploymentValidator:
         }
         
         # Retry configuration for Azure Functions
-        max_retries = 2
-        base_timeout = 60
+        # Increased for Azure Functions Flex cold start
+        max_retries = 3
+        base_timeout = 90
         
         for attempt in range(max_retries):
             try:
-                timeout = base_timeout + (attempt * 30)
+                timeout = base_timeout + (attempt * 45)
                 print(f"🔄 Testing guidance API (attempt {attempt + 1}/{max_retries}, timeout: {timeout}s)")
                 
                 async with session.post(
@@ -246,8 +248,8 @@ class PostDeploymentValidator:
                     elif response.status == 404:
                         # 404 suggests Functions app routes not loaded yet
                         if attempt < max_retries - 1:
-                            print(f"⚠️ Guidance API returned 404 (app may be starting), waiting 30s before retry...")
-                            await asyncio.sleep(30)
+                            print(f"⚠️ Guidance API returned 404 (app may be starting), waiting 45s before retry...")
+                            await asyncio.sleep(45)
                             continue
                         else:
                             return HealthCheckResult(
