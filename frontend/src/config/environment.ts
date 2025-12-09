@@ -67,8 +67,10 @@ export const getCurrentDomainConfig = () => {
       };
     }
     
-    // Fallback for unknown domains
-    console.warn('⚠️ Unknown domain detected, using runtime configuration:', runtimeDomain);
+    // Fallback for unknown domains (suppress warning in test environment)
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('⚠️ Unknown domain detected, using runtime configuration:', runtimeDomain);
+    }
     return {
       domain: runtimeDomain,
       redirectUri: `${runtimeDomain}/auth/callback`,

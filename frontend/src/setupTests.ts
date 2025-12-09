@@ -31,8 +31,10 @@ jest.mock('axios', () => ({
   }
 }));
 
-// Suppress act() warnings for tests - React 18 compatibility
+// Suppress act() warnings and MSAL warnings for tests - React 18 compatibility
 const originalError = console.error;
+const originalWarn = console.warn;
+
 beforeAll(() => {
   console.error = (...args: any[]) => {
     if (
@@ -46,12 +48,23 @@ beforeAll(() => {
     originalError.call(console, ...args);
   };
   
+  console.warn = (...args: any[]) => {
+    if (
+      typeof args[0] === 'string' &&
+      args[0].includes('Unknown domain detected')
+    ) {
+      return; // Suppress MSAL domain warnings in test environment
+    }
+    originalWarn.call(console, ...args);
+  };
+  
   // Setup comprehensive Web API mocks
   setupWebApiMocks();
 });
 
 afterAll(() => {
   console.error = originalError;
+  console.warn = originalWarn;
 });
 
 // Mock IntersectionObserver
@@ -157,4 +170,22 @@ jest.mock('@azure/msal-react', () => ({
   MsalProvider: ({ children }: { children: React.ReactNode }) => children,
   AuthenticatedTemplate: ({ children }: { children: React.ReactNode }) => null,
   UnauthenticatedTemplate: ({ children }: { children: React.ReactNode }) => children
+}));
+
+// Mock AuthContext globally for all tests
+const mockAuthValue = {
+  isAuthenticated: true,
+  user: {
+    id: 'test-user-123',
+    email: 'test@vimarsh.app',
+    name: 'Test User'
+  },
+  login: jest.fn(),
+  logout: jest.fn(),
+  loading: false
+};
+
+jest.mock('./context/AuthContext', () => ({
+  useAuth: () => mockAuthValue,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children
 }));
