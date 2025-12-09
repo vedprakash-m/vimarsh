@@ -170,7 +170,7 @@ class TestConfigurationValidation:
         """Test that essential dependencies are available"""
         essential_modules = [
             'azure.cosmos',
-            'google.generativeai',
+            'openai',  # Migrated from google.generativeai to Azure OpenAI
             'pytest',
             'unittest.mock'
         ]
