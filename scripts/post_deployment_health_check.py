@@ -29,10 +29,12 @@ class PostDeploymentValidator:
         self.results: List[HealthCheckResult] = []
         
         # Environment URLs
+        # Note: Azure Flex Consumption apps use standard .azurewebsites.net URLs
+        # The Flex-specific URLs with random suffixes are internal and not always accessible
         self.config = {
             "production": {
                 "frontend_url": "https://vimarsh.vedprakash.net",
-                "backend_url": "https://vimarsh-backend-app-flex-accch9cmbah2bzb0.westus2-01.azurewebsites.net"
+                "backend_url": "https://vimarsh-backend-app-flex.azurewebsites.net"
             },
             "staging": {
                 "frontend_url": "https://staging-vimarsh.vedprakash.net", 
