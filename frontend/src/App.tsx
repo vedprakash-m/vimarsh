@@ -34,6 +34,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { PersonalityProvider } from './contexts/PersonalityContext';
 import { MemoryProvider } from './contexts/MemoryContext';
 import { EngagementProvider } from './contexts/EngagementContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
@@ -127,6 +128,7 @@ function App() {
             <PersonalityProvider>
               <MemoryProvider>
               <EngagementProvider>
+              <SettingsProvider>
               <EngagementTourWrapper />
               <AppLoadingProvider>
                 <LanguageProvider>
@@ -211,6 +213,7 @@ function App() {
             </Router>
           </LanguageProvider>
         </AppLoadingProvider>
+        </SettingsProvider>
         </EngagementProvider>
         </MemoryProvider>
         </PersonalityProvider>
