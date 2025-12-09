@@ -34,7 +34,7 @@ class PostDeploymentValidator:
         self.config = {
             "production": {
                 "frontend_url": "https://vimarsh.vedprakash.net",
-                "backend_url": "https://vimarsh-backend-app-flex.azurewebsites.net"
+                "backend_url": "https://vimarsh-backend-app.azurewebsites.net"
             },
             "staging": {
                 "frontend_url": "https://staging-vimarsh.vedprakash.net", 

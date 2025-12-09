@@ -33,7 +33,7 @@ env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '18'
   COVERAGE_THRESHOLD: 10
-  AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend-app-flex'
+  AZURE_FUNCTIONAPP_NAME: 'vimarsh-backend-app'
   AZURE_STATICWEBAPP_NAME: 'vimarsh-frontend'
 
 jobs:

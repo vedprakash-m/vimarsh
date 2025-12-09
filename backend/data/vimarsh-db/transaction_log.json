@@ -838,5 +838,677 @@
     "committed_at": "2025-08-14T20:50:15.336890",
     "error_message": null,
     "operation_count": 2
+  },
+  {
+    "transaction_id": "36ae787b-8d68-463b-8935-e66c9ba0ce06",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:03.652144",
+    "committed_at": "2025-12-08T07:32:03.655256",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "b0b68572-37b9-4171-a33a-ee96f0977005",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:03.656387",
+    "committed_at": "2025-12-08T07:32:03.659317",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "1d0ab201-e08d-45b9-b6b5-91a118949d07",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:03.660394",
+    "committed_at": "2025-12-08T07:32:03.663287",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "7e7a0d91-7821-434e-b726-66ce8e80d878",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.162128",
+    "committed_at": "2025-12-08T07:32:04.168775",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "a1d5aad8-4432-42a5-a1f8-2e3a32fe3f94",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.170487",
+    "committed_at": "2025-12-08T07:32:04.175327",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "aa21c72c-52c8-40a9-87de-10fb075edb6a",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.176728",
+    "committed_at": "2025-12-08T07:32:04.180850",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "cc4b4782-4dfc-4975-ad76-5fc93cbd3ba0",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.182116",
+    "committed_at": "2025-12-08T07:32:04.185881",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "12591e9a-b521-46aa-b513-10c52fe4a073",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.187045",
+    "committed_at": "2025-12-08T07:32:04.190557",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "68b32e2d-7b40-4ae2-b2d7-7c2d2c04d3fc",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.191623",
+    "committed_at": "2025-12-08T07:32:04.195154",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "29d72e98-b214-47c1-9dc1-0741b5da3e2b",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.196234",
+    "committed_at": "2025-12-08T07:32:04.199476",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "a0e04aa3-4df8-4481-b5a0-e89fc69037a5",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.200475",
+    "committed_at": "2025-12-08T07:32:04.203815",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "cbcc3a3b-05d1-4d06-81b7-98987095695d",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.204816",
+    "committed_at": "2025-12-08T07:32:04.208484",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "60130e89-7935-4bb8-a760-1df719721e85",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.209491",
+    "committed_at": "2025-12-08T07:32:04.212705",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "ed925575-63a9-42a4-98dd-ba777aeca252",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.213669",
+    "committed_at": "2025-12-08T07:32:04.216626",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "4a70f84c-6892-4429-ba62-0f601864dcb0",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.217532",
+    "committed_at": "2025-12-08T07:32:04.220602",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "c6c441c2-2a9b-4383-b22e-0e4c3638063d",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.221574",
+    "committed_at": "2025-12-08T07:32:04.224472",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "5433c829-33ae-4e0b-890a-14e57a946884",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.225358",
+    "committed_at": "2025-12-08T07:32:04.228293",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "06ebf504-741d-4418-a63b-efb0d47e829c",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:04.229178",
+    "committed_at": "2025-12-08T07:32:04.231972",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "1f19c8e7-40e7-4251-ac92-fba02f044a4e",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:05.250187",
+    "committed_at": "2025-12-08T07:32:05.255993",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "10965c8d-9421-4917-ae29-019ff54324f1",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:05.257216",
+    "committed_at": "2025-12-08T07:32:05.259845",
+    "error_message": null,
+    "operation_count": 1
+  },
+  {
+    "transaction_id": "c3097169-aedc-46ae-9d6a-d8cb736054ad",
+    "state": "committed",
+    "created_at": "2025-12-08T07:32:05.276160",
+    "committed_at": "2025-12-08T07:32:05.280072",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "21e9f613-0c4d-4d0f-8c19-b84a0da8bbee",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.141297",
+    "committed_at": "2025-12-08T07:54:37.161774",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "4daf82cb-09a0-43fa-868a-ddc52d7af2a6",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.166313",
+    "committed_at": "2025-12-08T07:54:37.185414",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "905a4865-34ec-4cfb-8ed4-b8818033c873",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.189586",
+    "committed_at": "2025-12-08T07:54:37.207772",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "34b8d770-6539-4fd3-8afb-68db3a10a564",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.652449",
+    "committed_at": "2025-12-08T07:54:37.688098",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "d3c11a34-96da-4c22-91fc-4e4c6d7dcdd6",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.694121",
+    "committed_at": "2025-12-08T07:54:37.717439",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "3dd6f7d1-bd71-4249-9216-36a743d8bf88",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.722221",
+    "committed_at": "2025-12-08T07:54:37.742482",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "d119d3ac-0a59-47ac-b403-7b354f1a43e4",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.746824",
+    "committed_at": "2025-12-08T07:54:37.765880",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "89739318-d4c0-49c2-9736-37d13989c51c",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.770078",
+    "committed_at": "2025-12-08T07:54:37.788463",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "7e2423d4-46ff-47b5-8075-e03d8f083635",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.792661",
+    "committed_at": "2025-12-08T07:54:37.811119",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "44dddacb-b61c-4c81-bc1e-fa1a53507d10",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.815186",
+    "committed_at": "2025-12-08T07:54:37.833717",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "2291e37c-2e3b-4113-a1a2-462aef985b57",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.838158",
+    "committed_at": "2025-12-08T07:54:37.856966",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "7d40f81f-f31c-4e64-adeb-e72e4a174ee6",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.861514",
+    "committed_at": "2025-12-08T07:54:37.880317",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "449a921b-63d9-496f-bec9-edf20638e6ab",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.884659",
+    "committed_at": "2025-12-08T07:54:37.903605",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "a8398518-3b22-496d-b63b-22d4c011680a",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.907826",
+    "committed_at": "2025-12-08T07:54:37.927167",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "4593ace6-d0b5-4e52-beaa-bd06c6670fb9",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.931420",
+    "committed_at": "2025-12-08T07:54:37.950565",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "76b70fc0-6a6d-4b02-8b03-b16e4b612a61",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.955045",
+    "committed_at": "2025-12-08T07:54:37.974382",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "6de2c9bc-6515-40cf-ba69-c62c6eb9c65a",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:37.978860",
+    "committed_at": "2025-12-08T07:54:37.998126",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "aae8b809-054c-4e1d-8ed4-d281a2b87bb1",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:38.002486",
+    "committed_at": "2025-12-08T07:54:38.022082",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "3c9913cf-815e-43fd-aa93-086d8de79bf9",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:39.047713",
+    "committed_at": "2025-12-08T07:54:39.081782",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "3a1da7f9-1b66-4135-8e3e-b23ac9e48227",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:39.087541",
+    "committed_at": "2025-12-08T07:54:39.099995",
+    "error_message": null,
+    "operation_count": 1
+  },
+  {
+    "transaction_id": "af302256-90e6-43b4-851f-b3cc4ca1d6e9",
+    "state": "committed",
+    "created_at": "2025-12-08T07:54:39.122262",
+    "committed_at": "2025-12-08T07:54:39.143847",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "26d85be7-3f80-45c7-81c4-93e486546cac",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:54.541684",
+    "committed_at": "2025-12-08T07:59:54.565138",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "10e3d781-6ea2-4c21-9e2f-dcb19e58a913",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:54.570065",
+    "committed_at": "2025-12-08T07:59:54.591210",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "29a9a59f-7e96-4bd8-9254-54d69295d94e",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:54.595906",
+    "committed_at": "2025-12-08T07:59:54.616459",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "2b86b548-15d4-4c4d-9946-f88ebeaa0a45",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.050518",
+    "committed_at": "2025-12-08T07:59:55.091293",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "284e8f49-45dc-483b-ae70-d71c47aa359f",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.098007",
+    "committed_at": "2025-12-08T07:59:55.130204",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "6d7a1a4e-cd1c-453a-9367-5a5958958000",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.134988",
+    "committed_at": "2025-12-08T07:59:55.158345",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "5e1e3e36-682e-4808-9f75-7f69be4f6249",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.163108",
+    "committed_at": "2025-12-08T07:59:55.185605",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "9a854499-6c73-47af-8b87-03d95147514b",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.190799",
+    "committed_at": "2025-12-08T07:59:55.212858",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "8b0a527e-a3f4-4001-8f88-8af92ab947d6",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.218055",
+    "committed_at": "2025-12-08T07:59:55.240152",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "26f7365f-78c5-4e17-bf27-ea24e6466131",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.245013",
+    "committed_at": "2025-12-08T07:59:55.267011",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "b8b234a5-4b3e-4393-821a-15ae1dee71f5",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.272243",
+    "committed_at": "2025-12-08T07:59:55.294272",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "d44c4886-d548-46b4-b408-e2aea2f20a92",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.299230",
+    "committed_at": "2025-12-08T07:59:55.320915",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "68fd8ad1-7a12-4181-88d1-f49185bb185a",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.325756",
+    "committed_at": "2025-12-08T07:59:55.347570",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "b9e1599d-ac11-411a-8bb8-902a0e47822c",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.352508",
+    "committed_at": "2025-12-08T07:59:55.375046",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "7f28b7d8-05c1-43c1-ac3f-030f56e4505a",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.380187",
+    "committed_at": "2025-12-08T07:59:55.402110",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "9931507a-a458-4337-a85b-5b8085877df6",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.407161",
+    "committed_at": "2025-12-08T07:59:55.429327",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "9c40a5b9-df4a-4830-af89-6a6406e4b4cb",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.434257",
+    "committed_at": "2025-12-08T07:59:55.456510",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "7f954bcf-48d9-4f0e-a4ba-1560e5507199",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:55.461467",
+    "committed_at": "2025-12-08T07:59:55.483714",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "0614d46d-724e-469e-8b7c-975437cd621b",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:56.507397",
+    "committed_at": "2025-12-08T07:59:56.545446",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "104312cc-665a-4e60-b9c8-5a314c818ec1",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:56.551696",
+    "committed_at": "2025-12-08T07:59:56.565549",
+    "error_message": null,
+    "operation_count": 1
+  },
+  {
+    "transaction_id": "c87f35f6-de1e-4cfc-95eb-a4e772ebf412",
+    "state": "committed",
+    "created_at": "2025-12-08T07:59:56.590279",
+    "committed_at": "2025-12-08T07:59:56.613909",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "5b1b1a8b-ead5-414d-8cb7-d5c1bdc3b422",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:10.612541",
+    "committed_at": "2025-12-08T08:03:10.639401",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "dc903e4b-7915-4d20-a8b9-9fe945b651c6",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:10.645116",
+    "committed_at": "2025-12-08T08:03:10.670375",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "749f6236-3682-4296-be3e-fcff65be4ded",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:10.676396",
+    "committed_at": "2025-12-08T08:03:10.700971",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "b278f057-53a2-45bd-a707-f1a32679de0a",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.124083",
+    "committed_at": "2025-12-08T08:03:11.168487",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "fd3a7eec-5c5f-4edc-af95-8b20bbb2a3e9",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.175890",
+    "committed_at": "2025-12-08T08:03:11.204886",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "6ff884a4-07a0-411b-b382-aa87e140779b",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.211121",
+    "committed_at": "2025-12-08T08:03:11.237543",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "90da3193-e62f-4978-858f-31dcd067253b",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.243503",
+    "committed_at": "2025-12-08T08:03:11.268432",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "59d95238-3bc6-48bb-b41e-ca9a2eac30bc",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.274334",
+    "committed_at": "2025-12-08T08:03:11.299568",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "f5ff14b2-5741-49f8-abfd-8eb72b5ec876",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.305750",
+    "committed_at": "2025-12-08T08:03:11.331139",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "f3859efb-6205-4368-a879-c47633e3bcf2",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.336829",
+    "committed_at": "2025-12-08T08:03:11.363263",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "7369834d-5c76-40ae-b7f4-6fff28451e21",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.368880",
+    "committed_at": "2025-12-08T08:03:11.394397",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "29ed5d86-8934-4df4-b56d-eee59407bc2e",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.400349",
+    "committed_at": "2025-12-08T08:03:11.425905",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "24a9df95-2511-4652-8eb0-48716d2aeaf1",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.432090",
+    "committed_at": "2025-12-08T08:03:11.459191",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "2350181f-539a-448e-a8bc-ed39249a9acf",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.465352",
+    "committed_at": "2025-12-08T08:03:11.491602",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "96d16248-eb2a-4798-9fd8-480daadadbca",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.497808",
+    "committed_at": "2025-12-08T08:03:11.524518",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "9f0fb41a-a2a2-4f4e-af7f-716e630da9f9",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.530749",
+    "committed_at": "2025-12-08T08:03:11.556201",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "b960c21b-4dfd-4e47-8fba-6879e12a3cc8",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.561859",
+    "committed_at": "2025-12-08T08:03:11.587454",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "da440a11-d04a-4966-9155-7334ad707614",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:11.593268",
+    "committed_at": "2025-12-08T08:03:11.619357",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "8f75fc91-adad-4a38-aeea-d36446b9533a",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:12.646936",
+    "committed_at": "2025-12-08T08:03:12.687737",
+    "error_message": null,
+    "operation_count": 2
+  },
+  {
+    "transaction_id": "375a05bc-9261-469a-8bca-3ff67c9995f3",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:12.694669",
+    "committed_at": "2025-12-08T08:03:12.709883",
+    "error_message": null,
+    "operation_count": 1
+  },
+  {
+    "transaction_id": "bd036fee-692b-4293-a1ad-c3b9a466b019",
+    "state": "committed",
+    "created_at": "2025-12-08T08:03:12.733417",
+    "committed_at": "2025-12-08T08:03:12.759915",
+    "error_message": null,
+    "operation_count": 2
   }
 ]
