@@ -120,11 +120,24 @@ class PostDeploymentValidator:
                                 response_time=response_time,
                                 details=f"Backend health check returned: {data.get('status', 'unknown')} (attempt {attempt + 1})"
                             )
-                    else:
-                        # For non-200 status, try once more if not last attempt
+                    elif response.status == 404:
+                        # 404 suggests Functions app may be restarting or routes not loaded yet
                         if attempt < max_retries - 1:
-                            print(f"⚠️ Backend returned status {response.status}, retrying in 10 seconds...")
-                            await asyncio.sleep(10)
+                            print(f"⚠️ Backend returned 404 (app may be starting), waiting 30s before retry...")
+                            await asyncio.sleep(30)  # Longer wait for app startup
+                            continue
+                        else:
+                            return HealthCheckResult(
+                                check_name="backend_health",
+                                status="unhealthy",
+                                response_time=response_time,
+                                details=f"Backend health endpoint not found (404) - Functions app may need redeployment"
+                            )
+                    else:
+                        # For other non-200 status, try once more if not last attempt
+                        if attempt < max_retries - 1:
+                            print(f"⚠️ Backend returned status {response.status}, retrying in 15 seconds...")
+                            await asyncio.sleep(15)
                             continue
                         else:
                             return HealthCheckResult(
@@ -230,6 +243,19 @@ class PostDeploymentValidator:
                                     response_time=response_time,
                                     details=f"API response too short or empty after {max_retries} attempts"
                                 )
+                    elif response.status == 404:
+                        # 404 suggests Functions app routes not loaded yet
+                        if attempt < max_retries - 1:
+                            print(f"⚠️ Guidance API returned 404 (app may be starting), waiting 30s before retry...")
+                            await asyncio.sleep(30)
+                            continue
+                        else:
+                            return HealthCheckResult(
+                                check_name="guidance_api",
+                                status="unhealthy",
+                                response_time=response_time,
+                                details=f"Guidance API endpoint not found (404) - Functions app may need redeployment"
+                            )
                     elif response.status == 500:
                         # 500 errors are expected in degraded mode (missing LLM API keys, etc.)
                         if attempt < max_retries - 1:
