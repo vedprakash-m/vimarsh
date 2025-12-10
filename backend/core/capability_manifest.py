@@ -103,7 +103,10 @@ class CapabilityManifestService:
             # Test basic configuration
             response_time = (time.time() - start_time) * 1000
             
-            if llm_service.is_configured and llm_service.model is not None:
+            # After Azure OpenAI migration, check for client instead of model
+            client_initialized = hasattr(llm_service, 'client') and llm_service.client is not None
+            
+            if llm_service.is_configured and client_initialized:
                 self._record_success('llm', response_time)
                 return ServiceCapability(
                     name="llm_service",
@@ -114,8 +117,9 @@ class CapabilityManifestService:
                     fallback_mode=FallbackMode.NONE,
                     health_details={
                         "api_key_present": True,
+                        "endpoint_present": True,
                         "service_configured": True,
-                        "model_initialized": True,
+                        "client_initialized": True,
                         "personalities_loaded": len(llm_service.personalities)
                     }
                 )
@@ -131,7 +135,7 @@ class CapabilityManifestService:
                     health_details={
                         "api_key_present": api_key_configured,
                         "service_configured": llm_service.is_configured,
-                        "model_initialized": llm_service.model is not None
+                        "client_initialized": client_initialized
                     }
                 )
                 
@@ -352,12 +356,21 @@ class CapabilityManifestService:
         """Generate complete capability manifest"""
         capabilities: Dict[str, ServiceCapability] = {}
         
-        # Test all services
+        # Test all services with diagnostic logging
         capabilities["llm_service"] = self.test_llm_service()
+        logger.info(f"🔍 LLM Service: {capabilities['llm_service'].status.value} (available: {capabilities['llm_service'].available})")
+        
         capabilities["vector_search"] = self.test_vector_search()
+        logger.info(f"🔍 Vector Search: {capabilities['vector_search'].status.value} (available: {capabilities['vector_search'].available})")
+        
         capabilities["memory_persistence"] = self.test_memory_persistence()
+        logger.info(f"🔍 Memory Persistence: {capabilities['memory_persistence'].status.value} (available: {capabilities['memory_persistence'].available})")
+        
         capabilities["citation_grounding"] = self.test_citation_grounding()
+        logger.info(f"🔍 Citation Grounding: {capabilities['citation_grounding'].status.value} (available: {capabilities['citation_grounding'].available})")
+        
         capabilities["enhanced_rag"] = self.test_enhanced_rag()
+        logger.info(f"🔍 Enhanced RAG: {capabilities['enhanced_rag'].status.value} (available: {capabilities['enhanced_rag'].available})")
         
         # Calculate overall deployment readiness
         deployment_readiness = self._calculate_deployment_readiness(capabilities)
@@ -374,6 +387,13 @@ class CapabilityManifestService:
         
         # Assess user impact
         user_impact = self._assess_user_impact(capabilities)
+        
+        # Log deployment readiness summary
+        logger.info(f"📊 Deployment Readiness: {deployment_readiness*100:.0f}% - Status: {overall_status.value}")
+        if active_fallbacks:
+            logger.warning(f"⚠️  Active Fallbacks: {', '.join(active_fallbacks)}")
+        if recommendations:
+            logger.info(f"💡 Recommendations: {'; '.join(recommendations)}")
         
         return CapabilityManifest(
             timestamp=datetime.now(timezone.utc).isoformat(),
