@@ -3744,7 +3744,7 @@ except ImportError as e:
     analytics_service = None
 
 
-@app.route(route="api/user/profile", methods=["GET"])
+@app.route(route="user/profile", methods=["GET"])
 async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
     """
     GET /api/user/profile
@@ -3821,7 +3821,7 @@ async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="api/user/preferences", methods=["PATCH"])
+@app.route(route="user/preferences", methods=["PATCH"])
 async def update_user_preferences(req: func.HttpRequest) -> func.HttpResponse:
     """
     PATCH /api/user/preferences
@@ -3906,7 +3906,7 @@ async def update_user_preferences(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="api/user/usage-summary", methods=["GET"])
+@app.route(route="user/usage-summary", methods=["GET"])
 async def get_usage_summary(req: func.HttpRequest) -> func.HttpResponse:
     """
     GET /api/user/usage-summary
@@ -3960,7 +3960,7 @@ async def get_usage_summary(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="api/user/export", methods=["POST"])
+@app.route(route="user/export", methods=["POST"])
 async def export_user_data(req: func.HttpRequest) -> func.HttpResponse:
     """
     POST /api/user/export
@@ -4021,7 +4021,7 @@ async def export_user_data(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="api/user/account", methods=["DELETE"])
+@app.route(route="user/account", methods=["DELETE"])
 async def delete_user_account(req: func.HttpRequest) -> func.HttpResponse:
     """
     DELETE /api/user/account
