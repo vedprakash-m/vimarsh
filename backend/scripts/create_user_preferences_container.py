@@ -63,17 +63,17 @@ def create_user_preferences_container():
             ]
         }
         
-        # Create container
+        # Create container (serverless account - no throughput setting)
         logger.info(f"📦 Creating container '{container_name}' with partition key '{partition_key_path}'")
         container = database.create_container(
             id=container_name,
             partition_key=PartitionKey(path=partition_key_path),
-            indexing_policy=indexing_policy,
-            offer_throughput=400  # 400 RU/s for cost optimization
+            indexing_policy=indexing_policy
+            # Note: Serverless Cosmos DB doesn't support throughput settings
         )
         
         logger.info(f"✅ Container '{container_name}' created successfully")
-        logger.info(f"📊 Throughput: 400 RU/s")
+        logger.info(f"📊 Throughput: Serverless (automatic scaling)")
         logger.info(f"🔑 Partition key: {partition_key_path}")
         
         # Verify container properties
