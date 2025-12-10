@@ -93,8 +93,8 @@ class CapabilityManifestService:
                     fallback_mode=FallbackMode.TEMPLATE,
                     error_message="Azure OpenAI credentials not configured",
                     health_details={
-                        "api_key_present": bool(os.getenv('AZURE_OPENAI_API_KEY')),
-                        "endpoint_present": bool(os.getenv('AZURE_OPENAI_ENDPOINT')),
+                        "api_key_present": bool(os.getenv('AZURE_OPENAI_API_KEY') or os.getenv('AZURE_OPENAI_CHAT_API_KEY')),
+                        "endpoint_present": bool(os.getenv('AZURE_OPENAI_ENDPOINT') or os.getenv('AZURE_OPENAI_CHAT_ENDPOINT')),
                         "service_imported": True,
                         "service_configured": llm_service.is_configured
                     }
