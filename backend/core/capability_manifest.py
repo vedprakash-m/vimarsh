@@ -80,9 +80,10 @@ class CapabilityManifestService:
             
             llm_service = LLMService()
             # Check for Azure OpenAI credentials (migrated from Gemini)
+            # Support both generic and chat-specific environment variable names
             api_key_configured = bool(
-                os.getenv('AZURE_OPENAI_API_KEY') and 
-                os.getenv('AZURE_OPENAI_ENDPOINT')
+                (os.getenv('AZURE_OPENAI_API_KEY') or os.getenv('AZURE_OPENAI_CHAT_API_KEY')) and 
+                (os.getenv('AZURE_OPENAI_ENDPOINT') or os.getenv('AZURE_OPENAI_CHAT_ENDPOINT'))
             )
             
             if not api_key_configured:
