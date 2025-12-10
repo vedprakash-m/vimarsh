@@ -570,9 +570,9 @@ jobs:
 
     - name: ⏳ Wait for Functions App Initialization
       run: |
-        echo "⏳ Waiting 3 minutes for Azure Functions Flex to fully initialize..."
-        echo "📝 Flex Consumption apps require significant cold start time after deployment"
-        sleep 180
+        echo "⏳ Waiting 60 seconds for Azure Functions Flex to initialize..."
+        echo "📝 Reduced from 3min after fixing import failures - health check has 5 retries for warm-up"
+        sleep 60
         echo "✅ Wait complete, starting health checks"
 
     - name: 🏥 Comprehensive Health Check
