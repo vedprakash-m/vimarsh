@@ -108,7 +108,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setError(null);
 
       const headers = await getAuthHeaders();
-      const response = await fetch(`${getApiBaseUrl()}/api/user/profile`, {
+      const response = await fetch(`${getApiBaseUrl()}/user/profile`, {
         headers,
       });
 
@@ -127,8 +127,19 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  // Load profile in background, don't block initial render
   useEffect(() => {
-    refreshProfile();
+    // Delay profile loading slightly to prioritize critical data
+    const timer = setTimeout(() => {
+      refreshProfile().catch(err => {
+        // Silently fail - profile is not critical for initial page load
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Profile loading deferred, will retry:', err.message);
+        }
+      });
+    }, 500); // Load after 500ms to let critical contexts initialize first
+    
+    return () => clearTimeout(timer);
   }, [refreshProfile]);
 
   // Debounced save function

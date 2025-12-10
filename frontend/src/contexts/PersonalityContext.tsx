@@ -111,7 +111,9 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
   // Load personalities from API
   const loadPersonalities = async () => {
     try {
-      console.log('🔄 PersonalityContext: Starting personality load...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 PersonalityContext: Starting personality load...');
+      }
       setPersonalityLoading(true);
       
       // Check if we're in test environment
@@ -145,26 +147,32 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       // Import API configuration
       const { getApiBaseUrl } = await import('../config/environment');
       const apiBaseUrl = getApiBaseUrl();
-      console.log('🔗 PersonalityContext: Using API base URL:', apiBaseUrl);
       
       const params = new URLSearchParams();
       params.append('active_only', 'true');
       
       const url = `${apiBaseUrl}/personalities/active?${params.toString()}`;
-      console.log('📤 PersonalityContext: Calling API:', url);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📤 PersonalityContext: Calling API:', url);
+      }
       
       const response = await fetch(url);
-      console.log('📥 PersonalityContext: API response status:', response.status, response.statusText);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📥 PersonalityContext: API response status:', response.status, response.statusText);
+      }
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('📊 PersonalityContext: API response data:', data);
       
       if (data.personalities && Array.isArray(data.personalities)) {
-        console.log('✅ PersonalityContext: Successfully loaded', data.personalities.length, 'personalities');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ PersonalityContext: Successfully loaded', data.personalities.length, 'personalities');
+        }
         
         // Map API response to frontend interface
         const mappedPersonalities: Personality[] = data.personalities.map((p: any) => ({
@@ -194,34 +202,42 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
     } finally {
       setPersonalityLoading(false);
-      console.log('🏁 PersonalityContext: Personality loading complete');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🏁 PersonalityContext: Personality loading complete');
+      }
     }
   };
 
   // Load saved personality and available personalities on mount
   useEffect(() => {
-    console.log('🚀 PersonalityContext: useEffect triggered - loading personalities and saved state');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚀 PersonalityContext: useEffect triggered - loading personalities and saved state');
+    }
     
-    // Load saved personality from localStorage
+    // Load saved personality from localStorage (synchronous, fast)
     try {
       const savedPersonality = localStorage.getItem('vimarsh_selected_personality');
       if (savedPersonality) {
         const personality = JSON.parse(savedPersonality);
-        console.log('📦 PersonalityContext: Loaded saved personality from localStorage:', personality.name);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📦 PersonalityContext: Loaded saved personality from localStorage:', personality.name);
+        }
         setSelectedPersonalityState(personality);
       } else {
-        console.log('🔷 PersonalityContext: No saved personality found, leaving null for user selection');
-        // Don't set a default personality - let user choose
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔷 PersonalityContext: No saved personality found, leaving null for user selection');
+        }
         setSelectedPersonalityState(null);
       }
     } catch (error) {
       console.error('❌ PersonalityContext: Failed to load saved personality:', error);
-      // Don't set a default personality on error - let user choose
       setSelectedPersonalityState(null);
     }
 
-    // Load available personalities
-    console.log('🔄 PersonalityContext: Calling loadPersonalities()');
+    // Load available personalities (non-blocking)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔄 PersonalityContext: Calling loadPersonalities()');
+    }
     loadPersonalities();
   }, []);
 

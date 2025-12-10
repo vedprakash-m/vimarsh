@@ -5,8 +5,9 @@
 
 import axios from 'axios';
 import { QuizQuestion, QuizResponse, OnboardingState, QuizResult } from './types';
+import { getApiBaseUrl } from '../../config/environment';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'https://vimarsh-backend.azurewebsites.net/api';
+const API_BASE = getApiBaseUrl();
 
 export const onboardingApi = {
   /**

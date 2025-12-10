@@ -36,7 +36,9 @@ export const AppLoadingProvider: React.FC<AppLoadingProviderProps> = ({ children
 
   useEffect(() => {
     if (allReady && isInitializing) {
-      console.log('🎉 AppLoading: All contexts ready, app fully initialized');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎉 AppLoading: All contexts ready, app fully initialized');
+      }
       // Small delay to ensure UI state is consistent
       setTimeout(() => {
         setIsInitializing(false);
@@ -45,14 +47,16 @@ export const AppLoadingProvider: React.FC<AppLoadingProviderProps> = ({ children
   }, [allReady, isInitializing]);
 
   useEffect(() => {
-    console.log('📊 AppLoading status:', {
-      adminLoading,
-      personalityLoading,
-      adminReady,
-      personalitiesReady,
-      allReady,
-      isInitializing
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 AppLoading status:', {
+        adminLoading,
+        personalityLoading,
+        adminReady,
+        personalitiesReady,
+        allReady,
+        isInitializing
+      });
+    }
   }, [adminLoading, personalityLoading, adminReady, personalitiesReady, allReady, isInitializing]);
 
   const value: AppLoadingContextType = {

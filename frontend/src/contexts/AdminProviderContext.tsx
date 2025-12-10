@@ -60,6 +60,16 @@ const ADMIN_EMAILS = [
   'vedprakash@outlook.com'
 ];
 
+// Cache admin role to prevent redundant backend calls
+interface RoleCache {
+  data: AdminUser;
+  timestamp: number;
+  email: string;
+}
+
+const ROLE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+let roleCache: RoleCache | null = null;
+
 export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
   const { isAuthenticated, account } = useAuth();
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -69,11 +79,28 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
   const checkAdminStatus = useCallback(async () => {
     if (!isAuthenticated || !account) {
       setUser(null);
+      roleCache = null;
       return;
     }
 
     const userEmail = account.username || account.name || '';
-    console.log('🔍 AdminProvider: Checking admin status for:', userEmail);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 AdminProvider: Checking admin status for:', userEmail);
+    }
+
+    // Check cache first to prevent redundant API calls
+    if (roleCache && 
+        roleCache.email === userEmail && 
+        Date.now() - roleCache.timestamp < ROLE_CACHE_DURATION) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ AdminProvider: Using cached admin role (age:', 
+          Math.floor((Date.now() - roleCache.timestamp) / 1000), 'seconds)');
+      }
+      setUser(roleCache.data);
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -83,7 +110,9 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
       const isKnownAdmin = ADMIN_EMAILS.includes(userEmail.toLowerCase());
       
       if (isKnownAdmin) {
-        console.log('✅ AdminProvider: User is a known admin');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ AdminProvider: User is a known admin');
+        }
         
         // Try to get role from backend, fallback to local admin detection
         let backendRole = UserRole.ADMIN;
@@ -112,7 +141,10 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
           
           if (response.ok) {
             const roleData = await response.json();
-            console.log('📋 AdminProvider: Backend role data:', roleData);
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log('📋 AdminProvider: Backend role data:', roleData);
+            }
             
             if (roleData.role) {
               backendRole = roleData.role === 'SUPER_ADMIN' ? UserRole.SUPER_ADMIN : UserRole.ADMIN;
@@ -135,10 +167,22 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
           isSuperAdmin: backendRole === UserRole.SUPER_ADMIN
         };
 
+        // Cache the role data
+        roleCache = {
+          data: adminUser,
+          timestamp: Date.now(),
+          email: userEmail
+        };
+
         setUser(adminUser);
-        console.log('✅ AdminProvider: Admin user set:', adminUser);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ AdminProvider: Admin user set and cached:', adminUser);
+        }
       } else {
-        console.log('ℹ️ AdminProvider: User is not an admin');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('ℹ️ AdminProvider: User is not an admin');
+        }
         setUser(null);
       }
     } catch (err) {

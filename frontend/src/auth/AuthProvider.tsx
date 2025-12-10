@@ -41,12 +41,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const accounts = instance.getAllAccounts();
     const activeAccount = instance.getActiveAccount();
     
-    console.log('🔄 AuthProvider: Updating account state', {
-      accountsFound: accounts.length,
-      activeAccount: activeAccount?.username,
-      isAuthenticated,
-      msalInstanceReady: !!instance.getConfiguration()
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔄 AuthProvider: Updating account state', {
+        accountsFound: accounts.length,
+        activeAccount: activeAccount?.username,
+        isAuthenticated,
+        msalInstanceReady: !!instance.getConfiguration()
+      });
+    }
 
     if (accounts.length > 0) {
       // If we have accounts but no active account, set the first one as active
@@ -54,7 +56,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           instance.setActiveAccount(accounts[0]);
           setAccount(accounts[0]);
-          console.log('✅ AuthProvider: Set active account to', accounts[0].username);
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ AuthProvider: Set active account to', accounts[0].username);
+          }
         } catch (err) {
           console.error('❌ AuthProvider: Failed to set active account:', err);
           setError('Failed to set active account');
@@ -77,14 +82,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const activeAccount = instance.getActiveAccount();
     const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'unknown';
     
-    console.log('🔍 Multi-domain authentication validation:', {
-      currentDomain,
-      msalAuthenticated: isAuthenticated,
-      accountsCount: accounts.length,
-      hasActiveAccount: !!activeAccount,
-      accountEmail: activeAccount?.username,
-      msalInstanceReady: !!instance.getConfiguration()
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Multi-domain authentication validation:', {
+        currentDomain,
+        msalAuthenticated: isAuthenticated,
+        accountsCount: accounts.length,
+        hasActiveAccount: !!activeAccount,
+        accountEmail: activeAccount?.username,
+        msalInstanceReady: !!instance.getConfiguration()
+      });
+    }
 
     // Import domain validation function
     const { isValidProductionDomain } = require('../config/environment');
