@@ -79,7 +79,11 @@ class CapabilityManifestService:
             from services.llm_service import LLMService
             
             llm_service = LLMService()
-            api_key_configured = bool(os.getenv('GEMINI_API_KEY'))
+            # Check for Azure OpenAI credentials (migrated from Gemini)
+            api_key_configured = bool(
+                os.getenv('AZURE_OPENAI_API_KEY') and 
+                os.getenv('AZURE_OPENAI_ENDPOINT')
+            )
             
             if not api_key_configured:
                 return ServiceCapability(
@@ -87,9 +91,10 @@ class CapabilityManifestService:
                     status=ServiceStatus.UNAVAILABLE,
                     available=False,
                     fallback_mode=FallbackMode.TEMPLATE,
-                    error_message="API key not configured",
+                    error_message="Azure OpenAI credentials not configured",
                     health_details={
-                        "api_key_present": False,
+                        "api_key_present": bool(os.getenv('AZURE_OPENAI_API_KEY')),
+                        "endpoint_present": bool(os.getenv('AZURE_OPENAI_ENDPOINT')),
                         "service_imported": True,
                         "service_configured": llm_service.is_configured
                     }
@@ -477,7 +482,7 @@ class CapabilityManifestService:
         llm_cap = capabilities.get("llm_service")
         if llm_cap and not llm_cap.available:
             if llm_cap.error_message and "API key" in str(llm_cap.error_message):
-                recommendations.append("Configure GEMINI_API_KEY environment variable")
+                recommendations.append("Configure AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables")
             else:
                 recommendations.append("Check LLM service configuration and API connectivity")
         
