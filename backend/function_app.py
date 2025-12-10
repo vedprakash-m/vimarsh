@@ -508,14 +508,20 @@ async def health_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         # Generate comprehensive capability manifest
         manifest = capability_manifest_service.generate_manifest()
         
-        # Get personality data for compatibility
-        if database_personality_available or personality_models_available:
-            personalities = await get_personality_list()
-            total_personalities = len(personalities)
-            personality_ids = [p["id"] for p in personalities]
-        else:
+        # Use cached personality count for fast health checks (no DB query needed)
+        # Health checks run frequently and don't need real-time personality list
+        if 'FALLBACK_PERSONALITIES' in globals():
             personality_ids = list(FALLBACK_PERSONALITIES.keys())
             total_personalities = len(personality_ids)
+        else:
+            # Fallback to querying if no static list available
+            if database_personality_available or personality_models_available:
+                personalities = await get_personality_list()
+                total_personalities = len(personalities)
+                personality_ids = [p["id"] for p in personalities]
+            else:
+                personality_ids = []
+                total_personalities = 0
         
         # Convert to dictionary for JSON response
         health_data = {
