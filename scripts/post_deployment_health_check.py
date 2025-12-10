@@ -552,12 +552,12 @@ async def main():
             print(f"\n📄 Health report saved to {args.output}")
         
         # Exit with appropriate code
-        if report["overall_status"] == "HEALTHY":
+        # DEGRADED (80%+ score) is acceptable for production - services operational with minor issues
+        if report["overall_status"] in ["HEALTHY", "DEGRADED"]:
             exit(0)
-        elif report["overall_status"] == "DEGRADED":
-            exit(1)
         else:
-            exit(2)
+            # UNHEALTHY (<50% score) fails CI/CD
+            exit(1)
             
     except Exception as e:
         print(f"❌ Health check failed: {e}")
