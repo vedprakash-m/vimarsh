@@ -127,20 +127,20 @@ const AuthCallback: React.FC = () => {
                 fontSize: '4rem',
                 marginBottom: '1.5rem',
                 animation: 'pulse 2s ease-in-out infinite'
-              }}>🕉️</div>
+              }}>💭</div>
               <h2 style={{
                 fontSize: '1.5rem',
                 fontWeight: '700',
                 color: '#1e293b',
                 marginBottom: '1rem',
                 margin: '0 0 1rem 0'
-              }}>Connecting you to divine wisdom...</h2>
+              }}>Connecting you to timeless wisdom...</h2>
               <p style={{
                 color: '#64748b',
                 marginBottom: '2rem',
                 lineHeight: '1.6',
                 margin: '0 0 2rem 0'
-              }}>Please wait while we complete your authentication.</p>
+              }}>Preparing your personalized guidance experience.</p>
               <div style={{
                 width: '40px',
                 height: '40px',
@@ -195,7 +195,7 @@ const AuthCallback: React.FC = () => {
                 color: '#64748b',
                 lineHeight: '1.6',
                 margin: 0
-              }}>Taking you to your spiritual guidance...</p>
+              }}>Approaching Wisdom Without Boundaries...</p>
             </div>
           )}
         </div>
