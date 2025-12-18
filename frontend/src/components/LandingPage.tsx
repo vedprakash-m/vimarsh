@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, Brain, Shield, Sparkles, Play, Mic, Share2, Bell, Volume2, Heart, Trophy, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { useAppLoading } from '../contexts/AppLoadingContext';
 import { WisdomOfDay } from './WisdomOfDay';
 import { OnboardingWizard } from './onboarding';
 import { onboardingApi } from './onboarding/onboardingApi';
@@ -393,6 +394,9 @@ const LandingPage: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState('All');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  
+  // Import context loading status
+  const { allReady: contextsReady } = useAppLoading() || { allReady: false };
 
   // Helper function to filter personalities by domain
   const getFilteredPersonalities = () => {
@@ -436,7 +440,7 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  // Redirect authenticated users - with protection against circular redirects
+  // Redirect authenticated users - wait for contexts to be ready to prevent cascading loads
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
@@ -444,15 +448,17 @@ const LandingPage: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const isPreview = params.get('preview') === '1' || params.get('preview') === 'true';
 
-    if (isAuthenticated && account && !isPreview) {
-      console.log('🔄 LandingPage: Authenticated user detected, scheduling redirect to guidance');
+    if (isAuthenticated && account && !isPreview && contextsReady) {
+      console.log('🔄 LandingPage: Authenticated user detected, contexts ready, scheduling redirect');
       console.log('👤 User account:', account.username || account.name);
       
-      // Add a small delay to prevent immediate redirects that might cause loops
+      // Small delay to ensure UI state is fully settled
       timeoutId = setTimeout(() => {
         console.log('🚀 LandingPage: Executing redirect to /guidance');
         navigate('/guidance', { replace: true });
-      }, 200);
+      }, 100);
+    } else if (isAuthenticated && account && !isPreview && !contextsReady) {
+      console.log('⏳ LandingPage: Waiting for contexts to initialize before redirect...');
     }
 
     return () => {
@@ -460,7 +466,7 @@ const LandingPage: React.FC = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [isAuthenticated, account, navigate, location.search]);
+  }, [isAuthenticated, account, navigate, location.search, contextsReady]);
 
   const handleSignIn = async () => {
     try {

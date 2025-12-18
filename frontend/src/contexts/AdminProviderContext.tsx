@@ -195,6 +195,8 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
   }, [isAuthenticated, account]);
 
   const refreshUserData = useCallback(async () => {
+    // Clear cache to force fresh check
+    roleCache = null;
     await checkAdminStatus();
   }, [checkAdminStatus]);
 

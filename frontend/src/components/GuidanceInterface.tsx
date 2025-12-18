@@ -243,12 +243,8 @@ export default function GuidanceInterface() {
     loadPersonalities 
   } = usePersonality();
 
-  // Load personalities on component mount if not already loaded
-  useEffect(() => {
-    if (availablePersonalities.length === 0 && !personalityLoading) {
-      loadPersonalities();
-    }
-  }, [availablePersonalities.length, personalityLoading, loadPersonalities]);
+  // Personalities are loaded by PersonalityContext on mount - no need to reload here
+  // This prevents duplicate API calls when navigating to GuidanceInterface
 
   // Auto-show personality selector if no personality is selected and personalities are loaded
   useEffect(() => {

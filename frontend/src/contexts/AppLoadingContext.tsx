@@ -30,7 +30,9 @@ export const AppLoadingProvider: React.FC<AppLoadingProviderProps> = ({ children
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Track readiness state
-  const adminReady = !adminLoading && (adminUser !== null || !adminLoading);
+  // Admin is considered ready if not loading (regardless of whether user is admin)
+  // This prevents blocking the app for non-admin users
+  const adminReady = !adminLoading;
   const personalitiesReady = !personalityLoading && availablePersonalities.length > 0;
   const allReady = adminReady && personalitiesReady;
 

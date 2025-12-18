@@ -81,6 +81,9 @@ const DEFAULT_KRISHNA_PERSONALITY: Personality = {
   tags: ['spiritual', 'divine', 'bhagavad-gita', 'dharma']
 };
 
+// Request deduplication: track in-flight personality load requests
+let personalitiesLoadPromise: Promise<void> | null = null;
+
 export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ children }) => {
   // State management
   const [selectedPersonality, setSelectedPersonalityState] = useState<Personality | null>(null);
@@ -108,13 +111,32 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
     }
   };
 
-  // Load personalities from API
+  // Load personalities from API with request deduplication
   const loadPersonalities = async () => {
+    // If already loading, return existing promise to prevent duplicate calls
+    if (personalitiesLoadPromise) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⏭️ PersonalityContext: Load already in progress, reusing promise');
+      }
+      return personalitiesLoadPromise;
+    }
+    
+    // If already loaded, skip
+    if (availablePersonalities.length > 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ PersonalityContext: Personalities already loaded, skipping');
+      }
+      return;
+    }
+    
     try {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔄 PersonalityContext: Starting personality load...');
       }
-      setPersonalityLoading(true);
+      
+      // Create and store the load promise
+      personalitiesLoadPromise = (async () => {
+        setPersonalityLoading(true);
       
       // Check if we're in test environment
       if (process.env.NODE_ENV === 'test') {
@@ -198,13 +220,20 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       }
     } catch (error) {
       console.error('❌ PersonalityContext: Failed to load personalities:', error);
-      // Set default personalities on error
-      setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
-    } finally {
-      setPersonalityLoading(false);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🏁 PersonalityContext: Personality loading complete');
+        // Set default personalities on error
+        setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
+      } finally {
+        setPersonalityLoading(false);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🏁 PersonalityContext: Personality loading complete');
+        }
       }
+      })();
+      
+      await personalitiesLoadPromise;
+    } finally {
+      // Clear the promise after completion (success or failure)
+      personalitiesLoadPromise = null;
     }
   };
 

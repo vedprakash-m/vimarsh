@@ -148,7 +148,10 @@ export const EngagementProvider: React.FC<EngagementProviderProps> = ({
       
     } catch (err) {
       console.error('Failed to load engagement data:', err);
-      setError('Failed to load engagement data');
+      // Don't set error to prevent UI disruption - engagement features are supplementary
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎯 EngagementContext: Continuing without engagement data (non-critical)');
+      }
       
       // Try loading individual endpoints as fallback
       try {
@@ -165,6 +168,7 @@ export const EngagementProvider: React.FC<EngagementProviderProps> = ({
         }
       } catch (fallbackErr) {
         console.error('Fallback loading also failed:', fallbackErr);
+        // Still don't set error - these are optional features
       }
     } finally {
       setIsLoading(false);

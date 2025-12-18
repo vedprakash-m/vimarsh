@@ -127,17 +127,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
-  // Load profile in background, don't block initial render
+  // Load profile in background after critical contexts are ready - completely non-blocking
   useEffect(() => {
-    // Delay profile loading slightly to prioritize critical data
+    // Defer profile loading to prevent blocking critical paths
     const timer = setTimeout(() => {
       refreshProfile().catch(err => {
         // Silently fail - profile is not critical for initial page load
         if (process.env.NODE_ENV === 'development') {
-          console.warn('Profile loading deferred, will retry:', err.message);
+          console.log('📊 SettingsContext: Profile load deferred (non-critical), will retry on-demand');
         }
+        // Don't set error to prevent UI disruption
       });
-    }, 500); // Load after 500ms to let critical contexts initialize first
+    }, 2000); // Load after 2s to allow all critical contexts to initialize first
     
     return () => clearTimeout(timer);
   }, [refreshProfile]);
