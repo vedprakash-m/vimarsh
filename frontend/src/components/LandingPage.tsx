@@ -394,6 +394,7 @@ const LandingPage: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState('All');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [onboardingCheckInProgress, setOnboardingCheckInProgress] = useState(false);
   
   // Import context loading status
   const { allReady: contextsReady } = useAppLoading() || { allReady: false };
@@ -406,10 +407,16 @@ const LandingPage: React.FC = () => {
     return personalities.filter(p => p.domain === selectedDomain);
   };
 
-  // Check onboarding status for authenticated users
+  // Check onboarding status for authenticated users (with circuit breaker)
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      if (isAuthenticated && account && !onboardingChecked) {
+      // Circuit breaker: prevent multiple concurrent checks
+      if (onboardingCheckInProgress || onboardingChecked) {
+        return;
+      }
+      
+      if (isAuthenticated && account) {
+        setOnboardingCheckInProgress(true);
         try {
           const state = await onboardingApi.getOnboardingState(account.homeAccountId);
           // Show onboarding wizard if not completed
@@ -422,12 +429,14 @@ const LandingPage: React.FC = () => {
           // For new users, show onboarding wizard
           setShowOnboarding(true);
           setOnboardingChecked(true);
+        } finally {
+          setOnboardingCheckInProgress(false);
         }
       }
     };
     
     checkOnboardingStatus();
-  }, [isAuthenticated, account, onboardingChecked]);
+  }, [isAuthenticated, account, onboardingChecked, onboardingCheckInProgress]);
 
   // Handle onboarding completion
   const handleOnboardingComplete = (personalityId?: string) => {

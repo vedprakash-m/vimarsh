@@ -83,6 +83,7 @@ const DEFAULT_KRISHNA_PERSONALITY: Personality = {
 
 // Request deduplication: track in-flight personality load requests
 let personalitiesLoadPromise: Promise<void> | null = null;
+let hasLoadedPersonalities = false; // Circuit breaker: track if we've successfully loaded once
 
 export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ children }) => {
   // State management
@@ -90,6 +91,7 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
   const [personalitySwitchNotification, setPersonalitySwitchNotification] = useState<string | null>(null);
   const [personalityLoading, setPersonalityLoading] = useState<boolean>(false);
   const [availablePersonalities, setAvailablePersonalities] = useState<Personality[]>([]);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState<boolean>(false); // Component-level tracking
 
   // Enhanced personality setter with persistence
   const setSelectedPersonality = (personality: Personality | null) => {
@@ -113,6 +115,14 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
 
   // Load personalities from API with request deduplication
   const loadPersonalities = async () => {
+    // Circuit breaker: if we've successfully loaded before, never load again
+    if (hasLoadedPersonalities) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🛑 PersonalityContext: Circuit breaker active - already loaded successfully');
+      }
+      return;
+    }
+    
     // If already loading, return existing promise to prevent duplicate calls
     if (personalitiesLoadPromise) {
       if (process.env.NODE_ENV === 'development') {
@@ -126,6 +136,7 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       if (process.env.NODE_ENV === 'development') {
         console.log('✅ PersonalityContext: Personalities already loaded, skipping');
       }
+      hasLoadedPersonalities = true;
       return;
     }
     
@@ -214,15 +225,18 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
             }));
             
             setAvailablePersonalities(mappedPersonalities);
+            hasLoadedPersonalities = true; // Set circuit breaker
           } else {
             console.warn('⚠️ PersonalityContext: Failed to load personalities from API - unexpected response format:', data);
             // Set default personalities if API fails
             setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
+            hasLoadedPersonalities = true; // Set circuit breaker even on fallback
           }
         } catch (error) {
           console.error('❌ PersonalityContext: Failed to load personalities:', error);
           // Set default personalities on error
           setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
+          hasLoadedPersonalities = true; // Set circuit breaker even on error
         } finally {
           setPersonalityLoading(false);
           if (process.env.NODE_ENV === 'development') {
@@ -240,9 +254,19 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
 
   // Load saved personality and available personalities on mount
   useEffect(() => {
+    // Circuit breaker: prevent multiple loads during hot reload or remounts
+    if (hasLoadedOnce) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⏭️ PersonalityContext: useEffect skipped - already loaded once');
+      }
+      return;
+    }
+    
     if (process.env.NODE_ENV === 'development') {
       console.log('🚀 PersonalityContext: useEffect triggered - loading personalities and saved state');
     }
+    
+    setHasLoadedOnce(true);
     
     // Load saved personality from localStorage (synchronous, fast)
     try {
@@ -269,7 +293,7 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       console.log('🔄 PersonalityContext: Calling loadPersonalities()');
     }
     loadPersonalities();
-  }, []);
+  }, []); // Empty dependency array - only run once on mount
 
   // Context value
   const contextValue: PersonalityContextType = {
