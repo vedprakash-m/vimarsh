@@ -136,98 +136,99 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
       
       // Create and store the load promise
       personalitiesLoadPromise = (async () => {
-        setPersonalityLoading(true);
-      
-      // Check if we're in test environment
-      if (process.env.NODE_ENV === 'test') {
-        console.log('🧪 PersonalityContext: Test environment detected, using mock data');
-        const mockPersonalities: Personality[] = [
-          {
-            id: 'krishna',
-            name: 'krishna',
-            display_name: 'Krishna',
-            domain: 'spiritual' as const,
-            time_period: 'Ancient India (3102 BCE)',
-            description: 'Divine incarnation and spiritual guide',
-            expertise_areas: ['dharma', 'devotion'],
-            cultural_context: 'Hindu tradition',
-            quality_score: 95.0,
-            usage_count: 1000,
-            is_active: true,
-            tags: ['spiritual', 'divine']
+        try {
+          setPersonalityLoading(true);
+        
+          // Check if we're in test environment
+          if (process.env.NODE_ENV === 'test') {
+            console.log('🧪 PersonalityContext: Test environment detected, using mock data');
+            const mockPersonalities: Personality[] = [
+              {
+                id: 'krishna',
+                name: 'krishna',
+                display_name: 'Krishna',
+                domain: 'spiritual' as const,
+                time_period: 'Ancient India (3102 BCE)',
+                description: 'Divine incarnation and spiritual guide',
+                expertise_areas: ['dharma', 'devotion'],
+                cultural_context: 'Hindu tradition',
+                quality_score: 95.0,
+                usage_count: 1000,
+                is_active: true,
+                tags: ['spiritual', 'divine']
+              }
+            ];
+            setAvailablePersonalities(mockPersonalities);
+            if (!selectedPersonality) {
+              setSelectedPersonality(mockPersonalities[0]);
+            }
+            setPersonalityLoading(false);
+            console.log('🏁 PersonalityContext: Personality loading complete (test mode)');
+            return;
           }
-        ];
-        setAvailablePersonalities(mockPersonalities);
-        if (!selectedPersonality) {
-          setSelectedPersonality(mockPersonalities[0]);
+          
+          // Import API configuration
+          const { getApiBaseUrl } = await import('../config/environment');
+          const apiBaseUrl = getApiBaseUrl();
+          
+          const params = new URLSearchParams();
+          params.append('active_only', 'true');
+          
+          const url = `${apiBaseUrl}/personalities/active?${params.toString()}`;
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('📤 PersonalityContext: Calling API:', url);
+          }
+          
+          const response = await fetch(url);
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('📥 PersonalityContext: API response status:', response.status, response.statusText);
+          }
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          if (data.personalities && Array.isArray(data.personalities)) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('✅ PersonalityContext: Successfully loaded', data.personalities.length, 'personalities');
+            }
+            
+            // Map API response to frontend interface
+            const mappedPersonalities: Personality[] = data.personalities.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              display_name: p.name, // Use name as display_name since API doesn't have display_name
+              domain: p.domain as 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'leadership' | 'psychology',
+              time_period: 'Ancient/Historical', // Default since API doesn't provide this
+              description: p.description,
+              expertise_areas: [], // Default since API doesn't provide this
+              cultural_context: 'Historical', // Default since API doesn't provide this
+              quality_score: 95.0, // Default since API doesn't provide this
+              usage_count: 0, // Default since API doesn't provide this
+              is_active: true, // Default since API doesn't provide this
+              tags: [p.domain] // Use domain as default tag
+            }));
+            
+            setAvailablePersonalities(mappedPersonalities);
+          } else {
+            console.warn('⚠️ PersonalityContext: Failed to load personalities from API - unexpected response format:', data);
+            // Set default personalities if API fails
+            setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
+          }
+        } catch (error) {
+          console.error('❌ PersonalityContext: Failed to load personalities:', error);
+          // Set default personalities on error
+          setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
+        } finally {
+          setPersonalityLoading(false);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🏁 PersonalityContext: Personality loading complete');
+          }
         }
-        setPersonalityLoading(false);
-        console.log('🏁 PersonalityContext: Personality loading complete (test mode)');
-        return;
-      }
-      
-      // Import API configuration
-      const { getApiBaseUrl } = await import('../config/environment');
-      const apiBaseUrl = getApiBaseUrl();
-      
-      const params = new URLSearchParams();
-      params.append('active_only', 'true');
-      
-      const url = `${apiBaseUrl}/personalities/active?${params.toString()}`;
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📤 PersonalityContext: Calling API:', url);
-      }
-      
-      const response = await fetch(url);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📥 PersonalityContext: API response status:', response.status, response.statusText);
-      }
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.personalities && Array.isArray(data.personalities)) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ PersonalityContext: Successfully loaded', data.personalities.length, 'personalities');
-        }
-        
-        // Map API response to frontend interface
-        const mappedPersonalities: Personality[] = data.personalities.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          display_name: p.name, // Use name as display_name since API doesn't have display_name
-          domain: p.domain as 'spiritual' | 'scientific' | 'historical' | 'philosophical' | 'literary' | 'leadership' | 'psychology',
-          time_period: 'Ancient/Historical', // Default since API doesn't provide this
-          description: p.description,
-          expertise_areas: [], // Default since API doesn't provide this
-          cultural_context: 'Historical', // Default since API doesn't provide this
-          quality_score: 95.0, // Default since API doesn't provide this
-          usage_count: 0, // Default since API doesn't provide this
-          is_active: true, // Default since API doesn't provide this
-          tags: [p.domain] // Use domain as default tag
-        }));
-        
-        setAvailablePersonalities(mappedPersonalities);
-      } else {
-        console.warn('⚠️ PersonalityContext: Failed to load personalities from API - unexpected response format:', data);
-        // Set default personalities if API fails
-        setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
-      }
-    } catch (error) {
-      console.error('❌ PersonalityContext: Failed to load personalities:', error);
-        // Set default personalities on error
-        setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
-      } finally {
-        setPersonalityLoading(false);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🏁 PersonalityContext: Personality loading complete');
-        }
-      }
       })();
       
       await personalitiesLoadPromise;
