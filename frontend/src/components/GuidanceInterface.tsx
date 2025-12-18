@@ -888,235 +888,248 @@ export default function GuidanceInterface() {
           )}
         </div>
         
-        {/* Mobile-Responsive Personality Info & Toggle */}
+        {/* World-Class Navigation Bar */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: window.innerWidth <= 768 ? '0.5rem' : '1rem' 
+          gap: window.innerWidth <= 768 ? '0.75rem' : '1rem' 
         }}>
+          {/* Personality Badge - Primary Context */}
           {selectedPersonality && (
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: window.innerWidth <= 768 ? '0.5rem' : '0.75rem',
-              padding: window.innerWidth <= 768 ? '0.375rem 0.75rem' : '0.5rem 1rem',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              backdropFilter: 'blur(10px)',
-              maxWidth: window.innerWidth <= 768 ? '120px' : 'none',
-              overflow: 'hidden'
-            }}>
-              <div style={{ 
-                fontSize: window.innerWidth <= 768 ? '0.8rem' : '0.9rem', 
-                fontWeight: '600',
-                whiteSpace: 'nowrap',
+            <button
+              onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
+              disabled={!selectedPersonality}
+              style={{
+                background: selectedPersonality ? domainColors.bg : '#f8fafc',
+                borderRadius: window.innerWidth <= 768 ? '0.5rem' : '0.75rem',
+                padding: window.innerWidth <= 768 ? '0.375rem 0.75rem' : '0.5rem 1rem',
+                border: selectedPersonality ? `1.5px solid ${domainColors.border}` : '1px solid #e2e8f0',
+                backdropFilter: 'blur(10px)',
+                maxWidth: window.innerWidth <= 768 ? '120px' : 'none',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                {selectedPersonality?.name || 'Loading...'}
-              </div>
-              {window.innerWidth > 480 && (
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: selectedPersonality 
+                  ? `0 2px 8px ${domainColors.border}30` 
+                  : '0 1px 3px rgba(0, 0, 0, 0.05)'
+              }}
+              title={`Currently chatting with ${selectedPersonality?.name || 'Loading...'}`}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = `0 4px 12px ${domainColors.border}40`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = `0 2px 8px ${domainColors.border}30`;
+              }}
+            >
+              <Users size={16} style={{ opacity: 0.8 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <div style={{ 
-                  fontSize: window.innerWidth <= 768 ? '0.65rem' : '0.75rem', 
-                  opacity: 0.7,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
+                  fontSize: window.innerWidth <= 768 ? '0.8rem' : '0.875rem', 
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100px'
                 }}>
-                  {selectedPersonality?.domain === 'spiritual' ? 'SPIRITUAL' :
-                   selectedPersonality?.domain === 'scientific' ? 'SCIENTIFIC' :
-                   selectedPersonality?.domain === 'historical' ? 'HISTORICAL' :
-                   selectedPersonality?.domain === 'philosophical' ? 'PHILOSOPHICAL' :
-                   selectedPersonality?.domain === 'literary' ? 'LITERARY' :
-                   selectedPersonality?.domain === 'leadership' ? 'LEADERSHIP' :
-                   selectedPersonality?.domain === 'psychology' ? 'PSYCHOLOGY' :
-                   'SPIRITUAL'}
+                  {selectedPersonality?.name || 'Loading...'}
+                </div>
+                {window.innerWidth > 480 && (
+                  <div style={{ 
+                    fontSize: '0.65rem', 
+                    opacity: 0.7,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    {selectedPersonality?.domain?.toUpperCase() || 'LOADING'}
+                  </div>
+                )}
+              </div>
+            </button>
+          )}
+          
+          {/* Visual Separator */}
+          {selectedPersonality && window.innerWidth > 768 && (
+            <div style={{
+              width: '1px',
+              height: '32px',
+              background: 'linear-gradient(to bottom, transparent, #e5e7eb, transparent)',
+              opacity: 0.5
+            }} />
+          )}
+          
+          {/* Engagement Metrics - Secondary Context */}
+          {window.innerWidth > 480 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem'
+            }}>
+              {/* Memory Indicator */}
+              {selectedPersonality && memoryContext && window.innerWidth > 768 && (
+                <div 
+                  onClick={() => navigate('/memory')}
+                  style={{ 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    opacity: 0.9
+                  }}
+                  title="View your memory profile and relationships"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <MemoryIndicator compact={true} showTooltip={true} />
                 </div>
               )}
+              
+              {/* Streak Display */}
+              <div 
+                onClick={() => navigate('/progress')}
+                style={{ 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                title="View your progress, streaks, and achievements"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                <StreakDisplayContainer compact={true} />
+              </div>
             </div>
           )}
           
-          {/* Memory Context Indicator - Desktop Only */}
-          {selectedPersonality && memoryContext && window.innerWidth > 768 && (
-            <div 
-              onClick={() => navigate('/memory')}
-              style={{ 
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                opacity: 0.9
-              }}
-              title="View your memory profile and relationships"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = '1';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = '0.9';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <MemoryIndicator
-                compact={true}
-                showTooltip={true}
-              />
-            </div>
+          {/* Visual Separator */}
+          {window.innerWidth > 768 && (
+            <div style={{
+              width: '1px',
+              height: '32px',
+              background: 'linear-gradient(to bottom, transparent, #e5e7eb, transparent)',
+              opacity: 0.5
+            }} />
           )}
           
-          {/* Streak Display - Shows user's conversation streak */}
-          {window.innerWidth > 480 && (
-            <div 
-              onClick={() => navigate('/progress')}
-              style={{ 
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              title="View your progress, streaks, and achievements"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              <StreakDisplayContainer compact={true} />
-            </div>
-          )}
-          
-          {/* Settings Button - Access user settings and preferences */}
-          <button 
-            onClick={() => navigate('/settings')}
-            style={{
-              background: '#f8fafc',
-              border: '1px solid #cbd5e1',
-              color: '#475569',
-              padding: window.innerWidth <= 768 ? '0.5rem' : '0.5rem 0.75rem',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              transition: 'all 0.2s ease',
-              fontSize: '0.85rem',
-              fontWeight: '500',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-            }}
-            title="View your settings and preferences"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#e0e7ff';
-              e.currentTarget.style.borderColor = '#6366f1';
-              e.currentTarget.style.color = '#4338ca';
-              e.currentTarget.style.boxShadow = '0 2px 6px rgba(99, 102, 241, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#f8fafc';
-              e.currentTarget.style.borderColor = '#cbd5e1';
-              e.currentTarget.style.color = '#475569';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
-            }}
-          >
-            <Settings size={18} />
-            {window.innerWidth > 768 && <span>Settings</span>}
-          </button>
-          
-          <button 
-            onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
-            style={{
-              background: selectedPersonality ? domainColors.bg : '#f8fafc',
-              border: selectedPersonality ? `2px solid ${domainColors.border}` : '1px solid #e2e8f0',
-              color: selectedPersonality ? domainColors.text : '#1e293b',
-              padding: window.innerWidth <= 768 ? '0.5rem' : '0.5rem',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-            }}
-            title="Change Personality"
-            disabled={!selectedPersonality}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#f1f5f9';
-              e.currentTarget.style.borderColor = '#cbd5e1';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#f8fafc';
-              e.currentTarget.style.borderColor = '#e2e8f0';
-            }}
-          >
-            <Users size={18} />
-          </button>
-          
-          {/* Compact Streak Display in Header */}
-          <StreakDisplayContainer 
-            compact={true}
-            onClick={() => navigate('/progress')}
-          />
-          
-          {/* Admin Panel Button - Only visible to admin users after full initialization */}
-          {showAdminButton && (
+          {/* Action Buttons - Tertiary Actions */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: window.innerWidth <= 768 ? '0.5rem' : '0.75rem'
+          }}>
+            {/* Settings Button */}
             <button 
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate('/settings')}
               style={{
-                background: '#f8fafc',
-                border: '1px solid #fbbf24',
-                color: '#92400e',
-                padding: '0.5rem 1rem',
+                background: 'transparent',
+                border: 'none',
+                color: '#64748b',
+                padding: window.innerWidth <= 768 ? '0.5rem' : '0.625rem',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                transition: 'all 0.2s ease',
-                fontSize: '0.9rem',
-                fontWeight: '600',
+                justifyContent: 'center',
                 gap: '0.5rem',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                minWidth: window.innerWidth <= 768 ? '36px' : '44px',
+                height: window.innerWidth <= 768 ? '36px' : '44px'
               }}
-              title="Admin Panel"
+              title="Settings"
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#fef9c3';
-                e.currentTarget.style.borderColor = '#f59e0b';
-                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+                e.currentTarget.style.background = '#f1f5f9';
+                e.currentTarget.style.color = '#475569';
+                e.currentTarget.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#f8fafc';
-                e.currentTarget.style.borderColor = '#fbbf24';
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#64748b';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              ⚙️ Admin
+              <Settings size={20} strokeWidth={2} />
             </button>
-          )}
-          
-          {/* Logout Button */}
-          <button 
-            onClick={handleLogout}
-            style={{
-              background: '#f8fafc',
-              border: '1px solid #ef4444',
-              color: '#991b1b',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.2s ease',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              gap: '0.5rem',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-            }}
-            title="Logout"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#fef2f2';
-              e.currentTarget.style.borderColor = '#dc2626';
-              e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#f8fafc';
-              e.currentTarget.style.borderColor = '#ef4444';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
-            }}
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
+            
+            {/* Admin Panel Button - Only visible to admins */}
+            {showAdminButton && (
+              <button 
+                onClick={() => navigate('/admin')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#f59e0b',
+                  padding: window.innerWidth <= 768 ? '0.5rem' : '0.625rem',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  fontSize: '1.25rem',
+                  minWidth: window.innerWidth <= 768 ? '36px' : '44px',
+                  height: window.innerWidth <= 768 ? '36px' : '44px'
+                }}
+                title="Admin Panel"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#fef3c7';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                ⚙️
+              </button>
+            )}
+            
+            {/* Logout Button */}
+            <button 
+              onClick={handleLogout}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#64748b',
+                padding: window.innerWidth <= 768 ? '0.5rem' : '0.625rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                minWidth: window.innerWidth <= 768 ? '36px' : '44px',
+                height: window.innerWidth <= 768 ? '36px' : '44px'
+              }}
+              title="Logout"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#fef2f2';
+                e.currentTarget.style.color = '#dc2626';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#64748b';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <LogOut size={20} strokeWidth={2} />
+            </button>
+          </div>
           {/* Voice functionality temporarily hidden until fully implemented */}
           {/* 
           <button
