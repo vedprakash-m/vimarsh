@@ -461,11 +461,11 @@ const LandingPage: React.FC = () => {
       console.log('🔄 LandingPage: Authenticated user detected, contexts ready, scheduling redirect');
       console.log('👤 User account:', account.username || account.name);
       
-      // Small delay to ensure UI state is fully settled
+      // Stabilization delay to ensure auth state is fully settled (prevents redirect loops)
       timeoutId = setTimeout(() => {
         console.log('🚀 LandingPage: Executing redirect to /guidance');
         navigate('/guidance', { replace: true });
-      }, 100);
+      }, 500); // Increased from 100ms to 500ms for better auth state stability
     } else if (isAuthenticated && account && !isPreview && !contextsReady) {
       console.log('⏳ LandingPage: Waiting for contexts to initialize before redirect...');
     }
