@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { conversationHistory, ConversationSession } from '../utils/conversationHistory';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMsal } from '@azure/msal-react';
+import spiritualGuidanceAPI from '../utils/api';
 
 interface ConversationHistoryProps {
   onSessionSelect: (sessionId: string) => void;
@@ -25,7 +26,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
 
   useEffect(() => {
     loadSessions();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -36,10 +37,41 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
     }
   }, [searchQuery, sessions]);
 
-  const loadSessions = () => {
+  const loadSessions = useCallback(async () => {
+    // For authenticated users, fetch from backend API
+    if (user) {
+      try {
+        const response = await spiritualGuidanceAPI.getConversationHistory(50);
+        // Map backend format to ConversationSession format
+        const mappedSessions: ConversationSession[] = response.conversations.map(conv => ({
+          id: conv.sessionId,
+          title: conv.summary || `Conversation with ${conv.personalityId}`,
+          messages: conv.messages.map((msg, idx) => ({
+            id: `${conv.sessionId}-${idx}`,
+            text: msg.text,
+            sender: msg.sender,
+            timestamp: new Date(msg.timestamp)
+          })),
+          createdAt: new Date(conv.createdAt),
+          updatedAt: new Date(conv.endedAt || conv.createdAt),
+          language: 'en' as const,
+          metadata: {
+            messageCount: conv.turnCount,
+            lastActivity: new Date(conv.endedAt || conv.createdAt),
+            topics: conv.keyTopics
+          }
+        }));
+        setSessions(mappedSessions);
+        return;
+      } catch (error) {
+        console.warn('Failed to load conversations from API, falling back to local storage:', error);
+      }
+    }
+    
+    // Fallback to localStorage for unauthenticated users or API failure
     const loadedSessions = conversationHistory.getSessions();
     setSessions(loadedSessions);
-  };
+  }, [user]);
 
   const handleDeleteSession = (sessionId: string) => {
     conversationHistory.deleteSession(sessionId);

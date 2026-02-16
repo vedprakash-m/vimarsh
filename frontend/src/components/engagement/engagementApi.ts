@@ -1,9 +1,11 @@
 /**
  * Engagement API Service for Vimarsh
- * Handles all API calls related to streaks and achievements
+ * Handles all API calls related to streaks and achievements.
+ * Uses the authenticated SpiritualGuidanceAPI singleton for consistent
+ * auth token injection, retry logic, and error handling.
  */
 
-import axios from 'axios';
+import spiritualGuidanceAPI from '../../utils/api';
 import { 
   StreakData, 
   AchievementsData, 
@@ -11,9 +13,10 @@ import {
   WeeklySummary,
   Achievement
 } from './types';
-import { getApiBaseUrl } from '../../config/environment';
 
-const API_BASE = getApiBaseUrl();
+// Access the authenticated axios client from the API singleton.
+// This ensures all engagement calls include the Bearer token via interceptor.
+const getClient = () => (spiritualGuidanceAPI as any).client;
 
 export const engagementApi = {
   /**
@@ -21,7 +24,7 @@ export const engagementApi = {
    */
   async getStreakData(userId: string): Promise<StreakData> {
     try {
-      const response = await axios.get(`${API_BASE}/engagement/streaks`, {
+      const response = await getClient().get('/api/engagement/streaks', {
         params: { user_id: userId }
       });
       return response.data.data;
@@ -47,7 +50,7 @@ export const engagementApi = {
     milestone_message?: string;
   }> {
     try {
-      const response = await axios.post(`${API_BASE}/engagement/activity`, {
+      const response = await getClient().post('/api/engagement/activity', {
         user_id: userId,
         activity_type: activityType,
         personality_id: personalityId,
@@ -70,7 +73,7 @@ export const engagementApi = {
     freezes_remaining: number;
   }> {
     try {
-      const response = await axios.post(`${API_BASE}/engagement/streaks/freeze`, {
+      const response = await getClient().post('/api/engagement/streaks/freeze', {
         user_id: userId
       });
       return response.data.result;
@@ -85,7 +88,7 @@ export const engagementApi = {
    */
   async getWeeklySummary(userId: string): Promise<WeeklySummary> {
     try {
-      const response = await axios.get(`${API_BASE}/engagement/summary`, {
+      const response = await getClient().get('/api/engagement/summary', {
         params: { user_id: userId }
       });
       return response.data.summary;
@@ -100,7 +103,7 @@ export const engagementApi = {
    */
   async getAchievements(userId: string): Promise<AchievementsData> {
     try {
-      const response = await axios.get(`${API_BASE}/engagement/achievements`, {
+      const response = await getClient().get('/api/engagement/achievements', {
         params: { user_id: userId }
       });
       return response.data.data;
@@ -118,7 +121,7 @@ export const engagementApi = {
     metrics: Record<string, unknown>
   ): Promise<Achievement[]> {
     try {
-      const response = await axios.post(`${API_BASE}/engagement/achievements/check`, {
+      const response = await getClient().post('/api/engagement/achievements/check', {
         user_id: userId,
         metrics
       });
@@ -134,7 +137,7 @@ export const engagementApi = {
    */
   async getDashboard(userId: string): Promise<EngagementDashboard> {
     try {
-      const response = await axios.get(`${API_BASE}/engagement/dashboard`, {
+      const response = await getClient().get('/api/engagement/dashboard', {
         params: { user_id: userId }
       });
       return response.data.dashboard;

@@ -1,0 +1,826 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "18375781181801826799"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources - single region deployment"
+      }
+    },
+    "expertReviewEmail": {
+      "type": "string",
+      "defaultValue": "vedprakash.m@me.com",
+      "metadata": {
+        "description": "Expert review email for spiritual content validation"
+      }
+    }
+  },
+  "variables": {
+    "cosmosDbName": "vimarsh-db",
+    "keyVaultName": "[format('vimarsh-kv-{0}', uniqueString(resourceGroup().id))]",
+    "storageAccountName": "vimarshstorage",
+    "functionAppName": "vimarsh-backend-app-flex",
+    "staticWebAppName": "vimarsh-frontend",
+    "appInsightsName": "vimarsh-backend-app",
+    "hostingPlanName": "EastUSLinuxDynamicPlan"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false,
+        "networkAcls": {
+          "defaultAction": "Allow"
+        }
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "functions-storage",
+        "costStrategy": "unified"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-07-01",
+      "name": "[variables('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "tenantId": "[subscription().tenantId]",
+        "accessPolicies": [],
+        "enableRbacAuthorization": true,
+        "publicNetworkAccess": "Enabled",
+        "networkAcls": {
+          "defaultAction": "Allow",
+          "bypass": "AzureServices"
+        }
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "secrets-management",
+        "costStrategy": "unified"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2023-07-01",
+      "name": "[format('{0}/{1}', variables('keyVaultName'), 'COSMOS-DB-KEY')]",
+      "properties": {
+        "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName')), '2023-04-15').primaryMasterKey]",
+        "contentType": "application/x-cosmos-db-key"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2023-04-15",
+      "name": "[variables('cosmosDbName')]",
+      "location": "[parameters('location')]",
+      "kind": "GlobalDocumentDB",
+      "properties": {
+        "databaseAccountOfferType": "Standard",
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session"
+        },
+        "locations": [
+          {
+            "locationName": "[parameters('location')]",
+            "failoverPriority": 0
+          }
+        ],
+        "capabilities": [
+          {
+            "name": "EnableServerless"
+          }
+        ],
+        "enableFreeTier": false,
+        "publicNetworkAccess": "Enabled",
+        "networkAclBypass": "AzureServices"
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "data-storage",
+        "costStrategy": "unified"
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}', variables('cosmosDbName'), 'vimarsh-multi-personality')]",
+      "properties": {
+        "resource": {
+          "id": "vimarsh-multi-personality"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'conversations')]",
+      "properties": {
+        "resource": {
+          "id": "conversations",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'feedback')]",
+      "properties": {
+        "resource": {
+          "id": "feedback",
+          "partitionKey": {
+            "paths": [
+              "/conversation_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'spiritual_content')]",
+      "properties": {
+        "resource": {
+          "id": "spiritual_content",
+          "partitionKey": {
+            "paths": [
+              "/category"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'personalities')]",
+      "properties": {
+        "resource": {
+          "id": "personalities",
+          "partitionKey": {
+            "paths": [
+              "/personality_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'personality_vectors')]",
+      "properties": {
+        "resource": {
+          "id": "personality_vectors",
+          "partitionKey": {
+            "paths": [
+              "/personality_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/embedding/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'users')]",
+      "properties": {
+        "resource": {
+          "id": "users",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'user_preferences')]",
+      "properties": {
+        "resource": {
+          "id": "user_preferences",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'user_sessions')]",
+      "properties": {
+        "resource": {
+          "id": "user_sessions",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'user_interactions')]",
+      "properties": {
+        "resource": {
+          "id": "user_interactions",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'user_activity')]",
+      "properties": {
+        "resource": {
+          "id": "user_activity",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'notification_subscriptions')]",
+      "properties": {
+        "resource": {
+          "id": "notification_subscriptions",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'token_usage')]",
+      "properties": {
+        "resource": {
+          "id": "token_usage",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'user_cost_totals')]",
+      "properties": {
+        "resource": {
+          "id": "user_cost_totals",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'engagement_tracking')]",
+      "properties": {
+        "resource": {
+          "id": "engagement_tracking",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'memory_profiles')]",
+      "properties": {
+        "resource": {
+          "id": "memory_profiles",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'conversation_history')]",
+      "properties": {
+        "resource": {
+          "id": "conversation_history",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'relationship_states')]",
+      "properties": {
+        "resource": {
+          "id": "relationship_states",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2023-04-15",
+      "name": "[format('{0}/{1}/{2}', variables('cosmosDbName'), 'vimarsh-multi-personality', 'session_summaries')]",
+      "properties": {
+        "resource": {
+          "id": "session_summaries",
+          "partitionKey": {
+            "paths": [
+              "/user_id"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), 'vimarsh-multi-personality')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('appInsightsName')]",
+      "location": "eastus",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "RetentionInDays": 30,
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "monitoring",
+        "costStrategy": "unified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "eastus",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic"
+      },
+      "kind": "functionapp",
+      "properties": {
+        "reserved": true
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "functions-hosting",
+        "costStrategy": "unified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('functionAppName')]",
+      "location": "eastus",
+      "kind": "functionapp,linux",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "reserved": true,
+        "siteConfig": {
+          "linuxFxVersion": "Python|3.12",
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', variables('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-01-01').keys[0].value)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', variables('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-01-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').ConnectionString]"
+            },
+            {
+              "name": "COSMOS_DB_ENDPOINT",
+              "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName')), '2023-04-15').documentEndpoint]"
+            },
+            {
+              "name": "COSMOS_DB_KEY",
+              "value": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=COSMOS-DB-KEY)', variables('keyVaultName'))]"
+            },
+            {
+              "name": "KEY_VAULT_URL",
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2023-07-01').vaultUri]"
+            },
+            {
+              "name": "EXPERT_REVIEW_EMAIL",
+              "value": "[parameters('expertReviewEmail')]"
+            }
+          ],
+          "cors": {
+            "allowedOrigins": [
+              "https://vimarsh.vedprakash.net",
+              "https://white-forest-05c196d0f.2.azurestaticapps.net"
+            ],
+            "supportCredentials": true
+          },
+          "use32BitWorkerProcess": false,
+          "ftpsState": "Disabled",
+          "minTlsVersion": "1.2"
+        },
+        "httpsOnly": true
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "backend-api",
+        "costStrategy": "unified"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('staticWebAppName')]",
+      "location": "eastus2",
+      "sku": {
+        "name": "Free",
+        "tier": "Free"
+      },
+      "properties": {
+        "repositoryUrl": "https://github.com/vedprakash-m/vimarsh",
+        "branch": "main",
+        "buildProperties": {
+          "appLocation": "/frontend",
+          "outputLocation": "build"
+        }
+      },
+      "tags": {
+        "project": "vimarsh",
+        "purpose": "frontend-app",
+        "costStrategy": "unified"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.KeyVault/vaults/{0}', variables('keyVaultName'))]",
+      "name": "[guid(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), resourceId('Microsoft.Web/sites', variables('functionAppName')), 'Key Vault Secrets User')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-01-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "cosmosDbAccountName": {
+      "type": "string",
+      "value": "[variables('cosmosDbName')]"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[variables('keyVaultName')]"
+    },
+    "functionAppName": {
+      "type": "string",
+      "value": "[variables('functionAppName')]"
+    },
+    "staticWebAppName": {
+      "type": "string",
+      "value": "[variables('staticWebAppName')]"
+    },
+    "applicationInsightsName": {
+      "type": "string",
+      "value": "[variables('appInsightsName')]"
+    },
+    "cosmosDbEndpoint": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName')), '2023-04-15').documentEndpoint]"
+    },
+    "keyVaultUri": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2023-07-01').vaultUri]"
+    }
+  }
+}

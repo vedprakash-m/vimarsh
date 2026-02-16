@@ -4,7 +4,9 @@
 
 ## 1. Overview
 
-This document provides comprehensive technical specifications for the Vimarsh AI-powered multi-personality conversational platform. Vimarsh leverages advanced Retrieval-Augmented Generation (RAG) with Google Gemini 2.5 Flash to enable authentic conversations with **25 operational personalities** across **7 major domains** (spiritual, scientific, philosophical, historical, literary, leadership, psychology), each grounded in their authentic works and teachings through personality-specific knowledge bases.
+This document provides comprehensive technical specifications for the Vimarsh AI-powered multi-personality conversational platform. Vimarsh leverages advanced Retrieval-Augmented Generation (RAG) with **Azure OpenAI GPT-5-mini** for response generation and **Azure OpenAI text-embedding-3-large** for semantic search to enable authentic conversations with **25 operational personalities** across **6 major domains** (spiritual, scientific, philosophical, literary, leadership, psychology), each grounded in their authentic works and teachings through personality-specific knowledge bases.
+
+> **Migration Note (December 2025):** The platform has been fully migrated from Google Gemini to Azure OpenAI for both response generation (GPT-5-mini) and embeddings (text-embedding-3-large). All services must use the centralized `config/ai_models.py` configuration. Any remaining Gemini references in the codebase are legacy artifacts targeted for cleanup.
 
 **Current Implementation Status**: The system is a fully operational multi-personality platform with comprehensive Azure infrastructure, Microsoft Entra ID authentication, Progressive Web App (PWA) capabilities, real-time analytics, admin dashboard, and enterprise-grade monitoring. The platform successfully serves 25 personalities with domain-specific theming, conversation memory, and intelligent fallback systems.
 
@@ -24,7 +26,7 @@ This document provides comprehensive technical specifications for the Vimarsh AI
 
 **Deployment Philosophy:**
 * **Single Environment**: Production-only deployment for cost efficiency and operational simplicity
-* **Single Region**: East US deployment to minimize latency and cross-region costs  
+* **Single Region**: West US 2 deployment for compute (Functions, Cosmos DB, Key Vault) with East US 2 for Static Web App  
 * **Single Slot**: No staging slots to avoid environment duplication overhead
 * **Static Naming**: Idempotent resource names prevent duplicate creation during CI/CD
 
@@ -204,7 +206,7 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
 **Frontend (PWA Multi-Personality Interface):**
 - **Technology Stack:** React 18 with TypeScript, Azure Static Web Apps, PWA capabilities
 - **Core Components:**
-  - `PersonalitySelector`: Browse and select from 25 personalities across 7 domains with elegant modal interface
+  - `PersonalitySelector`: Browse and select from 25 personalities across 6 domains with elegant modal interface
   - `GuidanceInterface`: Main conversation interface with domain-specific theming and real-time status
   - `AdminDashboard`: Comprehensive management interface with analytics, user management, and cost monitoring
   - `VoiceInterface`: Personality-specific voice characteristics with Google Cloud TTS/STT integration
@@ -257,12 +259,13 @@ User Query → Domain Detection → Personality Selection → Knowledge Retrieva
   - Social share tracking and viral analytics
 
 **Current External Integrations:**
-* **AI Services:** Google Gemini 2.5 Flash for generation; **`gemini-embedding-001`** for vector embeddings with MRL support (768-3072 dimensions)
-* **Authentication:** Microsoft Entra ID (vedid.onmicrosoft.com tenant)
+* **AI Services:** Azure OpenAI GPT-5-mini (`vimarsh-chat-gpt5mini` deployment) for response generation; Azure OpenAI **`text-embedding-3-large`** (`vimarsh-embedding-large` deployment, 768-dim MRL) for vector embeddings
+* **Authentication:** Microsoft Entra ID (vedid.onmicrosoft.com tenant) — **fail-closed pattern required** (auth module failures must return 503, never silently bypass)
 * **Voice Services:** **Azure Speech Service (Neural TTS)** for personality-specific text-to-speech; Web Speech API for speech-to-text input
 * **Monitoring:** Azure Application Insights with custom dashboards and alerting
-* **Storage:** Azure Cosmos DB with vector search for personality knowledge bases  
-* **Translation:** Gemini Pro multilingual capabilities (built-in)
+* **Storage:** Azure Cosmos DB Serverless with vector search for personality knowledge bases (database: `vimarsh-multi-personality`)
+* **CORS Policy:** Restrict to production domains only — `https://vimarsh.vedprakash.net` and `https://white-forest-05c196d0f.2.azurestaticapps.net`. Wildcard CORS (`*`) is prohibited in production.
+* **Translation:** Azure OpenAI multilingual capabilities (built-in)
 
 ### 3.6. Azure OpenAI Embedding Model Configuration
 
@@ -626,6 +629,7 @@ Response:
   - Anonymous access for basic wisdom guidance (no registration required)
   - Authenticated access for conversation history, admin features, and personalization
   - Role-based admin access for platform management and analytics
+* **Auth Failure Policy:** Fail-closed — if the auth module cannot load (ImportError, missing dependency), all protected endpoints must return HTTP 503 Service Unavailable. Auth decorators must **never** degrade to identity functions (no-ops).
 
 > **Note:** Detailed authentication implementation, Bicep templates, and integration specifics are documented in Section 12.4.
 
@@ -9501,7 +9505,7 @@ async def load_test_concurrent_generation():
 ### 20.1. Production Deployment Status (August 2025)
 
 **✅ Fully Operational Features:**
-- **Multi-Personality Platform**: 25 personalities across 7 domains in production
+- **Multi-Personality Platform**: 25 personalities across 6 domains in production
 - **Azure Infrastructure**: Serverless architecture with Flex Consumption Plan
 - **Microsoft Entra ID**: Enterprise authentication with SSO capabilities
 - **PWA Implementation**: Full progressive web app with offline capabilities

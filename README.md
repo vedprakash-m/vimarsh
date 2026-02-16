@@ -173,15 +173,23 @@ python scripts/setup_production.py
 ### Core Components
 ```
 🎭 Frontend Layer (React 18 + TypeScript)
+├── 📂 utils/api.ts - Unified API client singleton with auth, retry, error handling
+├── 📂 components/chat/ - Extracted chat module (MessageList, MessageSourceBadge, types)
 ├── PersonalitySelector - Choose from 25 distinct personalities
-├── MultiDomainInterface - Unified conversation experience across 6 domains
+├── GuidanceInterface - Main conversation UI (1,607 lines, composition-based)
+├── ConversationHistory - Backend-synced conversation timeline for auth users
 ├── MemoryDashboard - Analytics and memory management interface
 ├── UserSettings - Comprehensive settings with 5 tabs (Profile, Experience, Notifications, Memory, Account)
 ├── SettingsContext - State management with 500ms auto-save debouncing
 ├── DomainSpecificUI - Tailored interfaces for each domain
 └── IntelligentPrompts - Context-aware sample questions for each personality
 
-🧠 AI Processing Layer (Python 3.12 + Azure Functions) - Modular Architecture
+🧠 AI Processing Layer (Python 3.12 + Azure Functions) - Blueprint Architecture
+├── 📂 routes/ - Modular Blueprint routing for clean API organization
+│   ├── guidance_bp - Core guidance API with RAG and memory integration
+│   ├── user_bp - User profile, preferences, and conversation history
+│   ├── admin_bp - Admin dashboard and monitoring endpoints
+│   └── health_bp - Health checks and service status
 ├── PersonalityService - Template-based authentic responses for all 25 personalities
 ├── HierarchicalMemoryService - 4-layer memory (Working/Core/Episodic/RAG) with 2800+ lines
 ├── MemoryAnalyticsService - Engagement metrics, emotional journey, topic analysis
@@ -195,15 +203,22 @@ python scripts/setup_production.py
 ├── RAGService - Enhanced vector search with Azure OpenAI embeddings and citation grounding
 └── AzureOpenAIEmbeddingService - Production-grade embedding generation with batch processing
 
-💾 Memory Layer (Azure Cosmos DB)
+💾 Memory Layer (Azure Cosmos DB - vimarsh-multi-personality)
+├── 📂 18 Containers managed via Bicep IaC
+├── personalities - Personality configurations and metadata
+├── personality_vectors - 31,422+ embeddings (768 dims)
+├── users - User profiles and authentication state
+├── user_preferences - Settings (experience, notifications, memory, privacy)
+├── user_sessions - Session tracking and analytics
+├── user_activity - Engagement tracking (streaks, achievements)
+├── conversation_history - Full conversation archives
+├── session_summaries - AI-generated session summaries
+├── memory_profiles - User-specific memory state
+├── relationship_states - Cross-session relationship tracking
 ├── WorkingMemory - Sliding window context (16K tokens)
 ├── CoreMemory - Personality facts, beliefs, emotional patterns (4K tokens)
 ├── EpisodicMemory - Key moments, milestones, breakthroughs (8K tokens)
-├── RAGMemory - Semantic search with vector embeddings (4K tokens)
-├── RelationshipState - Cross-session user relationship tracking
-├── user_preferences - User settings (experience, notifications, memory, privacy)
-├── user_activity - Engagement tracking (streaks, conversations, achievements)
-└── conversation_memory - Enhanced with privacy controls and data retention policies
+└── RAGMemory - Semantic search with vector embeddings (4K tokens)
 
 📚 Knowledge Layer (Template-Based + RAG)
 ├── PersonalityModels - 25 distinct personality configurations with authentic traits

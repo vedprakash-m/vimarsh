@@ -8,7 +8,7 @@ This document serves as the **authoritative source of truth** for all UX/UI desi
 
 **Design Philosophy:** "Authentic Wisdom Through Intuitive Design" - Creating interfaces that honor each personality's unique voice and historical context while remaining accessible to modern users across all technical proficiency levels and cultural backgrounds.
 
-**Platform Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a **comprehensive multi-personality wisdom platform** supporting 25 diverse historical figures across 7 major domains. Current implementation includes **PWA capabilities**, **Microsoft Entra ID authentication**, **Apple-inspired design system**, **domain-specific theming**, **comprehensive admin dashboard**, **real-time analytics**, and **enterprise-grade security** while maintaining cost-optimized serverless architecture.
+**Platform Evolution**: The system has evolved from a single-personality spiritual guidance platform (Lord Krishna) to a **comprehensive multi-personality wisdom platform** supporting 25 diverse historical figures across 6 major domains. Current implementation includes **PWA capabilities**, **Microsoft Entra ID authentication**, **Apple-inspired design system**, **domain-specific theming**, **comprehensive admin dashboard**, **real-time analytics**, and **enterprise-grade security** while maintaining cost-optimized serverless architecture.
 
 ---
 
@@ -18,7 +18,7 @@ This document serves as the **authoritative source of truth** for all UX/UI desi
 
 **Production-First Approach:**
 - **Environment**: Single production deployment for cost efficiency and operational simplicity
-- **Region**: East US for optimal performance and cost management
+- **Region**: West US 2 for compute (Functions, Cosmos DB), East US 2 for Static Web App
 - **Availability**: 24/7 operation with planned maintenance windows for cost optimization
 
 ### 2.2. High Availability & Reliability
@@ -5198,7 +5198,7 @@ This UX design ensures that Vimarsh's Azure OpenAI GPT-5-mini migration operates
 ### 17.1. Completed UX Features (As of August 2025)
 
 **✅ Core Platform Features:**
-- **Multi-Personality System**: 25 personalities across 7 domains fully operational
+- **Multi-Personality System**: 25 personalities across 6 domains fully operational
 - **Apple-Inspired Design**: Modern, clean interface with domain-specific theming
 - **Microsoft Entra ID**: Enterprise-grade authentication with SSO support
 - **PWA Capabilities**: Full Progressive Web App with offline functionality and installation

@@ -31,25 +31,6 @@ try:
 except ImportError:
     AZURE_OPENAI_AVAILABLE = False
 
-# Gemini fallback for embeddings
-try:
-    from .gemini_embedding_service import GeminiTransformer
-    GEMINI_EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    # Stub implementation for CI/CD and development
-    class GeminiTransformer:
-        def __init__(self, model_name):
-            self.model_name = model_name
-        
-        def encode(self, texts, **kwargs):
-            """Return dummy embeddings for CI/CD"""
-            if isinstance(texts, str):
-                texts = [texts]
-            # Return dummy 768-dimensional embeddings
-            import random
-            return [[random.random() for _ in range(768)] for _ in texts]
-    
-    GEMINI_EMBEDDINGS_AVAILABLE = False
 import json
 import os
 
@@ -129,19 +110,20 @@ class KnowledgeBaseManager:
     def __init__(self, db_service: Optional[DatabaseService] = None):
         self.db_service = db_service or DatabaseService()
         
-        # Initialize embedding model using Gemini API
-        self.embedding_model_name = "gemini-embedding"
-        try:
-            self.embedding_model = GeminiTransformer(self.embedding_model_name)
-            self.embedding_dim = 768  # MRL dimension for gemini-embedding-001 (Cosmos DB compatible)
-            if GEMINI_EMBEDDINGS_AVAILABLE:
-                logger.info(f"✅ Initialized Gemini embedding model: gemini-embedding-001 (dim={self.embedding_dim})")
-            else:
-                logger.warning("⚠️ Using stub embedding model (Gemini API not available)")
-        except Exception as e:
-            logger.error(f"❌ Failed to initialize embedding model: {e}")
-            self.embedding_model = None
-            self.embedding_dim = 768
+        # Initialize embedding model using Azure OpenAI
+        self.embedding_model_name = "vimarsh-embedding-large"
+        self.embedding_dim = 768  # MRL dimension for text-embedding-3-large (Cosmos DB compatible)
+        
+        if AZURE_OPENAI_AVAILABLE:
+            try:
+                self.embedding_service = AzureOpenAIEmbeddingService()
+                logger.info(f"✅ Initialized Azure OpenAI embedding model: {self.embedding_model_name} (dim={self.embedding_dim})")
+            except Exception as e:
+                logger.error(f"❌ Failed to initialize Azure OpenAI embedding model: {e}")
+                self.embedding_service = None
+        else:
+            logger.warning("⚠️ Azure OpenAI embedding service not available")
+            self.embedding_service = None
         
         # Domain-specific embedding strategies
         self.domain_strategies = {
@@ -319,8 +301,8 @@ class KnowledgeBaseManager:
     async def _generate_embedding(self, text: str, domain: str) -> Optional[List[float]]:
         """Generate embedding for text with domain-specific optimization"""
         try:
-            if not self.embedding_model:
-                logger.warning("Embedding model not available")
+            if not self.embedding_service:
+                logger.warning("Embedding service not available")
                 return None
             
             # Check cache
@@ -328,9 +310,8 @@ class KnowledgeBaseManager:
             if cache_key in self.embedding_cache:
                 return self.embedding_cache[cache_key]
             
-            # Generate embedding
-            embedding = self.embedding_model.encode(text, convert_to_tensor=False)
-            embedding_list = embedding.tolist()
+            # Generate embedding using Azure OpenAI
+            embedding_list = await self.embedding_service.generate_embedding_async(text)
             
             # Apply domain-specific weighting if needed
             if domain in self.domain_strategies:

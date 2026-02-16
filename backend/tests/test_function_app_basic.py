@@ -126,15 +126,19 @@ class TestFunctionAppConfiguration:
         """Test that personality configurations are present"""
         import function_app
         
-        # Check for hardcoded personalities in the source
-        source_code = open(function_app.__file__).read()
+        # After refactoring, personalities are in FALLBACK_PERSONALITIES dict
+        # exported from function_app via shared_services
+        assert hasattr(function_app, 'FALLBACK_PERSONALITIES'), \
+            "FALLBACK_PERSONALITIES should be exported from function_app"
+        
+        personalities = function_app.FALLBACK_PERSONALITIES
         
         # Should contain some personality names
-        personality_names = ['krishna', 'buddha', 'einstein', 'socrates']
+        expected_names = ['krishna', 'buddha', 'einstein', 'socrates']
         
         personalities_found = [
-            name for name in personality_names 
-            if name.lower() in source_code.lower()
+            name for name in expected_names 
+            if name in personalities
         ]
         
         assert len(personalities_found) >= 2, f"Should find at least 2 personalities, found: {personalities_found}"

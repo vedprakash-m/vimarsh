@@ -29,7 +29,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from function_app import guidance_endpoint
+from routes.guidance_bp import guidance_endpoint
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

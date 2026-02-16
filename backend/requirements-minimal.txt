@@ -15,7 +15,8 @@ PyJWT[crypto]==2.8.0
 cryptography==41.0.7
 
 # AI/ML Libraries (Essential only)
-google-generativeai==0.7.2
+# Migrated from Google Gemini to Azure OpenAI
+openai>=1.54.0
 
 # Utilities
 python-dotenv==1.0.0

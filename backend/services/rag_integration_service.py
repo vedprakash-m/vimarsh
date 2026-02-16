@@ -487,7 +487,7 @@ Response:"""
                 llm_service_health = {
                     "available": True,
                     "configured": self.llm_service.is_configured,
-                    "model": "gemini-2.5-flash"
+                    "model": "vimarsh-chat-gpt5mini"  # Azure OpenAI deployment
                 }
             else:
                 llm_service_health = {"available": False, "error": "Service not initialized"}

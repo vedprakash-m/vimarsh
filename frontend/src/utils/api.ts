@@ -10,12 +10,15 @@ interface ApiConfig {
 
 interface SpiritualGuidanceRequest {
   query: string;
-  language: 'en' | 'hi';
-  sessionId?: string;
-  context?: Array<{
-    text: string;
-    sender: 'user' | 'ai';
-    timestamp: string;
+  language?: string;  // Default: 'English'
+  personality_id?: string;  // Default: 'krishna'
+  user_id?: string;
+  session_id?: string;
+  include_citations?: boolean;
+  voice_enabled?: boolean;
+  conversation_context?: Array<{
+    role: 'user' | 'assistant';
+    content: string;
   }>;
 }
 
@@ -29,13 +32,19 @@ interface Citation {
 
 interface SpiritualGuidanceResponse {
   response: string;
-  citations: Citation[];
+  citations?: Citation[];
   sanskritText?: string;
   transliteration?: string;
-  confidence: number;
-  sessionId: string;
-  timestamp: string;
-  processingTime: number;
+  confidence?: number;
+  sessionId?: string;
+  timestamp?: string;
+  processingTime?: number;
+  achievements_unlocked?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+  }>;
   metadata?: {
     response_source?: 'gemini_ai' | 'template_fallback' | 'hardcoded_fallback' | 'hybrid_rag' | 'simple_rag';
     ai_generated?: boolean;
@@ -203,12 +212,12 @@ class SpiritualGuidanceAPI {
   }
 
   /**
-   * Get spiritual guidance from Lord Krishna
+   * Get spiritual guidance from any personality
    */
   async getSpiritualGuidance(request: SpiritualGuidanceRequest): Promise<SpiritualGuidanceResponse> {
     try {
       const response: AxiosResponse<SpiritualGuidanceResponse> = await this.client.post(
-        '/api/spiritual-guidance',
+        '/guidance',
         request
       );
 
@@ -250,25 +259,67 @@ class SpiritualGuidanceAPI {
   /**
    * Get conversation history (if user is authenticated)
    */
-  async getConversationHistory(limit: number = 50): Promise<{
+  async getConversationHistory(limit: number = 50, personalityId?: string): Promise<{
     conversations: Array<{
       sessionId: string;
+      personalityId: string;
       messages: Array<{
         text: string;
         sender: 'user' | 'ai';
         timestamp: string;
       }>;
+      summary: string;
+      keyTopics: string[];
+      emotionalJourney: string[];
       createdAt: string;
+      endedAt: string;
+      turnCount: number;
     }>;
   }> {
     try {
-      // TODO: Implement conversations endpoint in backend
-      // const response = await this.client.get(`/api/conversations?limit=${limit}`);
-      // return response.data;
-      return { conversations: [] }; // Temporary placeholder
+      const params = new URLSearchParams({ limit: limit.toString() });
+      if (personalityId) {
+        params.append('personality_id', personalityId);
+      }
+      const response = await this.client.get(`/conversations?${params.toString()}`);
+      return response.data;
     } catch (error) {
-      throw error;
+      console.error('Failed to get conversation history:', error);
+      return { conversations: [] };
     }
+  }
+
+  /**
+   * Get user profile with preferences
+   */
+  async getUserProfile(): Promise<{
+    user_id: string;
+    email: string;
+    name: string;
+    preferences: {
+      experience_preferences?: Record<string, unknown>;
+      notification_preferences?: Record<string, unknown>;
+      memory_preferences?: Record<string, unknown>;
+    };
+    journey_stats?: Record<string, unknown>;
+    ai_usage?: Record<string, unknown>;
+    member_since?: string;
+    last_updated?: string;
+  }> {
+    const response = await this.client.get('/api/user/profile');
+    return response.data;
+  }
+
+  /**
+   * Update user preferences
+   */
+  async updatePreferences(preferences: Record<string, unknown>): Promise<{
+    success: boolean;
+    preferences: Record<string, unknown>;
+    message?: string;
+  }> {
+    const response = await this.client.patch('/api/user/preferences', preferences);
+    return response.data;
   }
 
   /**

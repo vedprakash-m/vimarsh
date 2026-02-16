@@ -531,14 +531,14 @@ Response:"""
                     return SpiritualResponse(
                         content=response_text,
                         personality_id=personality_id,
-                        source=f"gemini_api_{personality_id}_optimized",
+                        source=f"azure_openai_{personality_id}_optimized",
                         character_count=len(response_text),
                         max_allowed=config.max_chars,
                         metadata={
                             "personality_name": config.name,
                             "domain": config.domain.value,
                             "response_time": response_time,
-                            "model": "gemini-2.5-flash",
+                            "model": "vimarsh-chat-gpt5mini",
                             "requires_citations": config.requires_citations,
                             "greeting_style": config.greeting_style,
                             "attempt": attempt + 1,
@@ -546,7 +546,7 @@ Response:"""
                         }
                     )
                 else:
-                    logger.warning(f"⚠️ Empty response from Gemini API for {personality_id} (attempt {attempt + 1})")
+                    logger.warning(f"⚠️ Empty response from Azure OpenAI for {personality_id} (attempt {attempt + 1})")
                     if attempt == config.max_retries:  # Last attempt
                         return SpiritualResponse(
                             content=f"{config.greeting_style}, I am unable to provide guidance at this moment. Please ask again with a specific question.",

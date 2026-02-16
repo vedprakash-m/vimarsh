@@ -22,7 +22,7 @@ try:
     AZURE_OPENAI_AVAILABLE = True
 except ImportError:
     AZURE_OPENAI_AVAILABLE = False
-    logger.warning("Azure OpenAI embedding service not available, falling back to Gemini")
+    logger.warning("Azure OpenAI embedding service not available")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -60,7 +60,7 @@ class EmbeddingGenerator:
         else:
             self.embedding_service = None
             logger.warning("Azure OpenAI embedding service not available")
-        self.embedding_model = "models/gemini-embedding-001"
+        self.embedding_model = "vimarsh-embedding-large"  # Azure OpenAI text-embedding-3-large
         self.embedding_output_dimensionality = 768  # MRL dimension for Cosmos DB compatibility
         
         # Initialize Cosmos DB client
@@ -274,20 +274,18 @@ class EmbeddingGenerator:
                 self.stats["failed_chunks"] += 1
     
     async def generate_batch_embeddings(self, batch: List[EmbeddingJob]) -> List[Optional[List[float]]]:
-        """Generate embeddings for a batch of chunks using Gemini API"""
+        """Generate embeddings for a batch of chunks using Azure OpenAI API"""
         
         embeddings = []
         
+        if not self.embedding_service:
+            logger.error("❌ Azure OpenAI embedding service not available")
+            return [None] * len(batch)
+        
         for job in batch:
             try:
-                # Generate embedding using Gemini
-                result = genai.embed_content(
-                    model=self.embedding_model,
-                    content=job.chunk_text,
-                    task_type="retrieval_document"
-                )
-                
-                embedding = result['embedding']
+                # Generate embedding using Azure OpenAI
+                embedding = await self.embedding_service.generate_embedding_async(job.chunk_text)
                 embeddings.append(embedding)
                 
                 self.stats["api_calls_made"] += 1

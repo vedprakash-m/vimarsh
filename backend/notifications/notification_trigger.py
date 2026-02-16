@@ -31,7 +31,7 @@ def get_cosmos_client():
             
         client = CosmosClient(endpoint, key)
         database = client.get_database_client(
-            os.environ.get("COSMOS_DATABASE", "vimarsh-db")
+            os.environ.get("AZURE_COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
         )
         
         return client, database

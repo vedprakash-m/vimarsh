@@ -6,10 +6,6 @@
 @description('Location for all resources - single region deployment')
 param location string = resourceGroup().location
 
-@description('Gemini API key for LLM integration')
-@secure()
-param geminiApiKey string
-
 @description('Expert review email for spiritual content validation')
 param expertReviewEmail string = 'vedprakash.m@me.com'
 
@@ -70,13 +66,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   }
 }
 
-// Store Gemini API key in Key Vault
-resource geminiApiKeySecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+// Store Cosmos DB key in Key Vault (never expose as plaintext app setting)
+resource cosmosDbKeySecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
-  name: 'GEMINI-API-KEY'
+  name: 'COSMOS-DB-KEY'
   properties: {
-    value: geminiApiKey
-    contentType: 'application/x-gemini-api-key'
+    value: cosmosDb.listKeys().primaryMasterKey
+    contentType: 'application/x-cosmos-db-key'
   }
 }
 
@@ -115,10 +111,10 @@ resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
 // Vimarsh Database
 resource vimarshDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2023-04-15' = {
   parent: cosmosDb
-  name: 'vimarsh'
+  name: 'vimarsh-multi-personality'
   properties: {
     resource: {
-      id: 'vimarsh'
+      id: 'vimarsh-multi-personality'
     }
   }
 }
@@ -185,6 +181,292 @@ resource spiritualContentContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDat
             path: '/*'
           }
         ]
+      }
+    }
+  }
+}
+
+// Personalities container - stores personality configurations
+resource personalitiesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'personalities'
+  properties: {
+    resource: {
+      id: 'personalities'
+      partitionKey: {
+        paths: ['/personality_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Personality vectors - stores embeddings for RAG
+resource personalityVectorsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'personality_vectors'
+  properties: {
+    resource: {
+      id: 'personality_vectors'
+      partitionKey: {
+        paths: ['/personality_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+        excludedPaths: [{ path: '/embedding/*' }] // Don't index embeddings
+      }
+    }
+  }
+}
+
+// Users container - stores user profiles
+resource usersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'users'
+  properties: {
+    resource: {
+      id: 'users'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// User preferences container
+resource userPreferencesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'user_preferences'
+  properties: {
+    resource: {
+      id: 'user_preferences'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// User sessions container
+resource userSessionsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'user_sessions'
+  properties: {
+    resource: {
+      id: 'user_sessions'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// User interactions container
+resource userInteractionsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'user_interactions'
+  properties: {
+    resource: {
+      id: 'user_interactions'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// User activity container
+resource userActivityContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'user_activity'
+  properties: {
+    resource: {
+      id: 'user_activity'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Notification subscriptions container
+resource notificationSubscriptionsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'notification_subscriptions'
+  properties: {
+    resource: {
+      id: 'notification_subscriptions'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Token usage tracking container
+resource tokenUsageContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'token_usage'
+  properties: {
+    resource: {
+      id: 'token_usage'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// User cost totals container
+resource userCostTotalsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'user_cost_totals'
+  properties: {
+    resource: {
+      id: 'user_cost_totals'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Engagement tracking container
+resource engagementTrackingContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'engagement_tracking'
+  properties: {
+    resource: {
+      id: 'engagement_tracking'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Memory profiles container (hierarchical memory)
+resource memoryProfilesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'memory_profiles'
+  properties: {
+    resource: {
+      id: 'memory_profiles'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Conversation history container (hierarchical memory)
+resource conversationHistoryContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'conversation_history'
+  properties: {
+    resource: {
+      id: 'conversation_history'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Relationship states container (hierarchical memory)
+resource relationshipStatesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'relationship_states'
+  properties: {
+    resource: {
+      id: 'relationship_states'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
+      }
+    }
+  }
+}
+
+// Session summaries container (hierarchical memory)
+resource sessionSummariesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  parent: vimarshDatabase
+  name: 'session_summaries'
+  properties: {
+    resource: {
+      id: 'session_summaries'
+      partitionKey: {
+        paths: ['/user_id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [{ path: '/*' }]
       }
     }
   }
@@ -268,15 +550,11 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'COSMOS_DB_KEY'
-          value: cosmosDb.listKeys().primaryMasterKey
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=COSMOS-DB-KEY)'
         }
         {
           name: 'KEY_VAULT_URL'
           value: keyVault.properties.vaultUri
-        }
-        {
-          name: 'GEMINI_API_KEY'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=GEMINI-API-KEY)'
         }
         {
           name: 'EXPERT_REVIEW_EMAIL'
@@ -284,8 +562,11 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
         }
       ]
       cors: {
-        allowedOrigins: ['*']
-        supportCredentials: false
+        allowedOrigins: [
+          'https://vimarsh.vedprakash.net'
+          'https://white-forest-05c196d0f.2.azurestaticapps.net'
+        ]
+        supportCredentials: true
       }
       use32BitWorkerProcess: false
       ftpsState: 'Disabled'

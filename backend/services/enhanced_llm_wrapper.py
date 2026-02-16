@@ -131,7 +131,7 @@ class EnhancedLLMService:
                 
                 # Enhance response with metadata
                 if isinstance(ai_response, dict):
-                    ai_response["metadata"]["response_source"] = "gemini_ai"
+                    ai_response["metadata"]["response_source"] = "azure_openai"
                     ai_response["metadata"]["generation_time_ms"] = response_time * 1000
                     ai_response["metadata"]["circuit_breaker_status"] = circuit_breaker.get_status()
                     ai_response["metadata"]["reliability_stats"] = fallback_tracker.get_stats()

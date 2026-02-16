@@ -130,7 +130,8 @@ class NotificationService:
         """Initialize Cosmos DB containers"""
         if self.cosmos_client:
             try:
-                database = self.cosmos_client.get_database_client("vimarsh-db")
+                database_name = os.environ.get("AZURE_COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
+                database = self.cosmos_client.get_database_client(database_name)
                 self._subscriptions_container = database.get_container_client(
                     "notification_subscriptions"
                 )

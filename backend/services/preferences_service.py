@@ -83,7 +83,7 @@ class PreferencesService:
         try:
             cosmos_endpoint = os.environ.get("COSMOS_ENDPOINT") or os.environ.get("COSMOS_DB_ENDPOINT")
             cosmos_key = os.environ.get("COSMOS_KEY") or os.environ.get("COSMOS_DB_KEY")
-            cosmos_database = os.environ.get("COSMOS_DATABASE", "vimarsh-db")
+            cosmos_database = os.environ.get("AZURE_COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
             
             if not cosmos_endpoint or not cosmos_key:
                 logger.warning("⚠️ Cosmos DB credentials not found, preferences will use in-memory storage")

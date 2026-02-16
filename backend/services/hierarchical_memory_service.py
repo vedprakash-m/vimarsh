@@ -26,14 +26,19 @@ import json
 from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError
 
-# Azure OpenAI for embeddings (with Gemini fallback for generation)
+# Azure OpenAI for embeddings and generation
 try:
     from services.azure_openai_embedding_service import AzureOpenAIEmbeddingService
     AZURE_OPENAI_AVAILABLE = True
 except ImportError:
     AZURE_OPENAI_AVAILABLE = False
 
-import google.generativeai as genai
+try:
+    from openai import AsyncAzureOpenAI
+    from config.ai_models import AI_CONFIG
+    AZURE_CHAT_AVAILABLE = True
+except ImportError:
+    AZURE_CHAT_AVAILABLE = False
 
 # Local models
 from models.memory_models import (
@@ -99,35 +104,49 @@ class HierarchicalMemoryService:
         # In-memory session cache for working memory
         self.working_memory_cache: Dict[str, WorkingMemoryContext] = {}
         
-        # Initialize Gemini for embeddings and reflections
-        self._init_gemini()
+        # Initialize Azure OpenAI for embeddings and reflections
+        self._init_ai_services()
         
         # Initialize Cosmos DB connection
         self._init_cosmos_db()
         
         logger.info("🧠 HierarchicalMemoryService initialized")
     
-    def _init_gemini(self) -> None:
-        """Initialize Google Gemini for embeddings and reflection generation."""
-        api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-        if api_key:
-            genai.configure(api_key=api_key)
-            self.embedding_model = "gemini-embedding-001"  # Migrated from deprecated text-embedding-004
-            self.embedding_output_dimensionality = 768  # MRL dimension for Cosmos DB compatibility
-            self.generation_model = genai.GenerativeModel("gemini-2.0-flash")
-            logger.info("✅ Gemini initialized for memory service (embedding: gemini-embedding-001)")
+    def _init_ai_services(self) -> None:
+        """Initialize Azure OpenAI for embeddings and reflection generation."""
+        # Initialize embedding service
+        if AZURE_OPENAI_AVAILABLE:
+            try:
+                self.embedding_service = AzureOpenAIEmbeddingService()
+                self.embedding_output_dimensionality = 768  # MRL dimension for Cosmos DB compatibility
+                logger.info("✅ Azure OpenAI embedding service initialized for memory service")
+            except Exception as e:
+                logger.warning(f"⚠️ Azure OpenAI embedding service failed to init: {e}")
+                self.embedding_service = None
         else:
-            logger.warning("⚠️ Gemini API key not found - embeddings disabled")
-            self.embedding_model = None
+            self.embedding_service = None
             self.embedding_output_dimensionality = 768
-            self.generation_model = None
+        
+        # Initialize generation client
+        if AZURE_CHAT_AVAILABLE and AI_CONFIG.azure_openai_chat_endpoint and AI_CONFIG.azure_openai_chat_api_key:
+            self.chat_client = AsyncAzureOpenAI(
+                azure_endpoint=AI_CONFIG.azure_openai_chat_endpoint,
+                api_key=AI_CONFIG.azure_openai_chat_api_key,
+                api_version=AI_CONFIG.azure_openai_chat_api_version
+            )
+            self.chat_deployment = AI_CONFIG.azure_openai_chat_deployment
+            logger.info("✅ Azure OpenAI chat initialized for memory reflection")
+        else:
+            logger.warning("⚠️ Azure OpenAI chat not available - reflections disabled")
+            self.chat_client = None
+            self.chat_deployment = None
     
     def _init_cosmos_db(self) -> None:
         """Initialize Cosmos DB connection and containers."""
         try:
             endpoint = os.environ.get("COSMOS_ENDPOINT")
             key = os.environ.get("COSMOS_KEY")
-            database_name = os.environ.get("COSMOS_DATABASE", "vimarsh-db")
+            database_name = os.environ.get("AZURE_COSMOS_DATABASE_NAME", "vimarsh-multi-personality")
             
             if not endpoint or not key:
                 logger.warning("⚠️ Cosmos DB credentials not found - using in-memory only")
@@ -2520,7 +2539,7 @@ class HierarchicalMemoryService:
         session: SessionSummary
     ) -> str:
         """Generate a summary of the session using AI."""
-        if not self.generation_model:
+        if not self.chat_client:
             return self._generate_simple_summary(messages)
         
         try:
@@ -2538,8 +2557,13 @@ Conversation:
 
 Summary:"""
             
-            response = await self.generation_model.generate_content_async(prompt)
-            return response.text.strip()
+            response = await self.chat_client.chat.completions.create(
+                model=self.chat_deployment,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=200
+            )
+            return response.choices[0].message.content.strip()
             
         except Exception as e:
             logger.warning(f"⚠️ AI summary failed, using simple summary: {e}")
@@ -2575,7 +2599,7 @@ Summary:"""
     
     async def _generate_reflection(self, session: SessionSummary) -> str:
         """Generate deeper reflection on the session."""
-        if not self.generation_model:
+        if not self.chat_client:
             return ""
         
         try:
@@ -2587,8 +2611,13 @@ Emotional journey: {session.starting_emotion} → {session.ending_emotion}
 
 Reflection:"""
             
-            response = await self.generation_model.generate_content_async(prompt)
-            return response.text.strip()
+            response = await self.chat_client.chat.completions.create(
+                model=self.chat_deployment,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=150
+            )
+            return response.choices[0].message.content.strip()
             
         except Exception as e:
             logger.warning(f"⚠️ Reflection generation failed: {e}")
@@ -2657,17 +2686,14 @@ Reflection:"""
     # =========================================================================
     
     async def _generate_embedding(self, text: str) -> Optional[List[float]]:
-        """Generate embedding for text using Gemini."""
-        if not self.embedding_model:
+        """Generate embedding for text using Azure OpenAI."""
+        if not self.embedding_service:
             return None
         
         try:
-            result = genai.embed_content(
-                model=f"models/{self.embedding_model}",
-                content=text[:2000],  # Limit text length
-                task_type="retrieval_document"
-            )
-            return result['embedding']
+            # Use Azure OpenAI embedding service
+            embedding = await self.embedding_service.generate_embedding_async(text[:2000])
+            return embedding
         except Exception as e:
             logger.warning(f"⚠️ Embedding generation failed: {e}")
             return None

@@ -15,137 +15,13 @@ import { useEngagement } from '../contexts/EngagementContext';
 import { useAdmin } from '../contexts/AdminProviderContext';
 import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
-import { getApiBaseUrl } from '../config/environment';
-import { getAuthHeaders, authService } from '../auth/authService';
+import { authService } from '../auth/authService';
+import spiritualGuidanceAPI from '../utils/api';
+import { Message, MessageSourceBadge } from './chat';
 import DebugAuth from './DebugAuth';
 import { pwaManager } from '../utils/pwa';
 import '../styles/vimarsh-design-system.css';
 import '../styles/spiritual-theme.css';
-
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-  personality?: string;
-  metadata?: {
-    response_source?: 'gemini_ai' | 'template_fallback' | 'hardcoded_fallback' | 'hybrid_rag' | 'simple_rag';
-    ai_generated?: boolean;
-    service_mode?: 'enhanced' | 'standard' | 'fallback';
-    fallback_reason?: string;
-    circuit_breaker_status?: {
-      state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
-      failure_count: number;
-      last_failure_time?: string;
-    };
-    reliability_stats?: {
-      success_rate: number;
-      total_attempts: number;
-      template_fallback_count: number;
-    };
-    generation_time_ms?: number;
-    memory_enhanced?: boolean;
-  };
-}
-
-// Compact Message Source Badge for chat interface
-interface MessageSourceBadgeProps {
-  metadata: NonNullable<Message['metadata']>;
-  compact?: boolean;
-}
-
-const MessageSourceBadge: React.FC<MessageSourceBadgeProps> = ({ metadata, compact = true }) => {
-  const getSourceInfo = () => {
-    const isAI = metadata.ai_generated === true;
-    const source = metadata.response_source;
-    
-    if (isAI && source === 'gemini_ai') {
-      return {
-        icon: '🤖',
-        label: 'AI',
-        color: 'rgba(59, 130, 246, 0.7)',
-        bgColor: 'rgba(59, 130, 246, 0.1)'
-      };
-    }
-    
-    if (source === 'template_fallback' || source === 'hardcoded_fallback') {
-      return {
-        icon: '📜',
-        label: 'Traditional',
-        color: 'rgba(245, 158, 11, 0.7)',
-        bgColor: 'rgba(245, 158, 11, 0.1)'
-      };
-    }
-    
-    if (source === 'hybrid_rag' || source === 'simple_rag') {
-      return {
-        icon: '📚',
-        label: 'Enhanced',
-        color: 'rgba(147, 51, 234, 0.7)',
-        bgColor: 'rgba(147, 51, 234, 0.1)'
-      };
-    }
-    
-    return {
-      icon: '🎭',
-      label: 'Wisdom',
-      color: 'rgba(107, 114, 128, 0.7)',
-      bgColor: 'rgba(107, 114, 128, 0.1)'
-    };
-  };
-  
-  const sourceInfo = getSourceInfo();
-  
-  if (compact) {
-    return (
-      <div style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.25rem',
-        padding: '0.25rem 0.5rem',
-        backgroundColor: sourceInfo.bgColor,
-        border: `1px solid ${sourceInfo.color}`,
-        borderRadius: '0.5rem',
-        fontSize: '0.7rem',
-        color: sourceInfo.color
-      }}>
-        <span>{sourceInfo.icon}</span>
-        <span>{sourceInfo.label}</span>
-        {metadata.generation_time_ms && (
-          <span style={{ opacity: 0.7 }}>
-            {metadata.generation_time_ms}ms
-          </span>
-        )}
-      </div>
-    );
-  }
-  
-  return (
-    <div style={{
-      padding: '0.5rem',
-      backgroundColor: sourceInfo.bgColor,
-      border: `1px solid ${sourceInfo.color}`,
-      borderRadius: '0.5rem',
-      fontSize: '0.8rem',
-      color: sourceInfo.color
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <span>{sourceInfo.icon}</span>
-        <span>{sourceInfo.label} Response</span>
-        {metadata.generation_time_ms && (
-          <span style={{ opacity: 0.7 }}>
-            ({metadata.generation_time_ms}ms)
-          </span>
-        )}
-      </div>
-      {metadata.fallback_reason && (
-        <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '0.25rem' }}>
-          Reason: {metadata.fallback_reason}
-        </div>
-      )}
-    </div>
-  );
-};
 
 export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -319,36 +195,21 @@ export default function GuidanceInterface() {
     try {
       // Get conversation context (last 4 messages for context)
       const recentMessages = messages.slice(-4).map(msg => ({
-        role: msg.isUser ? 'user' : 'assistant',
+        role: msg.isUser ? 'user' as const : 'assistant' as const,
         content: msg.text
       }));
 
-      // Call real guidance API with conversation context
-      const apiUrl = getApiBaseUrl();
-      const authHeaders = await getAuthHeaders();
-      const response = await fetch(`${apiUrl}/guidance`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders
-        },
-        body: JSON.stringify({
-          query: question,
-          language: 'English',
-          include_citations: true,
-          voice_enabled: false,
-          conversation_context: recentMessages,
-          personality_id: selectedPersonality.id,
-          user_id: sessionId,
-          session_id: sessionId
-        })
+      // Call guidance API using unified API client
+      const data = await spiritualGuidanceAPI.getSpiritualGuidance({
+        query: question,
+        language: 'English',
+        include_citations: true,
+        voice_enabled: false,
+        conversation_context: recentMessages,
+        personality_id: selectedPersonality.id,
+        user_id: sessionId,
+        session_id: sessionId
       });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
       
       // Use the response with metadata from backend
       const apiResponse: Message = {

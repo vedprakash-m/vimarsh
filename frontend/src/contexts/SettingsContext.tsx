@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getApiBaseUrl } from '../config/environment';
-import { getAuthHeaders } from '../auth/authService';
+import spiritualGuidanceAPI from '../utils/api';
 
 export interface ExperiencePreferences {
   conversation_style: 'brief' | 'balanced' | 'detailed';
@@ -81,6 +80,43 @@ export interface UserProfile {
   ai_usage: AIUsage;
 }
 
+// Default preference values
+const defaultExperiencePrefs: ExperiencePreferences = {
+  conversation_style: 'balanced',
+  language: 'en',
+  formality: 'respectful',
+  favorite_personalities: [],
+  theme: 'auto',
+  text_size: 'medium',
+  reduce_animations: false,
+};
+
+const defaultNotificationPrefs: NotificationPreferences = {
+  daily_wisdom_enabled: false,
+  preferred_time: '09:00',
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  quiet_hours_enabled: false,
+  quiet_start: '22:00',
+  quiet_end: '07:00',
+  types: {
+    daily_wisdom: false,
+    streak_reminders: false,
+    achievements: false,
+    weekly_summary: false,
+  },
+};
+
+const defaultMemoryPrefs: MemoryPreferences = {
+  remember_conversations: true,
+  connect_insights: true,
+  track_emotions: false,
+  suggest_topics: true,
+  privacy_mode: 'standard',
+  data_retention_days: 365,
+  analytics_consent: false,
+  research_consent: false,
+};
+
 interface SettingsContextType {
   settings: UserSettings | null;
   profile: UserProfile | null;
@@ -107,18 +143,36 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setLoading(true);
       setError(null);
 
-      const headers = await getAuthHeaders();
-      const response = await fetch(`${getApiBaseUrl()}/user/profile`, {
-        headers,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch profile: ${response.statusText}`);
-      }
-
-      const data: UserProfile = await response.json();
-      setProfile(data);
-      setSettings(data.preferences);
+      const data = await spiritualGuidanceAPI.getUserProfile();
+      
+      // Map API response to UserProfile structure
+      // Using type assertions through unknown for API responses
+      const mappedProfile: UserProfile = {
+        user: {
+          user_id: data.user_id,
+          name: data.name,
+          email: data.email,
+          member_since: data.member_since || new Date().toISOString(),
+        },
+        journey_stats: (data.journey_stats as unknown as JourneyStats) || {
+          current_streak: 0,
+          total_conversations: 0,
+          achievements_unlocked: 0,
+          wisdom_level: 1,
+          domain_exploration: { spiritual: 0, scientific: 0, philosophical: 0, leadership: 0, literary: 0, psychology: 0 },
+        },
+        preferences: {
+          user_id: data.user_id,
+          experience_preferences: (data.preferences?.experience_preferences as unknown as ExperiencePreferences) || defaultExperiencePrefs,
+          notification_preferences: (data.preferences?.notification_preferences as unknown as NotificationPreferences) || defaultNotificationPrefs,
+          memory_preferences: (data.preferences?.memory_preferences as unknown as MemoryPreferences) || defaultMemoryPrefs,
+          updated_at: data.last_updated || new Date().toISOString(),
+        },
+        ai_usage: (data.ai_usage as unknown as AIUsage) || { monthly_cost: 0, monthly_limit: 10, status: 'well_within_limits', trend: 'similar_to_last_month' },
+      };
+      
+      setProfile(mappedProfile);
+      setSettings(mappedProfile.preferences);
     } catch (err) {
       console.error('Failed to load user profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to load profile');
@@ -146,25 +200,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Debounced save function
   const debouncedSave = useCallback(async (updates: Partial<UserSettings>) => {
     try {
-      const headers = await getAuthHeaders();
-      const response = await fetch(`${getApiBaseUrl()}/api/user/preferences`, {
-        method: 'PATCH',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update preferences: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await spiritualGuidanceAPI.updatePreferences(updates);
       
       // Update settings with response from server
-      if (data.updated_preferences) {
-        setSettings(data.updated_preferences);
+      if (data.preferences) {
+        // Merge with existing settings to preserve user_id and updated_at
+        if (settings) {
+          setSettings({
+            ...settings,
+            ...data.preferences,
+            updated_at: new Date().toISOString(),
+          } as UserSettings);
+        }
       }
 
       // Show success toast
@@ -182,7 +229,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Revert optimistic update by refreshing
       await refreshProfile();
     }
-  }, [refreshProfile]);
+  }, [refreshProfile, settings]);
 
   // Update settings with optimistic UI and debounced save
   const updateSettings = useCallback(async (updates: Partial<UserSettings>) => {

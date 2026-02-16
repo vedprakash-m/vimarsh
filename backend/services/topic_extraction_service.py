@@ -5,7 +5,7 @@ Extracts key topics, themes, and emotional patterns from conversations
 to support the hierarchical memory architecture.
 
 Features:
-- Topic extraction using Gemini LLM
+- Topic extraction using Azure OpenAI
 - Theme clustering and categorization
 - Emotional arc tracking
 - Key insight identification
@@ -18,7 +18,13 @@ from typing import List, Dict, Any, Optional, Tuple
 import json
 import re
 
-import google.generativeai as genai
+# Azure OpenAI
+try:
+    from openai import AsyncAzureOpenAI
+    from config.ai_models import AI_CONFIG
+    AZURE_OPENAI_AVAILABLE = True
+except ImportError:
+    AZURE_OPENAI_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -47,16 +53,39 @@ class TopicExtractionService:
     
     def __init__(self):
         """Initialize the topic extraction service."""
-        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-        if api_key:
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel("gemini-2.0-flash-exp")
+        if AZURE_OPENAI_AVAILABLE and AI_CONFIG.azure_openai_chat_endpoint and AI_CONFIG.azure_openai_chat_api_key:
+            self.client = AsyncAzureOpenAI(
+                azure_endpoint=AI_CONFIG.azure_openai_chat_endpoint,
+                api_key=AI_CONFIG.azure_openai_chat_api_key,
+                api_version=AI_CONFIG.azure_openai_chat_api_version
+            )
+            self.deployment = AI_CONFIG.azure_openai_chat_deployment
             self.available = True
-            logger.info("✅ Topic Extraction Service initialized with Gemini")
+            logger.info("✅ Topic Extraction Service initialized with Azure OpenAI")
         else:
-            self.model = None
+            self.client = None
+            self.deployment = None
             self.available = False
-            logger.warning("⚠️ Topic Extraction Service: No API key available")
+            logger.warning("⚠️ Topic Extraction Service: Azure OpenAI not configured")
+    
+    async def _generate_response(self, prompt: str) -> Optional[str]:
+        """Generate response using Azure OpenAI."""
+        if not self.available or not self.client:
+            return None
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.deployment,
+                messages=[
+                    {"role": "system", "content": "You are an expert at analyzing conversations and extracting structured insights. Always return valid JSON."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=2000
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"❌ Azure OpenAI generation failed: {e}")
+            return None
     
     async def extract_conversation_topics(
         self,
@@ -100,10 +129,10 @@ Extract and return a JSON object with:
 For domain_relevance, score each from 0.0 to 1.0 based on how much the conversation relates to that domain.
 Return ONLY valid JSON."""
 
-            response = await self.model.generate_content_async(prompt)
+            response_text = await self._generate_response(prompt)
             
             # Parse response
-            result = self._parse_json_response(response.text)
+            result = self._parse_json_response(response_text)
             
             if result:
                 logger.info(f"📊 Extracted {len(result.get('main_topics', []))} topics from conversation")
@@ -162,8 +191,8 @@ Generate a JSON object with:
 
 Return ONLY valid JSON."""
 
-            response = await self.model.generate_content_async(prompt)
-            result = self._parse_json_response(response.text)
+            response_text = await self._generate_response(prompt)
+            result = self._parse_json_response(response_text)
             
             if result:
                 logger.info(f"📝 Generated session summary with {len(result.get('key_insights', []))} insights")
@@ -206,8 +235,8 @@ Respond with ONLY a JSON object:
     "secondary_emotions": ["list of other emotions present"]
 }}"""
 
-            response = await self.model.generate_content_async(prompt)
-            result = self._parse_json_response(response.text)
+            response_text = await self._generate_response(prompt)
+            result = self._parse_json_response(response_text)
             
             if result:
                 return (result.get("primary_emotion", "neutral"), result.get("confidence", 0.5))
@@ -247,8 +276,8 @@ Return ONLY a JSON object:
     "importance_boost": 0.0 to 0.5 (how much this should boost memory importance)
 }}"""
 
-            response = await self.model.generate_content_async(prompt)
-            result = self._parse_json_response(response.text)
+            response_text = await self._generate_response(prompt)
+            result = self._parse_json_response(response_text)
             
             if result:
                 return result
@@ -290,8 +319,8 @@ Return ONLY a JSON array of the most relevant life concerns from this list:
 Format: ["concern1", "concern2", "concern3"]
 Maximum 5 concerns, ordered by relevance."""
 
-            response = await self.model.generate_content_async(prompt)
-            result = self._parse_json_response(response.text)
+            response_text = await self._generate_response(prompt)
+            result = self._parse_json_response(response_text)
             
             if isinstance(result, list):
                 # Validate against known categories

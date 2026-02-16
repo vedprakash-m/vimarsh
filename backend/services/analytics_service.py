@@ -591,9 +591,10 @@ class AnalyticsService:
             previous_usage = await self._get_monthly_usage(user_id, previous_month)
             
             # Calculate costs (approximate based on tokens)
-            # Gemini 2.5 Flash pricing: ~$0.15 per 1M tokens (input + output combined)
-            monthly_cost = (usage_data.get("total_tokens", 0) / 1_000_000) * 0.15
-            previous_cost = (previous_usage.get("total_tokens", 0) / 1_000_000) * 0.15
+            # Azure OpenAI GPT-4o-mini pricing: ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
+            # Using blended estimate of ~$0.30 per 1M tokens
+            monthly_cost = (usage_data.get("total_tokens", 0) / 1_000_000) * 0.30
+            previous_cost = (previous_usage.get("total_tokens", 0) / 1_000_000) * 0.30
             
             # Free tier limit
             free_tier_limit = 10.00  # $10/month
