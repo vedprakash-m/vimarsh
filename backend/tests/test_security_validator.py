@@ -423,6 +423,8 @@ class TestSecureAdminEndpointDecorator:
         mock_req.get_json = Mock(return_value={})
         mock_req.params = {}
         mock_req.route_params = {}  # Add proper route_params as dict
+        mock_req.url = '/api/test'
+        mock_req.method = 'GET'
         
         # Mock security validator
         with patch('auth.security_validator.security_validator') as mock_validator_instance:
@@ -452,6 +454,8 @@ class TestSecureAdminEndpointDecorator:
         mock_req.get_json = Mock(return_value={})
         mock_req.params = {}
         mock_req.route_params = {}  # Add proper route_params as dict
+        mock_req.url = '/api/test'
+        mock_req.method = 'POST'
         
         # Mock security validator to raise error
         with patch('auth.security_validator.security_validator') as mock_validator_instance:
