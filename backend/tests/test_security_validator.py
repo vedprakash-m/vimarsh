@@ -432,12 +432,11 @@ class TestSecureAdminEndpointDecorator:
                 'client_ip': '127.0.0.1'
             }
             mock_validator_instance.filter_admin_response.return_value = {"message": "success"}
+            mock_validator_instance.log_security_event.return_value = None
             
-            # Patch the global instance
-            with patch('auth.security_validator.security_validator', mock_validator_instance):
-                result = await test_endpoint(req=mock_req)
-                
-                assert "message" in result
+            result = await test_endpoint(req=mock_req)
+            
+            assert "message" in result
     
     @pytest.mark.asyncio
     async def test_secure_admin_endpoint_security_error(self):
@@ -457,6 +456,7 @@ class TestSecureAdminEndpointDecorator:
         # Mock security validator to raise error
         with patch('auth.security_validator.security_validator') as mock_validator_instance:
             mock_validator_instance.validate_admin_request.side_effect = SecurityValidationError("Test error")
+            mock_validator_instance.log_security_event.return_value = None
             
             result = await test_endpoint(req=mock_req)
             
