@@ -263,7 +263,7 @@ jobs:
       run: |
         cd backend
         # Test installation in clean environment simulation
-        python -c "import pkg_resources; print('Dependencies validation passed')"
+        python -c "import importlib.metadata; print('Dependencies validation passed')"
 
     - name: 🧪 Run Backend Tests
       run: |

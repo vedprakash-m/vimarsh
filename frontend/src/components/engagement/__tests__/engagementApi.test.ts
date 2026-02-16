@@ -2,16 +2,27 @@
  * Engagement API Tests
  */
 
-// Mock axios before importing
-jest.mock('axios', () => ({
-  get: jest.fn(),
-  post: jest.fn()
+// Mock the api singleton to return our controlled client
+jest.mock('../../../utils/api', () => ({
+  __esModule: true,
+  default: {
+    client: {
+      get: jest.fn(),
+      post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn() },
+        response: { use: jest.fn() }
+      }
+    }
+  }
 }));
 
-import axios from 'axios';
+// Import after mocking
 import { engagementApi } from '../engagementApi';
+import spiritualGuidanceAPI from '../../../utils/api';
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+// Get the mocked client for assertions
+const mockedClient = (spiritualGuidanceAPI as any).client;
 
 describe('engagementApi', () => {
   beforeEach(() => {
@@ -30,13 +41,13 @@ describe('engagementApi', () => {
         activity_history: []
       };
 
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedClient.get.mockResolvedValueOnce({
         data: { data: mockStreakData }
       });
 
       const result = await engagementApi.getStreakData('user123');
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockedClient.get).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/streaks'),
         { params: { user_id: 'user123' } }
       );
@@ -44,7 +55,7 @@ describe('engagementApi', () => {
     });
 
     it('should throw error on failure', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error('Network error'));
+      mockedClient.get.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(engagementApi.getStreakData('user123')).rejects.toThrow('Network error');
     });
@@ -66,7 +77,7 @@ describe('engagementApi', () => {
         milestone_reached: false
       };
 
-      mockedAxios.post.mockResolvedValueOnce({
+      mockedClient.post.mockResolvedValueOnce({
         data: { result: mockResponse }
       });
 
@@ -77,7 +88,7 @@ describe('engagementApi', () => {
         'spiritual'
       );
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect(mockedClient.post).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/activity'),
         {
           user_id: 'user123',
@@ -105,21 +116,21 @@ describe('engagementApi', () => {
         milestone_reached: false
       };
 
-      mockedAxios.post.mockResolvedValueOnce({
+      mockedClient.post.mockResolvedValueOnce({
         data: { result: mockResponse }
       });
 
       const metadata = { conversation_id: 'conv123', duration: 300 };
       await engagementApi.recordActivity('user123', 'conversation', 'buddha', 'spiritual', metadata);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect(mockedClient.post).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/activity'),
         expect.objectContaining({ metadata })
       );
     });
 
     it('should throw error on failure', async () => {
-      mockedAxios.post.mockRejectedValueOnce(new Error('Server error'));
+      mockedClient.post.mockRejectedValueOnce(new Error('Server error'));
 
       await expect(
         engagementApi.recordActivity('user123', 'conversation')
@@ -135,13 +146,13 @@ describe('engagementApi', () => {
         freezes_remaining: 2
       };
 
-      mockedAxios.post.mockResolvedValueOnce({
+      mockedClient.post.mockResolvedValueOnce({
         data: { result: mockResponse }
       });
 
       const result = await engagementApi.useStreakFreeze('user123');
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect(mockedClient.post).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/streaks/freeze'),
         { user_id: 'user123' }
       );
@@ -149,7 +160,7 @@ describe('engagementApi', () => {
     });
 
     it('should throw error when no freezes available', async () => {
-      mockedAxios.post.mockRejectedValueOnce(new Error('No freezes available'));
+      mockedClient.post.mockRejectedValueOnce(new Error('No freezes available'));
 
       await expect(engagementApi.useStreakFreeze('user123')).rejects.toThrow('No freezes available');
     });
@@ -167,13 +178,13 @@ describe('engagementApi', () => {
         streak_milestone_reached: false
       };
 
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedClient.get.mockResolvedValueOnce({
         data: { summary: mockSummary }
       });
 
       const result = await engagementApi.getWeeklySummary('user123');
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockedClient.get).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/summary'),
         { params: { user_id: 'user123' } }
       );
@@ -181,7 +192,7 @@ describe('engagementApi', () => {
     });
 
     it('should throw error on failure', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error('Fetch failed'));
+      mockedClient.get.mockRejectedValueOnce(new Error('Fetch failed'));
 
       await expect(engagementApi.getWeeklySummary('user123')).rejects.toThrow('Fetch failed');
     });
@@ -214,13 +225,13 @@ describe('engagementApi', () => {
         recent_unlocks: []
       };
 
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedClient.get.mockResolvedValueOnce({
         data: { data: mockAchievements }
       });
 
       const result = await engagementApi.getAchievements('user123');
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockedClient.get).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/achievements'),
         { params: { user_id: 'user123' } }
       );
@@ -228,7 +239,7 @@ describe('engagementApi', () => {
     });
 
     it('should throw error on failure', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error('API error'));
+      mockedClient.get.mockRejectedValueOnce(new Error('API error'));
 
       await expect(engagementApi.getAchievements('user123')).rejects.toThrow('API error');
     });
@@ -251,14 +262,14 @@ describe('engagementApi', () => {
         }
       ];
 
-      mockedAxios.post.mockResolvedValueOnce({
+      mockedClient.post.mockResolvedValueOnce({
         data: { newly_unlocked: mockNewAchievements }
       });
 
       const metrics = { current_streak: 7, conversations: 20 };
       const result = await engagementApi.checkAchievements('user123', metrics);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect(mockedClient.post).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/achievements/check'),
         expect.objectContaining({
           user_id: 'user123',
@@ -289,13 +300,13 @@ describe('engagementApi', () => {
         }
       };
 
-      mockedAxios.get.mockResolvedValueOnce({
+      mockedClient.get.mockResolvedValueOnce({
         data: { dashboard: mockDashboard }
       });
 
       const result = await engagementApi.getDashboard('user123');
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect(mockedClient.get).toHaveBeenCalledWith(
         expect.stringContaining('/engagement/dashboard'),
         { params: { user_id: 'user123' } }
       );
