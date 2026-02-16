@@ -20,7 +20,8 @@ from auth.security_validator import (
     DataFilter,
     JWTValidator,
     SecurityConfig,
-    secure_admin_endpoint
+    secure_admin_endpoint,
+    security_validator as _sv_instance
 )
 
 
@@ -413,54 +414,54 @@ class TestSecureAdminEndpointDecorator:
     async def test_secure_admin_endpoint_basic(self):
         """Test basic decorator functionality"""
         
-        @secure_admin_endpoint(required_scopes=['admin.read'])
-        async def test_endpoint(req):
-            return {"message": "success"}
-        
-        # Mock request
+        # Mock request with all attributes the decorator accesses
         mock_req = Mock()
         mock_req.headers = {}
         mock_req.get_json = Mock(return_value={})
         mock_req.params = {}
-        mock_req.route_params = {}  # Add proper route_params as dict
+        mock_req.route_params = {}
         mock_req.url = '/api/test'
         mock_req.method = 'GET'
         
-        # Mock security validator
-        with patch('auth.security_validator.security_validator') as mock_validator_instance:
-            mock_validator_instance.validate_admin_request.return_value = {
-                'sanitized_data': {},
-                'jwt_payload': {'sub': 'test-user'},
-                'client_ip': '127.0.0.1'
-            }
-            mock_validator_instance.filter_admin_response.return_value = {"message": "success"}
-            mock_validator_instance.log_security_event.return_value = None
+        # Patch methods directly on the actual security_validator instance
+        # This is more reliable than replacing the module-level variable
+        with patch.object(_sv_instance, 'validate_admin_request', return_value={
+            'sanitized_data': {},
+            'jwt_payload': {'sub': 'test-user'},
+            'client_ip': '127.0.0.1'
+        }), \
+        patch.object(_sv_instance, 'filter_admin_response', return_value={"message": "success"}), \
+        patch.object(_sv_instance, 'log_security_event'):
+            
+            @secure_admin_endpoint(required_scopes=['admin.read'])
+            async def test_endpoint(req):
+                return {"message": "success"}
             
             result = await test_endpoint(req=mock_req)
             
+            assert isinstance(result, dict)
             assert "message" in result
     
     @pytest.mark.asyncio
     async def test_secure_admin_endpoint_security_error(self):
         """Test decorator handling security errors"""
         
-        @secure_admin_endpoint(required_scopes=['admin.read'])
-        async def test_endpoint(req):
-            return {"message": "success"}
-        
-        # Mock request
+        # Mock request with all attributes the decorator accesses
         mock_req = Mock()
         mock_req.headers = {}
         mock_req.get_json = Mock(return_value={})
         mock_req.params = {}
-        mock_req.route_params = {}  # Add proper route_params as dict
+        mock_req.route_params = {}
         mock_req.url = '/api/test'
         mock_req.method = 'POST'
         
-        # Mock security validator to raise error
-        with patch('auth.security_validator.security_validator') as mock_validator_instance:
-            mock_validator_instance.validate_admin_request.side_effect = SecurityValidationError("Test error")
-            mock_validator_instance.log_security_event.return_value = None
+        # Patch methods directly on the actual security_validator instance
+        with patch.object(_sv_instance, 'validate_admin_request', side_effect=SecurityValidationError("Test error")), \
+        patch.object(_sv_instance, 'log_security_event'):
+            
+            @secure_admin_endpoint(required_scopes=['admin.read'])
+            async def test_endpoint(req):
+                return {"message": "success"}
             
             result = await test_endpoint(req=mock_req)
             
