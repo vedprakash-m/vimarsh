@@ -125,16 +125,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         setIsLoading(true);
         
-        // Wait for MSAL to be fully initialized
-        let retries = 0;
-        while (!instance.getConfiguration() && retries < 5) {
-          console.log('⏳ AuthProvider: Waiting for MSAL initialization...', retries + 1);
-          await new Promise(resolve => setTimeout(resolve, 500));
-          retries++;
-        }
-
+        // MSAL should already be initialized in App.tsx before AuthProvider mounts
         if (!instance.getConfiguration()) {
-          throw new Error('MSAL instance failed to initialize');
+          console.warn('⚠️ AuthProvider: MSAL not yet initialized');
         }
 
         updateAccountState();
@@ -142,8 +135,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Validate authentication state consistency
         if (!validateAuthenticationState()) {
           console.warn('⚠️ AuthProvider: Authentication state inconsistency detected');
-          // Don't set error immediately to prevent redirect loops
-          // setError('Authentication state synchronization issue. Please try signing in again.');
         } else {
           setError(null);
         }

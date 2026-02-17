@@ -20,12 +20,12 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Override the global AuthContext mock for this test file
-jest.mock('../../context/AuthContext', () => ({
+jest.mock('../../auth/AuthProvider', () => ({
   useAuth: () => ({
-    user: { id: 'test-user-123', email: 'test@vimarsh.app', name: 'Test User' },
+    account: { username: 'test@vimarsh.app', name: 'Test User', homeAccountId: 'test-user-123' },
     logout: mockLogout,
     isAuthenticated: true,
-    loading: false,
+    isLoading: false,
   }),
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

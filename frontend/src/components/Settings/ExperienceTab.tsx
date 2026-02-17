@@ -297,11 +297,10 @@ const ExperienceTab: React.FC = () => {
             ))}
           </div>
           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-            <div className={`
-              ${experience_preferences.text_size === 'small' ? 'text-sm' : ''}
-              ${experience_preferences.text_size === 'medium' ? 'text-base' : ''}
-              ${experience_preferences.text_size === 'large' ? 'text-lg' : ''}
-            `}>
+            <div style={{
+              fontSize: experience_preferences.text_size === 'small' ? '0.875rem' :
+                        experience_preferences.text_size === 'large' ? '1.125rem' : '1rem'
+            }}>
               Preview: This is how text will appear
             </div>
           </div>

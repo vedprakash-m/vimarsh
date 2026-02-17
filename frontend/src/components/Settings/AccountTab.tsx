@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { CreditCard, Lock, LogOut, Trash2, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../auth/AuthProvider';
 
 const AccountTab: React.FC = () => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, account } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
@@ -86,7 +86,12 @@ const AccountTab: React.FC = () => {
             </div>
             <button
               onClick={() => alert('Premium plans coming soon!')}
-              className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium"
+              className="w-full px-4 py-2 text-white rounded-lg font-medium transition-all"
+              style={{
+                background: 'linear-gradient(to right, #2563eb, #9333ea)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'linear-gradient(to right, #1d4ed8, #7e22ce)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'linear-gradient(to right, #2563eb, #9333ea)'; }}
             >
               Coming Soon
             </button>
@@ -107,7 +112,7 @@ const AccountTab: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-medium text-gray-700">Email</div>
-                <div className="text-sm text-gray-900 mt-1">{user?.email || 'Not available'}</div>
+                <div className="text-sm text-gray-900 mt-1">{account?.username || 'Not available'}</div>
               </div>
               <div className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                 Verified

@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Send, MessageSquare, Users, Settings, LogOut, Download, X, Share2, Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Send, MessageSquare, Users, Download, X, Share2, Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { SharingInterface } from './SharingInterface';
 import { VoiceControls } from './VoiceControls';
 import { azureSpeechService } from '../services/azureSpeechService';
 import PersonalitySelector from './PersonalitySelector';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
-import MemoryIndicator from './MemoryIndicator';
+// MemoryIndicator moved to UserMenuDropdown
 import RelationshipBadge from './RelationshipBadge';
-import { StreakDisplayContainer, AchievementUnlockModal, AchievementShareModal } from './engagement';
+import { AchievementUnlockModal, AchievementShareModal } from './engagement';
+import EngagementTour, { useEngagementTour } from './engagement/EngagementTour';
+import UserMenuDropdown from './UserMenuDropdown';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
 import { useMemory } from '../contexts/MemoryContext';
 import { useEngagement } from '../contexts/EngagementContext';
 import { useAdmin } from '../contexts/AdminProviderContext';
 import { useAppLoading } from '../contexts/AppLoadingContext';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../auth/authService';
+// authService import removed — logout handled by UserMenuDropdown
 import spiritualGuidanceAPI from '../utils/api';
 import { Message, MessageSourceBadge } from './chat';
 import DebugAuth from './DebugAuth';
@@ -41,6 +43,9 @@ export default function GuidanceInterface() {
   
   const navigate = useNavigate();
 
+  // Engagement Tour — only shown for authenticated users on /guidance
+  const { showTour, closeTour } = useEngagementTour();
+
   // Context hooks
   const { user } = useAdmin();
   const { isInitializing, allReady } = useAppLoading();
@@ -60,9 +65,6 @@ export default function GuidanceInterface() {
     dismissAchievementModal
   } = useEngagement();
 
-  // Don't show admin button until all contexts are ready to prevent layout shift
-  const showAdminButton = allReady && user?.isAdmin;
-
   // Debug toggle for production troubleshooting
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -76,18 +78,7 @@ export default function GuidanceInterface() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
-  // Logout functionality
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-      // Navigate to login page or reload to trigger authentication flow
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Still navigate away even if logout fails
-      window.location.href = '/';
-    }
-  };  // Add animation styles
+  // Add animation styles
   useEffect(() => {
     const styles = `
       @keyframes pulse {
@@ -688,7 +679,7 @@ export default function GuidanceInterface() {
     }}>
       {/* Mobile-Optimized Header */}
       <header style={{
-        padding: window.innerWidth <= 768 ? '1rem 1.5rem' : '1.5rem 2rem',
+        padding: '1rem 1.5rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -707,66 +698,63 @@ export default function GuidanceInterface() {
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: window.innerWidth <= 768 ? '0.5rem' : '0.75rem' 
+          gap: '0.75rem' 
         }}>
           <div style={{
-            width: window.innerWidth <= 768 ? '2.5rem' : '3rem',
-            height: window.innerWidth <= 768 ? '2.5rem' : '3rem',
+            width: '2.75rem',
+            height: '2.75rem',
             background: selectedPersonality ? domainColors.gradient : 'linear-gradient(135deg, #f97316, #f59e0b)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem',
+            fontSize: '1.25rem',
             fontWeight: 'bold',
             color: 'white',
             boxShadow: selectedPersonality 
               ? `0 4px 12px ${domainColors.border}60` 
               : '0 4px 12px rgba(249, 115, 22, 0.3)',
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            flexShrink: 0
           }}>
             V
           </div>
-          {window.innerWidth > 480 && (
-            <div>
-              <h1 style={{ 
-                margin: 0, 
-                fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem', 
-                fontWeight: '600',
-                color: '#1d1d1f'
-              }}>
-                Vimarsh
-              </h1>
-              <p style={{ 
-                margin: 0, 
-                fontSize: window.innerWidth <= 768 ? '0.75rem' : '0.85rem', 
-                fontWeight: '500',
-                color: '#6e6e73'
-              }}>
-                Wisdom Without Boundaries
-              </p>
-            </div>
-          )}
+          <div>
+            <h1 style={{ 
+              margin: 0, 
+              fontSize: '1.25rem', 
+              fontWeight: '600',
+              color: '#1d1d1f'
+            }}>
+              Vimarsh
+            </h1>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '0.75rem', 
+              fontWeight: '500',
+              color: '#6e6e73'
+            }}>
+              Wisdom Without Boundaries
+            </p>
+          </div>
         </div>
         
-        {/* World-Class Navigation Bar */}
+        {/* Clean Navigation Bar — Personality Badge + User Menu */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: window.innerWidth <= 768 ? '0.75rem' : '1rem' 
+          gap: '0.75rem'
         }}>
           {/* Personality Badge - Primary Context */}
           {selectedPersonality && (
             <button
               onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
-              disabled={!selectedPersonality}
               style={{
                 background: selectedPersonality ? domainColors.bg : '#f8fafc',
-                borderRadius: window.innerWidth <= 768 ? '0.5rem' : '0.75rem',
-                padding: window.innerWidth <= 768 ? '0.375rem 0.75rem' : '0.5rem 1rem',
+                borderRadius: '0.75rem',
+                padding: '0.5rem 1rem',
                 border: selectedPersonality ? `1.5px solid ${domainColors.border}` : '1px solid #e2e8f0',
                 backdropFilter: 'blur(10px)',
-                maxWidth: window.innerWidth <= 768 ? '120px' : 'none',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 display: 'flex',
@@ -777,7 +765,7 @@ export default function GuidanceInterface() {
                   ? `0 2px 8px ${domainColors.border}30` 
                   : '0 1px 3px rgba(0, 0, 0, 0.05)'
               }}
-              title={`Currently chatting with ${selectedPersonality?.name || 'Loading...'}`}
+              title={`Currently chatting with ${selectedPersonality?.name || 'Loading...'} — click to switch`}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
                 e.currentTarget.style.boxShadow = `0 4px 12px ${domainColors.border}40`;
@@ -787,229 +775,32 @@ export default function GuidanceInterface() {
                 e.currentTarget.style.boxShadow = `0 2px 8px ${domainColors.border}30`;
               }}
             >
-              <Users size={16} style={{ opacity: 0.8 }} />
+              <Users size={16} style={{ opacity: 0.8, flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <div style={{ 
-                  fontSize: window.innerWidth <= 768 ? '0.8rem' : '0.875rem', 
+                  fontSize: '0.875rem', 
                   fontWeight: '600',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  maxWidth: '100px'
+                  maxWidth: '160px'
                 }}>
                   {selectedPersonality?.name || 'Loading...'}
                 </div>
-                {window.innerWidth > 480 && (
-                  <div style={{ 
-                    fontSize: '0.65rem', 
-                    opacity: 0.7,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
-                    {selectedPersonality?.domain?.toUpperCase() || 'LOADING'}
-                  </div>
-                )}
-              </div>
-            </button>
-          )}
-          
-          {/* Visual Separator */}
-          {selectedPersonality && window.innerWidth > 768 && (
-            <div style={{
-              width: '1px',
-              height: '32px',
-              background: 'linear-gradient(to bottom, transparent, #e5e7eb, transparent)',
-              opacity: 0.5
-            }} />
-          )}
-          
-          {/* Engagement Metrics - Secondary Context */}
-          {window.innerWidth > 480 && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem'
-            }}>
-              {/* Memory Indicator */}
-              {selectedPersonality && memoryContext && window.innerWidth > 768 && (
-                <div 
-                  onClick={() => navigate('/memory')}
-                  style={{ 
-                    cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    opacity: 0.9
-                  }}
-                  title="View your memory profile and relationships"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
-                >
-                  <MemoryIndicator compact={true} showTooltip={true} />
+                <div style={{ 
+                  fontSize: '0.65rem', 
+                  opacity: 0.7,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {selectedPersonality?.domain?.toUpperCase() || 'LOADING'}
                 </div>
-              )}
-              
-              {/* Streak Display */}
-              <div 
-                onClick={() => navigate('/progress')}
-                style={{ 
-                  cursor: 'pointer',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-                title="View your progress, streaks, and achievements"
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                <StreakDisplayContainer compact={true} />
               </div>
-            </div>
-          )}
-          
-          {/* Visual Separator */}
-          {window.innerWidth > 768 && (
-            <div style={{
-              width: '1px',
-              height: '32px',
-              background: 'linear-gradient(to bottom, transparent, #e5e7eb, transparent)',
-              opacity: 0.5
-            }} />
-          )}
-          
-          {/* Action Buttons - Tertiary Actions */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: window.innerWidth <= 768 ? '0.5rem' : '0.75rem'
-          }}>
-            {/* Settings Button */}
-            <button 
-              onClick={() => navigate('/settings')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#64748b',
-                padding: window.innerWidth <= 768 ? '0.5rem' : '0.625rem',
-                borderRadius: '0.5rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                minWidth: window.innerWidth <= 768 ? '36px' : '44px',
-                height: window.innerWidth <= 768 ? '36px' : '44px'
-              }}
-              title="Settings"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f1f5f9';
-                e.currentTarget.style.color = '#475569';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#64748b';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <Settings size={20} strokeWidth={2} />
             </button>
-            
-            {/* Admin Panel Button - Only visible to admins */}
-            {showAdminButton && (
-              <button 
-                onClick={() => navigate('/admin')}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#f59e0b',
-                  padding: window.innerWidth <= 768 ? '0.5rem' : '0.625rem',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  fontSize: '1.25rem',
-                  minWidth: window.innerWidth <= 768 ? '36px' : '44px',
-                  height: window.innerWidth <= 768 ? '36px' : '44px'
-                }}
-                title="Admin Panel"
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#fef3c7';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                ⚙️
-              </button>
-            )}
-            
-            {/* Logout Button */}
-            <button 
-              onClick={handleLogout}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#64748b',
-                padding: window.innerWidth <= 768 ? '0.5rem' : '0.625rem',
-                borderRadius: '0.5rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                minWidth: window.innerWidth <= 768 ? '36px' : '44px',
-                height: window.innerWidth <= 768 ? '36px' : '44px'
-              }}
-              title="Logout"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#fef2f2';
-                e.currentTarget.style.color = '#dc2626';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#64748b';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <LogOut size={20} strokeWidth={2} />
-            </button>
-          </div>
-          {/* Voice functionality temporarily hidden until fully implemented */}
-          {/* 
-          <button
-            onClick={() => setIsListening(!isListening)}
-            style={{
-              background: isListening ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.2)',
-              border: `1px solid ${isListening ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.3)'}`,
-              color: 'white',
-              padding: '0.5rem',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-          </button>
-          */}
+          )}
+
+          {/* User Menu Dropdown — consolidated Settings, Admin, Progress, Memory, Logout */}
+          <UserMenuDropdown />
         </div>
       </header>
 
@@ -1602,6 +1393,9 @@ export default function GuidanceInterface() {
       
       {/* Debug overlay for troubleshooting auth issues in production */}
       {showDebug && <DebugAuth />}
+
+      {/* Engagement Tour — only shows for authenticated users who haven't completed it */}
+      <EngagementTour open={showTour} onClose={closeTour} />
     </div>
   );
 }

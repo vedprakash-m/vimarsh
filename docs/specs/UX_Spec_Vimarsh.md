@@ -336,6 +336,12 @@ The Intelligent Onboarding System guides new users from landing to first meaning
 - User clicks "Start Your Journey" CTA
 - Anonymous user without conversation history
 
+**Implementation Requirements:**
+- There must be exactly ONE onboarding system. The Onboarding Wizard and the Engagement Tour must be merged into a single unified flow — not two competing systems.
+- The onboarding wizard must NEVER auto-show on API errors. If the onboarding state API call fails (e.g., for a new user), the system should treat this as "not yet onboarded" and allow the user to proceed to the Guidance Interface, where a gentle inline prompt can offer onboarding.
+- The onboarding wizard must NEVER show on the Landing Page for authenticated users. Authenticated users should be redirected to /guidance immediately — the landing page is for unauthenticated marketing only.
+- The EngagementTourWrapper must render INSIDE the Router and only for authenticated users on the /guidance route, never globally.
+
 **Flow Diagram:**
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -1502,10 +1508,21 @@ Settings Page Accessibility:
 **Header Navigation Update:**
 ```
 Before: [Memory indicator] [Streak] [Archive 📖] [Admin] [Logout]
-After:  [Memory indicator] [Streak] [⚙️ Settings] [Admin] [Logout]
+After:  [Personality Badge] | [⚙️ Settings] [👤 User Menu ▾]
 
-Rationale: Settings icon is more universal and discoverable than Archive button
-Archive link moves to Settings → My Profile → Quick Access section
+User Menu Dropdown contains:
+  - User name + email
+  - 📊 Progress Dashboard
+  - 🧠 Memory Dashboard
+  - ⚙️ Settings  
+  - 🛡️ Admin Panel (admin only)
+  - 🚪 Sign Out
+
+Rationale: 
+  - Reduces header clutter from 6+ icon-only buttons to 2-3 clear actions
+  - User avatar dropdown is a universal pattern (Google, GitHub, Slack)
+  - Personality badge remains prominent as primary context indicator
+  - Memory and streak metrics move to the dropdown or a subtle header status area
 ```
 
 **Context Provider Integration:**
@@ -1548,6 +1565,23 @@ Database Schema (Cosmos DB user_preferences):
 All Settings UI elements follow the Apple-inspired design system established in section 3.4:
 - Typography: -apple-system, SF Pro Display font stack
 - Color Palette: Domain-themed accents with neutral base
+
+**Implementation Requirements:**
+```
+CRITICAL: The Settings page must use the vimarsh-design-system.css custom properties 
+and inline styles consistent with the rest of the app. 
+
+DO NOT use Tailwind CSS utility classes — Tailwind is not configured with a 
+tailwind.config.js or PostCSS pipeline, so Tailwind classes will not render.
+
+Instead, use:
+  - CSS custom properties from vimarsh-design-system.css (--sacred-saffron, etc.)
+  - Inline styles matching the patterns in GuidanceInterface and LandingPage
+  - The app's existing font stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', etc.
+
+The Settings page must import useAuth from '../auth/AuthProvider' — NOT from 
+'../context/AuthContext' (which is an orphaned legacy module).
+```
 - Spacing: 8px grid system for visual rhythm
 - Animation: Subtle, purposeful transitions (150ms ease-in-out)
 - Components: Reusable form elements with consistent styling
@@ -1583,6 +1617,19 @@ System Experience:
 
 User State: Authenticated and ready to engage
 Design Goal: Seamless enterprise-grade security with wisdom context
+```
+
+**Auth Callback Implementation Requirements:**
+```
+CRITICAL: The auth callback (/auth/callback) must NOT introduce artificial delays.
+  - NO setTimeout delays for "state settling" — MSAL's handleRedirectPromise() 
+    is sufficient.
+  - NO "stabilization delays" on the Landing Page redirect.
+  - The callback should: process redirect → refresh auth → navigate to /guidance
+    in a single synchronous flow.
+  - Total time in callback screen: < 500ms (excluding Microsoft's redirect time).
+  - There must be exactly ONE auth provider (AuthProvider in src/auth/). 
+    Any legacy auth contexts (e.g., src/context/AuthContext.tsx) must be removed.
 ```
 
 **Single Sign-On Experience (Current Implementation):**

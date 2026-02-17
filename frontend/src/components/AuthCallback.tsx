@@ -56,10 +56,7 @@ const AuthCallback: React.FC = () => {
         await refreshAuth();
         console.log('✅ AuthCallback: Auth state refreshed');
 
-        // Wait for state to settle, then validate authentication
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Validate final authentication state
+        // Validate final authentication state (no artificial delays)
         const accounts = instance.getAllAccounts();
         const activeAccount = instance.getActiveAccount();
         
@@ -73,11 +70,8 @@ const AuthCallback: React.FC = () => {
         
         setProcessing(false);
         
-        // Navigate to guidance page after successful processing and validation
-        // Add a longer delay to ensure all contexts have time to initialize
-        setTimeout(() => {
-          navigate('/guidance', { replace: true });
-        }, 1200);
+        // Navigate immediately — no artificial delays needed
+        navigate('/guidance', { replace: true });
 
       } catch (error) {
         console.error('❌ Multi-domain authentication callback failed:', error);

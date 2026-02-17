@@ -41,10 +41,7 @@ export const AppLoadingProvider: React.FC<AppLoadingProviderProps> = ({ children
       if (process.env.NODE_ENV === 'development') {
         console.log('🎉 AppLoading: All contexts ready, app fully initialized');
       }
-      // Small delay to ensure UI state is consistent
-      setTimeout(() => {
-        setIsInitializing(false);
-      }, 100);
+      setIsInitializing(false);
     }
   }, [allReady, isInitializing]);
 

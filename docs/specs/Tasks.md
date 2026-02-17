@@ -242,33 +242,108 @@
 
 ---
 
+## Phase 4: UX Revamp — Login-to-Logout Experience
+
+> **Goal:** Fix the 5 critical UX problems identified in the Steve Jobs/Jony Ive audit: auth cascade, competing onboarding systems, confusing navigation, unstyled Settings, and inconsistent Admin panel.  
+> **Dependency:** After Phase 2 (especially 2.6 unified API, 2.7 component split).  
+> **Approach:** Fix in dependency order — auth stability first, then navigation, then pages.
+
+### 4.1 Fix Auth Callback Cascade (Remove Artificial Delays)
+**Priority:** P0 UX | **Risk:** High — users see 5+ screen transitions on every login  
+**Problem:** AuthCallback.tsx has 1000ms + 1200ms delays. LandingPage has 500ms redirect delay. AppLoadingContext has 100ms delay. Combined: 3+ seconds of unnecessary waiting across multiple flashing screens.  
+**Solution:** Remove all artificial delays. Auth callback should process redirect → refresh → navigate in one flow.
+
+| # | Task | Status | Files |
+|---|------|--------|-------|
+| 4.1.1 | Remove 1000ms "state settling" await from AuthCallback | ✅ | `frontend/src/components/AuthCallback.tsx` |
+| 4.1.2 | Remove 1200ms setTimeout before navigate('/guidance') | ✅ | `frontend/src/components/AuthCallback.tsx` |
+| 4.1.3 | Remove 500ms redirect delay from LandingPage | ✅ | `frontend/src/components/LandingPage.tsx` |
+| 4.1.4 | Remove 100ms delay from AppLoadingContext | ✅ | `frontend/src/contexts/AppLoadingContext.tsx` |
+| 4.1.5 | Remove MSAL initialization retry loop (5×500ms) from AuthProvider | ✅ | `frontend/src/auth/AuthProvider.tsx` |
+
+### 4.2 Eliminate Orphaned Auth Context
+**Priority:** P0 UX | **Risk:** High — AccountTab uses wrong auth provider, logout may break  
+**Problem:** `frontend/src/context/AuthContext.tsx` is an orphaned legacy module with a different interface (AuthUser vs AccountInfo). `AccountTab.tsx` imports `useAuth` from this wrong path, causing potential runtime errors when `user?.email` doesn't exist.  
+**Solution:** Delete orphaned context, fix AccountTab import.
+
+| # | Task | Status | Files |
+|---|------|--------|-------|
+| 4.2.1 | Fix AccountTab: import useAuth from `../../auth/AuthProvider` | ✅ | `frontend/src/components/Settings/AccountTab.tsx` |
+| 4.2.2 | Update AccountTab to use `account?.username` instead of `user?.email` | ✅ | `frontend/src/components/Settings/AccountTab.tsx` |
+| 4.2.3 | Delete orphaned `frontend/src/context/AuthContext.tsx` | ✅ | `frontend/src/context/AuthContext.tsx` (deleted) |
+| 4.2.4 | Verify no other files import from `context/AuthContext` | ✅ | Grep confirmed; updated test mocks in `setupTests.ts` |
+
+### 4.3 Fix EngagementTour Placement & Onboarding Unification
+**Priority:** P0 UX | **Risk:** High — modal fires on every page load for new users, blocks app  
+**Problem A:** `EngagementTourWrapper` renders in App.tsx OUTSIDE the Router, fires globally based on localStorage only (no auth check). Shows 6-step modal within 1.5s of ANY page load.  
+**Problem B:** Two competing onboarding systems: EngagementTour (localStorage-based, engagement features) and OnboardingWizard (API-based, personality quiz). Both can fire simultaneously.  
+**Problem C:** LandingPage shows OnboardingWizard on API error (catch block defaults to `setShowOnboarding(true)`).  
+**Solution:** Move EngagementTour inside /guidance route (auth-gated), fix onboarding error handling.
+
+| # | Task | Status | Files |
+|---|------|--------|-------|
+| 4.3.1 | Remove `EngagementTourWrapper` from App.tsx (global scope) | ✅ | `frontend/src/App.tsx` |
+| 4.3.2 | Add EngagementTour to GuidanceInterface (only shows for authenticated users on /guidance) | ✅ | `frontend/src/components/GuidanceInterface.tsx` |
+| 4.3.3 | Fix LandingPage: don't show OnboardingWizard on API error — treat as "new user, skip" | ✅ | `frontend/src/components/LandingPage.tsx` |
+| 4.3.4 | Remove onboarding wizard from LandingPage for authenticated users (they redirect to /guidance) | ✅ | Already handled by redirect logic |
+
+### 4.4 Revamp Navigation Header (User Menu Dropdown)
+**Priority:** P1 UX | **Risk:** Medium — confusing icon-only buttons, no discoverability  
+**Problem:** GuidanceInterface header has 6-8 icon-only buttons (personality badge, memory indicator, streak display, settings gear, admin emoji ⚙️, logout arrow). Personality name truncated to 100px. Uses `window.innerWidth` instead of CSS media queries.  
+**Solution:** Replace icon row with a clean personality badge + user avatar dropdown menu.
+
+| # | Task | Status | Files |
+|---|------|--------|-------|
+| 4.4.1 | Create UserMenuDropdown component with avatar, name, and menu items | ✅ | `frontend/src/components/UserMenuDropdown.tsx` (new, ~260 lines) |
+| 4.4.2 | Replace icon-only buttons in GuidanceInterface header with UserMenuDropdown | ✅ | `frontend/src/components/GuidanceInterface.tsx` (header reduced from ~260 to ~60 lines) |
+| 4.4.3 | Move Memory, Progress, Admin links into dropdown menu | ✅ | `frontend/src/components/UserMenuDropdown.tsx` |
+| 4.4.4 | Replace `window.innerWidth` checks with CSS media queries | ⏳ | Deferred: removed from header, still present in body (separate task) |
+
+### 4.5 Rewrite Settings Page Styling
+**Priority:** P1 UX | **Risk:** Medium — Tailwind classes don't render (no config), page looks broken  
+**Problem:** UserSettings.tsx and all 5 tab components use Tailwind utility classes (e.g., `className="min-h-screen bg-gray-50"`), but there's no `tailwind.config.js` or PostCSS config in the frontend. Classes don't compile → page renders with no styling. Also uses emoji icons (👤 ✨ 🔔 🔒 ⚙️) instead of proper icons.  
+**Solution:** Create settings-utilities.css providing CSS utility classes matching the vimarsh design system. Replace emoji icons with Lucide React icons. Fix complex patterns (toggle switches, group-hover) with component CSS classes.
+
+| # | Task | Status | Files |
+|---|------|--------|-------|
+| 4.5.1 | Create settings-utilities.css with utility classes + import in UserSettings | ✅ | `frontend/src/styles/settings-utilities.css` (new, 427 lines), `frontend/src/pages/UserSettings.tsx` |
+| 4.5.2 | Replace emoji tab icons with Lucide React icons | ✅ | `frontend/src/pages/UserSettings.tsx` (User, Sparkles, Bell, Shield, Settings icons) |
+| 4.5.3 | Fix toggle switches (NotificationsTab) — replace complex Tailwind peer/after patterns with CSS component class | ✅ | `frontend/src/components/Settings/NotificationsTab.tsx` |
+| 4.5.4 | Fix gradient hover button (AccountTab) — replace Tailwind gradient hover with inline style | ✅ | `frontend/src/components/Settings/AccountTab.tsx` |
+| 4.5.5 | Fix text size preview (ExperienceTab) — replace conditional Tailwind classes with inline style | ✅ | `frontend/src/components/Settings/ExperienceTab.tsx` |
+| 4.5.6 | Add missing focus ring and checkbox accent color utility classes | ✅ | `frontend/src/styles/settings-utilities.css` |
+
+### 4.6 Unify Admin Panel Design System
+**Priority:** P2 UX | **Risk:** Low-Medium — admin panel looks like a different app  
+**Problem:** AdminDashboard.tsx imports `admin.css` (1,215 lines) with completely different design tokens: Inter font instead of system stack, blue gradient sidebar instead of orange brand, separate spacing/shadow variables. It's the only place in the app with a sidebar navigation.  
+**Solution:** Apply consistent design from vimarsh-design-system.css. Replace sidebar with tab-based layout matching the rest of the app.
+
+| # | Task | Status | Files |
+|---|------|--------|-------|
+| 4.6.1 | Replace admin.css color tokens with vimarsh-design-system.css variables | ⏳ | Deferred: gray/spacing tokens already aligned |
+| 4.6.2 | Replace Inter font with app-wide system font stack | ✅ | `frontend/src/styles/admin.css` |
+| 4.6.3 | Replace blue gradient sidebar with orange-tinted brand-consistent header | ✅ | `frontend/src/styles/admin.css` (gradient now blue→saffron) |
+
+---
+
 ## Execution Order & Dependencies
 
 ```
 Phase 0 (Specs)          ← DONE
   │
-Phase 1 (P0 Security)   ← START HERE
-  ├── 1.1 Auth fail-closed        (no deps)
-  ├── 1.2 Settings API fix        (no deps)
-  ├── 1.3 Engagement auth         (no deps)
-  ├── 1.4 CORS fix                (no deps)
-  └── 1.5 Cosmos key to KV        (no deps)
+Phase 1 (P0 Security)   ← DONE
   │
-Phase 2 (P1 Architecture)
-  ├── 2.1 Blueprint split         (after 1.1 — auth must be stable first)
-  ├── 2.2 Gemini migration        (no deps, can parallel with 2.1)
-  ├── 2.3 DB name standardize     (no deps)
-  ├── 2.4 Bicep container sync    (after 2.3)
-  ├── 2.5 Conversation history    (after 2.1 — uses new route structure)
-  ├── 2.6 Unify API client        (after 1.2, 1.3 — correct patterns first)
-  └── 2.7 Component split         (after 2.6 — split uses unified API)
+Phase 2 (P1 Architecture) ← DONE (2.7.6-2.7.8 deferred)
   │
-Phase 3 (P2 Quality)
-  ├── 3.1 Test thresholds         (after Phase 2 — code must be stable)
-  ├── 3.2 CI lint/typecheck       (after Phase 2)
-  ├── 3.3 Archive dead services   (after 2.2)
-  ├── 3.4 Stale closure fix       (after 2.6)
-  └── 3.5 Region co-location      (deferred — requires infra access)
+Phase 3 (P2 Quality)    ← IN PROGRESS
+  │
+Phase 4 (UX Revamp)      ← DONE (4.4.4 and 4.6.1 deferred)
+  ├── 4.1 Auth cascade fix        ✅
+  ├── 4.2 Orphaned AuthContext     ✅
+  ├── 4.3 EngagementTour fix       ✅
+  ├── 4.4 Navigation revamp        ✅ (4.4.4 body media queries deferred)
+  ├── 4.5 Settings rewrite         ✅
+  └── 4.6 Admin consistency        ✅ (4.6.1 full token replacement deferred)
 ```
 
 ---
@@ -280,7 +355,8 @@ After each phase, verify:
 - **Phase 1:** `pytest backend/tests/` passes, `npm test` passes, settings save round-trips in browser, no wildcard CORS in Bicep
 - **Phase 2:** `pytest backend/tests/` passes, `npm run build` succeeds, `npm run type-check` clean, no `google.generativeai` imports in `backend/services/`
 - **Phase 3:** CI pipeline runs lint + typecheck, coverage thresholds enforced, `backend/services/` has < 30 active files
+- **Phase 4:** `npm run build` succeeds, no TypeScript errors, no imports from `context/AuthContext`, all Settings tabs render styled (visual check), auth callback completes in < 500ms (no artificial delays), EngagementTour only shows for authenticated users on /guidance route
 
 ---
 
-*Last updated: 2026-02-15*
+*Last updated: 2025-07-25*

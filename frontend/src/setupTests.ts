@@ -190,6 +190,12 @@ jest.mock('./context/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children
 }));
 
+// Also mock the canonical auth path for components that import from auth/AuthProvider
+jest.mock('./auth/AuthProvider', () => ({
+  useAuth: () => mockAuthValue,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children
+}));
+
 // Mock SettingsContext globally for all tests
 const mockSettings = {
   user_id: 'test-user-123',

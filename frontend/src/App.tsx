@@ -40,14 +40,11 @@ import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
 import AdminDashboard from './components/admin/AdminDashboard';
 
-// Engagement Tour
-import EngagementTour, { useEngagementTour } from './components/engagement/EngagementTour';
+// Engagement Tour - now rendered inside GuidanceInterface only (auth-gated)
+// import EngagementTour, { useEngagementTour } from './components/engagement/EngagementTour';
 
-// Engagement Tour Wrapper - auto-shows tour for new users
-const EngagementTourWrapper: React.FC = () => {
-  const { showTour, closeTour } = useEngagementTour();
-  return <EngagementTour open={showTour} onClose={closeTour} />;
-};
+// EngagementTourWrapper removed from global scope — now rendered inside GuidanceInterface
+// where it only shows for authenticated users on the /guidance route
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -129,7 +126,6 @@ function App() {
               <MemoryProvider>
               <EngagementProvider>
               <SettingsProvider>
-              <EngagementTourWrapper />
               <AppLoadingProvider>
                 <LanguageProvider>
                 <DomainThemeManager />

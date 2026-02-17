@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, User, Sparkles, Bell, Shield, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SettingsProvider, useSettings } from '../contexts/SettingsContext';
 import MyProfileTab from '../components/Settings/MyProfileTab';
@@ -8,21 +8,22 @@ import NotificationsTab from '../components/Settings/NotificationsTab';
 import MemoryPrivacyTab from '../components/Settings/MemoryPrivacyTab';
 import AccountTab from '../components/Settings/AccountTab';
 import '../styles/vimarsh-design-system.css';
+import '../styles/settings-utilities.css';
 
 type TabType = 'profile' | 'experience' | 'notifications' | 'memory' | 'account';
 
 interface Tab {
   id: TabType;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
 }
 
 const tabs: Tab[] = [
-  { id: 'profile', label: 'My Profile', icon: '👤' },
-  { id: 'experience', label: 'Experience', icon: '✨' },
-  { id: 'notifications', label: 'Notifications', icon: '🔔' },
-  { id: 'memory', label: 'Memory & Privacy', icon: '🔒' },
-  { id: 'account', label: 'Account', icon: '⚙️' },
+  { id: 'profile', label: 'My Profile', icon: <User className="w-4 h-4" /> },
+  { id: 'experience', label: 'Experience', icon: <Sparkles className="w-4 h-4" /> },
+  { id: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
+  { id: 'memory', label: 'Memory & Privacy', icon: <Shield className="w-4 h-4" /> },
+  { id: 'account', label: 'Account', icon: <Settings className="w-4 h-4" /> },
 ];
 
 const UserSettingsContent: React.FC = () => {
@@ -81,7 +82,7 @@ const UserSettingsContent: React.FC = () => {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">⚙️</span>
+            <Settings className="w-6 h-6 text-gray-600" />
             <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
           </div>
           <button

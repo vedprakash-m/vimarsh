@@ -408,6 +408,8 @@ const LandingPage: React.FC = () => {
   };
 
   // Check onboarding status for authenticated users (with circuit breaker)
+  // Note: Authenticated users are redirected to /guidance anyway, so this primarily
+  // handles the brief moment before redirect. Don't show onboarding wizard on errors.
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       // Circuit breaker: prevent multiple concurrent checks
@@ -426,8 +428,8 @@ const LandingPage: React.FC = () => {
           setOnboardingChecked(true);
         } catch (error) {
           console.log('📋 Onboarding check skipped (new user or service unavailable)');
-          // For new users, show onboarding wizard
-          setShowOnboarding(true);
+          // Don't show onboarding on error — let user proceed to /guidance naturally
+          // The onboarding can be offered there in a non-blocking way
           setOnboardingChecked(true);
         } finally {
           setOnboardingCheckInProgress(false);
@@ -451,30 +453,17 @@ const LandingPage: React.FC = () => {
 
   // Redirect authenticated users - wait for contexts to be ready to prevent cascading loads
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
     // Allow preview of landing page even when authenticated
     const params = new URLSearchParams(location.search);
     const isPreview = params.get('preview') === '1' || params.get('preview') === 'true';
 
     if (isAuthenticated && account && !isPreview && contextsReady) {
-      console.log('🔄 LandingPage: Authenticated user detected, contexts ready, scheduling redirect');
+      console.log('🔄 LandingPage: Authenticated user detected, contexts ready, redirecting');
       console.log('👤 User account:', account.username || account.name);
-      
-      // Stabilization delay to ensure auth state is fully settled (prevents redirect loops)
-      timeoutId = setTimeout(() => {
-        console.log('🚀 LandingPage: Executing redirect to /guidance');
-        navigate('/guidance', { replace: true });
-      }, 500); // Increased from 100ms to 500ms for better auth state stability
+      navigate('/guidance', { replace: true });
     } else if (isAuthenticated && account && !isPreview && !contextsReady) {
       console.log('⏳ LandingPage: Waiting for contexts to initialize before redirect...');
     }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
   }, [isAuthenticated, account, navigate, location.search, contextsReady]);
 
   const handleSignIn = async () => {
