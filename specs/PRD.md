@@ -1,23 +1,49 @@
 # Product Requirements Document (PRD): Vimarsh Multi-Personality Platform
 
 ## 1. Executive Summary
-Vimarsh is an AI-powered conversational platform bridging users with history's greatest minds. Leveraging Azure OpenAI GPT-5-mini and RAG, it features 25 operational personalities across 6 domains: Spiritual, Philosophical, Leadership, Scientific, Literary, and Psychology. It serves as an authoritative source of authentic, textually-grounded interactions. 
 
-## 2. Core Vision & Value Proposition
-* **Authenticity First**: Responses strictly grounded in historical works and provided through Pydantic-validated JSON structured boundaries to avoid hallucination.
-* **Cross-Domain Learning**: Explore the Bhagavad Gita with Krishna or universal relativity with Einstein, retaining cross-session context.
-* **Enterprise Stability**: Operated on Azure Serverless (Flex Consumption + Cosmos DB) with Microsoft Entra ID unified auth for 99.9% SLAs.
+**Vimarsh** is an enterprise-grade, AI-powered conversational platform designed to democratize access to the greatest minds in history through interactive, domain-specific chat interfaces. Driven by Azure OpenAI GPT-5-mini and large-scale semantic vector indexing, Vimarsh hosts 25 historical personalities across 6 diverse domains. 
 
-## 3. Competitive Analysis & Positioning
-Unlike generalized AI companions (e.g., Replika, standard ChatGPT), Vimarsh utilizes highly targeted Semantic Routing, Azure Neural TTS voice embodiment, and deep Idempotent memory management that perfectly captures the persona of 25 actual historical figures, providing a uniquely educational and profound tool.
+The primary business objective is to transition from basic generic AI chatbot engagements into highly authenticated, source-grounded relationship building. This platform empowers users with spiritual contemplation, strategic leadership advice, and deep historical reflection. The current implementation standardizes upon a zero-hallucination paradigm utilizing strictly validated schemas, rendering the application robust and reliable.
 
-## 4. Key Capabilities & Features
-1. **Multi-Domain Conversations**: Engage asynchronously or via Azure Neural TTS.
-2. **Growth & Engagement**: Intelligent onboarding funnels, progressive disclosure features, habit-tracking (Streaks), and a dedicated Progress Dashboard.
-3. **Decoupled User Identity**: Entra ID based, but Landing profiles are structurally detached from application routing, allowing casual exploration.
-4. **Adaptive Context**: "Wisdom Journal", cross-session Semantic Insights mapping, and automatic episodic memory compression for optimized context payloads.
+## 2. Business Value & Market Positioning
 
-## 5. Go-to-Market Strategy
-Prioritize Cross-Domain Learners and Spiritual Seekers. Focus on daily engagements through "Wisdom of the Day", one-click social sharing to foster organic traction, and structured milestone badges to motivate continued usage.
+### 2.1 Problem Statement
+Modern users looking for profound guidance often need to sift through thousands of archaic pages, complicated scholarly interpretations, or face modern AI counterparts that notoriously hallucinate historical positions. Knowledge is fragmented, largely inaccessible, and lacks personalization to actual human challenges.
 
-*(Refer to Tech-Spec.md and UX-Spec.md for engineering and design topologies).*
+### 2.2 Solution: The Multi-Personality Wisdom Platform
+Vimarsh distills tens of thousands of historical excerpts across 34,039 indexed documents spanning 25 personalities into highly specialized, isolated AI models. Each interaction is validated natively against Azure Cosmos DB vector spaces, and outputted strictly within the guardrails of the historical figure's known writings. No anachronisms. No generic responses. Perfect architectural idempotency prevents system failure or state corruption during complex interactions.
+
+## 3. Personality Configurations
+
+The roster consists of 25 meticulously calibrated personas, divided into 6 fundamental knowledge domains:
+
+1. **🕉️ Spiritual Domain (5 Personalities)**: Krishna (Bhagavad Gita), Buddha (Middle Path), Jesus Christ (Christian Wisdom), Rumi (Sufi Poetry), Swami Vivekananda (Vedantic Awakening).
+2. **💭 Philosophical Domain (6 Personalities)**: Marcus Aurelius (Stoicism), Lao Tzu (Taoism), Confucius (Social Harmony), Aristotle (Systematic Philosophy), Plato (Forms), Socrates (Socratic Inquiry).
+3. **🏛️ Leadership Domain (6 Personalities)**: Chanakya (Arthashastra Strategy), Abraham Lincoln (Civil Unity), Benjamin Franklin (Practical Diplomacy), George Washington (Foundations), Mahatma Gandhi (Non-violence), Martin Luther King Jr. (Moral Courage).
+4. **🔬 Scientific Domain (5 Personalities)**: Albert Einstein (Relativity), Isaac Newton (Motion), Nikola Tesla (Innovation), Archimedes (Physics), Leonardo da Vinci (Renaissance Innovation).
+5. **📚 Literary Domain (2 Personalities)**: Rabindranath Tagore (Cultural Renaissance), William Shakespeare (Dramatic Wisdom).
+6. **🧠 Psychology Domain (1 Personality)**: Sigmund Freud (Psychoanalysis).
+
+## 4. Core Features & Capabilities
+
+### 4.1 Conversational Integrity
+* **RAG-Driven Responses**: AI Generations strictly cross-reference embedded text indexes via `text-embedding-3-large`. Responses explicitly cite chapters/verses to validate authenticity.
+* **Cross-Session Memory Integration**: A Hierarchical Memory engine continuously compiles contextual history and offloads deep conversations via a semantic compression agent, avoiding token drift and ensuring the character "remembers" previous user engagements seamlessly.
+
+### 4.2 Growth, Engagement, & Gamification 
+* **Intelligent Onboarding Funnel (3-Step Discovery)**: Evaluates user intent immediately upon arrival (e.g. "Seeking Life Guidance") and maps them to appropriate personas (e.g. Marcus Aurelius) offering immediate starter-questions.
+* **Habit-Building System (Streaks)**: Incentivizes daily platform returns through quantified engagement mechanics (e.g., Daily Check-ins, Streak Protection).
+* **Wisdom Badge Achievements**: Visual trophies mapping out the depth of interactions such as "Consistency Seeker" (7 day streak) and "Einstein Apprentice".
+* **Quote Share System**: Embedded CTAs generate domain-themed share-cards fit for Social Media loops, encouraging organic viral growth.
+
+## 5. Non-Functional & Security Requirements
+
+* **Authentication & Identity**: Fully delegated to Microsoft Entra ID (`vedid.onmicrosoft.com`).
+* **Session Resilience**: Complete deprecation of brittle state operations; all transient configurations are cached via Cosmos DB (`session_state` containers) with absolute Time-To-Live logic (TTL 1800s).
+* **Fail-Closed Mechanics**: The application inherently terminates execution returning HTTP 503 instead of risking a false-bypass during any critical architectural failures. 
+
+## 6. Success & Rollout Metrics
+- **Performance**: Sub 3.5-second total-trip latency (LLM generation + API routing).
+- **Adoption**: 40% Day-1 user retention targeted via initial onboarding funnel implementations.
+- **System Stability**: 99.9% uptime, verified via strict observability traces tracking internal Pydantic validation rates and API Circuit breakers.

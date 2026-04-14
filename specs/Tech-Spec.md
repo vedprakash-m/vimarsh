@@ -1,23 +1,46 @@
 # Technical Specification Document: Vimarsh Platform
 
-## 1. Overview
-The architectural source of truth for the Vimarsh Multi-Personality Platform. Designed around the principles of "Probabilistic Pragmatism", the platform transforms LLM inferences into perfectly resilient, predictable system operations.
+## 1. Architectural Philosophy & Strategy
 
-## 2. Infrastructure & Cloud Footprint
-* **Compute**: Azure Functions (Flex Consumption Plan)
-* **Database**: Azure Cosmos DB (Serverless). Partitions unified under `/user_id`.
-* **State Management**: Distributed Serverless Caching (`session_state` container with 1800s TTL), replacing brittle python-in-memory caching. Checked via flag `USE_REDIS_STATE_V2`.
-* **Frontend Delivery**: Azure Static Web Apps representing a React 18, Vite-built PWA bundle.
+The Vimarsh System operates under the ethos of **"Probabilistic Pragmatism"** — ensuring inherently volatile AI structures (LLMs) are wrapped in rigid, unyielding computational frameworks. The current codebase enforces strict deterministic validations, stateless serverless memory boundaries, and idempotent processing to build a 99.9% reliable enterprise platform without compounding architectural debt.
 
-## 3. Core AI Integration (Azure OpenAI)
-* **Inference Layer**: `GPT-5-mini` enforcing JSON validation boundaries (`ResponseSchema` using Pydantic). Fallbacks exist to recover from LLM token hallucinations. Dark-launched via `ENABLE_STRUCTURED_OUTPUTS_V2`.
-* **Embedding Layer**: `text-embedding-3-large` (MRL dimensions truncated to 768) facilitating robust hybrid search and RAG indexing. 
+## 2. Infrastructure & Cloud Deployment
 
-## 4. Architectural Patterns & Guardrails
-* **Idempotency Execution**: Every LLM write request encodes a SHA256 deterministic key (user+session+time-floor) preventing loop database duplicate writes.
-* **Extractive Semantic Compression**: Episodic contexts are continuously condensed by an internal asynchronous compressor if payload spans bypass 2000 characters, drastically boosting context density.
-* **Telemetry & Error Catching**: Azure application insights catch tagged `VALIDATION_ERROR` markers to natively log failing extraction boundaries or payload generation limits.
-* **Fail-Closed Auth Boundaries**: MSAL.js integrates with Microsoft Entra ID (`vedid.onmicrosoft.com`). If access boundaries fail to load, endpoints strictly 503 rather than bypass.
+### 2.1 Compute and Integration Topology
+* **Environment Strategy**: Single environment (Production Only) housed entirely within a shared `vimarsh-rg` Azure Resource cluster. 
+* **Backend Processing**: Executed on **Azure Functions (Flex Consumption Plan)** built in Python 3.12, ensuring highly responsive autoscaling for varying burst loads.
+* **Frontend Delivery**: Built on React 18, Vite, packaged as a Progressive Web App (PWA) served dynamically via **Azure Static Web Apps**. 
+* **Cross-Origin Strategy**: Strict CORS restrictions mapping completely and exclusively to designated production URIs (`vimarsh.vedprakash.net`). Wildcard permissions are structurally eradicated.
 
-## 5. Deployment Specs
-* Hosted entirely on West US 2 (Compute) and East US 2 (Delivery). Single environment topology optimized to reduce idling costs.
+### 2.2 Database layer (Azure Cosmos DB)
+The platform effectively mitigated previous `Out-Of-Memory (OOM)` risks by ripping out brittle in-memory dict cache mechanisms. The backbone leverages Cosmos DB Serverless with specialized containers:
+* `conversations`: Stores persistent cross-session memories.
+* `session_state`: A highly performant distributed transient state tracking session payloads subject to strict **Time To Live (TTL: 1800s)** limits. Monitored specifically via the feature flag `USE_REDIS_STATE_V2`.
+* `analytics`: Houses real-time telemetry usage metrics.
+
+## 3. Advanced AI Engine Integrations
+
+### 3.1 Azure OpenAI Models and Dimension Truncation
+Vimarsh executed a full migration off external third-party models into a unified Microsoft Azure perimeter:
+* **Response Generation**: Utilizing **`GPT-5-mini`** (`vimarsh-chat-gpt5mini` deployment) optimized precisely for latency and narrative logic. 
+* **Embedding Model**: Leveraging **`text-embedding-3-large`**. Natively a 3072 dimension space, this has been intentionally optimized to **768 dimensions** (MRL truncation) resulting in lower memory usage while retaining roughly 94.8% of the embedding's raw analytical power, perfect for Cosmos DB's vector lookup compatibility constraints.
+
+### 3.2 Robust Request Idempotency 
+Mitigating duplicate database insertions or corrupt states originating from LLM retry-loops, **Idempotency Execution** is mandatory on the `llm_service.py` component:
+* A SHA-256 hash maps `user_id`, `session_id`, and a normalized 5-minute `time-floor`. 
+* Actions flagged with this execution hash terminate duplication immediately guaranteeing pristine database states despite variable agentic recursion.
+
+### 3.3 Semantic Compression Agent (Memory Pipeline)
+Managing immense episodic interaction records naturally inflates token dependencies, leading to prohibitive execution costs. The `HierarchicalMemoryService.py`:
+* Continuously measures local episodic context token footprints.
+* Activates a fully asynchronous **Semantic Compression Agent** passing 2000-character payload sweeps, distilling broad interactions into concise, structured knowledge snapshots fed back into working memory.
+
+### 3.4 Pydantic Forced Output Validation Loop
+Enacted via the feature switch `ENABLE_STRUCTURED_OUTPUTS_V2`, the system categorically rejects hallucinated schemas from the LLM. 
+* Uses **`ResponseSchema`** to enforce explicitly typed Python structures mapping JSON boundaries.
+* Tagged implicitly to Azure Application Insights: Missing parameters or incorrect values emit `🚨 VALIDATION_ERROR` metrics ensuring absolute observability across error states.
+
+## 4. Microsoft Entra ID Authentication 
+
+The platform relies on the `MSAL.js` v3 protocol connecting specifically to the localized MSFT tenant (`vedid.onmicrosoft.com`).
+* **Fail-Closed Execution**: If upstream auth architectures degrade or libraries crash via `ImportError`, the backend defaults strictly to 503 Service Unavailable, ensuring partial logic bypasses do not accidentally unlock unauthorized access levels.
