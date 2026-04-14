@@ -83,11 +83,12 @@ class TestRateLimiter:
         # Should be blocked
         assert limiter.is_blocked(identifier)
         
-        # Mock time forward to test block expiry
+        # Mock time forward to test block expiry — patch the time module globally
+        # since auth.security_validator resolves to an instance in the auth package __init__
         current_time = time.time()
-        with patch('auth.security_validator.time.time') as mock_time:
-            mock_time.return_value = current_time + 1000  # 16+ minutes later
+        with patch('time.time', return_value=current_time + 1000):  # 16+ minutes later
             assert not limiter.is_blocked(identifier)
+
 
 
 class TestInputSanitizer:

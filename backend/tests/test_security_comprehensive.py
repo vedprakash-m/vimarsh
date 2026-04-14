@@ -630,8 +630,8 @@ class TestSecurityIntegration:
         mock_token = 'Bearer valid_jwt_token'
         
         with patch('auth.msal_token_validator.MSALTokenValidator') as mock_msal:
-            with patch('auth.security_validator.SecurityValidator') as mock_security:
-                with patch('auth.unified_auth_service.UnifiedAuthService') as mock_unified:
+            with patch('auth.SecurityValidator') as mock_security:
+                with patch('auth.UnifiedAuthService') as mock_unified:
                     
                     # Configure authentication flow mocks
                     mock_msal.return_value.validate_token = AsyncMock(return_value={
@@ -697,7 +697,7 @@ class TestSecurityIntegration:
             }
         ]
         
-        with patch('auth.security_validator.SecurityValidator') as mock_security:
+        with patch('auth.SecurityValidator') as mock_security:
             security_validator = mock_security.return_value
             
             for scenario in attack_scenarios:

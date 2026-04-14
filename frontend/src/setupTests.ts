@@ -185,12 +185,7 @@ const mockAuthValue = {
   loading: false
 };
 
-jest.mock('./context/AuthContext', () => ({
-  useAuth: () => mockAuthValue,
-  AuthProvider: ({ children }: { children: React.ReactNode }) => children
-}));
-
-// Also mock the canonical auth path for components that import from auth/AuthProvider
+// Mock the auth provider for components that import from auth/AuthProvider
 jest.mock('./auth/AuthProvider', () => ({
   useAuth: () => mockAuthValue,
   AuthProvider: ({ children }: { children: React.ReactNode }) => children
