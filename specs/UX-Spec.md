@@ -1,42 +1,88 @@
 # User Experience (UX) Specification: Vimarsh Platform
 
-## 1. Core UX Philosophy 
-"Authentic Wisdom Through Intuitive Design" defines the primary interaction framework for Vimarsh. Users exist within a constantly curated environment mapping visual weight to their chosen historical persona. Instead of bombarding the central conversational engine with redundant analytics and notifications, the platform adopts an Apple-inspired layout vocabulary built on simplicity, high-impact whitespace, and modular interface execution.
+| Document Information | |
+|---|---|
+| **Design Language** | Apple Clean Aesthetic / Domain CSS Modules |
+| **Platforms** | Native PWA (iOS, Android, macOS, Windows) |
 
-## 2. Global Component Refactoring & Separation
+## 1. Executive Summary
+"Authentic Wisdom Through Intuitive Design."
+The UX interface manages cognitive load by separating operational analytics from the conversation canvas. It introduces uncoupled routing for casual guests and natively bounds 6 distinct thematic CSS palettes based closely on historical personality selections.
 
-### 2.1 CSS Modular Disengagement
-The critical user interface `GuidanceInterface.tsx` has been methodically stripped of legacy, in-line React stylesheet bloat. All visual aesthetics map via global classes and strictly abstracted modular styling inside a distinct `GuidanceInterface.css`. This ensures highly predictable component behavior when injecting cross-domain themes and significantly lowers the render overhead.
+## 2. Empathy Maps & User Personas
 
-### 2.2 Uncoupled Landing Operations
-Prior iterations trapped prospective users within aggressive Microsoft Entra ID loops, alienating unauthenticated discovery. 
-* The `LandingPage.tsx` interface handles initial visitors using decoupled navigation rendering the marketing layout natively without prompting backend validations.
-* Conditional Context Actions route unauthenticated impressions to "Get Started", seamlessly converting authenticated cached impressions to a smooth "Go to Dashboard" route without aggressive redirection intercepts.
+### 2.1 Persona 1: "The Reflective Guru" (Seeker)
+- **Says**: "I need objective ancient philosophy applied to modern burnout."
+- **Thinks**: Wants profound answers without dense, academic, unnavigable text.
+- **Does**: Skims rapidly, focuses on aesthetic ease, utilizes quick mobile prompts.
+- **Feels**: Overwhelmed by modern choices. Demands visual calm (`Contemplative Wisdom` domain).
 
-## 3. Dynamic Domain Theming System
+### 2.2 Persona 2: "The Scholar" (Leader/Researcher)
+- **Says**: "Which exact scripture did this advice originate from?"
+- **Thinks**: Requires trust. Values correct citations. 
+- **Does**: Click source validations. Expects serious typography (`Timeless Authority`).
+- **Feels**: Skeptical of AI hallucinations. Demands strict accuracy.
 
-The interface contextually morphs aesthetics dynamically responding to the active persona in play (out of the 25 operational historical figures).
+## 3. Wireframes & Layout Mechanics
 
-* **🕉️ Spiritual Domain (Sacred Harmony)**: Characterized by profound warmth (`#f97316`). Subtle meditation lotus background micro-animations. Fonts utilize elegant strokes (Crimson Text) honoring authoritative spiritual scriptures.
-* **🔬 Scientific Domain (Rational Clarity)**: Heavily weighted to analytic visual processing (`#0066cc`). Interfaces implement clinical sharp lines, contrast-heavy laboratory silver layouts with structured equation/mathematical font rendering mapping figures like Einstein and Newton.
-* **🏛️ Historical & Leadership (Timeless Authority)**: Presidential Blues (`#1E40AF`) and robust, stoic typography (Montserrat) enforcing a sense of gravity and leadership legacy relevant to Lincoln and Martin Luther King Jr.
-* **💭 Philosophical (Contemplative Wisdom)**: Deliberate and highly readable formatting utilizing Greyscale frameworks (`#6b7280`). Employs low-glare reading features and margin-adjustments maximizing readability.
+### 3.1 Uncoupled Landing User Interface
+```mermaid
+graph TD
+    A[Global Top Nav: Vimarsh Logo / Settings] --> B[Hero Section: Apple-inspired Carousel Showcase]
+    B --> C[Intent Onboarding Modal: "What brings you here?"]
+    B --> D[Domain Selector: 25 Personalities Cards]
+    
+    C --> |Casual Click| E[Unauthenticated Preview Flow]
+    C --> |Auth Verified via MSAL| F[Native Route: /guidance]
+```
 
-## 4. Onboarding, Streaks & Achievement Engagement UX
+### 3.2 Main Conversational Canvas (`GuidanceInterface`)
+```text
++-------------------------------------------------------------+
+| Vimarsh 🔥 12 days    [🎭 Krishna ▼]   [Profile] [Settings] |
++-------------------------------------------------------------+
+|                                                             |
+|   +-----------------------------------------------------+   |
+|   | 🕉️ Krishna (Spiritual)                              |   |
+|   | ─────────────────────────────────────────────────── |   |
+|   |  "You have the right to work, but never to the      |   |
+|   |   fruit of work..."  [Bhagavad Gita 2:47]           |   |
+|   +-----------------------------------------------------+   |
+|   | 📤 Share Card    |    ➕ Wisdom Journal             |   |
+|                                                             |
+|   +-----------------------------------------------------+   |
+|   |  I am struggling with my responsibilities...     [↗] |   |
+|   +-----------------------------------------------------+   |
++-------------------------------------------------------------+
+```
 
-Relegating user abandonment risks naturally involves gamification and intelligent contextual guidance arrays.
+## 4. Design System & Domain Theming
+Legacy inline styling was globally deprecated replacing React bloat with `GuidanceInterface.css` component CSS. 
 
-### 4.1 Intelligent Onboarding Discovery
-New users face 'Blank Page Syndrome'. An initial multi-choice funnel probes intent:
-* *Example*: User chooses "Seeking guidance on a life decision".
-* *System Contextualization*: Promotes specific relevant figures (Marcus Aurelius/Krishna) injecting 3 ready-to-click prompt accelerators instantly engaging the conversation flow.
+| Domain | CSS Identifier | Color Token | Typography Rules |
+|---|---|---|---|
+| **Spiritual** | `theme-spiritual` | Saffron `#f97316` | Crimson Text (Citations) |
+| **Philosophical** | `theme-philosophy` | Stoic Gray `#6b7280` | Libre Baskerville |
+| **Leadership** | `theme-leadership` | Auth Blue `#1e40af` | Montserrat Headers |
+| **Scientific** | `theme-scientific` | Lab Teal `#14b8a6` | Monospaced Metrics |
 
-### 4.2 Ongoing Streak Incentivization
-* **Habit Tracking**: Located cleanly in the top visual header, chronological engagement counts increment positively per completed day with associated visual fire emojis.
-* **Streak Protection**: Provides an automated visual pass allowing users an occasional missing day preventing catastrophic disappointment/churn. 
-* Visual cues scale progressively celebrating key duration milestones (7 days, 30 days).
+## 5. Gamified Engagement Journeys
 
-### 4.3 PWA Capabilities & Central Hub Navigation 
-* Reusable, universal `Settings` dashboards consolidate all metrics (Application Privacy, Wisdom Achievements, and Entra metadata) mitigating navigation fatigue. 
-* **Native App Feel**: The entire frontend is configured as a robust Progressive Web Application ensuring iOS and Android system compatibility wrapping directly to the user's home screen.
-* Offline resilience mechanics guarantee conversational templates remain visually unbroken during abrupt connectivity loss.
+### 5.1 Onboarding
+```mermaid
+journey
+    title 60-Second Intent Onboarding
+    section 1. Context Assessment
+      Select Intent: 5: User
+      "Life advice": 5: Vimarsh
+    section 2. Persona Match
+      Match Chanakya: 5: Vimarsh
+      Accept Chanakya: 5: User
+    section 3. Prompts
+      Click Suggested Query: 4: User
+      Validates CosmosDB Memory: 5: Vimarsh
+```
+
+### 5.2 Streaks & Badges
+* **Consistency Ticker**: Centralized on the top navigation.
+* **PWA Capability**: Push notifications and background caching permit users continuous access even offline, triggering badges (e.g., "7-Day Consistent Seeker", "Einstein Apprentice").
