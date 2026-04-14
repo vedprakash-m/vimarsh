@@ -6,6 +6,7 @@
 | **Version** | 2.1 (April 2026) |
 | **Status** | Production — Live at [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) |
 | **Architecture** | Serverless microservices on Azure |
+| **Integrity** | Stateless workers with External Session State (TTL 1800s) |
 
 ---
 
@@ -19,12 +20,12 @@
                           │   (vimarsh-frontend / React 18 PWA)  │
                           │   vimarsh.vedprakash.net              │
                           └──────────────┬───────────────────────┘
-                                         │ HTTPS / REST
+                                         │ HTTPS / SSE (Streaming)
                                          ▼
                     ┌────────────────────────────────────────────────┐
                     │   Azure Functions (Flex Consumption Plan)      │
                     │   vimarsh-backend-app-flex                     │
-                    │   Python 3.12 · 7 Blueprints + 4 API packages │
+                    │   Python 3.12 · Stateless Worker Nodes         │
                     └───┬──────┬──────┬──────┬──────┬───────────────┘
                         │      │      │      │      │
             ┌───────────┘      │      │      │      └──────────┐
@@ -33,18 +34,16 @@
      │ Azure    │    │   Azure OpenAI Service      │    │ Azure Speech │
      │ Cosmos   │    │   (vimarsh-openai)           │    │ Service      │
      │ DB       │    │                              │    │ (TTS/SSML)   │
-     │          │    │ Chat: gpt-5.4-mini           │    └──────────────┘
-     │ 9+ cont. │    │ Embed: text-embedding-3-large│
+     │ (State)  │    │ Chat: gpt-5.4-mini (SSE)     │    └──────────────┘
+     │ 11+ cont.│    │ Embed: text-embedding-3-large│
      └──────────┘    └────────────────────────────────┘
 ```
 
 ### 1.2 Design Principles
 1. **100% Azure-native** — No cross-cloud dependencies (migrated from Google Gemini, Dec 2025)
-2. **Serverless-first** — Zero idle compute cost; auto-scale to demand
-3. **RAG-grounded** — Every AI response backed by vector-retrieved source material
-4. **Fail-closed security** — Authentication failures produce 503 (never bypass)
-5. **Budget-enforced** — Monthly ceiling ($50) with real-time cost tracking
-6. **Circuit-breaker resilient** — Three-layer protection against runaway API loops
+2. **Stateless Resilience** — 100% of working memory and session state offloaded to Cosmos `session_state` (TTL enabled) to prevent OOM in ephemeral workers.
+3. **Hardware Sympathy** — Minimal abstraction between the streaming LLM buffer and the browser DOM.
+4. **Structured Handoffs** — Strict JSON Schema enforcement for all personality configurations and agentic memory extracts.
 
 ---
 

@@ -17,6 +17,10 @@ const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
 const MemoryDashboard = lazy(() => import('./components/MemoryDashboard'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
 const UserSettings = lazy(() => import('./pages/UserSettings'));
+const WisdomInterface = lazy(() => import('./components/WisdomInterface'));
+
+// Check feature flag for rendering
+const useGamification = process.env.REACT_APP_ENABLE_GAMIFICATION !== 'false';
 
 // Memory Dashboard Page Wrapper (handles route-based rendering)
 const MemoryDashboardPage: React.FC = () => {
@@ -139,11 +143,11 @@ function App() {
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     
                                       {/* Guidance Interface - Protected Route */}
-                    <Route 
+                  <Route 
                     path="/guidance" 
                     element={
                       <ProtectedRoute>
-                        <GuidanceInterface />
+                        {useGamification ? <GuidanceInterface /> : <WisdomInterface />}
                       </ProtectedRoute>
                     } 
                   />

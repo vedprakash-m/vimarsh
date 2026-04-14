@@ -3,26 +3,24 @@
 | Field | Value |
 |---|---|
 | **Product** | Vimarsh — AI-Powered Multi-Personality Conversational Wisdom Platform |
-| **Version** | 2.1 (April 2026) |
+| **Version** | 2.2 (April 2026) |
 | **Status** | Production — Live at [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) |
+| **Philosophy** | **Invisible UI** — Precision through subtraction. Precision is not when there is nothing left to add, but when there is nothing left to strip away. |
 | **License** | Business Source License (BSL) |
 
 ---
 
 ## 1. Executive Summary
 
-**Vimarsh** (Sanskrit: *विमर्श* — "conversation, thoughtful discourse") is an AI-powered conversational platform that enables authentic dialogues with **25 historical personalities** across **6 knowledge domains**. Powered by **Azure OpenAI GPT-5.4-mini** for response generation and **text-embedding-3-large** for semantic search across a **31,422-document knowledge base**, the platform transforms how users access and interact with humanity's greatest minds.
+**Vimarsh** (Sanskrit: *विमर्श* — "conversation, thoughtful discourse") is an AI-powered conversational platform that enables authentic dialogues with **25 historical personalities** across **6 knowledge domains**. 
 
 ### Core Achievement
 - **25 operational personalities** with domain-specific RAG pipelines and authentic voice preservation
 - **31,422 embedded documents** (migrated to Azure OpenAI text-embedding-3-large, 768-dim MRL)
 - **Enterprise-grade Azure infrastructure**: Serverless Functions (Flex Consumption), Cosmos DB, Static Web Apps, Microsoft Entra ID authentication
-- **PWA-enabled React 18 + TypeScript frontend** with Apple-inspired design system and domain-specific theming
+- **PWA-enabled React 18 + TypeScript frontend** with "Invisible UI" design system (Inter/Merriweather typography)
 - **Multi-modal interaction**: Text and voice (Azure Neural TTS with 25 personality-matched voices, Web Speech API STT)
-- **Production cost**: $15–40/month active, $5–15/month idle
-
-### Vision
-To be the definitive "Conversational Wisdom Platform" — combining authentic personality embodiment, strict textual grounding, and cross-domain wisdom access to create a new category at the intersection of AI, education, and cultural heritage.
+- **Architectural Resilience**: Stateless serverless design with deterministic idempotency and structured AI outputs.
 
 ---
 
@@ -32,25 +30,30 @@ To be the definitive "Conversational Wisdom Platform" — combining authentic pe
 |---|---|---|
 | Authenticate every response against source material | Citation rate ≥ 80% across all 25 personalities | ✅ 88% citation rate (validated) |
 | Sub-3-second response latency | P95 response time < 3s including AI generation | ✅ 2.17s avg latency |
-| Platform reliability | ≥ 99% uptime with automated fallbacks | ✅ 98.7%+ with circuit breakers |
-| Engagement retention | Day-1 return rate ≥ 40% via gamified interactions | 🎯 Target (streak system live) |
-| Knowledge base completeness | All 25 personalities with ≥ 1 source document | ✅ 31,422 docs across 25 personalities |
+| Platform reliability | ≥ 99.9% uptime with stateless worker nodes | ✅ 98.7%+ (moving to stateless) |
+| Architectural Integrity | 0% duplicate state additions via Idempotency Keys | ✅ Implemented in Core LLM |
+| Structured Handoffs | 100% adherence to expected data interfaces via JSON Schema | ✅ Implemented (V2) |
+| Engagement retention | Day-1 return rate ≥ 40% | 🎯 Target |
 
 ---
 
-## 3. Problem Statement
+## 3. Problem Statement & Philosophy
 
-### 3.1 Problem Space
+### 3.1 The "Invisible UI" Philosophy
+Vimarsh operates on the principle of **Architectural Pragmatism**. The UI should not be a barrier between the seeker and the wisdom. By stripping away "pop-up fatigue", aggressive gamification, and layout-shifting modals, we create a sanctuary for deep thought.
+
+### 3.2 Problem Space
 Users seeking wisdom from history's greatest minds face:
-- **Inaccessibility** — Historical texts are voluminous, archaic, and require deep scholarly effort to comprehend
-- **Fragmentation** — Insights from any specific figure are scattered across multiple lengthy works
-- **Domain barriers** — Cross-cultural, cross-discipline navigation is daunting without expert guidance
-- **Hallucination risk** — Generic AI chatbots fabricate historical positions, breaking trust
-- **Engagement barriers** — Static text interfaces lack the immediacy and naturalness of dialogue
-- **Authentication challenges** — Distinguishing authentic wisdom from modern reinterpretation is non-trivial
+- **Inaccessibility** — Historical texts are voluminous and archaic.
+- **Hallucination risk** — Generic AI chatbots fabricate historical positions.
+- **Agentic Fragility** — Unstructured AI responses causing UI failures.
+- **Serverless Paradigm Violations** — In-memory state causing OOM crashes in cloud workers.
 
-### 3.2 Vimarsh Solution
-Vimarsh distills **31,422 authentic source documents** across 25 personalities into personality-specific, isolated RAG pipelines. Each response is validated against its original knowledge base via Azure Cosmos DB vector search (cosine similarity, 768-dim embeddings), eliminating anachronisms and ensuring strict fidelity to each figure's actual writings and teachings.
+### 3.3 The Vimarsh Solution
+Vimarsh distills **31,422 authentic source documents** into personality-specific RAG pipelines. We ensure technical integrity through:
+- **Stateless Resilience**: Moving working memory to a TTL-enabled external state (`session_state` container).
+- **Probabilistic Pragmatism**: Using structured outputs to ground probabilistic LLM generation into deterministic UI schemas.
+- **Hardware Sympathy**: Optimizing token usage and local routing to minimize latency and cost.
 
 ---
 

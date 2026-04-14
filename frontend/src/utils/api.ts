@@ -212,6 +212,84 @@ class SpiritualGuidanceAPI {
   }
 
   /**
+   * Get spiritual guidance from any personality with streaming (SSE)
+   */
+  async getSpiritualGuidanceStream(
+    request: SpiritualGuidanceRequest, 
+    onChunk: (chunk: string) => void,
+    onComplete: (fullResponse: SpiritualGuidanceResponse) => void,
+    onError: (error: any) => void
+  ): Promise<void> {
+    try {
+      const token = await this.getAuthToken();
+      const response = await fetch(`${this.config.baseURL}/guidance?stream=true`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Stream error: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error('Response body is null');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+      let metadata: any = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.chunk) {
+                fullText += parsed.chunk;
+                onChunk(parsed.chunk);
+              }
+              if (parsed.metadata) {
+                metadata = parsed.metadata;
+              }
+              if (parsed.full_response) {
+                onComplete(parsed.full_response);
+                return;
+              }
+            } catch (e) {
+              // Partial JSON or heartbeat
+            }
+          }
+        }
+      }
+
+      // If we finished the stream but didn't get full_response object
+      onComplete({
+        response: fullText,
+        metadata: metadata || {}
+      } as SpiritualGuidanceResponse);
+
+    } catch (error) {
+      console.error('❌ Stream Error:', error);
+      onError(error);
+    }
+  }
+
+  /**
    * Get spiritual guidance from any personality
    */
   async getSpiritualGuidance(request: SpiritualGuidanceRequest): Promise<SpiritualGuidanceResponse> {

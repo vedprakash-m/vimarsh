@@ -1,417 +1,58 @@
-# 🌟 Vimarsh - AI-Powered Multi-Personality Conversational Platform
+# 🌟 Vimarsh (विमर्श) — Conversational Wisdom Platform
 
-**Vimarsh** is an AI-powered conversational platform that enables authentic dialogues with **history's greatest minds** across **6 major domains** with **Enhanced RAG Service**. Experience personalized conversations with **25 operational personalities** including spiritual guides, scientific innovators, literary masters, philosophical thinkers, leadership figures, and psychological pioneers - each grounded in their authentic works with persistent conversation memory, wisdom journal integration, and progressive personalization.
-
-> *Bridging timeless wisdom across all domains of human knowledge with modern AI technology and persistent memory*
+AI-powered dialogues with 25 historical personalities grounded in 31,422 authentic source documents.
 
 [![CI/CD Pipeline](https://github.com/vedprakash-m/vimarsh/actions/workflows/unified-ci-cd.yml/badge.svg)](https://github.com/vedprakash-m/vimarsh/actions)
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![License: BSL](https://img.shields.io/badge/License-BSL-blue.svg)](LICENSE)
 [![Azure](https://img.shields.io/badge/Cloud-Azure-blue.svg)](https://azure.microsoft.com/)
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org)
 
-## 🌟 What is Vimarsh?
+## 🏛️ Philosophy: The Invisible UI
+Vimarsh is built on **Architectural Pragmatism**. The interface is designed to be invisible—precision through subtraction. By stripping away pop-up fatigue and aggressive gamification, we create a sanctuary for deep, soul-level interaction with history's greatest minds.
 
-**Vimarsh** is a multi-personality AI platform that brings together wisdom from across human history and domains of knowledge. Whether you seek guidance from Krishna, scientific insights from Einstein or Newton, leadership lessons from Lincoln or Chanakya, or philosophical wisdom from Marcus Aurelius or Confucius - each personality maintains their authentic voice, expertise, and cultural context.
+## 🚀 Key Achievements
+- **25 Personalities** across 6 domains (Spiritual, Philosophical, Leadership, Scientific, Literary, Psychology).
+- **RAG-Grounded Wisdom**: 31,422 embedded documents via Azure OpenAI `text-embedding-3-large` (768-dim MRL).
+- **Fluid Streaming**: SSE-based (Server-Sent Events) guidance for sub-second Time-to-First-Token (TTFT).
+- **Stateless Resilience**: 100% of working memory and session state offloaded to Azure Cosmos DB `session_state` (TTL 1800s) for robust serverless operation.
+- **Enterprise Security**: Microsoft Entra ID (Auth) with fail-closed circuit breakers.
 
-> **Sanskrit**: *विमर्श (Vimarsh)* - "conversation," "dialogue," or "thoughtful discourse"
+## 🎭 Meet the 25 Personalities
+- **Spiritual**: Krishna, Buddha, Jesus Christ, Rumi, Swami Vivekananda
+- **Philosophical**: Socrates, Plato, Aristotle, Confucius, Lao Tzu, Marcus Aurelius
+- **Leadership**: Abraham Lincoln, George Washington, Chanakya, MLK Jr., Gandhi, Benjamin Franklin
+- **Scientific**: Einstein, Newton, Tesla, Da Vinci, Archimedes
+- **Literary**: Shakespeare, Tagore
+- **Psychology**: Freud
 
-**🌐 Live Application**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
-
-### 🎭 Meet the 25 Operational Personalities (Enhanced RAG Service V6)
-
-**🕉️ Spiritual Domain (5 personalities):**
-- **Krishna** - Guidance from Bhagavad Gita and dharmic wisdom
-- **Jesus Christ** - Christian wisdom on love and transformation
-- **Buddha** - Buddhist teachings on enlightenment and the Middle Path  
-- **Rumi** - Mystical poetry and spiritual insights
-- **Swami Vivekananda** - Vedantic spiritual teacher
-
-**🧠 Scientific Domain (5 personalities):**
-- **Albert Einstein** - Scientific inquiry, relativity, and philosophy of science
-- **Isaac Newton** - Mathematical genius and natural philosophy
-- **Nikola Tesla** - Visionary inventor and electrical engineering
-- **Leonardo da Vinci** - Renaissance polymath and inventor
-- **Archimedes** - Ancient mathematician and physicist
-
-**💭 Philosophical Domain (6 personalities):**
-- **Socrates** - Classical Greek philosopher and founder of Western philosophy
-- **Plato** - Greek philosopher and student of Socrates
-- **Aristotle** - Greek philosopher and polymath
-- **Confucius** - Chinese philosopher emphasizing ethics and social harmony
-- **Lao Tzu** - Taoist principles and natural harmony
-- **Marcus Aurelius** - Stoic philosophy and practical wisdom
-
-**🏛️ Leadership Domain (6 personalities):**
-- **Abraham Lincoln** - Leadership, governance, and national unity
-- **George Washington** - First President and founding father
-- **Chanakya** - Ancient strategist and political advisor
-- **Martin Luther King Jr.** - Civil rights leader and orator
-- **Mahatma Gandhi** - Non-violent resistance and political independence movement
-- **Benjamin Franklin** - Founding father, diplomat, and statesman
-
-**📚 Literary Domain (2 personalities):**
-- **William Shakespeare** - Greatest playwright and poet in English literature
-- **Rabindranath Tagore** - Bengali polymath, poet, and Nobel laureate
-
-**🧠 Psychology Domain (1 personality):**
-- **Sigmund Freud** - Founder of psychoanalysis
-
-### ✨ Enhanced RAG Service V6 Platform Features
-
-**🔬 Advanced Embedding Technology:**
-
-Powered by **Azure OpenAI text-embedding-3-large** (768 dimensions) for superior semantic understanding:
-- ✅ **Complete Azure Migration** (December 2025): 31,422 document embeddings successfully migrated from Google Gemini
-- ✅ **99.99% Success Rate**: Only 2 staging docs skipped, $0.19 total cost (78% under budget estimate)
-- ✅ **MTEB Score: 64.6**: Industry-leading quality maintaining excellent semantic search
-- ✅ **100% Azure-Native**: Complete Microsoft ecosystem integration with enterprise SLA (99.9% uptime)
-- ✅ **Production Validated**: 50/50 queries successful, 88% citation rate, 2.17s average latency
-- ✅ **Enterprise Ready**: Reserved Capacity pricing available (40-60% cost savings potential)
-- Automatic L2 normalization for optimal cosine similarity calculations
-- Batch processing optimization (100 texts/call) with exponential backoff retry logic
-
-**🧠 World-Class Hierarchical Memory System:**
-
-Inspired by cutting-edge research from Stanford and Berkeley, Vimarsh features a sophisticated 4-layer memory architecture that makes conversations feel genuinely personal:
-
-| Layer | Token Budget | Purpose |
-|-------|-------------|---------|
-| **Working Memory** | 16,000 tokens | Real-time conversation context with sliding window |
-| **Core Memory** | 4,000 tokens | Personality facts, beliefs, and emotional patterns |
-| **Episodic Memory** | 8,000 tokens | Key moments, breakthroughs, and milestones |
-| **RAG Memory** | 4,000 tokens | Semantic search across conversation history |
-
-**Key Memory Features:**
-- 🏆 **Milestone Detection**: Automatically celebrates 8 types of achievements (first conversation, consistency streaks, breakthrough insights, deep engagement)
-- 🔮 **Proactive Recall**: Personalities naturally reference past conversations ("Last time you asked about dharma...")
-- 📊 **Memory Analytics**: Dashboard showing engagement patterns, emotional journey, and topic exploration
-- 🔄 **Cross-Personality Insights**: Unified wisdom across all 25 personalities with domain-specific perspectives
-- 🛡️ **GDPR Compliance**: Full data export and selective memory deletion capabilities
-- ⏰ **Time-Aware References**: "Remember when we discussed this last month?"
-
-**🎯 For Learners & Seekers:**
-- **🎤 Voice Conversations**: Speak naturally with any personality using Web Speech API - ask questions by voice and hear wisdom read aloud with personality-specific speech patterns
-- **📤 Social Sharing**: Share profound insights instantly on Twitter, LinkedIn, WhatsApp, Telegram, Reddit, and Facebook with auto-generated social preview cards
-- **🌅 Wisdom of the Day**: Start each day with curated insights from history's greatest minds, with push notification support at your preferred time
-- **💾 Persistent Cross-Session Memory**: Conversations continue seamlessly with hierarchical memory that remembers your journey, emotional patterns, and personal breakthroughs
-- **⚙️ Comprehensive User Settings**: Personalize every aspect of your wisdom journey with 5 settings tabs:
-  - **My Profile**: Track journey stats, domain exploration, AI usage transparency
-  - **Experience**: Customize conversation style, language, formality, favorite personalities, theme, text size
-  - **Notifications**: Configure daily wisdom, quiet hours, timezone, notification types
-  - **Memory & Privacy**: Control privacy modes, memory features, data retention (GDPR compliant)
-  - **Account**: Manage subscription, security, data export, soft delete
-- **Wisdom Journal Integration**: Personal insights storage with semantic search for reflection and growth tracking
-- **Progressive Personalization**: UI and interaction patterns adapt based on user preferences and behavior patterns with auto-save (500ms debounced)
-- **Enhanced RAG Service V6**: Advanced vector search powered by Azure OpenAI embeddings with 31,422+ documents and hybrid search fusion for superior accuracy
-- **25 Operational Personalities**: Authentic conversations across 6 domains with consistent voice preservation
-- **Citation Grounding System**: Automated validation of response citations with source verification
-- **Domain-Specific Expertise**: Each personality offers specialized knowledge with authentic cultural context
-- **Administrative Excellence**: Quality assurance tools and content management for enterprise-grade operation
-- **Progressive Web App**: Accessible anywhere, works offline, mobile-optimized with persistent data
-
-**💻 For Developers:**
-- **Phase 2 Database Integration**: Complete Azure Cosmos DB implementation with 6 specialized containers
-- **Production Database Service**: 580+ line comprehensive database service with graceful fallback mechanisms
-- **User Settings API**: 5 REST endpoints (profile, preferences, usage-summary, export, account deletion) with GDPR compliance
-- **Modern Modular Architecture**: Clean, maintainable codebase with type-safe implementation
-- **Enterprise Security**: Microsoft Entra ID integration with role-based access control and admin privileges
-- **Cost-Optimized Infrastructure**: Serverless architecture with unified resource management and pause-resume functionality
-- **Comprehensive Testing**: 490+ tests (210+ backend, 330+ frontend, 50+ E2E) with >85% coverage
+## 🛠️ Architecture
+- **Frontend**: React 18 (PWA) + Inter/Merriweather typography.
+- **Backend**: Python 3.12 on Azure Functions (Flex Consumption) using Blueprint architecture.
+- **Database**: Azure Cosmos DB (NoSQL + Vector Search) with 11 specialized containers.
+- **AI**: Azure OpenAI (GPT-5.4-mini + Embeddings).
+- **Voice**: Azure Neural TTS (25 matched voices with SSML styling).
 
 ## 🚀 Quick Start
 
 ### **For Users**
-1. Visit [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
-2. Choose from 25 operational personalities across 6 domains
-3. Engage in conversations with persistent memory across sessions
-4. Build your wisdom journal with semantic search capabilities
-5. Experience progressive personalization that adapts to your preferences
+Visit [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) and start your journey of wisdom.
 
 ### **For Developers**
-
-#### **Prerequisites**
-- Azure subscription with active billing
-- Azure OpenAI Service access (text-embedding-3-large model)
-- Google AI Studio account (Gemini API for content generation)
-- Node.js 18+ and Python 3.12+
-- Azure CLI and Functions Core Tools
-
-#### **Local Development**
 ```bash
-# Clone repository
-git clone https://github.com/user/vimarsh.git
-cd vimarsh
-
-# Backend setup - Phase 2 Database Integration
+# Backend setup
 cd backend
 pip install -r requirements.txt
-cp local.settings.json.example local.settings.json
-# Configure API keys and connection strings for Phase 2 services
-# Automatic service registration: Phase2DatabaseService, ConversationMemoryService, WisdomJournalService
 func host start
 
-# Frontend setup (new terminal)
+# Frontend setup
 cd frontend
 npm install
-cp .env.example .env.local
-# Configure environment variables for 25-personality interface
 npm start
 ```
 
-#### **Production Deployment**
-```bash
-# Automated setup (recommended)
-python scripts/setup_production.py
-
-# Manual deployment
-./scripts/deploy-production.sh
-```
-
-## 🏗️ Multi-Personality Architecture
-
-### Core Components
-```
-🎭 Frontend Layer (React 18 + TypeScript)
-├── 📂 utils/api.ts - Unified API client singleton with auth, retry, error handling
-├── 📂 components/chat/ - Extracted chat module (MessageList, MessageSourceBadge, types)
-├── PersonalitySelector - Choose from 25 distinct personalities
-├── GuidanceInterface - Main conversation UI (1,607 lines, composition-based)
-├── ConversationHistory - Backend-synced conversation timeline for auth users
-├── MemoryDashboard - Analytics and memory management interface
-├── UserSettings - Comprehensive settings with 5 tabs (Profile, Experience, Notifications, Memory, Account)
-├── SettingsContext - State management with 500ms auto-save debouncing
-├── DomainSpecificUI - Tailored interfaces for each domain
-└── IntelligentPrompts - Context-aware sample questions for each personality
-
-🧠 AI Processing Layer (Python 3.12 + Azure Functions) - Blueprint Architecture
-├── 📂 routes/ - Modular Blueprint routing for clean API organization
-│   ├── guidance_bp - Core guidance API with RAG and memory integration
-│   ├── user_bp - User profile, preferences, and conversation history
-│   ├── admin_bp - Admin dashboard and monitoring endpoints
-│   └── health_bp - Health checks and service status
-├── PersonalityService - Template-based authentic responses for all 25 personalities
-├── HierarchicalMemoryService - 4-layer memory (Working/Core/Episodic/RAG) with 2800+ lines
-├── MemoryAnalyticsService - Engagement metrics, emotional journey, topic analysis
-├── PreferencesService - User settings management (experience, notifications, memory, privacy)
-├── DataExportService - GDPR-compliant data export (conversations, preferences, activity)
-├── EngagementService - Journey stats tracking (streaks, conversations, achievements, domain exploration)
-├── NotificationService - Daily wisdom, quiet hours, timezone-aware notifications
-├── AdminService - Lightweight administrative functions and monitoring
-├── SafetyService - Content validation and safety filtering framework
-├── LLMService - Google Gemini 2.5 Flash integration for advanced responses
-├── RAGService - Enhanced vector search with Azure OpenAI embeddings and citation grounding
-└── AzureOpenAIEmbeddingService - Production-grade embedding generation with batch processing
-
-💾 Memory Layer (Azure Cosmos DB - vimarsh-multi-personality)
-├── 📂 18 Containers managed via Bicep IaC
-├── personalities - Personality configurations and metadata
-├── personality_vectors - 31,422+ embeddings (768 dims)
-├── users - User profiles and authentication state
-├── user_preferences - Settings (experience, notifications, memory, privacy)
-├── user_sessions - Session tracking and analytics
-├── user_activity - Engagement tracking (streaks, achievements)
-├── conversation_history - Full conversation archives
-├── session_summaries - AI-generated session summaries
-├── memory_profiles - User-specific memory state
-├── relationship_states - Cross-session relationship tracking
-├── WorkingMemory - Sliding window context (16K tokens)
-├── CoreMemory - Personality facts, beliefs, emotional patterns (4K tokens)
-├── EpisodicMemory - Key moments, milestones, breakthroughs (8K tokens)
-└── RAGMemory - Semantic search with vector embeddings (4K tokens)
-
-📚 Knowledge Layer (Template-Based + RAG)
-├── PersonalityModels - 25 distinct personality configurations with authentic traits
-├── ResponseTemplates - Curated authentic responses based on historical works
-├── DomainClassification - Spiritual, Scientific, Philosophical, Leadership, Literary, Psychology domains
-├── VectorDatabase - 31,422+ Azure OpenAI embeddings (768 dims) for semantic retrieval
-└── AzureOpenAI - text-embedding-3-large model (120K tokens/min, MTEB 64.6)
-
-🔧 Infrastructure Layer (Azure Cloud)
-├── Azure Functions - Serverless backend with reliable function registration
-├── Azure Cosmos DB - Multi-container database with vector search (31,422+ docs)
-├── Azure OpenAI - text-embedding-3-large deployment (West US, 120K tokens/min)
-├── Modular Services - Clean separation of concerns with graceful fallbacks
-├── TypeScript + Python - Full type safety across frontend and backend
-├── Unified Resource Management - Cost-optimized serverless architecture
-└── Global Distribution - CDN and multi-region deployment
-```
-
-### 🔄 Optimized Processing Pipeline
-
-1. **Personality Selection** - Fast personality switching with template-based responses
-2. **Request Validation** - Safety service validates input across all personalities
-3. **Template Matching** - Optimized personality-specific response generation
-4. **Authentic Response** - Maintain character voice and historical accuracy
-5. **Safety Validation** - Content filtering with personality-specific guidelines
-6. **Fast Delivery** - Sub-second response times with caching optimization
-
-## ✨ Recent UX Improvements (Phase 4 - February 2026)
-
-### **Login-to-Logout Experience Revamp**
-- ✅ **Auth Cascade Fix**: Removed 4.7 seconds of artificial delays (1000ms+1200ms+500ms+100ms+2500ms retry loop) from AuthCallback, LandingPage, and AuthProvider for immediate auth completion
-- ✅ **Navigation Redesign**: Replaced 6-8 icon-only buttons with clean UserMenuDropdown component featuring user avatar, personality selector, and collapsible menu (Settings, Admin, Memory, Progress, Sign Out)
-- ✅ **Orphaned Context Cleanup**: Deleted legacy `context/AuthContext.tsx`, fixed imports in AccountTab, updated test mocks for canonical auth
-- ✅ **Onboarding Unification**: Moved EngagementTour to auth-gated GuidanceInterface, fixed error handler to prevent duplicate wizards on API failures
-- ✅ **Settings Styling**: Created comprehensive `settings-utilities.css` (427 lines) providing Tailwind-compatible utility classes; replaced emoji icons (👤 ✨ 🔔 🔒 ⚙️) with Lucide React icons
-- ✅ **Admin Design Alignment**: Updated `admin.css` font family and sidebar gradient to match brand identity with vimarsh design system
-- ✅ **TypeScript Clean**: Zero errors after all phase changes
-
-### **Settings Pages Now Fully Styled**
-- All 5 tabs now render with proper styling: My Profile, Experience, Notifications, Memory & Privacy, Account
-- Toggle switches, dropdowns, and form controls use unified design tokens
-- Responsive layout works on all screen sizes with grid-based approach
-- GDPR features fully functional: data export, history clearing, privacy modes
-- AI usage transparency and milestone celebration integrated
-
-## 📚 Documentation
-
-### **Core Documentation**
-- **[Technical Specification](docs/specs/Tech_Spec_Vimarsh.md)** - Complete technical details
-- **[User Experience Specification](docs/specs/UX_Spec_Vimarsh.md)** - Master UX specification with implementation requirements
-- **[Deployment Guide](docs/deploy_instructions.md)** - Production deployment instructions
-- **[Implementation Roadmap](docs/specs/Tasks.md)** - Phase-based task tracking and execution status
-
-### **Development Resources**
-- **[Project Metadata](docs/metadata.md)** - Complete project overview and implementation status
-- **[API Documentation](docs/api/)** - REST API reference
-- **[Contributing Guide](CONTRIBUTING.md)** - Code standards and review process
-
-## 🛡️ Security & Compliance
-
-### **Multi-Personality Security Features**
-- **Authentication**: Microsoft Entra ID with JWT validation across all personalities
-- **Authorization**: Role-based access control (RBAC) with domain-specific permissions
-- **Input Validation**: XSS prevention and sanitization for all personality interactions
-- **Rate Limiting**: Abuse protection with sliding window algorithm per personality
-- **Audit Logging**: Comprehensive security event tracking across all domains
-- **Data Protection**: Sensitive information masking and encryption for all personality data
-
-### **Cross-Domain Compliance Standards**
-- ✅ **OWASP Top 10**: Complete protection implementation across all personalities
-- ✅ **Enterprise Security**: JWT signature verification for multi-domain access
-- ✅ **Zero Trust**: Comprehensive input validation across all personality interfaces
-- ✅ **Audit Ready**: Complete security logging for all domain interactions
-- ✅ **Privacy**: Data filtering and protection for all personality conversations
-
-## 🧪 Testing & Quality
-
-### **Multi-Personality Test Coverage**
-- **Backend Tests**: 210+ tests including unit, integration, and API validation
-- **Frontend Tests**: 330+ tests covering components, contexts, and user workflows
-- **E2E Tests**: 50+ Cypress tests for complete user journey validation
-- **User Settings**: Dedicated test suites for all 5 settings tabs with >85% coverage
-- **Security Tests**: Comprehensive safety validation for each personality domain
-
-### **Cross-Domain Quality Metrics**
-- **Code Quality**: TypeScript + Python type safety across all 25 personality services
-- **Test Coverage**: >85% backend, >80% frontend with 490+ total tests
-- **Performance**: Memory-optimized with LRU caching for 25-personality operations
-- **Reliability**: Atomic database transactions for all personality data
-- **Maintainability**: Unified configuration system supporting all 25 personalities
-- **Safety**: Comprehensive validation system with personality-specific filters
-
-## 📈 Platform Achievements
-
-### **Current Implementation Status**
-- **Phase 0-2**: ✅ Complete (Security, Microservices, API Unification)
-- **Phase 3**: 🔄 In Progress (Test Coverage Thresholds, Lint/Type-Check CI, Service Archival)
-- **Phase 4**: ✅ Complete (UX Revamp - Auth Cascade, Navigation, Settings, Admin Consistency)
-
-### **Current Capabilities**
-- **25 Personalities**: Complete roster across 6 knowledge domains
-- **Azure OpenAI Embeddings**: 31,422+ documents with text-embedding-3-large (768 dims, MTEB 64.6)
-- **World-Class Memory**: 4-layer hierarchical system (Working/Core/Episodic/RAG)
-- **Production-Grade UX**: Polished login-to-logout experience with instant auth, clean navigation, styled settings
-- **Proactive Intelligence**: Milestone detection, proactive recall, cross-personality insights
-- **User Settings**: Completed 5-tab Settings interface (Profile, Experience, Notifications, Memory, Account) with GDPR compliance
-- **Production Deployment**: Full platform live on Azure infrastructure  
-- **Performance Optimized**: Auth callback < 500ms, sub-second response times across all personalities (avg 0.15s for embeddings)
-- **Enterprise Ready**: Comprehensive security, monitoring, and admin tools
-- **Universal Access**: Available to users worldwide
-
-### **Recent Phase 4 Achievements** (February 2026)
-- **Zero Auth Delay**: Auth flow reduced from 5+ seconds to < 500ms total time
-- **Cleaner Navigation**: Replaced icon clutter with user-centric dropdown menu
-- **Styled Settings**: All 5 settings tabs fully rendered with brand design system
-- **Unified Admin**: Admin panel now matches app design language and look-and-feel
-- **Test Verified**: All TypeScript changes compile clean with zero errors
-
-### **Memory System Highlights**
-- **32K Token Budget**: Total memory capacity across all layers
-- **8 Milestone Types**: Automatic achievement detection and celebration
-- **5 Recall Triggers**: Topic continuations, emotional callbacks, progress references
-- **GDPR Compliant**: Full data export and selective deletion
-- **Cross-Personality**: Unified relationship state across all 25 personalities
-
-### **Performance Benchmarks**
-- **Embedding Generation**: 150ms average (Azure OpenAI text-embedding-3-large)
-- **Personality Switching**: 150ms average response time
-- **Memory Retrieval**: 200ms average for hierarchical memory assembly
-- **Vector Search**: 300ms average search time across 31,422+ embeddings
-- **25-Personality Cache**: 25ms cache hit time
-- **Safety Validation**: 75ms validation time
-- **Embedding Success Rate**: 99.99% with 100% L2 normalization
-- **Uptime**: 99.9% availability target
-
-## 🤝 Contributing
-
-We welcome contributions from developers, historians, philosophers, and wisdom seekers! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
-- Code standards and review process for multi-personality development
-- Historical and philosophical content guidelines across all domains
-- Personality authenticity validation requirements
-- Cross-domain testing standards and documentation
-
-## 📄 License
-
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** - see the [LICENSE](LICENSE) file for details.
-
-**Key License Points**:
-- ✅ Free to use, modify, and distribute across all personalities
-- ✅ Source code must remain open for multi-personality platform
-- ✅ Network use requires source availability
-- ✅ Commercial use permitted with compliance
-
-## 🌟 Universal Knowledge Mission
-
-Vimarsh serves as a bridge between humanity's greatest minds and modern learners:
-
-- **Authentic Multi-Domain Guidance**: Based on authentic historical texts and traditions across all domains
-- **Knowledge Democracy**: Making wisdom accessible across all backgrounds and beliefs
-- **Universal Access**: Connecting contemporary learners with timeless insights
-- **Holistic Learning**: Supporting intellectual, philosophical, and personal growth
-
-### **Wisdom Across Domains**
-
-**🏛️ Leadership**: *"A house divided against itself cannot stand."* - Abraham Lincoln
-
-**💭 Philosophical**: *"You have power over your mind - not outside events. Realize this, and you will find strength."* - Marcus Aurelius
-
-**🔬 Scientific**: *"If I have seen further it is by standing on the shoulders of Giants."* - Isaac Newton, *"The present is theirs; the future, for which I really worked, is mine."* - Nikola Tesla
-
-**🕉️ Spiritual**: *"Just as a lamp in a windless place does not flicker, so the disciplined mind of a yogi remains steady in meditation on the Supreme."* - Bhagavad Gita 6.19
-
-## 🌟 Live Experience
-
-**Ready to converse with history's greatest minds?**
-
-**🌐 Visit**: [https://vimarsh.vedprakash.net](https://vimarsh.vedprakash.net)
-
-Experience authentic conversations with 25 distinct personalities across spiritual, scientific, philosophical, leadership, literary, and psychology domains. Powered by AI, grounded in authentic wisdom, and delivered with **world-class hierarchical memory** that remembers your journey, celebrates your milestones, and proactively recalls past insights to deepen your learning experience.
-
-**✨ Latest Features:**
-- 🧠 4-layer hierarchical memory inspired by Stanford & Berkeley research
-- 🏆 Automatic milestone detection and celebration
-- 🔮 Proactive recall of past conversations
-- 📊 Memory analytics dashboard
-- ⚙️ Comprehensive User Settings with 5 tabs for complete personalization
-- 🎨 Experience customization (conversation style, language, formality, theme)
-- 🔔 Notification management (daily wisdom, quiet hours, timezone)
-- 🔒 Privacy controls (memory features, data retention, privacy modes)
-- 💾 Auto-save with 500ms debouncing for seamless experience
-- 🛡️ Full GDPR compliance with data export and soft delete
+## 📜 License
+This project is licensed under the **Business Source License (BSL)**.
 
 ---
-
-*Built with 🌟 for wisdom seekers worldwide*  
-*May this technology serve the highest good and support all beings in their quest for knowledge and understanding across all domains of human wisdom* 
+*Built with 🌟 for wisdom seekers worldwide. May this technology serve the highest good.*

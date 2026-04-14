@@ -7,9 +7,10 @@ This is the core RAG pipeline entrypoint.
 
 import azure.functions as func
 import json
+import asyncio
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, AsyncGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,103 @@ def _cors():
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
     }
+
+
+async def _guidance_stream_generator(
+    user_query: str,
+    personality_id: str,
+    personality_info: dict,
+    ctx: dict,
+    user_id: str,
+    session_id: str,
+    language: str,
+    conversation_context_str: str,
+    user_preferences: Optional[dict] = None
+) -> AsyncGenerator[str, None]:
+    """Generator for SSE streaming guidance."""
+    try:
+        from services.azure_openai_chat_service import get_azure_chat_service
+        chat_service = get_azure_chat_service()
+        
+        # Retrieve RAG context first (non-streaming part)
+        rag_context = None
+        if ctx["enhanced_rag_available"]:
+            rag = _get_rag_service()
+            if rag:
+                rag_context = await rag.retrieve_context(user_query, personality_id)
+        
+        # Build prompt
+        from services.enhanced_rag_service_v6 import EnhancedRAGService
+        rag_svc = EnhancedRAGService() 
+        
+        # Prepare context pass-through
+        context_passages = []
+        if rag_context and rag_context.relevant_chunks:
+            context_passages = [f"Source: {c.source}\nContent: {c.content[:500]}..." for c in rag_context.relevant_chunks[:3]]
+        
+        personality_prompt_context = rag_svc._get_personality_context(personality_id)
+        
+        if context_passages:
+            context_text = "\n\n".join(context_passages)
+            prompt = f"{personality_prompt_context}\n\nContext:\n{context_text}\n\nQuestion: {user_query}\n\nRespond in character:"
+        else:
+            prompt = f"{personality_prompt_context}\n\nQuestion: {user_query}\n\nRespond in character:"
+
+        messages = [
+            {"role": "system", "content": "You are a wise spiritual guide."},
+            {"role": "user", "content": prompt}
+        ]
+
+        # 2. Start Streaming
+        full_response_text = ""
+        
+        # Send initial metadata
+        initial_metadata = {
+            "personality": personality_info,
+            "status": "starting",
+            "rag_enhanced": bool(rag_context and rag_context.relevant_chunks)
+        }
+        yield f"data: {json.dumps({'metadata': initial_metadata})}\n\n"
+
+        # Stream chunks
+        for chunk in chat_service.generate_streaming_response(messages):
+            full_response_text += chunk
+            yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+            await asyncio.sleep(0.01)
+
+        # 3. Finalize and Save to Memory
+        try:
+            if ctx["hierarchical_memory_available"] and ctx["hierarchical_memory_service"]:
+                from models.memory_models import MessageRole, EmotionalTone
+                await ctx["hierarchical_memory_service"].store_message(
+                    user_id=user_id, personality_id=personality_id, session_id=session_id,
+                    role=MessageRole.USER, content=user_query, emotional_tone=EmotionalTone.NEUTRAL
+                )
+                await ctx["hierarchical_memory_service"].store_message(
+                    user_id=user_id, personality_id=personality_id, session_id=session_id,
+                    role=MessageRole.ASSISTANT, content=full_response_text, emotional_tone=EmotionalTone.CALM
+                )
+        except Exception as mem_err:
+            logger.warning(f"⚠️ Memory save failed in stream: {mem_err}")
+
+        # Send final complete response object for frontend cleanup
+        final_response = {
+            "full_response": {
+                "response": full_response_text,
+                "personality": personality_info,
+                "metadata": {
+                    "streamed": True,
+                    "citations": rag_context.citations if rag_context else [],
+                    "rag_enhanced": bool(rag_context and rag_context.relevant_chunks)
+                }
+            }
+        }
+        yield f"data: {json.dumps(final_response)}\n\n"
+        yield "data: [DONE]\n\n"
+
+    except Exception as e:
+        logger.error(f"❌ Stream generation error: {e}")
+        yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
 
 # ── lazy service accessor ───────────────────────────────────────────────────
@@ -148,11 +246,15 @@ async def _get_template_fallback_response(personality_id: str, ctx=None):
 
 # ── main guidance route ──────────────────────────────────────────────────────
 
-@bp.route(route="guidance", methods=["POST"])
+@bp.route(route="guidance", methods=["POST", "OPTIONS"])
 async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
-    """Enhanced guidance endpoint with modular service integration."""
+    """Enhanced guidance endpoint with modular service integration and streaming support."""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_cors())
+
     try:
         ctx = _ctx()
+        is_stream = req.params.get("stream", "").lower() == "true"
 
         # ── parse request ────────────────────────────────────────────────
         try:
@@ -247,6 +349,49 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             except Exception as mem_err:
                 logger.warning(f"⚠️ Failed to retrieve conversation context: {mem_err}")
 
+        # ── personality info ─────────────────────────────────────────────
+        if ctx["personality_models_available"]:
+            config = await ctx["get_personality_config"](personality_id)
+            if config and hasattr(config, "id"):
+                personality_info = {"id": config.id, "name": config.name, "domain": config.domain.value, "description": config.description}
+            else:
+                fi = FALLBACK[personality_id]
+                personality_info = {"id": personality_id, "name": fi["name"], "domain": fi["domain"], "description": fi["description"]}
+        else:
+            fi = FALLBACK[personality_id]
+            personality_info = {"id": personality_id, "name": fi["name"], "domain": fi["domain"], "description": fi["description"]}
+
+        # ── Streaming Path ──────────────────────────────────────────────
+        if is_stream:
+            user_preferences = None
+            try:
+                if user_id:
+                    from services.preferences_service import preferences_service as prefs_svc
+                    user_preferences = prefs_svc.get_preferences(user_id)
+            except Exception:
+                pass
+
+            headers = _cors()
+            headers["Content-Type"] = "text/event-stream"
+            headers["Cache-Control"] = "no-cache"
+            headers["Connection"] = "keep-alive"
+            
+            return func.HttpResponse(
+                _guidance_stream_generator(
+                    user_query=user_query,
+                    personality_id=personality_id,
+                    personality_info=personality_info,
+                    ctx=ctx,
+                    user_id=user_id,
+                    session_id=session_id,
+                    language=language,
+                    conversation_context_str=conversation_context,
+                    user_preferences=user_preferences
+                ),
+                status_code=200,
+                headers=headers
+            )
+
         # ── generate response (RAG → LLM → personality → template) ─────
         response_source = "template_fallback"
         response_text = None
@@ -275,9 +420,9 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                             "content_backed": rag_response.content_backed,
                             "confidence_score": rag_response.confidence_score,
                             "citations": rag_response.rag_context.citations if rag_response.rag_context else [],
-                            "chunks_used": len(rag_response.rag_context.relevant_chunks) if rag_response.rag_context else 0,
-                            "retrieval_method": rag_response.rag_context.retrieval_method if rag_response.rag_context else "none",
-                            "avg_similarity": rag_response.rag_context.avg_similarity_score if rag_response.rag_context else 0.0,
+                            "chunks_used": len(rag_response.rag_context.relevant_chunks) if rag_context else 0,
+                            "retrieval_method": rag_response.rag_context.retrieval_method if rag_context else "none",
+                            "avg_similarity": rag_response.rag_context.avg_similarity_score if rag_context else 0.0,
                             "memory_enhanced": bool(conversation_context),
                             **rag_response.metadata,
                         }
@@ -353,18 +498,6 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 logger.info("💾 Stored conversation exchange in memory")
             except Exception as e:
                 logger.error(f"❌ Failed to store conversation: {e}")
-
-        # ── personality info ─────────────────────────────────────────────
-        if ctx["personality_models_available"]:
-            config = await ctx["get_personality_config"](personality_id)
-            if config and hasattr(config, "id"):
-                personality_info = {"id": config.id, "name": config.name, "domain": config.domain.value, "description": config.description}
-            else:
-                fi = FALLBACK[personality_id]
-                personality_info = {"id": personality_id, "name": fi["name"], "domain": fi["domain"], "description": fi["description"]}
-        else:
-            fi = FALLBACK[personality_id]
-            personality_info = {"id": personality_id, "name": fi["name"], "domain": fi["domain"], "description": fi["description"]}
 
         # ── engagement tracking (non-blocking) ───────────────────────────
         newly_unlocked = []

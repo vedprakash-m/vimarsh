@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | **Product** | Vimarsh — AI-Powered Multi-Personality Conversational Wisdom Platform |
-| **Version** | 2.1 (April 2026) |
-| **Status** | Production — Live at [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) |
-| **Design System** | Apple-inspired with 6 domain-specific themes |
+| **Version** | 2.2 (April 2026) |
+| **Philosophy** | **Invisible UI** — Precision through subtraction. |
+| **Design System** | Inter & Merriweather Hybrid with 6 domain-specific themes |
 
 ---
 
@@ -13,11 +13,10 @@
 
 ### Core Principles
 
-1. **Reverence Through Design** — Every pixel communicates respect for the historical figures and the wisdom they represent. The UI never trivializes or gamifies the source material.
-2. **Progressive Disclosure** — Show what matters now; reveal depth on demand. New users see a clean, inviting interface; power users access advanced features through discoverable layers.
-3. **Personality-Driven Context** — The interface adapts its visual identity (colors, typography accents, tone) to the active personality's domain, creating an immersive conversational environment.
-4. **Mobile-First, Desktop-Enhanced** — All interactions are designed for touch-first (≥44px targets) and enhanced for pointer-device environments with richer hover states and keyboard shortcuts.
-5. **Accessibility as Foundation** — WCAG 2.1 AA compliance, ARIA labels on all interactive elements, keyboard navigation throughout, minimum contrast ratios enforced.
+1. **Invisible UI (Precision through Subtraction)** — We strip away everything that does not serve the soul of the conversation. No aggressive modals, no layout-shifting elements, and zero "pop-up fatigue".
+2. **Typography-First Canvas** — Using the **Inter** (sans-serif) and **Merriweather** (serif) font families to create a balance between modern utility and timeless wisdom.
+3. **Decoupled Discovery** — Allowing users to read and interact with "Wisdom of the Day" fragments before full authentication, reducing barriers to first-interaction.
+4. **Fluid Streaming** — Leveraging SSE to reduce the Time-to-First-Token (TTFT), making the interface feel "alive" and breathing as thoughts are generated.
 
 ### Design System Stack
 

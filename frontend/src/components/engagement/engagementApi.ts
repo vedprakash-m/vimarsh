@@ -65,6 +65,31 @@ export const engagementApi = {
   },
 
   /**
+   * Headless tracking that acts silently as an un-awaited background process.
+   * Guarantees zero UI modaling or error boundary breaks if it fails.
+   */
+  async recordActivityHeadless(
+    userId: string,
+    activityType: string = 'conversation',
+    personalityId?: string,
+    domain?: string,
+    metadata?: Record<string, unknown>
+  ): Promise<void> {
+    try {
+      await getClient().post('/api/engagement/activity', {
+        user_id: userId,
+        activity_type: activityType,
+        personality_id: personalityId,
+        domain,
+        metadata
+      });
+    } catch (error) {
+      // Intentionally swallowed for UI continuity
+      console.warn('Headless analytics tracking dynamically failed. Ignoring error.');
+    }
+  },
+
+  /**
    * Use a streak freeze
    */
   async useStreakFreeze(userId: string): Promise<{

@@ -807,15 +807,23 @@ class HierarchicalMemoryService:
                 # Offload state to transient Cosmos container (TTL 1800s)
                 container = self.containers["session_state"]
                 try:
-                    # In a real impl, WorkingMemoryContext needs a to_dict method
-                    # for now we'll store basic identifiers 
-                    container.upsert_item({
+                    # Serialize context for storage
+                    context_data = {
                         "id": cache_key, 
                         "user_id": user_id, 
                         "session_id": session_id,
                         "ttl": 1800,
-                        "context_tokens": context.get_total_tokens() if hasattr(context, 'get_total_tokens') else 0
-                    })
+                        "user_profile_context": context.user_profile_context,
+                        "relationship_context": context.relationship_context,
+                        "recent_session_summaries": context.recent_session_summaries,
+                        "relevant_past_insights": context.relevant_past_insights,
+                        "retrieved_memories": context.retrieved_memories,
+                        "current_messages": context.current_messages,
+                        "context_quality_score": context.context_quality_score,
+                        "assembled_at": context.assembled_at.isoformat(),
+                        "total_tokens": context.get_total_tokens() if hasattr(context, 'get_total_tokens') else 0
+                    }
+                    container.upsert_item(context_data)
                     logger.info(f"💾 Offloaded WorkingMemory state to stateless Cosmos store for {cache_key}")
                 except Exception as e:
                     logger.warning(f"⚠️ Failed to write to transient state store: {e}")

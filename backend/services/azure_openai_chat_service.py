@@ -126,6 +126,46 @@ class AzureOpenAIChatService:
         
         # If we get here, all retries failed
         raise Exception(f"Failed to generate response after {self.max_retries} attempts: {last_error}")
+
+    def generate_streaming_response(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 1,
+        max_tokens: int = 2000
+    ):
+        """
+        Generate streaming chat response for GPT-5-mini
+        
+        Args:
+            messages: List of message dicts with 'role' and 'content'
+            temperature: Randomness (GPT-5-mini expects 1)
+            max_tokens: Maximum output tokens
+            
+        Yields:
+            Chunks of text as they are generated
+        """
+        if self.test_mode:
+            yield "This is a test streaming response from Azure OpenAI GPT-5-mini"
+            return
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.deployment_name,
+                messages=messages,
+                max_completion_tokens=max_tokens,
+                temperature=1,
+                stream=True
+            )
+            
+            for chunk in response:
+                if chunk.choices and len(chunk.choices) > 0:
+                    delta = chunk.choices[0].delta
+                    if delta.content:
+                        yield delta.content
+                        
+        except Exception as e:
+            logger.error(f"❌ Streaming completion error: {e}")
+            raise
     
     def _generate_test_response(self, messages: List[Dict[str, str]]) -> ChatResponse:
         """Generate test response for unit testing"""

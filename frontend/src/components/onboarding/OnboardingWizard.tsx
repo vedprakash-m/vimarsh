@@ -1,9 +1,9 @@
 /**
  * OnboardingWizard Component
- * Main onboarding container that manages the multi-step flow
+ * Flattened domain selector for immediate Time-To-Wisdom
  */
 
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import {
   Box,
   Dialog,
@@ -11,213 +11,72 @@ import {
   IconButton,
   useTheme,
   useMediaQuery,
-  Slide,
+  Typography,
+  Grid,
+  Card,
+  CardActionArea,
   CircularProgress
 } from '@mui/material';
-import { TransitionProps } from '@mui/material/transitions';
-import { X } from 'lucide-react';
-import WelcomeStep from './WelcomeStep';
-import PersonalityQuiz from './PersonalityQuiz';
-import MatchResult from './MatchResult';
-import NotificationOptInStep from './NotificationOptInStep';
-import { useOnboarding } from './useOnboarding';
+import { X, Flame, BookOpen, Crown, Microscope, Feather, Brain } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { usePersonality } from '../../contexts/PersonalityContext';
 
 interface OnboardingWizardProps {
   open: boolean;
   onClose: () => void;
-  userId: string;
+  userId?: string;
   userName?: string;
   onSelectPersonality: (personalityId: string) => void;
 }
 
-// Slide transition for mobile
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & { children: React.ReactElement },
-  ref: React.Ref<unknown>,
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const DOMAIN_CONFIG = [
+  { id: 'spiritual', label: 'Spiritual', icon: <Flame size={24} /> },
+  { id: 'philosophical', label: 'Philosophical', icon: <BookOpen size={24} /> },
+  { id: 'leadership', label: 'Leadership', icon: <Crown size={24} /> },
+  { id: 'scientific', label: 'Scientific', icon: <Microscope size={24} /> },
+  { id: 'literary', label: 'Literary', icon: <Feather size={24} /> },
+  { id: 'psychology', label: 'Psychology', icon: <Brain size={24} /> }
+];
 
 const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
   open,
   onClose,
-  userId,
-  userName,
   onSelectPersonality
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
+  const { availablePersonalities, personalityLoading, setSelectedPersonality } = usePersonality();
 
-  // Track if user has seen notification opt-in
-  const [showNotificationOptIn, setShowNotificationOptIn] = useState(false);
-  const [selectedPersonalityForNotif, setSelectedPersonalityForNotif] = useState<string | null>(null);
-
-  const {
-    state,
-    questions,
-    quizResult,
-    currentStep,
-    isLoading,
-    error,
-    advanceStep,
-    recordResponse,
-    submitQuiz,
-    completeOnboarding,
-    skipOnboarding,
-    responses
-  } = useOnboarding(userId);
-
-  // Handle starting the quiz
-  const handleStartQuiz = async () => {
-    await advanceStep();
-  };
-
-  // Handle skipping onboarding
-  const handleSkip = async () => {
-    await skipOnboarding();
-    onClose();
-  };
-
-  // Handle starting conversation with selected personality - show notification opt-in first
-  const handleStartConversation = async (personalityId: string) => {
-    // Store selected personality and show notification opt-in
-    setSelectedPersonalityForNotif(personalityId);
-    setShowNotificationOptIn(true);
-  };
-
-  // Handle continuing after notification opt-in
-  const handleNotificationComplete = async () => {
-    await completeOnboarding();
-    if (selectedPersonalityForNotif) {
-      onSelectPersonality(selectedPersonalityForNotif);
-    }
-    onClose();
-  };
-
-  // Handle exploring all personalities - show notification opt-in first
-  const handleExploreMore = async () => {
-    // Show notification opt-in before exploring
-    setSelectedPersonalityForNotif(null);
-    setShowNotificationOptIn(true);
-  };
-
-  // Handle continuing to explore after notification opt-in
-  const handleExploreAfterNotification = async () => {
-    await completeOnboarding();
-    onClose();
-  };
-
-  // Render current step content
-  const renderStepContent = () => {
-    if (isLoading && !questions.length) {
-      return (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '50vh'
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      );
-    }
-
-    // Check if already completed
-    if (state?.is_complete || state?.was_skipped) {
+  const handleDomainSelect = (domainId: string) => {
+    // Find the first available personality for this domain or fallback to first
+    const personality = availablePersonalities.find(p => p.domain === domainId) || availablePersonalities[0];
+    
+    if (personality) {
+      setSelectedPersonality(personality);
+      onSelectPersonality(personality.id);
       onClose();
-      return null;
-    }
-
-    // Show notification opt-in if triggered
-    if (showNotificationOptIn) {
-      const personalityName = quizResult?.recommended_personality?.name || 'your guide';
-      return (
-        <NotificationOptInStep
-          onContinue={selectedPersonalityForNotif ? handleNotificationComplete : handleExploreAfterNotification}
-          personalityName={personalityName}
-        />
-      );
-    }
-
-    switch (currentStep) {
-      case 'welcome':
-        return (
-          <WelcomeStep
-            onStart={handleStartQuiz}
-            onSkip={handleSkip}
-            userName={userName}
-          />
-        );
-
-      case 'quiz':
-        return (
-          <PersonalityQuiz
-            questions={questions}
-            responses={responses}
-            onRecordResponse={recordResponse}
-            onSubmit={submitQuiz}
-            isSubmitting={isLoading}
-          />
-        );
-
-      case 'first_chat':
-      case 'discovery':
-        // Show match results if we have quiz results
-        if (quizResult) {
-          return (
-            <MatchResult
-              result={quizResult}
-              onStartConversation={handleStartConversation}
-              onExploreMore={handleExploreMore}
-            />
-          );
-        }
-        // Fallback - shouldn't happen normally
-        return (
-          <WelcomeStep
-            onStart={handleStartQuiz}
-            onSkip={handleSkip}
-            userName={userName}
-          />
-        );
-
-      case 'complete':
-        onClose();
-        return null;
-
-      default:
-        return (
-          <WelcomeStep
-            onStart={handleStartQuiz}
-            onSkip={handleSkip}
-            userName={userName}
-          />
-        );
+      navigate('/guidance');
     }
   };
 
   return (
     <Dialog
       open={open}
-      onClose={handleSkip}
+      onClose={onClose}
       fullScreen={fullScreen}
       maxWidth="md"
       fullWidth
-      TransitionComponent={fullScreen ? Transition : undefined}
       PaperProps={{
         sx: {
           borderRadius: fullScreen ? 0 : 4,
-          minHeight: fullScreen ? '100vh' : '70vh',
-          maxHeight: fullScreen ? '100vh' : '90vh',
+          minHeight: fullScreen ? '100vh' : 'auto',
           overflow: 'hidden'
         }
       }}
     >
-      {/* Close button */}
       <IconButton
-        onClick={handleSkip}
+        onClick={onClose}
         sx={{
           position: 'absolute',
           right: 16,
@@ -233,20 +92,58 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
         <X size={20} />
       </IconButton>
 
-      <DialogContent
-        sx={{
-          p: 0,
-          overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: 6
-          },
-          '&::-webkit-scrollbar-thumb': {
-            bgcolor: 'grey.300',
-            borderRadius: 3
-          }
-        }}
-      >
-        {renderStepContent()}
+      <DialogContent sx={{ p: { xs: 3, md: 6 }, textAlign: 'center' }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ fontFamily: 'var(--font-wisdom-body, serif)', fontWeight: 300, color: '#111', mb: 2 }}>
+          Choose your path.
+        </Typography>
+        <Typography variant="subtitle1" sx={{ color: '#666', mb: 6, maxWidth: '600px', mx: 'auto' }}>
+          Select a domain of wisdom to begin your journey immediately.
+        </Typography>
+
+        {personalityLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {DOMAIN_CONFIG.map((domain) => {
+              const count = availablePersonalities.filter(p => p.domain === domain.id).length;
+              return (
+                <Grid item xs={12} sm={6} md={4} key={domain.id}>
+                  <Card 
+                    elevation={0}
+                    sx={{ 
+                      border: '1px solid #eaeaea',
+                      borderRadius: 3,
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: '#222',
+                        transform: 'translateY(-2px)'
+                      }
+                    }}
+                  >
+                    <CardActionArea 
+                      onClick={() => handleDomainSelect(domain.id)}
+                      sx={{ p: 4, height: '100%' }}
+                    >
+                      <Box sx={{ color: '#222', mb: 2, display: 'flex', justifyContent: 'center' }}>
+                        {domain.icon}
+                      </Box>
+                      <Typography variant="h6" sx={{ fontFamily: 'var(--font-wisdom-ui, sans-serif)', fontWeight: 500, color: '#111' }}>
+                        {domain.label}
+                      </Typography>
+                      {count > 0 && (
+                        <Typography variant="caption" sx={{ color: '#888', display: 'block', mt: 1 }}>
+                          {count} guide{count !== 1 ? 's' : ''} available
+                        </Typography>
+                      )}
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        )}
       </DialogContent>
     </Dialog>
   );
