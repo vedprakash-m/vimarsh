@@ -451,20 +451,13 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  // Redirect authenticated users - wait for contexts to be ready to prevent cascading loads
+  // Decoupled Landing Page: Removed aggressive auto-redirect logic.
+  // Returning users can now freely view the landing page and use the explicit 'Go to Dashboard' CTA.
   useEffect(() => {
-    // Allow preview of landing page even when authenticated
-    const params = new URLSearchParams(location.search);
-    const isPreview = params.get('preview') === '1' || params.get('preview') === 'true';
-
-    if (isAuthenticated && account && !isPreview && contextsReady) {
-      console.log('🔄 LandingPage: Authenticated user detected, contexts ready, redirecting');
-      console.log('👤 User account:', account.username || account.name);
-      navigate('/guidance', { replace: true });
-    } else if (isAuthenticated && account && !isPreview && !contextsReady) {
-      console.log('⏳ LandingPage: Waiting for contexts to initialize before redirect...');
+    if (isAuthenticated && account && contextsReady) {
+      console.log('👀 LandingPage: Authenticated user viewing marketing page successfully.');
     }
-  }, [isAuthenticated, account, navigate, location.search, contextsReady]);
+  }, [isAuthenticated, account, contextsReady]);
 
   const handleSignIn = async () => {
     try {
@@ -539,7 +532,7 @@ const LandingPage: React.FC = () => {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              Sign In / Sign Up
+              {isAuthenticated ? "Go to Dashboard" : "Sign In / Sign Up"}
             </button>
           </nav>
         </div>
@@ -625,7 +618,7 @@ const LandingPage: React.FC = () => {
                 }}
                 aria-label="Begin your journey"
               >
-                Begin Your Journey
+                {isAuthenticated ? "Go to Dashboard" : "Begin Your Journey"}
                 <ArrowRight size={18} />
               </button>
               <button

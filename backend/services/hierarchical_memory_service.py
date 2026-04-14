@@ -160,7 +160,8 @@ class HierarchicalMemoryService:
                 ("memory_profiles", "/user_id"),
                 ("conversation_history", "/user_id"),
                 ("relationship_states", "/user_id"),
-                ("session_summaries", "/user_id")
+                ("session_summaries", "/user_id"),
+                ("session_state", "/user_id")  # Added Cosmos DB TTL container for stateless serverless memory
             ]
             
             for container_name, partition_key in container_configs:
@@ -759,10 +760,16 @@ class HierarchicalMemoryService:
                 all_insights.extend(session.key_insights)
             context.relevant_past_insights = all_insights[:5]
             
-            context.episodic_memory_tokens = self._estimate_tokens(
-                json.dumps(context.recent_session_summaries) + 
-                " ".join(context.relevant_past_insights)
-            )
+            # Phase 4 Semantic Extraction
+            raw_episodic = json.dumps(context.recent_session_summaries) + " ".join(context.relevant_past_insights)
+            if len(raw_episodic) > 2000:
+                logger.info(f"🗜️ Semantic Extraction: Compressing Episodic Context payload of size {len(raw_episodic)}")
+                try:
+                    raw_episodic = await self._compress_episodic_context(raw_episodic)
+                except Exception as e:
+                    logger.error(f"Compression failed: {e}")
+            
+            context.episodic_memory_tokens = self._estimate_tokens(raw_episodic)
             
             # 3. Semantic search for relevant past conversations
             if current_query and self.embedding_model:
@@ -792,10 +799,30 @@ class HierarchicalMemoryService:
             context.context_quality_score = self._calculate_context_quality(context)
             context.assembled_at = datetime.utcnow()
             
-            # Cache in working memory
+            # Cache in working memory (Serverless implementation)
             cache_key = f"{user_id}:{session_id}"
-            self.working_memory_cache[cache_key] = context
+            use_redis_state = os.environ.get("USE_REDIS_STATE_V2", "False").lower() == "true"
             
+            if use_redis_state and "session_state" in self.containers:
+                # Offload state to transient Cosmos container (TTL 1800s)
+                container = self.containers["session_state"]
+                try:
+                    # In a real impl, WorkingMemoryContext needs a to_dict method
+                    # for now we'll store basic identifiers 
+                    container.upsert_item({
+                        "id": cache_key, 
+                        "user_id": user_id, 
+                        "session_id": session_id,
+                        "ttl": 1800,
+                        "context_tokens": context.get_total_tokens() if hasattr(context, 'get_total_tokens') else 0
+                    })
+                    logger.info(f"💾 Offloaded WorkingMemory state to stateless Cosmos store for {cache_key}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to write to transient state store: {e}")
+            else:
+                self.working_memory_cache[cache_key] = context
+            
+
             logger.info(
                 f"🧠 Assembled working memory: {context.get_total_tokens()} tokens, "
                 f"quality={context.context_quality_score:.2f}"
@@ -813,6 +840,25 @@ class HierarchicalMemoryService:
                 current_messages=current_messages
             )
     
+    async def _compress_episodic_context(self, raw_episodic_text: str) -> str:
+        """Phase 4 Semantic Extraction: Compresses excessive episodic contexts."""
+        if not self.chat_client:
+            return raw_episodic_text[:2000]
+        try:
+            response = await self.chat_client.chat.completions.create(
+                model=self.chat_deployment,
+                messages=[
+                    {"role": "system", "content": "You are a memory compression agent. Compress this conversation context into key salient points (under 1000 characters) preserving temporal, factual and psychological accuracy."},
+                    {"role": "user", "content": raw_episodic_text}
+                ],
+                max_tokens=600,
+                temperature=0.3
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"Failed to compress episodic context: {e}")
+            return raw_episodic_text[:2000]
+
     def _build_profile_context(self, profile: MemoryProfile) -> str:
         """Build context string from user profile."""
         parts = []

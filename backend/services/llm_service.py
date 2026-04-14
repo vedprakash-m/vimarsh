@@ -11,6 +11,7 @@ import os
 import logging
 import time
 import asyncio
+import hashlib
 from openai import AzureOpenAI
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field
@@ -528,6 +529,17 @@ Response:"""
                     
                     logger.info(f"✅ Real {config.name} response generated: {len(response_text)} chars in {response_time:.2f}s")
                     
+                    tokens_used = response.usage.total_tokens if hasattr(response, 'usage') and response.usage else 0
+                    if tokens_used > 0:
+                        logger.info(f"📊 TELEMETRY: personality={personality_id} tokens={tokens_used} latency={response_time:.2f}s")
+                    
+                    # Generate deterministic Idempotency hash for downstream DB upserts
+                    idempotency_key = None
+                    if user_id and session_id:
+                        # Time-floor to 5 minutes to prevent loop duplication
+                        time_floor = int(time.time() / 300)
+                        idempotency_key = hashlib.sha256(f"{user_id}_{session_id}_{time_floor}".encode()).hexdigest()
+                    
                     return SpiritualResponse(
                         content=response_text,
                         personality_id=personality_id,
@@ -542,7 +554,8 @@ Response:"""
                             "requires_citations": config.requires_citations,
                             "greeting_style": config.greeting_style,
                             "attempt": attempt + 1,
-                            "timeout_seconds": config.timeout_seconds
+                            "timeout_seconds": config.timeout_seconds,
+                            "idempotency_key": idempotency_key
                         }
                     )
                 else:
@@ -589,27 +602,76 @@ Response:"""
         if not self.client:
             raise RuntimeError("Azure OpenAI client not configured")
         
+        enable_structured = os.environ.get("ENABLE_STRUCTURED_OUTPUTS_V2", "False").lower() == "true"
+        
         try:
-            response = await asyncio.get_event_loop().run_in_executor(
-                None,
-                lambda: self.client.chat.completions.create(
-                    model=self.azure_deployment,
-                    messages=[
-                        {"role": "system", "content": "You are a wise spiritual guide providing thoughtful, compassionate guidance."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    max_tokens=max_tokens,
-                    temperature=0.7,
-                    top_p=0.95
+            if enable_structured:
+                # Execution of Phase 1: Structured json_schema enforcement
+                response = await asyncio.get_event_loop().run_in_executor(
+                    None,
+                    lambda: self.client.chat.completions.create(
+                        model=self.azure_deployment,
+                        messages=[
+                            {"role": "system", "content": "You are a wise spiritual guide providing thoughtful, compassionate guidance."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_tokens=max_tokens,
+                        temperature=0.7,
+                        top_p=0.95,
+                        response_format={
+                            "type": "json_schema",
+                            "json_schema": {
+                                "name": "ResponseSchema",
+                                "strict": True,
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {"type": "string"},
+                                        "citations": {"type": "array", "items": {"type": "string"}},
+                                        "suggested_prompts": {"type": "array", "items": {"type": "string"}}
+                                    },
+                                    "required": ["message", "citations", "suggested_prompts"],
+                                    "additionalProperties": False
+                                }
+                            }
+                        }
+                    )
                 )
-            )
-            
-            # Create a response object similar to Gemini's format
-            class AzureResponse:
-                def __init__(self, text):
-                    self.text = text
-            
-            return AzureResponse(response.choices[0].message.content)
+                
+                class AzureResponse:
+                    def __init__(self, text, usage=None):
+                        self.usage = usage
+                        import json
+                        try:
+                            data = json.loads(text)
+                            self.text = data.get("message", text)
+                        except Exception as e:
+                            logger.error(f"🚨 VALIDATION_ERROR: Fallback validation triggered: {e}")
+                            self.text = text
+                            
+                return AzureResponse(response.choices[0].message.content, getattr(response, "usage", None))
+            else:
+                response = await asyncio.get_event_loop().run_in_executor(
+                    None,
+                    lambda: self.client.chat.completions.create(
+                        model=self.azure_deployment,
+                        messages=[
+                            {"role": "system", "content": "You are a wise spiritual guide providing thoughtful, compassionate guidance."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        max_tokens=max_tokens,
+                        temperature=0.7,
+                        top_p=0.95
+                    )
+                )
+                
+                # Create a response object similar to Gemini's format
+                class AzureResponse:
+                    def __init__(self, text, usage=None):
+                        self.usage = usage
+                        self.text = text
+                
+                return AzureResponse(response.choices[0].message.content, getattr(response, "usage", None))
             
         except Exception as e:
             self.logger.error(f"❌ Azure OpenAI API error: {e}")

@@ -24,6 +24,7 @@ import DebugAuth from './DebugAuth';
 import { pwaManager } from '../utils/pwa';
 import '../styles/vimarsh-design-system.css';
 import '../styles/spiritual-theme.css';
+import './GuidanceInterface.css';
 
 export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -667,113 +668,50 @@ export default function GuidanceInterface() {
   const domainColors = selectedPersonality ? getDomainColor(selectedPersonality.domain) : getDomainColor('spiritual');
 
   return (
-    <div style={{
-      minHeight: '100vh',
+    <div className="guidance-layout" style={{
       background: selectedPersonality 
         ? `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.95) 100%)`
-        : '#ffffff',
-      color: '#1d1d1f',
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-      display: 'flex',
-      flexDirection: 'column'
+        : '#ffffff'
     }}>
-      {/* Mobile-Optimized Header */}
-      <header style={{
-        padding: '1rem 1.5rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+      {/* Mobile-Optimized Header using modular CSS */}
+      <header className="guidance-header" style={{
         background: selectedPersonality 
           ? `linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, ${domainColors.bg} 100%)`
           : '#ffffff',
         borderBottom: selectedPersonality 
           ? `2px solid ${domainColors.border}` 
-          : '1px solid #e5e7eb',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+          : '1px solid #e5e7eb'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.75rem' 
-        }}>
-          <div style={{
-            width: '2.75rem',
-            height: '2.75rem',
+        <div className="guidance-header-left">
+          <div className="guidance-logo-container" style={{
             background: selectedPersonality ? domainColors.gradient : 'linear-gradient(135deg, #f97316, #f59e0b)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            color: 'white',
             boxShadow: selectedPersonality 
               ? `0 4px 12px ${domainColors.border}60` 
-              : '0 4px 12px rgba(249, 115, 22, 0.3)',
-            transition: 'all 0.3s ease',
-            flexShrink: 0
+              : '0 4px 12px rgba(249, 115, 22, 0.3)'
           }}>
             V
           </div>
           <div>
-            <h1 style={{ 
-              margin: 0, 
-              fontSize: '1.25rem', 
-              fontWeight: '600',
-              color: '#1d1d1f'
-            }}>
-              Vimarsh
-            </h1>
-            <p style={{ 
-              margin: 0, 
-              fontSize: '0.75rem', 
-              fontWeight: '500',
-              color: '#6e6e73'
-            }}>
-              Wisdom Without Boundaries
-            </p>
+            <h1 className="guidance-title">Vimarsh</h1>
+            <p className="guidance-subtitle">Wisdom Without Boundaries</p>
           </div>
         </div>
         
-        {/* Clean Navigation Bar — Personality Badge + User Menu */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.75rem'
-        }}>
+        {/* Clean Navigation Bar */}
+        <div className="guidance-header-actions">
           {/* Personality Badge - Primary Context */}
           {selectedPersonality && (
             <button
+              className="personality-badge"
               onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
               style={{
                 background: selectedPersonality ? domainColors.bg : '#f8fafc',
-                borderRadius: '0.75rem',
-                padding: '0.5rem 1rem',
                 border: selectedPersonality ? `1.5px solid ${domainColors.border}` : '1px solid #e2e8f0',
-                backdropFilter: 'blur(10px)',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: selectedPersonality 
                   ? `0 2px 8px ${domainColors.border}30` 
                   : '0 1px 3px rgba(0, 0, 0, 0.05)'
               }}
               title={`Currently chatting with ${selectedPersonality?.name || 'Loading...'} — click to switch`}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = `0 4px 12px ${domainColors.border}40`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = `0 2px 8px ${domainColors.border}30`;
-              }}
             >
               <Users size={16} style={{ opacity: 0.8, flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>

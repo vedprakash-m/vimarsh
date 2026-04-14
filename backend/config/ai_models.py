@@ -47,7 +47,7 @@ def get_ai_model_config() -> AIModelConfig:
         # Azure OpenAI Chat Configuration (migrated from Gemini)
         azure_openai_chat_endpoint=azure_endpoint,
         azure_openai_chat_api_key=azure_api_key,
-        azure_openai_chat_deployment=os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini'),
+        azure_openai_chat_deployment=os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'gpt-5.4-mini'),
         azure_openai_chat_api_version=os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-08-01-preview'),
         
         # Azure OpenAI Embedding Configuration
@@ -67,7 +67,7 @@ def get_ai_model_config() -> AIModelConfig:
         max_retries=int(os.getenv('AZURE_OPENAI_MAX_RETRIES', '3')),
         
         # Fallback - use same deployment
-        fallback_chat_deployment=os.getenv('AZURE_OPENAI_FALLBACK_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
+        fallback_chat_deployment=os.getenv('AZURE_OPENAI_FALLBACK_DEPLOYMENT', 'gpt-5.4-mini')
     )
 
 # Global configuration instance
