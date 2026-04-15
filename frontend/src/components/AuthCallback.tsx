@@ -70,7 +70,8 @@ const AuthCallback: React.FC = () => {
         
         setProcessing(false);
         
-        // Navigate immediately — no artificial delays needed
+        // Force navigate to guidance - ignore any MSAL saved request URLs
+        // to ensure the user gets to the wisdom interface immediately
         navigate('/guidance', { replace: true });
 
       } catch (error) {

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Brain, Shield, Sparkles, Play, Mic, Share2, Bell, Volume2, Heart, Trophy, Zap } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { useAppLoading } from '../contexts/AppLoadingContext';
 import { WisdomOfDay } from './WisdomOfDay';
-import { OnboardingWizard } from './onboarding';
-import { onboardingApi } from './onboarding/onboardingApi';
 
 // CSS Variables for Apple Design System
 const cssVariables = `
@@ -390,14 +388,11 @@ const personalities: Personality[] = [
 const LandingPage: React.FC = () => {
   const { isAuthenticated, account, login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [selectedDomain, setSelectedDomain] = useState('All');
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [onboardingChecked, setOnboardingChecked] = useState(false);
-  const [onboardingCheckInProgress, setOnboardingCheckInProgress] = useState(false);
   
   // Import context loading status
-  const { allReady: contextsReady } = useAppLoading() || { allReady: false };
+  const appLoading = useAppLoading();
+  const contextsReady = appLoading?.allReady || false;
 
   // Helper function to filter personalities by domain
   const getFilteredPersonalities = () => {
@@ -407,57 +402,14 @@ const LandingPage: React.FC = () => {
     return personalities.filter(p => p.domain === selectedDomain);
   };
 
-  // Check onboarding status for authenticated users (with circuit breaker)
-  // Note: Authenticated users are redirected to /guidance anyway, so this primarily
-  // handles the brief moment before redirect. Don't show onboarding wizard on errors.
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      // Circuit breaker: prevent multiple concurrent checks
-      if (onboardingCheckInProgress || onboardingChecked) {
-        return;
-      }
-      
-      if (isAuthenticated && account) {
-        setOnboardingCheckInProgress(true);
-        try {
-          const state = await onboardingApi.getOnboardingState(account.homeAccountId);
-          // Show onboarding wizard if not completed
-          if (state && !state.is_complete) {
-            setShowOnboarding(true);
-          }
-          setOnboardingChecked(true);
-        } catch (error) {
-          console.log('📋 Onboarding check skipped (new user or service unavailable)');
-          // Don't show onboarding on error — let user proceed to /guidance naturally
-          // The onboarding can be offered there in a non-blocking way
-          setOnboardingChecked(true);
-        } finally {
-          setOnboardingCheckInProgress(false);
-        }
-      }
-    };
-    
-    checkOnboardingStatus();
-  }, [isAuthenticated, account, onboardingChecked, onboardingCheckInProgress]);
-
-  // Handle onboarding completion
-  const handleOnboardingComplete = (personalityId?: string) => {
-    setShowOnboarding(false);
-    if (personalityId) {
-      // Navigate to guidance with the matched personality
-      navigate(`/guidance?personality=${personalityId}`);
-    } else {
-      navigate('/guidance');
-    }
-  };
-
-  // Decoupled Landing Page: Removed aggressive auto-redirect logic.
-  // Returning users can now freely view the landing page and use the explicit 'Go to Dashboard' CTA.
+  // Decoupled Landing Page: Implement automatic redirect for authenticated users
+  // to ensure they land directly in the wisdom interface after login.
   useEffect(() => {
     if (isAuthenticated && account && contextsReady) {
-      console.log('👀 LandingPage: Authenticated user viewing marketing page successfully.');
+      console.log('🚀 LandingPage: Authenticated user detected, auto-navigating to /guidance');
+      navigate('/guidance', { replace: true });
     }
-  }, [isAuthenticated, account, contextsReady]);
+  }, [isAuthenticated, account, contextsReady, navigate]);
 
   const handleSignIn = async () => {
     try {
@@ -1559,20 +1511,8 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
-
-      {/* Onboarding Wizard for New Users */}
-      {showOnboarding && account && (
-        <OnboardingWizard
-          open={showOnboarding}
-          onClose={() => setShowOnboarding(false)}
-          userId={account.homeAccountId}
-          userName={account.name}
-          onSelectPersonality={handleOnboardingComplete}
-        />
-      )}
     </div>
   );
 };
 
 export default LandingPage;
- 
