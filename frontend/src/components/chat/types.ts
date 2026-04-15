@@ -2,6 +2,8 @@
  * Shared types for chat components
  */
 
+import { Citation } from '../../utils/api';
+
 export interface MessageMetadata {
   response_source?: 'gemini_ai' | 'template_fallback' | 'hardcoded_fallback' | 'hybrid_rag' | 'simple_rag';
   ai_generated?: boolean;
@@ -19,6 +21,9 @@ export interface MessageMetadata {
   };
   generation_time_ms?: number;
   memory_enhanced?: boolean;
+  citations?: Citation[];
+  streamed?: boolean;
+  rag_enhanced?: boolean;
 }
 
 export interface Message {
