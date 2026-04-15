@@ -1,1339 +1,373 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Send, MessageSquare, Users, Download, X, Share2, Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { SharingInterface } from './SharingInterface';
-import { VoiceControls } from './VoiceControls';
-import { azureSpeechService } from '../services/azureSpeechService';
-import PersonalitySelector from './PersonalitySelector';
-import ServiceStatusIndicator from './ServiceStatusIndicator';
-// MemoryIndicator moved to UserMenuDropdown
-import RelationshipBadge from './RelationshipBadge';
-import { AchievementUnlockModal, AchievementShareModal } from './engagement';
-import EngagementTour, { useEngagementTour } from './engagement/EngagementTour';
-import UserMenuDropdown from './UserMenuDropdown';
-import { usePersonality, Personality } from '../contexts/PersonalityContext';
-import { useMemory } from '../contexts/MemoryContext';
-import { useEngagement } from '../contexts/EngagementContext';
-import { useAdmin } from '../contexts/AdminProviderContext';
-import { useAppLoading } from '../contexts/AppLoadingContext';
+import { Hash, CornerDownLeft, Settings, User, LogOut, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-// authService import removed — logout handled by UserMenuDropdown
+import PersonalitySelector from './PersonalitySelector';
+import { usePersonality, Personality } from '../contexts/PersonalityContext';
+import { useAuth } from '../auth/AuthProvider';
+import { useAppLoading } from '../contexts/AppLoadingContext';
 import spiritualGuidanceAPI from '../utils/api';
-import { Message, MessageSourceBadge } from './chat';
-import DebugAuth from './DebugAuth';
-import { pwaManager } from '../utils/pwa';
+import { engagementApi } from './engagement/engagementApi';
+import { Message } from './chat';
+
+import '../styles/wisdom-typography.css';
 import '../styles/vimarsh-design-system.css';
-import '../styles/spiritual-theme.css';
-import './GuidanceInterface.css';
 
 export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-  
-  // Share state
-  const [shareMessage, setShareMessage] = useState<Message | null>(null);
-  const [shareAchievementOpen, setShareAchievementOpen] = useState(false);
-  const [achievementToShare, setAchievementToShare] = useState<typeof pendingAchievement>(null);
-  
-  // Voice state
-  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  
-  const navigate = useNavigate();
-
-  // Engagement Tour — only shown for authenticated users on /guidance
-  const { showTour, closeTour } = useEngagementTour();
-
-  // Context hooks
-  const { user } = useAdmin();
-  const { isInitializing, allReady } = useAppLoading();
-  const { 
-    currentSession: memoryContext, 
-    relationships, 
-    startSession, 
-    endSession,
-    isLoading: memoryLoading 
-  } = useMemory();
-  
-  // Engagement context for tracking activity
-  const {
-    recordActivity,
-    showAchievementModal,
-    pendingAchievement,
-    dismissAchievementModal
-  } = useEngagement();
-
-  // Debug toggle for production troubleshooting
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + Shift + D to toggle debug
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
-        setShowDebug(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
-
-  // Add animation styles
-  useEffect(() => {
-    const styles = `
-      @keyframes pulse {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 1; }
-      }
-    `;
-    
-    if (!document.getElementById('pulse-animation')) {
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'pulse-animation';
-      styleSheet.textContent = styles;
-      document.head.appendChild(styleSheet);
-    }
-  }, []);
-  const [isListening, setIsListening] = useState(false);
   const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   
-  // PWA install prompt state
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const [canInstall, setCanInstall] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   
-  // Use PersonalityContext instead of local state
+  const { logout, account } = useAuth();
+  const { isInitializing } = useAppLoading();
   const { 
     selectedPersonality, 
     setSelectedPersonality, 
     availablePersonalities, 
-    personalityLoading,
-    loadPersonalities 
+    personalityLoading 
   } = usePersonality();
 
-  // Personalities are loaded by PersonalityContext on mount - no need to reload here
-  // This prevents duplicate API calls when navigating to GuidanceInterface
-
-  // Auto-show personality selector if no personality is selected and personalities are loaded
+  // Redirect if no personality and none available (safety)
   useEffect(() => {
-    if (availablePersonalities.length > 0 && !selectedPersonality && !personalityLoading) {
+    if (!personalityLoading && availablePersonalities.length > 0 && !selectedPersonality) {
       setShowPersonalitySelector(true);
     }
-  }, [availablePersonalities.length, selectedPersonality, personalityLoading]);
+  }, [personalityLoading, availablePersonalities, selectedPersonality]);
 
-  // Load memory context when personality changes
+  // Auto-scroll
   useEffect(() => {
-    if (selectedPersonality && sessionId) {
-      startSession(selectedPersonality.id, sessionId).catch(err => {
-        console.warn('Failed to load memory context:', err);
-      });
-    }
-  }, [selectedPersonality?.id, sessionId, startSession]);
-
-  // Check for PWA install prompt availability
-  useEffect(() => {
-    const checkInstallPrompt = () => {
-      const installAvailable = pwaManager.canInstall();
-      setCanInstall(installAvailable);
-      
-      // Show install prompt on mobile after user has been active for 30 seconds
-      if (installAvailable && window.innerWidth <= 768) {
-        setTimeout(() => {
-          setShowInstallPrompt(true);
-        }, 30000);
-      }
-    };
-    
-    checkInstallPrompt();
-  }, []);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
 
   const handlePersonalitySelect = (personality: Personality) => {
     setSelectedPersonality(personality);
     setShowPersonalitySelector(false);
-    // Clear messages when switching personality to provide fresh context
-    setMessages([]);
-  };
-
-  // PWA install prompt handlers
-  const handleInstallApp = async () => {
-    try {
-      await pwaManager.showInstallPrompt();
-      setShowInstallPrompt(false);
-    } catch (error) {
-      console.error('Install prompt failed:', error);
-    }
-  };
-
-  const dismissInstallPrompt = () => {
-    setShowInstallPrompt(false);
+    setMessages([]); // Clear canvas for new personality
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || isLoading || !selectedPersonality) return;
 
+    const question = inputText;
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText,
+      text: question,
       isUser: true,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const question = inputText;
     setInputText('');
     setIsLoading(true);
 
+    const aiMessageId = (Date.now() + 1).toString();
+    const initialAiMessage: Message = {
+      id: aiMessageId,
+      text: '',
+      isUser: false,
+      timestamp: new Date(),
+      personality: selectedPersonality.id
+    };
+
+    setMessages(prev => [...prev, initialAiMessage]);
+
     try {
-      // Get conversation context (last 4 messages for context)
       const recentMessages = messages.slice(-4).map(msg => ({
         role: msg.isUser ? 'user' as const : 'assistant' as const,
         content: msg.text
       }));
 
-      // Call guidance API using unified API client
-      const data = await spiritualGuidanceAPI.getSpiritualGuidance({
-        query: question,
-        language: 'English',
-        include_citations: true,
-        voice_enabled: false,
-        conversation_context: recentMessages,
-        personality_id: selectedPersonality.id,
-        user_id: sessionId,
-        session_id: sessionId
-      });
-      
-      // Use the response with metadata from backend
-      const apiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: data.response,
-        isUser: false,
-        timestamp: new Date(),
-        personality: selectedPersonality.id,
-        metadata: data.metadata // Include the gap remediation metadata
-      };
-      
-      setMessages(prev => [...prev, apiResponse]);
-      
-      // Handle achievements from backend response (backend now tracks engagement)
-      // If backend returned unlocked achievements, trigger the modal
-      if (data.achievements_unlocked && data.achievements_unlocked.length > 0) {
-        console.log('🏆 Achievements unlocked from backend:', data.achievements_unlocked);
-        // Record activity will handle displaying the achievement modal
-        // The backend already recorded the activity, but we call this to update local state
-        recordActivity(
-          'conversation',
-          selectedPersonality.id,
-          selectedPersonality.domain,
-          {
-            session_id: sessionId,
-            message_count: messages.length + 2,
-            response_source: data.metadata?.response_source,
-            // Pass backend achievements to trigger modal
-            backend_achievements: data.achievements_unlocked
-          }
-        ).catch(err => {
-          console.warn('Failed to sync activity state:', err);
-        });
-      } else {
-        // Still record activity for local state sync (non-blocking)
-        recordActivity(
-          'conversation',
-          selectedPersonality.id,
-          selectedPersonality.domain,
-          {
-            session_id: sessionId,
-            message_count: messages.length + 2,
-            response_source: data.metadata?.response_source
-          }
-        ).catch(err => {
-          // Don't let engagement tracking errors affect the user experience
-          console.warn('Failed to record activity:', err);
-        });
-      }
-      
+      await spiritualGuidanceAPI.getSpiritualGuidanceStream(
+        {
+          query: question,
+          language: 'English',
+          include_citations: true,
+          voice_enabled: false,
+          conversation_context: recentMessages,
+          personality_id: selectedPersonality.id,
+          user_id: account?.homeAccountId || sessionId,
+          session_id: sessionId
+        },
+        (chunk) => {
+          setMessages(prev => prev.map(msg => 
+            msg.id === aiMessageId ? { ...msg, text: msg.text + chunk } : msg
+          ));
+        },
+        (fullData) => {
+          setMessages(prev => prev.map(msg => 
+            msg.id === aiMessageId ? { 
+              ...msg, 
+              text: fullData.response, 
+              metadata: fullData.metadata 
+            } : msg
+          ));
+          setIsLoading(false);
+          
+          // Headless engagement tracking
+          engagementApi.recordActivityHeadless(
+            account?.homeAccountId || sessionId,
+            'conversation',
+            selectedPersonality.id,
+            selectedPersonality.domain,
+            { session_id: sessionId, message_count: messages.length + 2 }
+          );
+        },
+        (error) => {
+          console.error('Streaming Error:', error);
+          setMessages(prev => prev.map(msg => 
+            msg.id === aiMessageId ? { 
+              ...msg, 
+              text: "The silence of the universe remains. Please try again.",
+            } : msg
+          ));
+          setIsLoading(false);
+        }
+      );
     } catch (error) {
-      console.error('Error calling guidance API:', error);
-      
-      // Fallback response for errors
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "🤔 I'm having trouble connecting to the guidance service. Please check your connection and try again. (Frontend Error)",
-        isUser: false,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, errorResponse]);
-    } finally {
+      console.error('Guidance API Error:', error);
       setIsLoading(false);
     }
   };
 
-  // Handle voice input transcript
-  const handleVoiceTranscript = useCallback((transcript: string) => {
-    if (transcript.trim() && selectedPersonality) {
-      setInputText(transcript);
-      // Auto-submit after voice input
-      const form = document.querySelector('form');
-      if (form) {
-        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-        form.dispatchEvent(submitEvent);
-      }
-    }
-  }, [selectedPersonality]);
-
-  // Handle TTS for AI responses using Azure Neural Voice
-  const speakMessage = useCallback(async (text: string) => {
-    // Get personality ID for voice selection
-    const personalityId = selectedPersonality?.id?.toLowerCase().replace(/\s+/g, '_') || 'krishna';
-    
-    try {
-      // Try Azure Neural Voice first
-      const isAzureAvailable = await azureSpeechService.isAvailable();
-      
-      if (isAzureAvailable) {
-        console.log('🎙️ Using Azure Neural Voice for', personalityId);
-        await azureSpeechService.speak(text, personalityId, {
-          onStart: () => setIsSpeaking(true),
-          onEnd: () => setIsSpeaking(false),
-          onError: (error) => {
-            console.warn('Azure Speech failed, using fallback:', error);
-            fallbackSpeak(text);
-          }
-        });
-        return;
-      }
-    } catch (error) {
-      console.warn('Azure Speech not available, using fallback:', error);
-    }
-    
-    // Fallback to Web Speech API
-    fallbackSpeak(text);
-  }, [selectedPersonality]);
-
-  // Web Speech API fallback
-  const fallbackSpeak = useCallback((text: string) => {
-    if (!('speechSynthesis' in window)) return;
-    
-    window.speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-    
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    
-    window.speechSynthesis.speak(utterance);
-  }, []);
-
-  // Stop speech (both Azure and Web Speech)
-  const stopSpeaking = useCallback(() => {
-    azureSpeechService.stop();
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
-  }, []);
-
-  // Handle share button click
-  const handleShareClick = useCallback((message: Message) => {
-    setShareMessage(message);
-  }, []);
-
-  // Close share modal
-  const closeShareModal = useCallback(() => {
-    setShareMessage(null);
-  }, []);
-
-  // Generate domain-appropriate placeholder text
-  const getPlaceholderText = () => {
-    if (!selectedPersonality) {
-      return "Please choose a guide first...";
-    }
-    
-    const domainPlaceholders = {
-      spiritual: "Ask your spiritual question...",
-      scientific: "Ask your scientific question...",
-      historical: "Ask your historical question...", 
-      philosophical: "Ask your philosophical question...",
-      literary: "Ask your literary question..."
-    };
-    
-    return domainPlaceholders[selectedPersonality.domain as keyof typeof domainPlaceholders] || "Ask your question...";
-  };
-
-  // Dynamic quick prompts based on selected personality
-  const getQuickPrompts = () => {
-    if (!selectedPersonality) {
-      return [
-        "How can I find my dharma and live according to my true purpose?",
-        "How can I maintain equanimity during life's ups and downs?",
-        "What are the different paths of yoga and which one suits me?",
-        "How do I overcome anger and jealousy through spiritual practice?"
-      ];
-    }
-
-    // First check for specific personality-based questions
-    const personalityId = selectedPersonality.id?.toLowerCase() || selectedPersonality.name?.toLowerCase();
-    
-    switch (personalityId) {
-      case 'jesus':
-      case 'jesus christ':
-        return [
-          "How can I show love and compassion to those who have hurt me?",
-          "What does it mean to carry my cross in daily life?",
-          "How do I find hope and peace during times of suffering?",
-          "How can I serve others and live according to God's will?"
-        ];
-      
-      case 'krishna':
-      case 'lord krishna':
-        return [
-          "How can I find my dharma and live according to my true purpose?",
-          "How can I maintain equanimity during life's ups and downs?",
-          "What are the different paths of yoga and which one suits me?",
-          "How do I overcome anger and jealousy through spiritual practice?"
-        ];
-      
-      case 'buddha':
-      case 'gautama buddha':
-        return [
-          "How can I find freedom from suffering and attachment?",
-          "What is the path to mindfulness and inner peace?",
-          "How do I cultivate compassion for all living beings?",
-          "How can I understand the nature of impermanence?"
-        ];
-      
-      case 'einstein':
-      case 'albert einstein':
-        return [
-          "How does the theory of relativity change our understanding of time and space?",
-          "What is the relationship between energy and matter in the universe?",
-          "How do we approach scientific discovery and overcome preconceived notions?",
-          "What role does imagination play in scientific breakthroughs?"
-        ];
-      
-      case 'lincoln':
-      case 'abraham lincoln':
-      case 'abraham_lincoln':
-        return [
-          "What lessons can we learn from leadership during times of crisis?",
-          "How do we build unity and preserve democracy in challenging times?",
-          "What role does character play in effective governance?",
-          "How do we balance justice with compassion in difficult decisions?"
-        ];
-      
-      case 'aurelius':
-      case 'marcus aurelius':
-        return [
-          "How do we cultivate virtue and wisdom in daily life?",
-          "What is the relationship between reason and emotion in decision-making?",
-          "How do we find meaning and purpose in the face of adversity?",
-          "What does it mean to live according to nature and cosmic order?"
-        ];
-      
-      case 'rumi':
-        return [
-          "How do I open my heart to divine love and connection?",
-          "What is the spiritual meaning behind life's joys and sorrows?",
-          "How do I find unity with the divine through mystical experience?",
-          "How can poetry and beauty lead me to spiritual truth?"
-        ];
-      
-      case 'laotzu':
-      case 'lao tzu':
-        return [
-          "How do I find balance and harmony in the natural flow of life?",
-          "What does it mean to act through wu wei (effortless action)?",
-          "How do I cultivate simplicity and humility in modern life?",
-          "What is the Way and how do I align with it?"
-        ];
-      
-      case 'benjamin_franklin':
-      case 'franklin':
-        return [
-          "How can I develop practical wisdom and better habits in daily life?",
-          "What principles of diplomacy and negotiation can help resolve conflicts?",
-          "How do I balance innovation and invention with practical application?",
-          "What role does hard work and industry play in achieving success?"
-        ];
-      
-      case 'isaac_newton':
-      case 'newton':
-        return [
-          "How do the laws of motion apply to understanding life's challenges?",
-          "What role does mathematical thinking play in solving complex problems?",
-          "How do we build upon the work of others to achieve greater discoveries?",
-          "What is the relationship between observation and theoretical understanding?"
-        ];
-      
-      case 'nikola_tesla':
-      case 'tesla':
-        return [
-          "How can I harness the power of imagination and visualization for innovation?",
-          "What role does intuition play in scientific and creative breakthroughs?",
-          "How do I persist through setbacks when pursuing revolutionary ideas?",
-          "What is the relationship between energy, frequency, and vibration in life?"
-        ];
-      
-      case 'leonardo_da_vinci':
-      case 'leonardo':
-      case 'da_vinci':
-        return [
-          "How can I cultivate curiosity and observe the world with fresh eyes?",
-          "What is the connection between art, science, and human understanding?",
-          "How do I develop multiple skills and integrate different disciplines?",
-          "What role does sketching and visual thinking play in problem-solving?"
-        ];
-      
-      case 'archimedes':
-        return [
-          "How do I approach complex problems with systematic thinking?",
-          "What role does practical experimentation play in understanding principles?",
-          "How can simple principles lead to powerful applications?",
-          "What is the relationship between mathematical precision and real-world solutions?"
-        ];
-      
-      case 'william_shakespeare':
-      case 'shakespeare':
-        return [
-          "How does understanding human nature help us navigate relationships?",
-          "What can the complexity of characters teach us about ourselves?",
-          "How do stories and drama reflect the deepest truths about life?",
-          "What role does language and expression play in revealing truth?"
-        ];
-      
-      case 'rabindranath_tagore':
-      case 'tagore':
-        return [
-          "How can education nurture the whole human being?",
-          "What is the relationship between individual creativity and universal truth?",
-          "How do we find harmony between tradition and progress?",
-          "What role does poetry and art play in spiritual development?"
-        ];
-      
-      case 'chanakya':
-        return [
-          "What principles of strategy and statecraft guide effective leadership?",
-          "How do we balance pragmatism with ethical principles in governance?",
-          "What role does understanding human nature play in political wisdom?",
-          "How do we build and maintain power while serving the greater good?"
-        ];
-      
-      case 'confucius':
-        return [
-          "How do we cultivate virtue and moral character in daily life?",
-          "What is the proper relationship between individual growth and social harmony?",
-          "How do we show respect and filial piety in modern relationships?",
-          "What role does education and self-cultivation play in good governance?"
-        ];
-      
-      case 'george_washington':
-      case 'washington':
-        return [
-          "What principles of leadership unite people during times of division?",
-          "How do we balance personal ambition with service to others?",
-          "What role does character and integrity play in earning trust?",
-          "How do we establish lasting institutions while avoiding the corruption of power?"
-        ];
-      
-      case 'mahatma_gandhi':
-      case 'gandhi':
-        return [
-          "How can non-violent resistance create lasting social change?",
-          "What is the relationship between personal transformation and social reform?",
-          "How do we practice truth and simplicity in a complex world?",
-          "What role does self-discipline play in serving others effectively?"
-        ];
-      
-      case 'martin_luther_king_jr':
-      case 'mlk':
-      case 'king':
-        return [
-          "How do we pursue justice while maintaining love for our opponents?",
-          "What role does moral courage play in challenging unjust systems?",
-          "How do we build bridges between different communities and perspectives?",
-          "What is the relationship between individual dignity and collective freedom?"
-        ];
-      
-      case 'socrates':
-        return [
-          "How do we examine our lives and question our assumptions?",
-          "What does it mean to know that we know nothing?",
-          "How do we pursue wisdom through dialogue and questioning?",
-          "What is the relationship between virtue, knowledge, and the good life?"
-        ];
-      
-      case 'plato':
-        return [
-          "How do we distinguish between appearance and reality in our understanding?",
-          "What is the relationship between justice in the soul and justice in society?",
-          "How do we pursue the ideal while living in an imperfect world?",
-          "What role does education play in awakening the mind to truth?"
-        ];
-      
-      case 'aristotle':
-        return [
-          "How do we find the golden mean between extremes in ethical decisions?",
-          "What is the relationship between theoretical knowledge and practical wisdom?",
-          "How do we cultivate excellence through habit and practice?",
-          "What constitutes human flourishing and the good life?"
-        ];
-      
-      case 'sigmund_freud':
-      case 'freud':
-        return [
-          "How do unconscious motivations influence our conscious behavior?",
-          "What role do dreams and symbols play in understanding the psyche?",
-          "How do childhood experiences shape our adult personalities?",
-          "What is the relationship between individual psychology and civilization?"
-        ];
-      
-      case 'swami_vivekananda':
-      case 'vivekananda':
-        return [
-          "How do we realize the divinity within ourselves and others?",
-          "What is the practical application of Vedantic philosophy in daily life?",
-          "How do we serve humanity while pursuing spiritual growth?",
-          "What role does strength and fearlessness play in spiritual development?"
-        ];
-      
-      default:
-        // Fall back to domain-based questions if personality not found
-        switch (selectedPersonality.domain) {
-          case 'scientific':
-            return [
-              "How does the theory of relativity change our understanding of time and space?",
-              "What is the relationship between energy and matter in the universe?",
-              "How do we approach scientific discovery and overcome preconceived notions?",
-              "What role does imagination play in scientific breakthroughs?"
-            ];
-          case 'historical':
-            return [
-              "What lessons can we learn from leadership during times of crisis?",
-              "How do we build unity and preserve democracy in challenging times?",
-              "What role does character play in effective governance?",
-              "How do we balance justice with compassion in difficult decisions?"
-            ];
-          case 'leadership':
-            return [
-              "What principles of leadership and governance guide effective decision-making?",
-              "How do we build trust and inspire others during challenging times?",
-              "What role does character and integrity play in true leadership?",
-              "How do we balance competing interests while serving the common good?"
-            ];
-          case 'philosophical':
-            return [
-              "How do we cultivate virtue and wisdom in daily life?",
-              "What is the relationship between reason and emotion in decision-making?",
-              "How do we find meaning and purpose in the face of adversity?",
-              "What does it mean to live according to nature and cosmic order?"
-            ];
-          case 'literary':
-            return [
-              "How does literature help us understand the human condition?",
-              "What is the relationship between beauty and truth in art?",
-              "How do stories shape our understanding of morality and ethics?",
-              "What role does creativity play in personal transformation?"
-            ];
-          case 'spiritual':
-          default:
-            return [
-              "How can I find my dharma and live according to my true purpose?",
-              "How can I maintain equanimity during life's ups and downs?",
-              "What are the different paths of yoga and which one suits me?",
-              "How do I overcome anger and jealousy through spiritual practice?"
-            ];
-        }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
     }
   };
 
-  // Get domain-specific colors for visual enhancement
-  const getDomainColor = (domain: string) => {
-    switch (domain) {
-      case 'spiritual': return { bg: 'rgba(255, 107, 53, 0.1)', text: '#ea580c', border: 'rgba(255, 107, 53, 0.3)', gradient: 'linear-gradient(135deg, #ff6b35, #ea580c)' };
-      case 'scientific': return { bg: 'rgba(59, 130, 246, 0.1)', text: '#2563eb', border: 'rgba(59, 130, 246, 0.3)', gradient: 'linear-gradient(135deg, #3b82f6, #2563eb)' };
-      case 'historical': return { bg: 'rgba(34, 197, 94, 0.1)', text: '#16a34a', border: 'rgba(34, 197, 94, 0.3)', gradient: 'linear-gradient(135deg, #22c55e, #16a34a)' };
-      case 'philosophical': return { bg: 'rgba(147, 51, 234, 0.1)', text: '#9333ea', border: 'rgba(147, 51, 234, 0.3)', gradient: 'linear-gradient(135deg, #9333ea, #7c3aed)' };
-      case 'literary': return { bg: 'rgba(16, 185, 129, 0.1)', text: '#059669', border: 'rgba(16, 185, 129, 0.3)', gradient: 'linear-gradient(135deg, #10b981, #059669)' };
-      case 'leadership': return { bg: 'rgba(239, 68, 68, 0.1)', text: '#dc2626', border: 'rgba(239, 68, 68, 0.3)', gradient: 'linear-gradient(135deg, #ef4444, #dc2626)' };
-      case 'psychology': return { bg: 'rgba(139, 92, 246, 0.1)', text: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)', gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' };
-      default: return { bg: 'rgba(107, 114, 128, 0.1)', text: '#374151', border: 'rgba(107, 114, 128, 0.3)', gradient: 'linear-gradient(135deg, #6b7280, #374151)' };
-    }
-  };
-
-  const quickPrompts = getQuickPrompts();
-  const domainColors = selectedPersonality ? getDomainColor(selectedPersonality.domain) : getDomainColor('spiritual');
+  if (isInitializing || personalityLoading) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
+        <div className="apple-spinner"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="guidance-layout" style={{
-      background: selectedPersonality 
-        ? `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.95) 100%)`
-        : '#ffffff'
-    }}>
-      {/* Mobile-Optimized Header using modular CSS */}
-      <header className="guidance-header" style={{
-        background: selectedPersonality 
-          ? `linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, ${domainColors.bg} 100%)`
-          : '#ffffff',
-        borderBottom: selectedPersonality 
-          ? `2px solid ${domainColors.border}` 
-          : '1px solid #e5e7eb'
-      }}>
-        <div className="guidance-header-left">
-          <div className="guidance-logo-container" style={{
-            background: selectedPersonality ? domainColors.gradient : 'linear-gradient(135deg, #f97316, #f59e0b)',
-            boxShadow: selectedPersonality 
-              ? `0 4px 12px ${domainColors.border}60` 
-              : '0 4px 12px rgba(249, 115, 22, 0.3)'
-          }}>
-            V
-          </div>
-          <div>
-            <h1 className="guidance-title">Vimarsh</h1>
-            <p className="guidance-subtitle">Wisdom Without Boundaries</p>
+    <div className="wisdom-canvas-container" style={{ minHeight: '100vh', background: '#fff', display: 'flex', flexDirection: 'column' }}>
+      <style>{`
+        .apple-spinner {
+          width: 24px;
+          height: 24px;
+          border: 2px solid #f3f4f6;
+          border-top: 2px solid #000;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .user-menu-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 0.5rem;
+          background: #fff;
+          border: 1px solid #eee;
+          border-radius: 12px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+          width: 200px;
+          z-index: 100;
+          overflow: hidden;
+        }
+        .user-menu-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
+          color: #333;
+          text-decoration: none;
+          cursor: pointer;
+          transition: background 0.2s;
+          font-size: 0.9rem;
+        }
+        .user-menu-item:hover {
+          background: #f5f5f7;
+        }
+      `}</style>
+
+      {showPersonalitySelector ? (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#fff', overflowY: 'auto' }}>
+          <div style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <h1 style={{ fontFamily: 'var(--font-wisdom-ui)', fontSize: '2rem', textAlign: 'center', marginBottom: '3rem', fontWeight: 400, letterSpacing: '-0.02em' }}>
+              Whose wisdom do you seek?
+            </h1>
+            <PersonalitySelector 
+              availablePersonalities={availablePersonalities}
+              selectedPersonalityId={selectedPersonality?.id} 
+              onPersonalitySelect={handlePersonalitySelect} 
+              onClose={() => setShowPersonalitySelector(false)}
+            />
           </div>
         </div>
-        
-        {/* Clean Navigation Bar */}
-        <div className="guidance-header-actions">
-          {/* Personality Badge - Primary Context */}
-          {selectedPersonality && (
-            <button
-              className="personality-badge"
-              onClick={() => setShowPersonalitySelector(!showPersonalitySelector)}
-              style={{
-                background: selectedPersonality ? domainColors.bg : '#f8fafc',
-                border: selectedPersonality ? `1.5px solid ${domainColors.border}` : '1px solid #e2e8f0',
-                boxShadow: selectedPersonality 
-                  ? `0 2px 8px ${domainColors.border}30` 
-                  : '0 1px 3px rgba(0, 0, 0, 0.05)'
-              }}
-              title={`Currently chatting with ${selectedPersonality?.name || 'Loading...'} — click to switch`}
+      ) : (
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.5rem', maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+          
+          {/* Navigation Bar */}
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
+            <div 
+              onClick={() => setShowPersonalitySelector(true)}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '20px', background: '#f5f5f7', transition: 'background 0.2s' }}
             >
-              <Users size={16} style={{ opacity: 0.8, flexShrink: 0 }} />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <div style={{ 
-                  fontSize: '0.875rem', 
-                  fontWeight: '600',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '160px'
-                }}>
-                  {selectedPersonality?.name || 'Loading...'}
-                </div>
-                <div style={{ 
-                  fontSize: '0.65rem', 
-                  opacity: 0.7,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  {selectedPersonality?.domain?.toUpperCase() || 'LOADING'}
-                </div>
+              <Hash size={14} color="#666" />
+              <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#333' }}>{selectedPersonality?.display_name || 'Select Guide'}</span>
+              <ChevronRight size={14} color="#999" />
+            </div>
+
+            <div style={{ position: 'relative' }}>
+              <div 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                style={{ cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%', background: '#f5f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.2s' }}
+              >
+                <User size={18} color="#333" />
               </div>
-            </button>
-          )}
-
-          {/* User Menu Dropdown — consolidated Settings, Admin, Progress, Memory, Logout */}
-          <UserMenuDropdown />
-        </div>
-      </header>
-
-      {/* PWA Install Prompt */}
-      {showInstallPrompt && canInstall && (
-        <div style={{
-          position: 'fixed',
-          top: '80px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#ffffff',
-          color: '#1e293b',
-          padding: window.innerWidth <= 768 ? '1rem' : '1.5rem',
-          borderRadius: '12px',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
-          zIndex: 200,
-          maxWidth: window.innerWidth <= 768 ? '90vw' : '400px',
-          border: '1px solid #e2e8f0'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <Download size={24} color="#FF6B35" />
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Install Vimarsh</h3>
-            <button
-              onClick={dismissInstallPrompt}
-              style={{
-                marginLeft: 'auto',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <X size={18} color="#666" />
-            </button>
-          </div>
-          <p style={{ 
-            margin: '0 0 1rem 0', 
-            fontSize: '0.9rem', 
-            lineHeight: '1.4',
-            color: '#555'
-          }}>
-            Install Vimarsh as an app for faster access and a better mobile experience. Get spiritual guidance anytime, even offline.
-          </p>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button
-              onClick={handleInstallApp}
-              style={{
-                flex: 1,
-                background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
-                color: 'white',
-                border: 'none',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              Install Now
-            </button>
-            <button
-              onClick={dismissInstallPrompt}
-              style={{
-                background: 'transparent',
-                color: '#666',
-                border: '1px solid #ddd',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                fontSize: '0.9rem',
-                cursor: 'pointer'
-              }}
-            >
-              Later
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Personality Selector Modal */}
-      {showPersonalitySelector && (
-        <PersonalitySelector
-          availablePersonalities={availablePersonalities}
-          selectedPersonalityId={selectedPersonality?.id}
-          onPersonalitySelect={handlePersonalitySelect}
-          onClose={() => setShowPersonalitySelector(false)}
-          showAsDialog={true}
-        />
-      )}
-
-      {/* System Status Indicator - Admin Only */}
-      {user?.role === 'admin' && (
-        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1rem 2rem 0' }}>
-          <ServiceStatusIndicator compact={true} className="mb-4" />
-        </div>
-      )}
-
-      {/* Mobile-Optimized Main Content */}
-      <div style={{
-        maxWidth: window.innerWidth <= 768 ? '100%' : '1000px',
-        margin: '0 auto',
-        padding: window.innerWidth <= 768 ? '0.75rem 1rem' : '1rem 2rem',
-        minHeight: window.innerWidth <= 768 ? 'calc(100vh - 120px)' : 'calc(100vh - 140px)',
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        {/* Mobile-Optimized Welcome Section */}
-        {messages.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            padding: window.innerWidth <= 768 ? '1rem 0.5rem' : '2rem 1rem',
-            marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem'
-          }}>
-            <div style={{
-              fontSize: window.innerWidth <= 768 ? '2.5rem' : '4rem',
-              marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem'
-            }}>🏵️</div>
-            
-            {!selectedPersonality ? (
-              <>
-                <h2 style={{
-                  fontSize: window.innerWidth <= 768 ? '1.75rem' : '2.5rem',
-                  fontWeight: '700',
-                  marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
-                  lineHeight: '1.2',
-                  color: '#1e293b'
-                }}>Welcome to Vimarsh</h2>
-                <p style={{
-                  fontSize: window.innerWidth <= 768 ? '1rem' : '1.25rem',
-                  maxWidth: window.innerWidth <= 768 ? '100%' : '600px',
-                  margin: window.innerWidth <= 768 ? '0 auto 1rem' : '0 auto 2rem',
-                  lineHeight: window.innerWidth <= 768 ? '1.4' : '1.6',
-                  padding: window.innerWidth <= 768 ? '0 0.5rem' : '0',
-                  color: '#475569'
-                }}>
-                  <strong>Wisdom Without Boundaries</strong><br/>
-                  Choose your wisdom guide to begin your journey of knowledge and insight.
-                </p>
-                <button
-                  onClick={() => setShowPersonalitySelector(true)}
-                  style={{
-                    background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
-                    border: 'none',
-                    color: 'white',
-                    padding: '1rem 2rem',
-                    borderRadius: '0.75rem',
-                    fontSize: '1.1rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(255, 107, 53, 0.2)',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
-                  }}
-                >
-                  Choose Your Wisdom Guide
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 style={{
-                  fontSize: window.innerWidth <= 768 ? '1.5rem' : '2.5rem',
-                  fontWeight: '700',
-                  marginBottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                  lineHeight: '1.2',
-                  background: domainColors.gradient,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>Welcome to Your {selectedPersonality.domain === 'spiritual' ? 'Spiritual' :
-                  selectedPersonality.domain === 'scientific' ? 'Scientific' :
-                  selectedPersonality.domain === 'historical' ? 'Historical' :
-                  selectedPersonality.domain === 'philosophical' ? 'Philosophical' :
-                  selectedPersonality.domain === 'literary' ? 'Literary' :
-                  selectedPersonality.domain === 'leadership' ? 'Leadership' :
-                  selectedPersonality.domain === 'psychology' ? 'Psychology' :
-                  'Spiritual'} Journey</h2>
-                <p style={{
-                  fontSize: window.innerWidth <= 768 ? '0.95rem' : '1.25rem',
-                  maxWidth: window.innerWidth <= 768 ? '100%' : '600px',
-                  margin: window.innerWidth <= 768 ? '0 auto 0.75rem' : '0 auto 1rem',
-                  lineHeight: '1.6',
-                  color: '#475569'
-                }}>
-                  {selectedPersonality.domain === 'spiritual' 
-                    ? 'Ask questions about spirituality, philosophy, and find wisdom from ancient teachings with' 
-                    : selectedPersonality.domain === 'scientific'
-                    ? 'Explore the mysteries of the universe and scientific discoveries with'
-                    : selectedPersonality.domain === 'historical'
-                    ? 'Learn from history\'s great leaders and their timeless wisdom with'
-                    : selectedPersonality.domain === 'philosophical'
-                    ? 'Contemplate life\'s deepest questions and philosophical insights with'
-                    : selectedPersonality.domain === 'literary'
-                    ? 'Discover the beauty and wisdom found in great literature with'
-                    : selectedPersonality.domain === 'leadership'
-                    ? 'Learn about leadership, governance, and strategic thinking with'
-                    : selectedPersonality.domain === 'psychology'
-                    ? 'Explore the human mind, behavior, and psychological insights with'
-                    : 'Ask questions about spirituality, philosophy, and find wisdom from ancient teachings with'}{' '}
-                  <strong>{selectedPersonality.name}</strong>.
-                </p>
-                <p style={{
-                  fontSize: '1rem',
-                  marginBottom: '2rem',
-                  fontStyle: 'italic',
-                  color: '#64748b'
-                }}>
-                  {selectedPersonality.description}
-                </p>
-                
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-                  maxWidth: window.innerWidth <= 768 ? '100%' : '800px',
-                  margin: '0 auto'
-                }}>
-                  {quickPrompts.map((prompt, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setInputText(prompt)}
-                      style={{
-                        background: `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.9) 100%)`,
-                        border: `2px solid ${domainColors.border}`,
-                        color: domainColors.text,
-                        padding: '1rem',
-                        borderRadius: '0.75rem',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        fontSize: '0.9rem',
-                        lineHeight: '1.4',
-                        transition: 'all 0.2s ease',
-                        boxShadow: `0 2px 8px ${domainColors.border}40`,
-                        fontWeight: '500'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = domainColors.gradient;
-                        e.currentTarget.style.borderColor = domainColors.text;
-                        e.currentTarget.style.color = '#ffffff';
-                        e.currentTarget.style.boxShadow = `0 4px 12px ${domainColors.border}60`;
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(255, 255, 255, 0.9) 100%)`;
-                        e.currentTarget.style.borderColor = domainColors.border;
-                        e.currentTarget.style.color = domainColors.text;
-                        e.currentTarget.style.boxShadow = `0 2px 8px ${domainColors.border}40`;
-                        e.currentTarget.style.transform = 'translateY(0)';
-                      }}
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Mobile-Optimized Messages */}
-        <div style={{
-          flex: '1',
-          marginBottom: window.innerWidth <= 768 ? '1rem' : '2rem',
-          overflowY: 'auto'
-        }}>
-          {messages.map((message) => (
-            <div key={message.id} style={{
-              display: 'flex',
-              justifyContent: message.isUser ? 'flex-end' : 'flex-start',
-              marginBottom: window.innerWidth <= 768 ? '0.75rem' : '1rem'
-            }}>
-              <div style={{
-                maxWidth: window.innerWidth <= 768 ? '85%' : '70%',
-                background: message.isUser 
-                  ? 'linear-gradient(135deg, #FF6B35, #F7931E)' 
-                  : '#ffffff',
-                borderRadius: '1rem',
-                padding: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-                border: message.isUser ? 'none' : '1px solid #e2e8f0',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-                color: message.isUser ? 'white' : '#1e293b'
-              }}>
-                {!message.isUser && (
-                  <div style={{
-                    fontSize: '0.8rem',
-                    marginBottom: '0.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    color: '#64748b'
-                  }}>
-                    <span>🎭</span> {selectedPersonality?.display_name || 'Wisdom Guide'}
+              
+              {showUserMenu && (
+                <div className="user-menu-dropdown">
+                  <div className="user-menu-item" onClick={() => navigate('/settings')}>
+                    <Settings size={16} />
+                    <span>Settings</span>
                   </div>
-                )}
-                <div style={{
-                  fontSize: '0.95rem',
-                  lineHeight: '1.5'
-                }}>
-                  {message.isUser ? (
-                    <div>{message.text}</div>
-                  ) : (
-                    <div>
-                      <ReactMarkdown>{message.text}</ReactMarkdown>
-                      {/* Action buttons for AI responses */}
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        marginTop: '0.75rem',
-                        paddingTop: '0.5rem',
-                        borderTop: '1px solid #f1f5f9'
+                  <div className="user-menu-item" onClick={() => { logout(); navigate('/'); }}>
+                    <LogOut size={16} />
+                    <span>Sign Out</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </header>
+
+          {/* Conversation Canvas */}
+          <div className="wisdom-canvas-messages" style={{ flex: 1, overflowY: 'auto', paddingBottom: '4rem' }}>
+            {messages.length === 0 ? (
+              <div style={{ 
+                marginTop: '15vh', 
+                textAlign: 'center',
+                fontFamily: 'var(--font-wisdom-ui)',
+                fontSize: '2.5rem',
+                fontWeight: 500,
+                color: '#1d1d1f',
+                letterSpacing: '-0.03em',
+                opacity: 0.9
+              }}>
+                What burdens your mind today?
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+                {messages.map(msg => (
+                  <div key={msg.id} style={{ 
+                    maxWidth: msg.isUser ? '85%' : '100%',
+                    alignSelf: msg.isUser ? 'flex-end' : 'flex-start',
+                    width: '100%'
+                  }}>
+                    {msg.isUser ? (
+                      <div style={{ 
+                        fontFamily: 'var(--font-wisdom-ui)', 
+                        fontSize: '1.25rem', 
+                        color: '#1d1d1f', 
+                        fontWeight: 500,
+                        textAlign: 'right',
+                        lineHeight: 1.4
                       }}>
-                        {/* Share button */}
-                        <button
-                          onClick={() => handleShareClick(message)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.25rem',
-                            padding: '0.375rem 0.5rem',
-                            background: 'transparent',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '0.5rem',
-                            cursor: 'pointer',
-                            color: '#64748b',
-                            fontSize: '0.75rem',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#f8fafc';
-                            e.currentTarget.style.borderColor = '#FF6B35';
-                            e.currentTarget.style.color = '#FF6B35';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.borderColor = '#e2e8f0';
-                            e.currentTarget.style.color = '#64748b';
-                          }}
-                          title="Share this wisdom"
-                        >
-                          <Share2 size={14} />
-                          <span>Share</span>
-                        </button>
-                        
-                        {/* Text-to-Speech button */}
-                        <button
-                          onClick={() => isSpeaking ? stopSpeaking() : speakMessage(message.text)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.25rem',
-                            padding: '0.375rem 0.5rem',
-                            background: isSpeaking ? '#FF6B35' : 'transparent',
-                            border: `1px solid ${isSpeaking ? '#FF6B35' : '#e2e8f0'}`,
-                            borderRadius: '0.5rem',
-                            cursor: 'pointer',
-                            color: isSpeaking ? '#ffffff' : '#64748b',
-                            fontSize: '0.75rem',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isSpeaking) {
-                              e.currentTarget.style.background = '#f8fafc';
-                              e.currentTarget.style.borderColor = '#FF6B35';
-                              e.currentTarget.style.color = '#FF6B35';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isSpeaking) {
-                              e.currentTarget.style.background = 'transparent';
-                              e.currentTarget.style.borderColor = '#e2e8f0';
-                              e.currentTarget.style.color = '#64748b';
-                            }
-                          }}
-                          title={isSpeaking ? "Stop speaking" : "Listen to this wisdom"}
-                        >
-                          {isSpeaking ? <VolumeX size={14} /> : <Volume2 size={14} />}
-                          <span>{isSpeaking ? 'Stop' : 'Listen'}</span>
-                        </button>
-                        
-                        {/* Response Source Transparency for Assistant Messages - Admin Only */}
-                        {message.metadata && user?.role === 'admin' && (
-                          <MessageSourceBadge 
-                            metadata={message.metadata}
-                            compact={true}
-                          />
-                        )}
-                        
-                        {/* Memory-Enhanced Badge */}
-                        {message.metadata?.memory_enhanced && (
-                          <div
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.25rem',
-                              padding: '0.25rem 0.5rem',
-                              backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                              border: '1px solid rgba(147, 51, 234, 0.3)',
-                              borderRadius: '0.5rem',
-                              fontSize: '0.7rem',
-                              color: '#9333ea',
-                              cursor: 'help',
-                            }}
-                            title="This response was enhanced with your conversation memory for personalized guidance"
-                          >
-                            <span>🧠</span>
-                            <span>Memory</span>
+                        {msg.text}
+                      </div>
+                    ) : (
+                      <div className="wisdom-ai-response" style={{ 
+                        animation: 'fadeIn 0.5s ease-out',
+                        padding: '0 1rem'
+                      }}>
+                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        {msg.metadata?.citations && msg.metadata.citations.length > 0 && (
+                          <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }}>
+                            — Grounded in {msg.metadata.citations[0].source}
                           </div>
                         )}
                       </div>
-                    </div>
-                  )}
-                </div>
-                <div style={{
-                  fontSize: '0.7rem',
-                  opacity: 0.6,
-                  marginTop: '0.5rem',
-                  textAlign: message.isUser ? 'right' : 'left'
-                }}>
-                  {message.timestamp.toLocaleTimeString()}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Loading */}
-        {isLoading && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '2rem',
-            marginBottom: '2rem'
-          }}>
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '1rem',
-              padding: '1.5rem 2rem',
-              border: '1px solid #e2e8f0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
-            }}>
-              <div style={{
-                display: 'flex',
-                gap: '0.25rem'
-              }}>
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      background: '#FF6B35',
-                      borderRadius: '50%',
-                      animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite`
-                    }}
-                  />
+                    )}
+                  </div>
                 ))}
               </div>
-              <span style={{ fontSize: '0.9rem', color: '#64748b' }}>
-                {selectedPersonality?.display_name || 'Your guide'} is reflecting...
-              </span>
-            </div>
+            )}
+            
+            {isLoading && (
+              <div className="wisdom-ai-response" style={{ opacity: 0.4, padding: '2rem 1rem' }}>
+                 <div className="apple-spinner"></div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
-        )}
 
-        {/* Mobile-Optimized Input Form */}
-        <form 
-          onSubmit={handleSubmit}
-          style={{
-            position: 'sticky',
-            bottom: window.innerWidth <= 768 ? '0.5rem' : '1rem',
-            background: '#ffffff',
-            borderRadius: window.innerWidth <= 768 ? '1rem' : '1.5rem',
-            padding: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-            display: 'flex',
-            gap: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-            alignItems: 'center',
-            opacity: selectedPersonality ? 1 : 0.6,
-            pointerEvents: selectedPersonality ? 'auto' : 'none',
-            margin: window.innerWidth <= 768 ? '0 -0.5rem' : '0'
-          }}
-        >
-          {/* Voice Input Button */}
-          <VoiceControls
-            onTranscript={handleVoiceTranscript}
-            disabled={!selectedPersonality || isLoading}
-            personality={selectedPersonality?.id}
-            domain={selectedPersonality?.domain}
-          />
-          
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={getPlaceholderText()}
-            disabled={!selectedPersonality}
-            style={{
-              flex: '1',
-              background: selectedPersonality ? `linear-gradient(135deg, ${domainColors.bg} 0%, rgba(248, 250, 252, 0.9) 100%)` : '#f8fafc',
-              border: selectedPersonality ? `2px solid ${domainColors.border}` : '1px solid #e2e8f0',
-              borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-              padding: window.innerWidth <= 768 ? '0.875rem 1rem' : '1rem 1.5rem',
-              color: '#1e293b',
-              fontSize: '1rem',
-              outline: 'none',
-              cursor: selectedPersonality ? 'text' : 'not-allowed'
-            }}
-          />
-          <button
-            type="submit"
-            disabled={!inputText.trim() || isLoading || !selectedPersonality}
-            style={{
-              background: inputText.trim() && !isLoading && selectedPersonality
-                ? domainColors.gradient
-                : '#e2e8f0',
-              border: 'none',
-              borderRadius: window.innerWidth <= 768 ? '0.75rem' : '1rem',
-              padding: window.innerWidth <= 768 ? '0.875rem' : '1rem',
-              color: inputText.trim() && !isLoading && selectedPersonality ? 'white' : '#94a3b8',
-              cursor: inputText.trim() && !isLoading && selectedPersonality ? 'pointer' : 'not-allowed',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: window.innerWidth <= 768 ? '2.75rem' : '3rem',
-              transition: 'all 0.3s ease',
-              boxShadow: inputText.trim() && !isLoading && selectedPersonality ? `0 4px 12px ${domainColors.border}60` : 'none'
-            }}
-          >
-            <Send size={18} />
-          </button>
-        </form>
-      </div>
-      
-      {/* Share Modal */}
-      {shareMessage && selectedPersonality && (
-        <SharingInterface
-          content={{
-            text: shareMessage.text,
-            personality: selectedPersonality.display_name || selectedPersonality.id,
-            domain: selectedPersonality.domain || 'spiritual',
-            messageId: shareMessage.id
-          }}
-          isModal={true}
-          onClose={closeShareModal}
-          onShareComplete={() => closeShareModal()}
-        />
+          {/* Input Area */}
+          <div style={{ position: 'sticky', bottom: '2rem', width: '100%', background: '#fff' }}>
+            <form onSubmit={handleSubmit} style={{ position: 'relative' }}>
+              <div className="wisdom-canvas-input" style={{ 
+                background: '#f5f5f7', 
+                borderRadius: '24px', 
+                padding: '0.75rem 1.25rem',
+                border: '1px solid transparent',
+                transition: 'border 0.2s, background 0.2s',
+                display: 'flex',
+                alignItems: 'flex-end'
+              }}>
+                <textarea
+                  value={inputText}
+                  onChange={e => setInputText(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Seek understanding..."
+                  rows={1}
+                  style={{ 
+                    fontFamily: 'var(--font-wisdom-body)', 
+                    fontSize: '1.1rem',
+                    lineHeight: '1.5',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    width: '100%',
+                    resize: 'none',
+                    padding: '0.25rem 0',
+                    color: '#1d1d1f'
+                  }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${Math.min(target.scrollHeight, 200)}px`;
+                  }}
+                />
+                <button 
+                  type="submit" 
+                  disabled={!inputText.trim() || isLoading}
+                  style={{ 
+                    background: inputText.trim() ? '#000' : 'transparent',
+                    border: 'none',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: inputText.trim() ? '#fff' : '#ccc',
+                    cursor: inputText.trim() ? 'pointer' : 'default',
+                    transition: 'all 0.2s',
+                    marginLeft: '0.5rem',
+                    flexShrink: 0
+                  }}
+                >
+                  <CornerDownLeft size={18} />
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
       )}
-      
-      {/* Achievement Unlock Modal */}
-      {showAchievementModal && pendingAchievement && (
-        <AchievementUnlockModal
-          achievement={pendingAchievement}
-          open={showAchievementModal}
-          onClose={dismissAchievementModal}
-          onShare={() => {
-            setAchievementToShare(pendingAchievement);
-            setShareAchievementOpen(true);
-            dismissAchievementModal();
-          }}
-        />
-      )}
-      
-      {/* Achievement Share Modal */}
-      <AchievementShareModal
-        open={shareAchievementOpen}
-        achievement={achievementToShare}
-        onClose={() => {
-          setShareAchievementOpen(false);
-          setAchievementToShare(null);
-        }}
-      />
-      
-      {/* Debug overlay for troubleshooting auth issues in production */}
-      {showDebug && <DebugAuth />}
-
-      {/* Engagement Tour — only shows for authenticated users who haven't completed it */}
-      <EngagementTour open={showTour} onClose={closeTour} />
     </div>
   );
 }

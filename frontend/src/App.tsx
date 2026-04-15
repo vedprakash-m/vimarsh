@@ -17,10 +17,6 @@ const WisdomArchive = lazy(() => import('./pages/WisdomArchive'));
 const MemoryDashboard = lazy(() => import('./components/MemoryDashboard'));
 const ProgressDashboard = lazy(() => import('./pages/ProgressDashboard'));
 const UserSettings = lazy(() => import('./pages/UserSettings'));
-const WisdomInterface = lazy(() => import('./components/WisdomInterface'));
-
-// Check feature flag for rendering
-const useGamification = process.env.REACT_APP_ENABLE_GAMIFICATION !== 'false';
 
 // Memory Dashboard Page Wrapper (handles route-based rendering)
 const MemoryDashboardPage: React.FC = () => {
@@ -43,12 +39,6 @@ import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
 import AdminDashboard from './components/admin/AdminDashboard';
-
-// Engagement Tour - now rendered inside GuidanceInterface only (auth-gated)
-// import EngagementTour, { useEngagementTour } from './components/engagement/EngagementTour';
-
-// EngagementTourWrapper removed from global scope — now rendered inside GuidanceInterface
-// where it only shows for authenticated users on the /guidance route
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -102,10 +92,6 @@ function App() {
       try {
         await msalInstance.initialize();
         console.log('✅ MSAL initialized successfully');
-        
-        // Initialize PWA functionality after MSAL
-        console.log('✅ PWA initialized successfully');
-        
         setIsInitialized(true);
       } catch (error) {
         console.error('❌ MSAL initialization failed:', error);
@@ -142,15 +128,15 @@ function App() {
                     {/* Authentication Callback - Public Route */}
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     
-                                      {/* Guidance Interface - Protected Route */}
-                  <Route 
-                    path="/guidance" 
-                    element={
-                      <ProtectedRoute>
-                        {useGamification ? <GuidanceInterface /> : <WisdomInterface />}
-                      </ProtectedRoute>
-                    } 
-                  />
+                    {/* Guidance Interface - Protected Route (New Wisdom Canvas) */}
+                    <Route 
+                      path="/guidance" 
+                      element={
+                        <ProtectedRoute>
+                          <GuidanceInterface />
+                        </ProtectedRoute>
+                      } 
+                    />
                   
                   {/* Admin Dashboard - Protected Route with Admin Requirement */}
                   <Route 

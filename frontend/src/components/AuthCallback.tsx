@@ -71,7 +71,7 @@ const AuthCallback: React.FC = () => {
         setProcessing(false);
         
         // Force navigate to guidance - ignore any MSAL saved request URLs
-        // to ensure the user gets to the wisdom interface immediately
+        // App.tsx handles the actual component rendering based on FEATURE_FLAGS
         navigate('/guidance', { replace: true });
 
       } catch (error) {
