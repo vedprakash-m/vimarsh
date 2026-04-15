@@ -167,8 +167,10 @@ export default function WisdomInterface() {
               Choose your guide.
             </h1>
             <PersonalitySelector 
-              selectedPersonality={null} 
-              onSelect={handlePersonalitySelect} 
+              availablePersonalities={availablePersonalities}
+              selectedPersonalityId={selectedPersonality?.id} 
+              onPersonalitySelect={handlePersonalitySelect} 
+              onClose={() => setShowPersonalitySelector(false)}
             />
           </div>
         </div>

@@ -109,7 +109,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
             {DOMAIN_CONFIG.map((domain) => {
               const count = availablePersonalities.filter(p => p.domain === domain.id).length;
               return (
-                <Grid item xs={12} sm={6} md={4} key={domain.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={domain.id}>
                   <Card 
                     elevation={0}
                     sx={{ 
