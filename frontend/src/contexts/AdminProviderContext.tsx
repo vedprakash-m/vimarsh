@@ -129,7 +129,14 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
 
         try {
           const apiBaseUrl = getApiBaseUrl();
-          const authHeaders = await getAuthHeaders();
+          // Use try-catch for auth headers to prevent silent token failures from breaking the app
+          let authHeaders = {};
+          try {
+            authHeaders = await getAuthHeaders();
+          } catch (authErr) {
+            console.warn('⚠️ AdminProvider: Could not get auth headers (token may be expired):', authErr);
+            // Continue without headers - the fetch below will likely fail but we'll handle it
+          }
           
           const response = await fetch(`${apiBaseUrl}/vimarsh-admin/role`, {
             method: 'GET',

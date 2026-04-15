@@ -152,24 +152,11 @@ export class MSALAuthService implements AuthService {
     } catch (error: any) {
       console.warn('🔐 Silent token acquisition failed:', error);
 
-      // If silent fails, we need to trigger interactive flow
-      // For redirect flow, we can't return a token immediately
-      try {
-        const interactiveRequest = {
-          ...apiTokenRequest,
-          account: this.accounts[0]
-        };
-
-        // This will redirect the user, so we can't return a token here
-        await this.msalInstance.acquireTokenRedirect(interactiveRequest);
-        
-        // This line won't be reached in redirect flow
-        throw new Error('Token acquisition requires user interaction. Please try again.');
-
-      } catch (interactiveError) {
-        console.error('🔐 Interactive token acquisition failed:', interactiveError);
-        throw new Error(AUTH_ERROR_MESSAGES.TOKEN_EXPIRED);
-      }
+      // CRITICAL: Prevent automatic redirect.
+      // We no longer call acquireTokenRedirect here because it causes 
+      // unexpected UI jumps for users just viewing the landing page.
+      // The calling component (like AdminProvider) should handle the lack of token gracefully.
+      throw new Error(AUTH_ERROR_MESSAGES.TOKEN_EXPIRED);
     }
   }
 
