@@ -24,6 +24,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Use virtual environment Python if available
+repo_root = Path(__file__).parent.parent
+venv_python = repo_root / ".venv" / "bin" / "python"
+if venv_python.exists():
+    PYTHON_EXECUTABLE = str(venv_python)
+else:
+    PYTHON_EXECUTABLE = sys.executable
+
 @dataclass
 class TestResult:
     """Structured test result"""
@@ -151,7 +159,7 @@ class ComprehensiveValidator:
         
         # 1. Python syntax validation
         success, stdout, stderr = run_command_with_retry(
-            "cd backend && python3 -m py_compile function_app.py",
+            f"cd backend && {PYTHON_EXECUTABLE} -m py_compile function_app.py",
             "Python syntax check",
             timeout=30
         )
@@ -160,7 +168,7 @@ class ComprehensiveValidator:
         
         # 2. Import validation with better error handling
         success, stdout, stderr = run_command_with_retry(
-            "cd backend && python3 -c 'import sys; sys.path.insert(0, \".\"); import function_app; print(\"Function app imports successful\")'",
+            f"cd backend && {PYTHON_EXECUTABLE} -c 'import sys; sys.path.insert(0, \".\"); import function_app; print(\"Function app imports successful\")'",
             "Import validation",
             critical=False,
             timeout=45
@@ -170,7 +178,7 @@ class ComprehensiveValidator:
         
         # 3. Requirements validation
         success, stdout, stderr = run_command_with_retry(
-            "cd backend && python3 -m pip check",
+            f"cd backend && {PYTHON_EXECUTABLE} -m pip check",
             "Dependencies compatibility check",
             critical=False,
             timeout=30
@@ -360,7 +368,7 @@ class ComprehensiveValidator:
         
         # Run tests with increased timeout and better error handling
         success, stdout, stderr = run_command_with_retry(
-            "cd backend && python3 -m pytest tests/ -v --tb=short --maxfail=5 --timeout=300",
+            f"cd backend && {PYTHON_EXECUTABLE} -m pytest tests/ -v --tb=short --maxfail=5 --timeout=300",
             f"Backend tests ({test_count} test files)",
             critical=False,
             timeout=400,  # Increased timeout for comprehensive tests
