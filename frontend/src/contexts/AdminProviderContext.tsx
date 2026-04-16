@@ -107,9 +107,10 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
       setError(null);
 
       // Parse admin emails from environment, merging with hardcoded list
-      const envAdminEmailsStr = import.meta.env.VITE_ADMIN_EMAILS || '';
+      const envAdminEmailsStr = process.env.REACT_APP_ADMIN_EMAILS || '';
       const envAdminEmails = envAdminEmailsStr.split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean);
-      const allKnownAdminEmails = [...new Set([...ADMIN_EMAILS.map(e => e.toLowerCase()), ...envAdminEmails])];
+      const combinedEmails = ADMIN_EMAILS.map(e => e.toLowerCase()).concat(envAdminEmails);
+      const allKnownAdminEmails = combinedEmails.filter((e, i, self) => self.indexOf(e) === i);
       const isKnownAdmin = allKnownAdminEmails.includes(userEmail.toLowerCase());
       
       let backendRole = UserRole.USER;

@@ -180,20 +180,20 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Supply a fallback to prevent infinite loading screens
       const fallbackProfile: UserProfile = {
         user: {
-          user_id: 'localAccountId' in (account || {}) ? account?.localAccountId as string : 'anonymous_fallback',
-          name: account?.name || 'Wisdom Seeker',
-          email: account?.username || '',
+          user_id: 'anonymous_fallback',
+          name: 'Wisdom Seeker',
+          email: '',
           member_since: new Date().toISOString(),
         },
         journey_stats: {
           current_streak: 0,
           total_conversations: 0,
           achievements_unlocked: 0,
-          wisdom_level: 1,
+          wisdom_level: 'Novice',
           domain_exploration: { spiritual: 0, scientific: 0, philosophical: 0, leadership: 0, literary: 0, psychology: 0 },
         },
         preferences: {
-          user_id: 'localAccountId' in (account || {}) ? account?.localAccountId as string : 'anonymous_fallback',
+          user_id: 'anonymous_fallback',
           experience_preferences: defaultExperiencePrefs,
           notification_preferences: defaultNotificationPrefs,
           memory_preferences: defaultMemoryPrefs,
@@ -206,7 +206,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  }, [account]);
+  }, []);
 
   // Load profile in background after critical contexts are ready - completely non-blocking
   useEffect(() => {
