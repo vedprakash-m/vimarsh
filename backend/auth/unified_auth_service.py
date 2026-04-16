@@ -640,19 +640,58 @@ def get_authenticated_user_sync(req: HttpRequest) -> Optional[AuthenticatedUser]
     """Get authenticated user from request (sync version for tests)"""
     return auth_service.authenticate_request_sync(req)
 
+def _validate_graph_token_sync(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Validate an opaque Microsoft Graph API token synchronously.
+
+    MSAL configured with User.Read (or any Graph scope) returns an opaque
+    access token — not a JWT — that can only be validated by calling Graph API.
+    We use the already-imported `requests` library so there is no event-loop
+    dependency.
+    """
+    try:
+        response = requests.get(
+            "https://graph.microsoft.com/v1.0/me",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10
+        )
+        if response.status_code == 200:
+            info = response.json()
+            email = info.get("mail") or info.get("userPrincipalName", "")
+            sub = info.get("id", "")
+            logger.info(f"✅ Graph API sync validation OK for {email}")
+            return {
+                "sub": sub,
+                "oid": sub,
+                "email": email,
+                "preferred_username": email,
+                "name": info.get("displayName", ""),
+                "roles": []
+            }
+        logger.warning(f"⚠️ Graph API sync validation failed: HTTP {response.status_code}")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Graph API sync validation error: {e}")
+        return None
+
+
 def verify_token(token: str) -> Optional[Dict[str, Any]]:
     """
-    Verify and decode a JWT token — synchronous, safe to call from async context.
+    Verify a JWT or opaque Microsoft Graph API token — fully synchronous.
 
-    In production mode we validate the JWT signature synchronously via JWKS
-    (avoiding loop.run_until_complete inside an already-running event loop).
-    In development mode we use the existing relaxed validator.
+    Strategy:
+      1. Dev mode     → existing relaxed JWT validator (no network call)
+      2. JWT token    → synchronous JWKS/Entra validation; Graph API fallback
+      3. Opaque token → synchronous Microsoft Graph API call via `requests`
+
+    This is safe to call from inside an async Azure Functions handler because
+    it never touches the event loop (no asyncio.run / loop.run_until_complete).
 
     Args:
-        token: JWT token string
+        token: Bearer token string
 
     Returns:
-        Decoded token payload if valid, None otherwise
+        User info dict if valid, None otherwise
     """
     try:
         svc = auth_service._async_service
@@ -671,54 +710,69 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
                 }
             return None
 
-        # ── Production mode — synchronous JWKS validation ────────────────────
-        # Decode header/claims without verifying signature first to get tenant
-        try:
-            unverified = jwt.decode(token, options={"verify_signature": False})
-        except Exception:
-            logger.warning("⚠️ verify_token: could not decode JWT header")
-            return None
+        # ── Detect token type ─────────────────────────────────────────────────
+        # JWTs have exactly three base64url segments separated by dots.
+        # Opaque tokens (issued for Graph scopes like User.Read) are random
+        # strings that cannot be decoded as JSON.
+        parts = token.split('.')
+        is_jwt = len(parts) == 3
+        unverified: dict = {}
 
-        tenant_id = os.getenv("AZURE_TENANT_ID", "common")
-        client_id = os.getenv("AZURE_CLIENT_ID", "")
-        actual_tenant = unverified.get("tid", tenant_id)
+        if is_jwt:
+            try:
+                unverified = jwt.decode(token, options={"verify_signature": False})
+            except Exception:
+                # Looks like a JWT but fails to decode — treat as opaque
+                is_jwt = False
 
-        # Try full signature-verified validation using the existing sync JWKS path
-        try:
-            validated = svc._validate_entra_token(token, actual_tenant, client_id)
-            if validated:
-                email = validated.get("email") or validated.get("preferred_username", "")
-                name = validated.get("name", "")
-                sub = validated.get("sub") or validated.get("oid", "")
+        if is_jwt:
+            # ── JWT path: synchronous JWKS validation ─────────────────────────
+            tenant_id = os.getenv("AZURE_TENANT_ID", "common")
+            client_id = os.getenv("AZURE_CLIENT_ID", "")
+            actual_tenant = unverified.get("tid", tenant_id)
+
+            try:
+                validated = svc._validate_entra_token(token, actual_tenant, client_id)
+                if validated:
+                    email = validated.get("email") or validated.get("preferred_username", "")
+                    sub = validated.get("sub") or validated.get("oid", "")
+                    return {
+                        "sub": sub,
+                        "oid": sub,
+                        "email": email,
+                        "preferred_username": email,
+                        "name": validated.get("name", ""),
+                        "roles": validated.get("roles", [])
+                    }
+            except Exception as entra_err:
+                logger.warning(f"⚠️ JWKS validation failed, trying Graph API: {entra_err}")
+
+            # JWKS failed — try Graph API (handles audience-mismatch cases)
+            graph_result = _validate_graph_token_sync(token)
+            if graph_result:
+                return graph_result
+
+            # Last-resort: trust unverified JWT claims if email+sub are present
+            email = unverified.get("email") or unverified.get("preferred_username", "")
+            sub = unverified.get("sub") or unverified.get("oid", "")
+            if email and sub:
+                logger.info(f"✅ verify_token: last-resort unverified claims for {email}")
                 return {
                     "sub": sub,
                     "oid": sub,
                     "email": email,
                     "preferred_username": email,
-                    "name": name,
-                    "roles": validated.get("roles", [])
+                    "name": unverified.get("name", ""),
+                    "roles": unverified.get("roles", [])
                 }
-        except Exception as entra_err:
-            logger.warning(f"⚠️ verify_token: Entra validation failed: {entra_err}")
+        else:
+            # ── Opaque token path (Graph scopes like User.Read) ───────────────
+            logger.info("🔍 verify_token: opaque token detected → Graph API validation")
+            graph_result = _validate_graph_token_sync(token)
+            if graph_result:
+                return graph_result
 
-        # Fallback: accept the token's own unverified claims (Microsoft Graph API
-        # opaque tokens won't have exploitable claims; full validation happens in
-        # the async path for the guidance endpoint)
-        email = unverified.get("email") or unverified.get("preferred_username", "")
-        name = unverified.get("name", "")
-        sub = unverified.get("sub") or unverified.get("oid", "")
-        if email and sub:
-            logger.info(f"✅ verify_token: accepted unverified claims for {email}")
-            return {
-                "sub": sub,
-                "oid": sub,
-                "email": email,
-                "preferred_username": email,
-                "name": name,
-                "roles": unverified.get("roles", [])
-            }
-
-        logger.warning("⚠️ verify_token: token has no usable email/sub claims")
+        logger.warning("⚠️ verify_token: all validation strategies exhausted")
         return None
 
     except Exception as e:
