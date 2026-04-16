@@ -106,69 +106,93 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
       setLoading(true);
       setError(null);
 
-      // Check if user is in predefined admin list
-      const isKnownAdmin = ADMIN_EMAILS.includes(userEmail.toLowerCase());
+      // Parse admin emails from environment, merging with hardcoded list
+      const envAdminEmailsStr = import.meta.env.VITE_ADMIN_EMAILS || '';
+      const envAdminEmails = envAdminEmailsStr.split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean);
+      const allKnownAdminEmails = [...new Set([...ADMIN_EMAILS.map(e => e.toLowerCase()), ...envAdminEmails])];
+      const isKnownAdmin = allKnownAdminEmails.includes(userEmail.toLowerCase());
       
-      if (isKnownAdmin) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ AdminProvider: User is a known admin');
+      let backendRole = UserRole.USER;
+      let permissions: UserPermissions = {
+        can_view_cost_dashboard: false,
+        can_manage_users: false,
+        can_block_users: false,
+        can_view_system_costs: false,
+        can_configure_budgets: false,
+        can_access_admin_endpoints: false,
+        can_override_budget_limits: false,
+        can_manage_emergency_controls: false
+      };
+
+      // Always try to get role from backend first
+      try {
+        const apiBaseUrl = getApiBaseUrl();
+        // Use try-catch for auth headers to prevent silent token failures from breaking the app
+        let authHeaders = {};
+        try {
+          authHeaders = await getAuthHeaders();
+        } catch (authErr) {
+          console.warn('⚠️ AdminProvider: Could not get auth headers (token may be expired):', authErr);
         }
         
-        // Try to get role from backend, fallback to local admin detection
-        let backendRole = UserRole.ADMIN;
-        let permissions: UserPermissions = {
-          can_view_cost_dashboard: true,
-          can_manage_users: true,
-          can_block_users: true,
-          can_view_system_costs: true,
-          can_configure_budgets: true,
-          can_access_admin_endpoints: true,
-          can_override_budget_limits: true,
-          can_manage_emergency_controls: true
-        };
+        const response = await fetch(`${apiBaseUrl}/vimarsh-admin/role`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders
+          }
+        });
+        
+        if (response.ok) {
+          const roleData = await response.json();
+          if (roleData.role) {
+            backendRole = roleData.role === 'SUPER_ADMIN' ? UserRole.SUPER_ADMIN : 
+                          (roleData.role === 'ADMIN' ? UserRole.ADMIN : UserRole.USER);
+            if (roleData.permissions) {
+               permissions = roleData.permissions;
+            } else if (backendRole === UserRole.ADMIN || backendRole === UserRole.SUPER_ADMIN) {
+               permissions = {
+                  can_view_cost_dashboard: true,
+                  can_manage_users: true,
+                  can_block_users: true,
+                  can_view_system_costs: true,
+                  can_configure_budgets: true,
+                  can_access_admin_endpoints: true,
+                  can_override_budget_limits: true,
+                  can_manage_emergency_controls: true
+               };
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ AdminProvider: Could not contact backend for role check:', error);
+      }
 
-        try {
-          const apiBaseUrl = getApiBaseUrl();
-          // Use try-catch for auth headers to prevent silent token failures from breaking the app
-          let authHeaders = {};
-          try {
-            authHeaders = await getAuthHeaders();
-          } catch (authErr) {
-            console.warn('⚠️ AdminProvider: Could not get auth headers (token may be expired):', authErr);
-            // Continue without headers - the fetch below will likely fail but we'll handle it
-          }
-          
-          const response = await fetch(`${apiBaseUrl}/vimarsh-admin/role`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              ...authHeaders
-            }
-          });
-          
-          if (response.ok) {
-            const roleData = await response.json();
-            
-            if (process.env.NODE_ENV === 'development') {
-              console.log('📋 AdminProvider: Backend role data:', roleData);
-            }
-            
-            if (roleData.role) {
-              backendRole = roleData.role === 'SUPER_ADMIN' ? UserRole.SUPER_ADMIN : UserRole.ADMIN;
-              permissions = roleData.permissions || permissions;
-            }
-          } else {
-            console.warn('⚠️ AdminProvider: Backend role check failed, using local admin detection');
-          }
-        } catch (backendError) {
-          console.warn('⚠️ AdminProvider: Backend unreachable, using local admin detection:', backendError);
+      // Check if user is in predefined admin list or backend role is admin
+      if (backendRole === UserRole.ADMIN || backendRole === UserRole.SUPER_ADMIN || isKnownAdmin) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`✅ AdminProvider: User verified as admin (Backend: ${backendRole}, Known list: ${isKnownAdmin})`);
+        }
+        
+        // If not retrieved from backend but in known list, populate default admin permissions
+        if (permissions.can_manage_users === false) {
+           permissions = {
+            can_view_cost_dashboard: true,
+            can_manage_users: true,
+            can_block_users: true,
+            can_view_system_costs: true,
+            can_configure_budgets: true,
+            can_access_admin_endpoints: true,
+            can_override_budget_limits: true,
+            can_manage_emergency_controls: true
+          };
         }
 
         const adminUser: AdminUser = {
           id: account.homeAccountId || account.localAccountId || userEmail,
           email: userEmail,
           name: account.name || userEmail.split('@')[0],
-          role: backendRole,
+          role: backendRole === UserRole.USER ? UserRole.ADMIN : backendRole,
           permissions,
           isAdmin: true,
           isSuperAdmin: backendRole === UserRole.SUPER_ADMIN

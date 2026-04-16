@@ -224,7 +224,12 @@ export const PersonalityProvider: React.FC<PersonalityProviderProps> = ({ childr
               tags: [p.domain] // Use domain as default tag
             }));
             
-            setAvailablePersonalities(mappedPersonalities);
+            if (mappedPersonalities.length > 0) {
+              setAvailablePersonalities(mappedPersonalities);
+            } else {
+              console.warn('⚠️ PersonalityContext: API returned empty personalities array');
+              setAvailablePersonalities([DEFAULT_KRISHNA_PERSONALITY]);
+            }
             hasLoadedPersonalities = true; // Set circuit breaker
           } else {
             console.warn('⚠️ PersonalityContext: Failed to load personalities from API - unexpected response format:', data);

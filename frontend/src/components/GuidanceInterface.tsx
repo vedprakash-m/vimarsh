@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Hash, CornerDownLeft, Settings, User, LogOut, ChevronRight } from 'lucide-react';
+import { Hash, CornerDownLeft, Settings, User, LogOut, ChevronRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PersonalitySelector from './PersonalitySelector';
 import { usePersonality, Personality } from '../contexts/PersonalityContext';
@@ -13,6 +13,52 @@ import { Message } from './chat';
 import '../styles/wisdom-typography.css';
 import '../styles/vimarsh-design-system.css';
 
+// Sample questions mapped to domains/personalities for "Wisdom Starters"
+const WISDOM_STARTERS: Record<string, string[]> = {
+  'krishna': [
+    "How can I find peace in times of great uncertainty?",
+    "What is the true meaning of performing one's duty?",
+    "How do I overcome attachment to results?"
+  ],
+  'buddha': [
+    "How do I practice mindfulness in a busy world?",
+    "What is the path to overcoming suffering?",
+    "How can I cultivate more compassion for myself and others?"
+  ],
+  'marcus_aurelius': [
+    "How do I stay resilient when things go wrong?",
+    "What should I focus on when I feel overwhelmed?",
+    "How can I stop worrying about what others think of me?"
+  ],
+  'albert_einstein': [
+    "What is the importance of curiosity in our lives?",
+    "How can we solve problems that seem impossible?",
+    "What is the relationship between imagination and knowledge?"
+  ],
+  'socrates': [
+    "How do I know if I am truly living a good life?",
+    "What is the value of questioning my own beliefs?",
+    "How can I become more wise through self-reflection?"
+  ],
+  'default': [
+    "How can I find more meaning in my daily life?",
+    "What is the best way to handle difficult emotions?",
+    "How do I align my actions with my values?"
+  ]
+};
+
+const getDomainGradient = (domain?: string) => {
+  switch (domain) {
+    case 'spiritual': return 'linear-gradient(180deg, #fffcf0 0%, #ffffff 100%)';
+    case 'philosophical': return 'linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%)';
+    case 'scientific': return 'linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)';
+    case 'leadership': return 'linear-gradient(180deg, #fef2f2 0%, #ffffff 100%)';
+    case 'literary': return 'linear-gradient(180deg, #fdf2f8 0%, #ffffff 100%)';
+    case 'psychology': return 'linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)';
+    default: return 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)';
+  }
+};
+
 export default function GuidanceInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -24,7 +70,7 @@ export default function GuidanceInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
-  const { logout, account } = useAuth();
+  const { logout, account, isAuthenticated } = useAuth();
   const { isInitializing } = useAppLoading();
   const { 
     selectedPersonality, 
@@ -32,6 +78,11 @@ export default function GuidanceInterface() {
     availablePersonalities, 
     personalityLoading 
   } = usePersonality();
+
+  // Get current effective user ID for API calls
+  const effectiveUserId = useMemo(() => {
+    return account?.homeAccountId || account?.localAccountId || sessionId;
+  }, [account, sessionId]);
 
   // Redirect if no personality and none available (safety)
   useEffect(() => {
@@ -51,11 +102,17 @@ export default function GuidanceInterface() {
     setMessages([]); // Clear canvas for new personality
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim() || isLoading || !selectedPersonality) return;
+  const starters = useMemo(() => {
+    if (!selectedPersonality) return WISDOM_STARTERS.default;
+    return WISDOM_STARTERS[selectedPersonality.id] || WISDOM_STARTERS.default;
+  }, [selectedPersonality]);
 
-    const question = inputText;
+  const handleSubmit = async (e?: React.FormEvent, overrideText?: string) => {
+    if (e) e.preventDefault();
+    const textToSubmit = overrideText || inputText;
+    if (!textToSubmit.trim() || isLoading || !selectedPersonality) return;
+
+    const question = textToSubmit;
     const userMessage: Message = {
       id: Date.now().toString(),
       text: question,
@@ -92,7 +149,7 @@ export default function GuidanceInterface() {
           voice_enabled: false,
           conversation_context: recentMessages,
           personality_id: selectedPersonality.id,
-          user_id: account?.homeAccountId || sessionId,
+          user_id: effectiveUserId,
           session_id: sessionId
         },
         (chunk) => {
@@ -112,7 +169,7 @@ export default function GuidanceInterface() {
           
           // Headless engagement tracking
           engagementApi.recordActivityHeadless(
-            account?.homeAccountId || sessionId,
+            effectiveUserId,
             'conversation',
             selectedPersonality.id,
             selectedPersonality.domain,
@@ -139,7 +196,7 @@ export default function GuidanceInterface() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as unknown as React.FormEvent);
+      handleSubmit();
     }
   };
 
@@ -152,7 +209,13 @@ export default function GuidanceInterface() {
   }
 
   return (
-    <div className="wisdom-canvas-container" style={{ minHeight: '100vh', background: '#fff', display: 'flex', flexDirection: 'column' }}>
+    <div className="wisdom-canvas-container" style={{ 
+      minHeight: '100vh', 
+      background: getDomainGradient(selectedPersonality?.domain), 
+      display: 'flex', 
+      flexDirection: 'column',
+      transition: 'background 1s ease'
+    }}>
       <style>{`
         .apple-spinner {
           width: 24px;
@@ -166,6 +229,10 @@ export default function GuidanceInterface() {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         .user-menu-dropdown {
           position: absolute;
           top: 100%;
@@ -178,6 +245,7 @@ export default function GuidanceInterface() {
           width: 200px;
           z-index: 100;
           overflow: hidden;
+          animation: fadeIn 0.2s ease-out;
         }
         .user-menu-item {
           display: flex;
@@ -192,6 +260,27 @@ export default function GuidanceInterface() {
         }
         .user-menu-item:hover {
           background: #f5f5f7;
+        }
+        .wisdom-starter-card {
+          background: rgba(255, 255, 255, 0.7);
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          border-radius: 16px;
+          padding: 1rem 1.25rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: left;
+          font-size: 0.95rem;
+          color: #444;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .wisdom-starter-card:hover {
+          background: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          border-color: rgba(0, 0, 0, 0.1);
         }
       `}</style>
 
@@ -216,7 +305,7 @@ export default function GuidanceInterface() {
           <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
             <div 
               onClick={() => setShowPersonalitySelector(true)}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '20px', background: '#f5f5f7', transition: 'background 0.2s' }}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '20px', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.05)', transition: 'all 0.2s' }}
             >
               <Hash size={14} color="#666" />
               <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#333' }}>{selectedPersonality?.display_name || 'Select Guide'}</span>
@@ -226,14 +315,18 @@ export default function GuidanceInterface() {
             <div style={{ position: 'relative' }}>
               <div 
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                style={{ cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%', background: '#f5f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.2s' }}
+                style={{ cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.2s' }}
               >
                 <User size={18} color="#333" />
               </div>
               
               {showUserMenu && (
                 <div className="user-menu-dropdown">
-                  <div className="user-menu-item" onClick={() => navigate('/settings')}>
+                  <div className="user-menu-item" style={{ borderBottom: '1px solid #f0f0f0', padding: '1rem', cursor: 'default' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#999', marginBottom: '0.25rem' }}>Signed in as</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{account?.username || 'Guest Seeker'}</div>
+                  </div>
+                  <div className="user-menu-item" onClick={() => { setShowUserMenu(false); navigate('/settings'); }}>
                     <Settings size={16} />
                     <span>Settings</span>
                   </div>
@@ -249,17 +342,41 @@ export default function GuidanceInterface() {
           {/* Conversation Canvas */}
           <div className="wisdom-canvas-messages" style={{ flex: 1, overflowY: 'auto', paddingBottom: '4rem' }}>
             {messages.length === 0 ? (
-              <div style={{ 
-                marginTop: '15vh', 
-                textAlign: 'center',
-                fontFamily: 'var(--font-wisdom-ui)',
-                fontSize: '2.5rem',
-                fontWeight: 500,
-                color: '#1d1d1f',
-                letterSpacing: '-0.03em',
-                opacity: 0.9
-              }}>
-                What burdens your mind today?
+              <div style={{ marginTop: '8vh', animation: 'fadeIn 1s ease-out' }}>
+                <h2 style={{ 
+                  textAlign: 'center',
+                  fontFamily: 'var(--font-wisdom-ui)',
+                  fontSize: '2.5rem',
+                  fontWeight: 500,
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.03em',
+                  marginBottom: '3rem',
+                  opacity: 0.9
+                }}>
+                  What burdens your mind today?
+                </h2>
+                
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '1fr', 
+                  gap: '1rem', 
+                  maxWidth: '500px', 
+                  margin: '0 auto' 
+                }}>
+                  <div style={{ fontSize: '0.8rem', color: '#999', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', textAlign: 'center' }}>
+                    Wisdom Starters for {selectedPersonality?.display_name}
+                  </div>
+                  {starters.map((starter, idx) => (
+                    <button 
+                      key={idx} 
+                      className="wisdom-starter-card"
+                      onClick={() => handleSubmit(undefined, starter)}
+                    >
+                      <Sparkles size={16} style={{ color: '#f97316', flexShrink: 0 }} />
+                      <span>{starter}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
@@ -307,22 +424,24 @@ export default function GuidanceInterface() {
           </div>
 
           {/* Input Area */}
-          <div style={{ position: 'sticky', bottom: '2rem', width: '100%', background: '#fff' }}>
+          <div style={{ position: 'sticky', bottom: '2rem', width: '100%', padding: '1rem 0' }}>
             <form onSubmit={handleSubmit} style={{ position: 'relative' }}>
               <div className="wisdom-canvas-input" style={{ 
-                background: '#f5f5f7', 
+                background: 'rgba(245, 245, 247, 0.8)', 
+                backdropFilter: 'blur(20px)',
                 borderRadius: '24px', 
                 padding: '0.75rem 1.25rem',
-                border: '1px solid transparent',
-                transition: 'border 0.2s, background 0.2s',
+                border: '1px solid rgba(0,0,0,0.05)',
+                transition: 'all 0.2s ease',
                 display: 'flex',
-                alignItems: 'flex-end'
+                alignItems: 'flex-end',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
               }}>
                 <textarea
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Seek understanding..."
+                  placeholder={`Seek ${selectedPersonality?.display_name || 'wisdom'}'s perspective...`}
                   rows={1}
                   style={{ 
                     fontFamily: 'var(--font-wisdom-body)', 
