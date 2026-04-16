@@ -129,39 +129,41 @@ export function AdminProvider({ children }: AdminProviderProps): JSX.Element {
       try {
         const apiBaseUrl = getApiBaseUrl();
         // Use try-catch for auth headers to prevent silent token failures from breaking the app
-        let authHeaders = {};
+        let authHeaders: any = null;
         try {
           authHeaders = await getAuthHeaders();
         } catch (authErr) {
           console.warn('⚠️ AdminProvider: Could not get auth headers (token may be expired):', authErr);
         }
         
-        const response = await fetch(`${apiBaseUrl}/vimarsh-admin/role`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeaders
-          }
-        });
-        
-        if (response.ok) {
-          const roleData = await response.json();
-          if (roleData.role) {
-            backendRole = roleData.role === 'SUPER_ADMIN' ? UserRole.SUPER_ADMIN : 
-                          (roleData.role === 'ADMIN' ? UserRole.ADMIN : UserRole.USER);
-            if (roleData.permissions) {
-               permissions = roleData.permissions;
-            } else if (backendRole === UserRole.ADMIN || backendRole === UserRole.SUPER_ADMIN) {
-               permissions = {
-                  can_view_cost_dashboard: true,
-                  can_manage_users: true,
-                  can_block_users: true,
-                  can_view_system_costs: true,
-                  can_configure_budgets: true,
-                  can_access_admin_endpoints: true,
-                  can_override_budget_limits: true,
-                  can_manage_emergency_controls: true
-               };
+        if (authHeaders) {
+          const response = await fetch(`${apiBaseUrl}/vimarsh-admin/role`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...authHeaders
+            }
+          });
+          
+          if (response.ok) {
+            const roleData = await response.json();
+            if (roleData.role) {
+              backendRole = roleData.role === 'SUPER_ADMIN' ? UserRole.SUPER_ADMIN : 
+                            (roleData.role === 'ADMIN' ? UserRole.ADMIN : UserRole.USER);
+              if (roleData.permissions) {
+                 permissions = roleData.permissions;
+              } else if (backendRole === UserRole.ADMIN || backendRole === UserRole.SUPER_ADMIN) {
+                 permissions = {
+                    can_view_cost_dashboard: true,
+                    can_manage_users: true,
+                    can_block_users: true,
+                    can_view_system_costs: true,
+                    can_configure_budgets: true,
+                    can_access_admin_endpoints: true,
+                    can_override_budget_limits: true,
+                    can_manage_emergency_controls: true
+                 };
+              }
             }
           }
         }

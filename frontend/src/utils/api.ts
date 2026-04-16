@@ -310,7 +310,7 @@ class SpiritualGuidanceAPI {
    */
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     try {
-      const response = await this.client.get('/api/health');
+      const response = await this.client.get('/health');
       return response.data;
     } catch (error) {
       throw error;
@@ -327,7 +327,7 @@ class SpiritualGuidanceAPI {
     sessionId: string;
   }): Promise<{ success: boolean }> {
     try {
-      const response = await this.client.post('/api/feedback/collect', feedback);
+      const response = await this.client.post('/feedback/collect', feedback);
       return response.data;
     } catch (error) {
       throw error;
@@ -384,7 +384,7 @@ class SpiritualGuidanceAPI {
     member_since?: string;
     last_updated?: string;
   }> {
-    const response = await this.client.get('/api/user/profile');
+    const response = await this.client.get('/user/profile');
     return response.data;
   }
 
@@ -396,7 +396,7 @@ class SpiritualGuidanceAPI {
     preferences: Record<string, unknown>;
     message?: string;
   }> {
-    const response = await this.client.patch('/api/user/preferences', preferences);
+    const response = await this.client.patch('/user/preferences', preferences);
     return response.data;
   }
 

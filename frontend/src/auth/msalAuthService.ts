@@ -134,6 +134,7 @@ export class MSALAuthService implements AuthService {
 
   async getToken(): Promise<string> {
     try {
+      this.accounts = this.msalInstance.getAllAccounts();
       if (this.accounts.length === 0) {
         throw new Error(AUTH_ERROR_MESSAGES.NO_ACCOUNT);
       }
