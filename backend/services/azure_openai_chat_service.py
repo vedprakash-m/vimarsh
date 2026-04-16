@@ -30,12 +30,21 @@ class AzureOpenAIChatService:
         """Initialize Azure OpenAI chat service"""
         self.test_mode = test_mode
         
-        # Configuration
-        self.endpoint = os.getenv('AZURE_OPENAI_CHAT_ENDPOINT', 'https://vimarsh-openai.openai.azure.com')
-        self.api_key = os.getenv('AZURE_OPENAI_CHAT_API_KEY', '')
+        # Configuration — prefer the unified AZURE_OPENAI_* vars (used by embedding/RAG)
+        # so that chat and embeddings share the same endpoint and API key.
+        self.endpoint = (
+            os.getenv('AZURE_OPENAI_CHAT_ENDPOINT')
+            or os.getenv('AZURE_OPENAI_ENDPOINT')
+            or 'https://vimarsh-openai.openai.azure.com'
+        )
+        self.api_key = (
+            os.getenv('AZURE_OPENAI_CHAT_API_KEY')
+            or os.getenv('AZURE_OPENAI_API_KEY')
+            or ''
+        )
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
-        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-5-mini')
-        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', '2024-08-01-preview')
+        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-4o-mini')
+        self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', os.getenv('AZURE_OPENAI_API_VERSION', '2024-08-01-preview'))
         
         # Retry configuration
         self.max_retries = 5

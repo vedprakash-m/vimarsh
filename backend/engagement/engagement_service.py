@@ -612,42 +612,51 @@ class EngagementService:
     
     def get_journey_stats(self, user_id: str) -> Dict[str, Any]:
         """
-        Get comprehensive journey statistics for user
-        
+        Get comprehensive journey statistics for user (synchronous).
+
         Args:
             user_id: User identifier
-            
+
         Returns:
             Dictionary with journey stats including streak, conversations, achievements, etc.
         """
         try:
-            # Get streak info
-            streak_info = self.get_user_streak(user_id)
-            
+            # Read streak data synchronously from in-memory store (Cosmos path is async)
+            doc_id = self._generate_id(user_id)
+            data: Dict = {}
+
+            if self.container:
+                try:
+                    data = self.container.read_item(item=doc_id, partition_key=user_id)
+                except Exception:
+                    data = {}
+            else:
+                data = getattr(self, "_memory_store", {}).get(doc_id, {})
+
+            streaks = data.get("streaks", {})
+            stats = data.get("stats", {})
+
             # Get conversation count
             conversation_count = self._get_conversation_count(user_id)
-            
-            # Get achievements count (placeholder - will be implemented with achievement system)
-            achievements_count = 0
-            
+
             # Calculate wisdom level based on activity
             wisdom_level = self._calculate_wisdom_level(conversation_count)
-            
+
             # Get domain exploration breakdown
             domain_exploration = self._get_domain_exploration(user_id)
-            
-            stats = {
-                "current_streak": streak_info.get("current_streak", 0),
-                "longest_streak": streak_info.get("longest_streak", 0),
+
+            result = {
+                "current_streak": streaks.get("current_streak", 0),
+                "longest_streak": streaks.get("longest_streak", 0),
                 "total_conversations": conversation_count,
-                "achievements_unlocked": achievements_count,
+                "achievements_unlocked": 0,
                 "wisdom_level": wisdom_level,
-                "domain_exploration": domain_exploration
+                "domain_exploration": domain_exploration,
             }
-            
+
             logger.info(f"📊 Retrieved journey stats for user {user_id}")
-            return stats
-            
+            return result
+
         except Exception as e:
             logger.error(f"❌ Error getting journey stats for user {user_id}: {e}")
             return {
@@ -656,8 +665,9 @@ class EngagementService:
                 "total_conversations": 0,
                 "achievements_unlocked": 0,
                 "wisdom_level": "Seeker",
-                "domain_exploration": {}
+                "domain_exploration": {},
             }
+
     
     def _get_conversation_count(self, user_id: str) -> int:
         """Get total conversation count for user"""

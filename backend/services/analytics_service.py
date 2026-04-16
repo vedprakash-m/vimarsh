@@ -51,9 +51,17 @@ class AnalyticsService:
         self.db_service = db_service  # Use global instance
         self.cache_service = CacheService() if 'CacheService' in globals() else None
         
-        # Local storage for development
-        self.local_storage_path = "data/analytics"
-        os.makedirs(self.local_storage_path, exist_ok=True)
+        # Local storage for development — Azure Functions has a read-only filesystem
+        # except /home/site; guard against EROFS so the service still initialises.
+        self.local_storage_path = os.getenv(
+            "ANALYTICS_LOCAL_STORAGE_PATH",
+            os.path.join(os.getenv("HOME", "/tmp"), "data", "analytics")
+        )
+        try:
+            os.makedirs(self.local_storage_path, exist_ok=True)
+        except OSError as fs_err:
+            logger.warning(f"⚠️ Analytics local storage unavailable: {fs_err} — using in-memory only")
+            self.local_storage_path = None
         
         # Cache popular queries
         self.popular_queries_cache = {}
