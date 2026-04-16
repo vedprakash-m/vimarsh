@@ -660,7 +660,10 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
             asyncio.set_event_loop(loop)
         
         # Validate token using auth service
-        user = loop.run_until_complete(auth_service._validate_token(token))
+        if auth_service._async_service.mode == AuthenticationMode.DEVELOPMENT:
+            user = auth_service._async_service._validate_development_token(token)
+        else:
+            user = loop.run_until_complete(auth_service._async_service._validate_production_token(token))
         
         if user:
             # Return user info as dict for backward compatibility
