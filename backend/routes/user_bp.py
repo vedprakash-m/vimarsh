@@ -54,6 +54,14 @@ except ImportError as e:
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
+def _cors() -> dict:
+    return {
+        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    }
+
 def _extract_user(req: func.HttpRequest):
     """Return (user_info, user_id) or (None, error_response)."""
     auth_header = req.headers.get("Authorization", "")
@@ -62,6 +70,7 @@ def _extract_user(req: func.HttpRequest):
             json.dumps({"error": "Missing or invalid authorization header"}),
             status_code=401,
             mimetype="application/json",
+            headers=_cors(),
         )
     token = auth_header.replace("Bearer ", "")
     user_info = _get_user_from_token(token)
@@ -70,6 +79,7 @@ def _extract_user(req: func.HttpRequest):
             json.dumps({"error": "Invalid or expired token"}),
             status_code=401,
             mimetype="application/json",
+            headers=_cors(),
         )
     user_id = user_info.get("sub") or user_info.get("oid")
     if not user_id:
@@ -77,15 +87,18 @@ def _extract_user(req: func.HttpRequest):
             json.dumps({"error": "Could not extract user ID from token"}),
             status_code=400,
             mimetype="application/json",
+            headers=_cors(),
         )
     return (user_info, user_id), None
 
 
 # ── routes ───────────────────────────────────────────────────────────────────
 
-@bp.route(route="user/profile", methods=["GET"])
+@bp.route(route="user/profile", methods=["GET", "OPTIONS"])
 async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
     """GET /api/user/profile — complete user profile"""
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=_cors())
     try:
         result, err = _extract_user(req)
         if err:
@@ -94,8 +107,8 @@ async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
 
         prefs = preferences_service.get_preferences(user_id)
         engagement_service = _get_engagement_service()
-        journey_stats = engagement_service.get_journey_stats(user_id)
-        ai_usage = await analytics_service.get_ai_usage_summary(user_id)
+        journey_stats = engagement_service.get_journey_stats(user_id) if engagement_service else {}
+        ai_usage = await analytics_service.get_ai_usage_summary(user_id) if analytics_service else {}
 
         profile = {
             "user_id": user_id,
@@ -113,7 +126,8 @@ async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
         }
 
         logger.info(f"👤 Retrieved profile for user {user_id}")
-        return func.HttpResponse(json.dumps(profile), status_code=200, mimetype="application/json")
+        headers = {"Content-Type": "application/json", **_cors()}
+        return func.HttpResponse(json.dumps(profile), status_code=200, headers=headers)
 
     except Exception as e:
         logger.error(f"❌ Error getting user profile: {e}")
@@ -121,6 +135,7 @@ async def get_user_profile(req: func.HttpRequest) -> func.HttpResponse:
             json.dumps({"error": "Internal server error", "details": str(e)}),
             status_code=500,
             mimetype="application/json",
+            headers=_cors(),
         )
 
 

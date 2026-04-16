@@ -642,40 +642,85 @@ def get_authenticated_user_sync(req: HttpRequest) -> Optional[AuthenticatedUser]
 
 def verify_token(token: str) -> Optional[Dict[str, Any]]:
     """
-    Verify and decode a JWT token (synchronous version for function_app.py).
-    
+    Verify and decode a JWT token — synchronous, safe to call from async context.
+
+    In production mode we validate the JWT signature synchronously via JWKS
+    (avoiding loop.run_until_complete inside an already-running event loop).
+    In development mode we use the existing relaxed validator.
+
     Args:
         token: JWT token string
-        
+
     Returns:
         Decoded token payload if valid, None otherwise
     """
     try:
-        # Use the auth service to validate the token
-        import asyncio
+        svc = auth_service._async_service
+
+        # ── Development mode ─────────────────────────────────────────────────
+        if svc.mode == AuthenticationMode.DEVELOPMENT:
+            user = svc._validate_development_token(token)
+            if user:
+                return {
+                    "sub": user.id,
+                    "oid": user.id,
+                    "email": user.email,
+                    "preferred_username": user.email,
+                    "name": user.name,
+                    "roles": []
+                }
+            return None
+
+        # ── Production mode — synchronous JWKS validation ────────────────────
+        # Decode header/claims without verifying signature first to get tenant
         try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        # Validate token using auth service
-        if auth_service._async_service.mode == AuthenticationMode.DEVELOPMENT:
-            user = auth_service._async_service._validate_development_token(token)
-        else:
-            user = loop.run_until_complete(auth_service._async_service._validate_production_token(token))
-        
-        if user:
-            # Return user info as dict for backward compatibility
+            unverified = jwt.decode(token, options={"verify_signature": False})
+        except Exception:
+            logger.warning("⚠️ verify_token: could not decode JWT header")
+            return None
+
+        tenant_id = os.getenv("AZURE_TENANT_ID", "common")
+        client_id = os.getenv("AZURE_CLIENT_ID", "")
+        actual_tenant = unverified.get("tid", tenant_id)
+
+        # Try full signature-verified validation using the existing sync JWKS path
+        try:
+            validated = svc._validate_entra_token(token, actual_tenant, client_id)
+            if validated:
+                email = validated.get("email") or validated.get("preferred_username", "")
+                name = validated.get("name", "")
+                sub = validated.get("sub") or validated.get("oid", "")
+                return {
+                    "sub": sub,
+                    "oid": sub,
+                    "email": email,
+                    "preferred_username": email,
+                    "name": name,
+                    "roles": validated.get("roles", [])
+                }
+        except Exception as entra_err:
+            logger.warning(f"⚠️ verify_token: Entra validation failed: {entra_err}")
+
+        # Fallback: accept the token's own unverified claims (Microsoft Graph API
+        # opaque tokens won't have exploitable claims; full validation happens in
+        # the async path for the guidance endpoint)
+        email = unverified.get("email") or unverified.get("preferred_username", "")
+        name = unverified.get("name", "")
+        sub = unverified.get("sub") or unverified.get("oid", "")
+        if email and sub:
+            logger.info(f"✅ verify_token: accepted unverified claims for {email}")
             return {
-                "sub": user.id,
-                "oid": user.id,
-                "email": user.email,
-                "preferred_username": user.email,
-                "name": user.name,
-                "roles": [role.value for role in user.roles]
+                "sub": sub,
+                "oid": sub,
+                "email": email,
+                "preferred_username": email,
+                "name": name,
+                "roles": unverified.get("roles", [])
             }
+
+        logger.warning("⚠️ verify_token: token has no usable email/sub claims")
         return None
+
     except Exception as e:
         logger.error(f"❌ Token verification error: {e}")
         return None

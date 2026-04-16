@@ -362,6 +362,8 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             personality_info = {"id": personality_id, "name": fi["name"], "domain": fi["domain"], "description": fi["description"]}
 
         # ── Streaming Path ──────────────────────────────────────────────
+        # NOTE: Azure Functions HttpResponse does NOT support async generators
+        # as body. We materialise the SSE frames into a bytes buffer first.
         if is_stream:
             user_preferences = None
             try:
@@ -371,13 +373,10 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
             except Exception:
                 pass
 
-            headers = _cors()
-            headers["Content-Type"] = "text/event-stream"
-            headers["Cache-Control"] = "no-cache"
-            headers["Connection"] = "keep-alive"
-            
-            return func.HttpResponse(
-                _guidance_stream_generator(
+            # Collect all SSE frames from the async generator
+            sse_frames: list[str] = []
+            try:
+                async for frame in _guidance_stream_generator(
                     user_query=user_query,
                     personality_id=personality_id,
                     personality_info=personality_info,
@@ -386,10 +385,22 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                     session_id=session_id,
                     language=language,
                     conversation_context_str=conversation_context,
-                    user_preferences=user_preferences
-                ),
+                    user_preferences=user_preferences,
+                ):
+                    sse_frames.append(frame)
+            except Exception as gen_err:
+                logger.error(f"❌ Stream generator error: {gen_err}")
+                sse_frames.append(f"data: {json.dumps({'error': str(gen_err)})}\n\n")
+
+            headers = _cors()
+            headers["Content-Type"] = "text/event-stream"
+            headers["Cache-Control"] = "no-cache"
+            headers["Connection"] = "keep-alive"
+
+            return func.HttpResponse(
+                body="".join(sse_frames),
                 status_code=200,
-                headers=headers
+                headers=headers,
             )
 
         # ── generate response (RAG → LLM → personality → template) ─────
