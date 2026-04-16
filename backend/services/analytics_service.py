@@ -53,10 +53,16 @@ class AnalyticsService:
         
         # Local storage for development — Azure Functions has a read-only filesystem
         # except /home/site; guard against EROFS so the service still initialises.
-        self.local_storage_path = os.getenv(
-            "ANALYTICS_LOCAL_STORAGE_PATH",
-            os.path.join(os.getenv("HOME", "/tmp"), "data", "analytics")
-        )
+        # CRITICAL: Always use /tmp in production to avoid Errno 30 Read-only file system
+        is_production = os.getenv("AZURE_FUNCTIONS_ENVIRONMENT") == "Production" or os.getenv("WEBSITE_HOSTNAME") is not None
+        
+        if is_production:
+            self.local_storage_path = os.path.join("/tmp", "data", "analytics")
+        else:
+            self.local_storage_path = os.getenv(
+                "ANALYTICS_LOCAL_STORAGE_PATH",
+                os.path.join(os.getenv("HOME", "/tmp"), "data", "analytics")
+            )
         try:
             os.makedirs(self.local_storage_path, exist_ok=True)
         except OSError as fs_err:

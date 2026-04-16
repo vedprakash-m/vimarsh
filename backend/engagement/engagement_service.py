@@ -506,6 +506,11 @@ class EngagementService:
             logger.error(f"❌ Error getting streak info: {e}")
             return {"current_streak": 0, "longest_streak": 0}
     
+    async def get_user_streak(self, user_id: str) -> int:
+        """Get current streak count for a user"""
+        info = await self.get_streak_info(user_id)
+        return info.get("current_streak", 0)
+
     async def get_progress_summary(self, user_id: str) -> Dict[str, Any]:
         """Get comprehensive progress summary for dashboard"""
         try:

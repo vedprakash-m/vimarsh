@@ -42,7 +42,7 @@ class AzureOpenAIChatService:
             or os.getenv('AZURE_OPENAI_API_KEY')
             or ''
         )
-        self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'vimarsh-chat-gpt5mini')
+        self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'gpt-5.4-mini')
         self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-4o-mini')
         self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', os.getenv('AZURE_OPENAI_API_VERSION', '2024-08-01-preview'))
         

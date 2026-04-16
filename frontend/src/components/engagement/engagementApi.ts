@@ -24,7 +24,7 @@ export const engagementApi = {
    */
   async getStreakData(userId: string): Promise<StreakData> {
     try {
-      const response = await getClient().get('/api/engagement/streaks', {
+      const response = await getClient().get('/engagement/streaks', {
         params: { user_id: userId }
       });
       return response.data.data;
@@ -50,7 +50,7 @@ export const engagementApi = {
     milestone_message?: string;
   }> {
     try {
-      const response = await getClient().post('/api/engagement/activity', {
+      const response = await getClient().post('/engagement/activity', {
         user_id: userId,
         activity_type: activityType,
         personality_id: personalityId,
@@ -76,7 +76,7 @@ export const engagementApi = {
     metadata?: Record<string, unknown>
   ): Promise<void> {
     try {
-      await getClient().post('/api/engagement/activity', {
+      await getClient().post('/engagement/activity', {
         user_id: userId,
         activity_type: activityType,
         personality_id: personalityId,
@@ -98,7 +98,7 @@ export const engagementApi = {
     freezes_remaining: number;
   }> {
     try {
-      const response = await getClient().post('/api/engagement/streaks/freeze', {
+      const response = await getClient().post('/engagement/streaks/freeze', {
         user_id: userId
       });
       return response.data.result;
@@ -113,7 +113,7 @@ export const engagementApi = {
    */
   async getWeeklySummary(userId: string): Promise<WeeklySummary> {
     try {
-      const response = await getClient().get('/api/engagement/summary', {
+      const response = await getClient().get('/engagement/summary', {
         params: { user_id: userId }
       });
       return response.data.summary;
@@ -128,7 +128,7 @@ export const engagementApi = {
    */
   async getAchievements(userId: string): Promise<AchievementsData> {
     try {
-      const response = await getClient().get('/api/engagement/achievements', {
+      const response = await getClient().get('/engagement/achievements', {
         params: { user_id: userId }
       });
       return response.data.data;
@@ -146,7 +146,7 @@ export const engagementApi = {
     metrics: Record<string, unknown>
   ): Promise<Achievement[]> {
     try {
-      const response = await getClient().post('/api/engagement/achievements/check', {
+      const response = await getClient().post('/engagement/achievements/check', {
         user_id: userId,
         metrics
       });
@@ -162,7 +162,7 @@ export const engagementApi = {
    */
   async getDashboard(userId: string): Promise<EngagementDashboard> {
     try {
-      const response = await getClient().get('/api/engagement/dashboard', {
+      const response = await getClient().get('/engagement/dashboard', {
         params: { user_id: userId }
       });
       return response.data.dashboard;
