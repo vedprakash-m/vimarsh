@@ -285,6 +285,44 @@ export default function GuidanceInterface() {
           box-shadow: 0 4px 12px rgba(0,0,0,0.05);
           border-color: rgba(0, 0, 0, 0.1);
         }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+          .wisdom-canvas-messages {
+            padding: 0 0.5rem 6rem 0.5rem !important;
+          }
+          .greeting-text {
+            font-size: 1.8rem !important;
+            margin-top: 4vh !important;
+            margin-bottom: 2rem !important;
+            padding: 0 1rem;
+          }
+          .wisdom-starter-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+            padding: 0 1rem;
+          }
+          .wisdom-starter-card {
+            padding: 0.85rem 1rem !important;
+            font-size: 0.85rem !important;
+          }
+          .nav-header {
+            margin-bottom: 2rem !important;
+            padding: 1rem 1rem 0 1rem !important;
+          }
+          .input-container {
+            bottom: 1rem !important;
+            padding: 0 1rem !important;
+          }
+          .message-user {
+            font-size: 1.1rem !important;
+            max-width: 90% !important;
+          }
+          .wisdom-ai-response {
+            padding: 0 0.5rem !important;
+            font-size: 1rem !important;
+          }
+        }
       `}</style>
 
       {showPersonalitySelector ? (
@@ -305,7 +343,7 @@ export default function GuidanceInterface() {
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.5rem', maxWidth: '900px', margin: '0 auto', width: '100%' }}>
           
           {/* Navigation Bar */}
-          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
+          <header className="nav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
             <div 
               onClick={() => setShowPersonalitySelector(true)}
               style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '20px', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.05)', transition: 'all 0.2s' }}
@@ -346,7 +384,7 @@ export default function GuidanceInterface() {
           <div className="wisdom-canvas-messages" style={{ flex: 1, overflowY: 'auto', paddingBottom: '4rem' }}>
             {messages.length === 0 ? (
               <div style={{ marginTop: '8vh', animation: 'fadeIn 1s ease-out' }}>
-                <h2 style={{ 
+                <h2 className="greeting-text" style={{ 
                   textAlign: 'center',
                   fontFamily: 'var(--font-wisdom-ui)',
                   fontSize: '2.5rem',
@@ -359,7 +397,7 @@ export default function GuidanceInterface() {
                   What burdens your mind today?
                 </h2>
                 
-                <div style={{ 
+                <div className="wisdom-starter-grid" style={{ 
                   display: 'grid', 
                   gridTemplateColumns: '1fr', 
                   gap: '1rem', 
@@ -390,7 +428,7 @@ export default function GuidanceInterface() {
                     width: '100%'
                   }}>
                     {msg.isUser ? (
-                      <div style={{ 
+                      <div className="message-user" style={{ 
                         fontFamily: 'var(--font-wisdom-ui)', 
                         fontSize: '1.25rem', 
                         color: '#1d1d1f', 
@@ -427,7 +465,7 @@ export default function GuidanceInterface() {
           </div>
 
           {/* Input Area */}
-          <div style={{ position: 'sticky', bottom: '2rem', width: '100%', padding: '1rem 0' }}>
+          <div className="input-container" style={{ position: 'sticky', bottom: '2rem', width: '100%', padding: '1rem 0' }}>
             <form onSubmit={handleSubmit} style={{ position: 'relative' }}>
               <div className="wisdom-canvas-input" style={{ 
                 background: 'rgba(245, 245, 247, 0.8)', 
