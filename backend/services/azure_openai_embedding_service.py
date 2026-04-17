@@ -188,10 +188,9 @@ class AzureOpenAIEmbeddingService:
         """Initialize Azure OpenAI client"""
         try:
             # Clean endpoint: AzureOpenAI client expects 'https://{resource}.openai.azure.com/'
-            # If the env var has /openai/v1, strip it to prevent 404s with double-pathing
-            clean_endpoint = self.endpoint
-            if '/openai/v1' in clean_endpoint:
-                clean_endpoint = clean_endpoint.split('/openai/v1')[0]
+            # If the env var has /openai/v1 or just /openai, strip it to prevent 404s with double/triple-pathing.
+            # The SDK automatically appends '/openai' to the azure_endpoint.
+            clean_endpoint = self.endpoint.split('/openai')[0].rstrip('/')
                 
             from openai import AzureOpenAI
             self.client = AzureOpenAI(
