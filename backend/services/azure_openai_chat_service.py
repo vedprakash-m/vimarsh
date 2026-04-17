@@ -43,7 +43,7 @@ class AzureOpenAIChatService:
             or ''
         )
         self.deployment_name = os.getenv('AZURE_OPENAI_CHAT_DEPLOYMENT', 'gpt-5.4-mini')
-        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-4o-mini')
+        self.model_name = os.getenv('AZURE_OPENAI_CHAT_MODEL', 'gpt-5.4-mini')
         self.api_version = os.getenv('AZURE_OPENAI_CHAT_API_VERSION', os.getenv('AZURE_OPENAI_API_VERSION', '2024-08-01-preview'))
         
         # Retry configuration
@@ -57,8 +57,14 @@ class AzureOpenAIChatService:
                 raise ValueError("AZURE_OPENAI_CHAT_API_KEY is required")
             
             try:
+                # Clean endpoint: AzureOpenAI client expects 'https://{resource}.openai.azure.com/'
+                # If the env var has /openai/v1, strip it to prevent 404s with double-pathing
+                clean_endpoint = self.endpoint
+                if '/openai/v1' in clean_endpoint:
+                    clean_endpoint = clean_endpoint.split('/openai/v1')[0]
+                
                 self.client = AzureOpenAI(
-                    azure_endpoint=self.endpoint,
+                    azure_endpoint=clean_endpoint,
                     api_key=self.api_key,
                     api_version=self.api_version
                 )

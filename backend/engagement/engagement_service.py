@@ -333,7 +333,7 @@ class EngagementService:
             logger.error(f"❌ Error recording check-in: {e}")
             raise
     
-    async def record_activity(
+    async def record_daily_activity(
         self, 
         user_id: str, 
         activity_type: str, 

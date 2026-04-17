@@ -187,10 +187,17 @@ class AzureOpenAIEmbeddingService:
     def _initialize_client(self):
         """Initialize Azure OpenAI client"""
         try:
-            self.client = OpenAI(
-                base_url=self.endpoint,
+            # Clean endpoint: AzureOpenAI client expects 'https://{resource}.openai.azure.com/'
+            # If the env var has /openai/v1, strip it to prevent 404s with double-pathing
+            clean_endpoint = self.endpoint
+            if '/openai/v1' in clean_endpoint:
+                clean_endpoint = clean_endpoint.split('/openai/v1')[0]
+                
+            from openai import AzureOpenAI
+            self.client = AzureOpenAI(
+                azure_endpoint=clean_endpoint,
                 api_key=self.api_key,
-                default_headers={"api-version": self.api_version}
+                api_version=self.api_version
             )
             logger.info(f"✅ Azure OpenAI embedding service initialized")
             logger.info(f"   Deployment: {self.deployment_name}")

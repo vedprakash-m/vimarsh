@@ -21,6 +21,7 @@
 - **PWA-enabled React 18 + TypeScript frontend** with "Invisible UI" design system (Inter/Merriweather typography)
 - **Multi-modal interaction**: Text and voice (Azure Neural TTS with 25 personality-matched voices, Web Speech API STT)
 - **Architectural Resilience**: Stateless serverless design with deterministic idempotency and structured AI outputs.
+- **Powered by**: Azure OpenAI **gpt-5.4-mini** and **text-embedding-3-large**.
 
 ---
 
