@@ -4,7 +4,7 @@
 |---|---|
 | **Product** | Vimarsh — AI-Powered Multi-Personality Conversational Wisdom Platform |
 | **Version** | 2.2 (April 2026) |
-| **Status** | Production — Live at [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) |
+| **Status** | Production — Live at [vimarsh.vedmishra.com](https://vimarsh.vedmishra.com) |
 | **Philosophy** | **Invisible UI** — Precision through subtraction. Precision is not when there is nothing left to add, but when there is nothing left to strip away. |
 | **License** | Business Source License (BSL) |
 
@@ -239,7 +239,7 @@ Authentic Wisdom → User Shares Quote → Social Proof → New User → Onboard
 
 | Requirement | Specification |
 |---|---|
-| **Security** | Microsoft Entra ID JWT validation; fail-closed auth (503 on auth module failure, never bypass); CORS restricted to production domains only (`vimarsh.vedprakash.net` and Azure Static Web App domain) |
+| **Security** | Microsoft Entra ID JWT validation; fail-closed auth (503 on auth module failure, never bypass); CORS restricted to production domains only (`vimarsh.vedmishra.com` and Azure Static Web App domain) |
 | **Resilience** | Three-layer circuit breakers; intelligent fallback to template responses; Cosmos DB session state with 1,800s TTL replacing in-memory structures |
 | **Cost Control** | Monthly budget enforcement ($50 ceiling); real-time cost tracking via Application Insights; 45% cache hit rate reducing AI API costs by ~30% |
 | **Data Privacy** | GDPR-compliant data export (JSON); granular privacy modes (Standard / Private / Minimal); configurable data retention (30–365 days); soft-delete with 30-day recovery |

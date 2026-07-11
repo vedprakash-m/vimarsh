@@ -4,7 +4,7 @@
 |---|---|
 | **Product** | Vimarsh — AI-Powered Multi-Personality Conversational Wisdom Platform |
 | **Version** | 2.1 (April 2026) |
-| **Status** | Production — Live at [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) |
+| **Status** | Production — Live at [vimarsh.vedmishra.com](https://vimarsh.vedmishra.com) |
 | **Architecture** | Serverless microservices on Azure |
 | **Integrity** | Stateless workers with External Session State (TTL 1800s) |
 
@@ -18,7 +18,7 @@
                           ┌──────────────────────────────────────┐
                           │        Azure Static Web Apps         │
                           │   (vimarsh-frontend / React 18 PWA)  │
-                          │   vimarsh.vedprakash.net              │
+                          │   vimarsh.vedmishra.com              │
                           └──────────────┬───────────────────────┘
                                          │ HTTPS / SSE (Streaming)
                                          ▼
@@ -409,7 +409,7 @@ Three CSS design system layers:
 
 | Control | Implementation |
 |---|---|
-| **CORS** | Production: `vimarsh.vedprakash.net` and Azure Static Web App domain only |
+| **CORS** | Production: `vimarsh.vedmishra.com` and Azure Static Web App domain only |
 | **Rate Limiting** | 60 requests/minute per user (configurable) |
 | **Content Safety** | `SafetyService` — PII detection, harmful content filtering |
 | **Input Validation** | Max query length: 1,000 characters |

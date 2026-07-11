@@ -3,7 +3,7 @@
     "clientId": "e4bd74b8-9a82-40c6-8d52-3e231733095e",
     "authority": "https://login.microsoftonline.com/common",
     "redirectUri": "https://localhost:3000/auth/callback",
-    "postLogoutRedirectUri": "https://vimarsh.vedprakash.net"
+    "postLogoutRedirectUri": "https://vimarsh.vedmishra.com"
   },
   "cache": {
     "cacheLocation": "sessionStorage",

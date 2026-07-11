@@ -121,7 +121,7 @@ class ExpertReviewService:
             ExpertProfile(
                 expert_id="expert_spiritual_1",
                 name="Dr. Priya Sharma",
-                email="priya.sharma@vedprakash.net",
+                email="priya.sharma@vedmishra.com",
                 domains=[ReviewDomain.SPIRITUAL],
                 expertise_level=ExpertLevel.DOMAIN_EXPERT,
                 specializations=["Hindu Philosophy", "Sanskrit", "Bhagavad Gita", "Vedanta"],

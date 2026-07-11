@@ -22,7 +22,7 @@ except ImportError:
     azure_chat_deployment = "vimarsh-chat-gpt5mini"
 
 # ──────────────────────────────────────────────
-# Service availability flags
+# Service availability flags & instances
 # ──────────────────────────────────────────────
 personality_models_available = False
 personality_service_available = False
@@ -34,9 +34,6 @@ hierarchical_memory_available = False
 engagement_available = False
 user_services_available = False
 
-# ──────────────────────────────────────────────
-# Service instances (populated by init_services)
-# ──────────────────────────────────────────────
 optimized_personality_service = None
 safety_service = None
 admin_service = None
@@ -50,9 +47,113 @@ achievement_service_instance = None
 preferences_service = None
 data_export_service = None
 analytics_service = None
-
-# Personality data
 PERSONALITY_CONFIGS = None
+
+# ──────────────────────────────────────────────
+# Service Initialization
+# ──────────────────────────────────────────────
+
+# 1. Database Personality Service
+try:
+    from services.database_personality_service import DatabasePersonalityService
+    database_personality_service = DatabasePersonalityService()
+    database_personality_available = True
+    logger.info("✅ Database-driven personality service initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Database personality service failed: {e}")
+
+# 2. Personality Service
+try:
+    from models.personality_models import PERSONALITY_CONFIGS as _CONFIGS
+    from services.personality_service import PersonalityService
+    PERSONALITY_CONFIGS = _CONFIGS
+    personality_models_available = True
+    optimized_personality_service = PersonalityService()
+    personality_service_available = True
+    logger.info("✅ Personality service initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Personality service failed: {e}")
+
+# 3. Enhanced LLM Service
+try:
+    from services.enhanced_llm_wrapper import enhanced_llm_service as _llm
+    enhanced_llm_service = _llm
+    enhanced_llm_available = True
+    logger.info("✅ Enhanced LLM service loaded")
+except Exception as e:
+    logger.warning(f"⚠️ Enhanced LLM service failed: {e}")
+
+# 4. Enhanced RAG Service
+try:
+    from services.enhanced_rag_service_v6 import EnhancedRAGService
+    enhanced_rag_available = True
+    # Initialized lazily in blueprints
+    logger.info("✅ Enhanced RAG service available")
+except Exception as e:
+    logger.warning(f"⚠️ Enhanced RAG service unavailable: {e}")
+
+# 5. Conversation Memory & Preferences
+try:
+    from services.conversation_memory_service import ConversationMemoryService
+    from services.preferences_service import preferences_service as _prefs
+    preferences_service = _prefs
+    conversation_memory_service = ConversationMemoryService(preferences_service=preferences_service)
+    memory_service_available = True
+    logger.info("✅ Conversation memory service initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Conversation memory service failed: {e}")
+
+# 6. Hierarchical Memory Service
+try:
+    from services.hierarchical_memory_service import get_memory_service
+    hierarchical_memory_service = get_memory_service()
+    hierarchical_memory_available = True
+    logger.info("✅ Hierarchical memory service initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Hierarchical memory service failed: {e}")
+
+# 7. Safety Service
+try:
+    from services.safety_service import SafetyService
+    safety_service = SafetyService()
+    logger.info("✅ Safety service initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Safety service failed: {e}")
+
+# 8. Admin Service
+try:
+    from services.admin_service import AdminService
+    admin_service = AdminService()
+    logger.info("✅ Admin service initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Admin service failed: {e}")
+
+# 9. Engagement & Achievement Services
+try:
+    from engagement.engagement_service import get_engagement_service
+    from engagement.achievement_service import get_achievement_service
+    engagement_service_instance = get_engagement_service()
+    achievement_service_instance = get_achievement_service()
+    engagement_available = True
+    logger.info("🏆 Engagement and achievement services initialized")
+except Exception as e:
+    logger.warning(f"⚠️ Engagement services failed: {e}")
+
+# 10. Analytics & Data Export
+try:
+    from services.analytics_service import analytics_service as _analytics
+    from services.data_export_service import data_export_service as _export
+    analytics_service = _analytics
+    data_export_service = _export
+    user_services_available = True
+    logger.info("📊 Analytics and data export services loaded")
+except Exception as e:
+    logger.warning(f"⚠️ Analytics/Export services failed: {e}")
+
+
+# ──────────────────────────────────────────────
+# Personality Data
+# ──────────────────────────────────────────────
 FALLBACK_PERSONALITIES = {
     "krishna": {"name": "Krishna", "domain": "spiritual", "description": "Divine guide offering spiritual wisdom from the Bhagavad Gita"},
     "buddha": {"name": "Buddha", "domain": "spiritual", "description": "Enlightened teacher of the Middle Way and mindfulness"},
@@ -86,7 +187,7 @@ def get_cors_headers() -> Dict[str, str]:
     """Get standard CORS headers for all responses"""
     return {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",

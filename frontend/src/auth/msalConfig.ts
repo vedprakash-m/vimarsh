@@ -4,7 +4,7 @@ import { getAuthConfig, validateEnvironmentConfig, getCurrentDomainConfig, ENTRA
 // Microsoft Authentication Library (MSAL) Configuration
 // Implements unified Vedprakash domain authentication standard
 // Following Apps_Auth_Requirement.md specifications
-// Supports multi-domain: vimarsh.vedprakash.net AND white-forest-05c196d0f.2.azurestaticapps.net
+// Supports multi-domain: vimarsh.vedmishra.com AND white-forest-05c196d0f.2.azurestaticapps.net
 
 // Create dynamic MSAL configuration that adapts to multi-domain runtime
 export const createMsalConfig = (): Configuration => {
@@ -142,7 +142,7 @@ export const validateMsalConfig = (): boolean => {
   }
 
   // Validate custom domain configuration
-  const expectedDomain = 'vimarsh.vedprakash.net';
+  const expectedDomain = 'vimarsh.vedmishra.com';
   const domainValid = domainConfig.domain.includes(expectedDomain) || 
                      domainConfig.domain.includes('localhost') ||
                      domainConfig.domain.includes('.azurestaticapps.net');
@@ -169,8 +169,8 @@ export const getAuthConfigStatic = () => {
     usePlaceholder: authConfig.usePlaceholder,
     enableLogging: authConfig.enableDebugLogging,
     tenantId: ENTRA_ID_CONFIG.tenantId,
-    domain: 'vedprakash.net',
-    customDomain: 'vimarsh.vedprakash.net'
+    domain: 'vedmishra.com',
+    customDomain: 'vimarsh.vedmishra.com'
   };
 };
 

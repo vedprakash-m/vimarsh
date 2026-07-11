@@ -36,7 +36,7 @@ Vimarsh is built on **Architectural Pragmatism**. The interface is designed to b
 ## 🚀 Quick Start
 
 ### **For Users**
-Visit [vimarsh.vedprakash.net](https://vimarsh.vedprakash.net) and start your journey of wisdom.
+Visit [vimarsh.vedmishra.com](https://vimarsh.vedmishra.com) and start your journey of wisdom.
 
 ### **For Developers**
 ```bash

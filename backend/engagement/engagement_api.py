@@ -16,7 +16,7 @@ def get_cors_headers() -> Dict[str, str]:
     """Get standard CORS headers for all responses"""
     return {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -46,7 +46,17 @@ def register_engagement_routes(app: func.FunctionApp):
             from engagement import get_engagement_service
             engagement_service = get_engagement_service()
             
-            streak_data = await engagement_service.get_or_create_streak_data(user_id)
+            streak_info = await engagement_service.get_streak_info(user_id)
+            
+            # Map to frontend expected format
+            streak_data = {
+                "current_streak": streak_info.get("current_streak", 0),
+                "longest_streak": streak_info.get("longest_streak", 0),
+                "streak_freezes_available": streak_info.get("freeze_count", 0),
+                "last_active_date": streak_info.get("last_activity_date"),
+                "streak_at_risk": streak_info.get("streak_at_risk", False),
+                "is_active_today": streak_info.get("is_active_today", False)
+            }
             
             return func.HttpResponse(
                 json.dumps({
@@ -95,18 +105,47 @@ def register_engagement_routes(app: func.FunctionApp):
             from engagement import get_engagement_service
             engagement_service = get_engagement_service()
             
+            # Enrich metadata
+            if personality_id:
+                metadata["personality_id"] = personality_id
+            if domain:
+                metadata["domain"] = domain
+            
             result = await engagement_service.record_daily_activity(
                 user_id=user_id,
                 activity_type=activity_type,
-                personality_id=personality_id,
-                domain=domain,
                 metadata=metadata
             )
+            
+            # Gather additional data for frontend
+            streak_info = await engagement_service.get_streak_info(user_id)
+            
+            from engagement import get_achievement_service
+            achievement_service = get_achievement_service()
+            
+            # Check for new achievements
+            newly_unlocked = await achievement_service.check_and_unlock_achievements(
+                user_id=user_id,
+                metrics={"last_activity": activity_type}
+            )
+            
+            response_data = {
+                "streak_data": {
+                    "current_streak": streak_info.get("current_streak", 0),
+                    "longest_streak": streak_info.get("longest_streak", 0),
+                    "streak_freezes_available": streak_info.get("freeze_count", 0),
+                    "last_active_date": streak_info.get("last_activity_date"),
+                    "streak_at_risk": streak_info.get("streak_at_risk", False)
+                },
+                "newly_unlocked_achievements": newly_unlocked,
+                "milestone_reached": len(newly_unlocked) > 0,
+                "success": True
+            }
             
             return func.HttpResponse(
                 json.dumps({
                     "success": True,
-                    "result": result,
+                    "result": response_data,
                     "timestamp": datetime.now(timezone.utc).isoformat()
                 }),
                 status_code=200,
@@ -146,7 +185,7 @@ def register_engagement_routes(app: func.FunctionApp):
             from engagement import get_engagement_service
             engagement_service = get_engagement_service()
             
-            result = await engagement_service.use_streak_freeze(user_id)
+            result = await engagement_service.freeze_streak(user_id)
             
             return func.HttpResponse(
                 json.dumps({
@@ -182,7 +221,8 @@ def register_engagement_routes(app: func.FunctionApp):
             from engagement import get_engagement_service
             engagement_service = get_engagement_service()
             
-            summary = await engagement_service.get_weekly_summary(user_id)
+            progress = await engagement_service.get_progress_summary(user_id)
+            summary = progress.get("weekly_summary", {})
             
             return func.HttpResponse(
                 json.dumps({
@@ -372,17 +412,18 @@ def register_engagement_routes(app: func.FunctionApp):
             achievement_service = get_achievement_service()
             
             # Gather all data
-            streak_data = await engagement_service.get_or_create_streak_data(user_id)
+            streak_info = await engagement_service.get_streak_info(user_id)
             achievements = await achievement_service.get_all_achievements(user_id)
-            weekly_summary = await engagement_service.get_weekly_summary(user_id)
+            progress = await engagement_service.get_progress_summary(user_id)
+            weekly_summary = progress.get("weekly_summary", {})
             
             dashboard = {
                 "streaks": {
-                    "current_streak": streak_data.get("current_streak", 0),
-                    "longest_streak": streak_data.get("longest_streak", 0),
-                    "streak_freezes_available": streak_data.get("streak_freezes_available", 0),
-                    "last_active_date": streak_data.get("last_active_date"),
-                    "streak_at_risk": streak_data.get("streak_at_risk", False)
+                    "current_streak": streak_info.get("current_streak", 0),
+                    "longest_streak": streak_info.get("longest_streak", 0),
+                    "streak_freezes_available": streak_info.get("freeze_count", 0),
+                    "last_active_date": streak_info.get("last_activity_date"),
+                    "streak_at_risk": streak_info.get("streak_at_risk", False)
                 },
                 "achievements": {
                     "total": achievements["summary"]["total"],
@@ -393,7 +434,7 @@ def register_engagement_routes(app: func.FunctionApp):
                     "recent_unlocks": achievements.get("recent_unlocks", [])[:5]
                 },
                 "weekly_activity": weekly_summary,
-                "engagement_score": _calculate_engagement_score(streak_data, achievements)
+                "engagement_score": _calculate_engagement_score(streak_info, achievements)
             }
             
             return func.HttpResponse(
@@ -417,10 +458,10 @@ def register_engagement_routes(app: func.FunctionApp):
     logger.info("✅ Engagement API routes registered successfully")
 
 
-def _calculate_engagement_score(streak_data: Dict[str, Any], achievements: Dict[str, Any]) -> Dict[str, Any]:
+def _calculate_engagement_score(streak_info: Dict[str, Any], achievements: Dict[str, Any]) -> Dict[str, Any]:
     """Calculate an overall engagement score"""
     # Base score from streak
-    streak_score = min(streak_data.get("current_streak", 0) * 10, 100)
+    streak_score = min(streak_info.get("current_streak", 0) * 10, 100)
     
     # Bonus from achievements
     total_achievements = achievements["summary"]["total"]

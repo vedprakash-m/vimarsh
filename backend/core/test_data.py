@@ -276,7 +276,7 @@ class TestDataManager:
         return [
             TestUser(
                 user_id="test_user_1",
-                email="test1@vedprakash.net",
+                email="test1@vedmishra.com",
                 name="Test User One",
                 preferences={
                     "language": "English",
@@ -286,7 +286,7 @@ class TestDataManager:
             ),
             TestUser(
                 user_id="test_user_2", 
-                email="test2@vedprakash.net",
+                email="test2@vedmishra.com",
                 name="Test User Two",
                 preferences={
                     "language": "Hindi",

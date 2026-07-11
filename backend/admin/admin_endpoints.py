@@ -22,7 +22,7 @@ from monitoring.admin_metrics import get_admin_metrics_collector, AdminOperation
 def get_cors_headers() -> Dict[str, str]:
     """Get standardized CORS headers for admin endpoints"""
     return {
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"

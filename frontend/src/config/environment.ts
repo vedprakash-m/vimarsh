@@ -1,6 +1,6 @@
 /**
  * Environment Configuration for Vimarsh Frontend
- * Handles custom domain vimarsh.vedprakash.net
+ * Handles custom domain vimarsh.vedmishra.com
  * Provides proper Entra ID settings per Apps_Auth_Requirement.md
  */
 
@@ -12,7 +12,7 @@ export const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Define both valid production domains
 const VALID_PRODUCTION_DOMAINS = [
-  'vimarsh.vedprakash.net',
+  'vimarsh.vedmishra.com',
   'white-forest-05c196d0f.2.azurestaticapps.net'
 ];
 
@@ -34,9 +34,9 @@ export const getCurrentRuntimeDomain = (): string => {
 // Multi-domain configuration supporting both valid production domains
 export const DOMAIN_CONFIG = {
   production: {
-    domain: 'https://vimarsh.vedprakash.net',
-    redirectUri: 'https://vimarsh.vedprakash.net/auth/callback',
-    postLogoutRedirectUri: 'https://vimarsh.vedprakash.net',
+    domain: 'https://vimarsh.vedmishra.com',
+    redirectUri: 'https://vimarsh.vedmishra.com/auth/callback',
+    postLogoutRedirectUri: 'https://vimarsh.vedmishra.com',
   },
   development: {
     domain: 'http://localhost:3000',
@@ -168,8 +168,8 @@ export const APP_CONFIG = {
   name: 'Vimarsh',
   description: 'Wisdom Without Boundaries - AI guidance from great minds across history',
   version: process.env.REACT_APP_VERSION || '1.0.0',
-  domain: 'vimarsh.vedprakash.net',
-  supportEmail: 'ved@vedprakash.net',
+  domain: 'vimarsh.vedmishra.com',
+  supportEmail: 'ved@vedmishra.com',
   environment: process.env.NODE_ENV || 'development',
 };
 

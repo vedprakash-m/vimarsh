@@ -56,7 +56,7 @@ except ImportError as e:
 
 def _cors() -> dict:
     return {
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",

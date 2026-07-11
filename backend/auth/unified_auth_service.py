@@ -510,7 +510,7 @@ class UnifiedAuthService:
                             status_code=401,
                             mimetype="application/json",
                             headers={
-                                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                                "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
                                 "Access-Control-Allow-Credentials": "true",
                                 "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
                                 "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"
@@ -524,7 +524,7 @@ class UnifiedAuthService:
                             status_code=403, 
                             mimetype="application/json",
                             headers={
-                                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                                "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
                                 "Access-Control-Allow-Credentials": "true",
                                 "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
                                 "Access-Control-Allow-Headers": "Content-Type, Authorization, x-request-id, x-user-id, x-user-email, x-session-id"

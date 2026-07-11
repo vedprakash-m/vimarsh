@@ -68,7 +68,7 @@ Level 4: 0 8px 24px rgba(0, 0, 0, 0.15) — Floating action buttons
 ### Site Map
 
 ```
-vimarsh.vedprakash.net
+vimarsh.vedmishra.com
 ├── / (Landing Page — public)
 │   ├── Hero + Value Proposition
 │   ├── Feature Showcase
@@ -562,7 +562,7 @@ Listens to active personality changes and updates CSS custom properties globally
 │           — Socrates         │
 │           📚 Meditations 2.1 │
 │                              │
-│  🕉️ vimarsh.vedprakash.net  │
+│  🕉️ vimarsh.vedmishra.com  │
 └────────────────────────────┘
 ```
 

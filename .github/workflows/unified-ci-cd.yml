@@ -538,7 +538,7 @@ jobs:
     - name: 🔍 Verify Deployment
       run: |
         echo "✅ Frontend deployment completed to Azure Static Web Apps"
-        echo "🌐 Frontend URL: https://vimarsh.vedprakash.net"
+        echo "🌐 Frontend URL: https://vimarsh.vedmishra.com"
         echo "🚀 Frontend Resource: vimarsh-frontend"
         echo ""
         echo "✅ Backend deployment completed to Azure Functions"

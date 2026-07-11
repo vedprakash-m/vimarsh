@@ -7,6 +7,6 @@
     "https://graph.microsoft.com/.default"
   ],
   "redirect_uri": "https://vimarsh-functions.azurewebsites.net/.auth/login/aad/callback",
-  "logout_uri": "https://vimarsh.vedprakash.net",
+  "logout_uri": "https://vimarsh.vedmishra.com",
   "_comment": "Updated with exact tenant ID and client ID from Azure Portal screenshots"
 }

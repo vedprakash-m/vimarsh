@@ -313,7 +313,7 @@ class MetadataProductionSyncer:
                 "vector_database_chunks": total_chunks,
                 "embedding_model": "text-embedding-3-large",
                 "embedding_dimensions": "768 (Azure OpenAI, truncated from 3072, L2-normalized)",
-                "production_url": "https://vimarsh.vedprakash.net"
+                "production_url": "https://vimarsh.vedmishra.com"
             },
             "data_sources": {
                 "original_personalities": 8,

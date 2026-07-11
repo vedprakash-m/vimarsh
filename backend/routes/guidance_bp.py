@@ -20,7 +20,7 @@ bp = func.Blueprint()
 def _cors():
     return {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -516,7 +516,7 @@ async def guidance_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         if ctx["engagement_available"] and ctx["engagement_service_instance"] and user_id != "anonymous":
             try:
                 await ctx["engagement_service_instance"].record_check_in(user_id)
-                await ctx["engagement_service_instance"].record_activity(
+                await ctx["engagement_service_instance"].record_daily_activity(
                     user_id=user_id, activity_type="conversation",
                     metadata={"personality_id": personality_id, "domain": personality_info.get("domain", ""), "query_length": len(user_query), "response_length": len(response_text)},
                 )

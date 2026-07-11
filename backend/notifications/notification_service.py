@@ -123,7 +123,7 @@ class NotificationService:
         self.vapid_private_key: Optional[str] = None
         self.vapid_public_key: Optional[str] = None
         self.vapid_claims: Dict[str, str] = {
-            "sub": "mailto:support@vimarsh.vedprakash.net"
+            "sub": "mailto:support@vimarsh.vedmishra.com"
         }
     
     async def initialize(self) -> None:

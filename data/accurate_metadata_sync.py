@@ -158,7 +158,7 @@ class EnhancedMetadataProductionSyncer:
                 "vector_database_chunks": production_data['total_chunks'],
                 "embedding_model": "text-embedding-3-large",
                 "embedding_dimensions": "768 (Azure OpenAI, truncated from 3072, L2-normalized)",
-                "production_url": "https://vimarsh.vedprakash.net",
+                "production_url": "https://vimarsh.vedmishra.com",
                 "cosmos_db_container": "personality-vectors",
                 "last_upload_date": "2025-07-29"
             },
@@ -343,7 +343,7 @@ def main():
         print(f"📊 Total Chunks in Production: {result['total_chunks']}")
         print(f"👥 Active Personalities: {result['personalities']}")
         print(f"✅ All 5 requested files confirmed uploaded!")
-        print(f"🌐 Live at: https://vimarsh.vedprakash.net")
+        print(f"🌐 Live at: https://vimarsh.vedmishra.com")
     else:
         print(f"\n❌ Accurate sync failed: {result['error']}")
 

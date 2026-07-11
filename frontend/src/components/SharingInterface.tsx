@@ -106,7 +106,7 @@ export const SharingInterface: React.FC<SharingInterfaceProps> = ({
 
   // Get share URL 
   const getShareUrl = useCallback(() => {
-    return `https://vimarsh.vedprakash.net`;
+    return `https://vimarsh.vedmishra.com`;
   }, []);
 
   // Track share event (analytics)

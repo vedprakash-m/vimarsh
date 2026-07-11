@@ -80,13 +80,13 @@ class ComprehensiveE2EValidator:
         default_config = {
             "environments": {
                 "production": {
-                    "frontend_url": "https://vimarsh.vedprakash.net",
+                    "frontend_url": "https://vimarsh.vedmishra.com",
                     "backend_url": "https://vimarsh-backend-app-flex.azurewebsites.net",
                     "health_endpoint": "/api/health",
                     "test_timeout": 30
                 },
                 "staging": {
-                    "frontend_url": "https://staging-vimarsh.vedprakash.net",
+                    "frontend_url": "https://staging-vimarsh.vedmishra.com",
                     "backend_url": "https://staging-vimarsh-backend.azurewebsites.net",
                     "health_endpoint": "/api/health",
                     "test_timeout": 30

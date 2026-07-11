@@ -35,7 +35,7 @@ except Exception as e:
 def _cors():
     return {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+        "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -112,7 +112,7 @@ async def voice_synthesize(req: func.HttpRequest) -> func.HttpResponse:
             headers={
                 "Content-Type": content_type,
                 "Content-Length": str(len(audio_data)),
-                "Access-Control-Allow-Origin": "https://vimarsh.vedprakash.net",
+                "Access-Control-Allow-Origin": "https://vimarsh.vedmishra.com",
                 "Access-Control-Allow-Credentials": "true",
                 "Cache-Control": "public, max-age=3600",
             },

@@ -140,7 +140,7 @@ const AchievementShareModal: React.FC<AchievementShareModalProps> = ({
   }, [achievement]);
 
   // Get share URL
-  const getShareUrl = () => 'https://vimarsh.vedprakash.net';
+  const getShareUrl = () => 'https://vimarsh.vedmishra.com';
 
   // Track share
   const trackShare = useCallback((platform: string) => {

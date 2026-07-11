@@ -563,7 +563,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       ]
       cors: {
         allowedOrigins: [
-          'https://vimarsh.vedprakash.net'
+          'https://vimarsh.vedmishra.com'
           'https://white-forest-05c196d0f.2.azurestaticapps.net'
         ]
         supportCredentials: true
