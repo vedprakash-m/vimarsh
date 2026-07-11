@@ -72,6 +72,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
   if (!showAsDialog) return null;
 
   return (
+    <>
       <style>{`
         .personality-grid {
           display: grid;
@@ -456,6 +457,7 @@ const PersonalitySelector: React.FC<PersonalitySelectorProps> = ({
         )}
       </div>
     </div>
+    </>
   );
 };
 

@@ -100,6 +100,9 @@ try:
         memory_service_available,
         hierarchical_memory_available,
         engagement_available,
+        database_personality_service,
+        optimized_personality_service as personality_service,
+        PersonalityService,
     )
 except ImportError:
     pass
