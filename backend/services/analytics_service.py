@@ -18,12 +18,33 @@ except ImportError as e:
     db_service = None
     CacheService = None
 
-# Analytics service is simplified - these models don't exist yet
-# Using basic types instead
-UserAnalyticsEvent = None
-EventType = None
-PersonalityUsageStats = None
-DailyAnalyticsSummary = None
+# Analytics service is simplified - using basic types instead
+from enum import Enum
+
+class EventType(Enum):
+    QUERY_RECEIVED = "query_received"
+    RESPONSE_SENT = "response_sent"
+    INSIGHT_SAVED = "insight_saved"
+    SHARE_CLICKED = "share_clicked"
+    PERSONALITY_CHANGED = "personality_changed"
+    ERROR_OCCURRED = "error_occurred"
+
+class UserAnalyticsEvent:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        if not hasattr(self, "timestamp"):
+            self.timestamp = datetime.utcnow().isoformat()
+
+class PersonalityUsageStats:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+class DailyAnalyticsSummary:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
 # Helper functions that were from models.vimarsh_models
 def model_to_dict(obj):

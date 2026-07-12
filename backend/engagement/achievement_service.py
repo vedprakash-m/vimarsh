@@ -58,6 +58,7 @@ class AchievementService:
     def __init__(self):
         """Initialize achievement service with Cosmos DB connection"""
         self.container = None
+        self._memory_store: Dict[str, Dict] = {}
         self._cache = AchievementCache(default_ttl=self.CACHE_TTL_SECONDS)
         self._init_cosmos_db()
     
@@ -71,7 +72,6 @@ class AchievementService:
             if not cosmos_endpoint or not cosmos_key:
                 logger.warning("⚠️ Cosmos DB credentials not found, achievements will use in-memory storage")
                 self.container = None
-                self._memory_store: Dict[str, Dict] = {}
                 return
             
             client = CosmosClient(cosmos_endpoint, cosmos_key)
@@ -92,7 +92,6 @@ class AchievementService:
         except Exception as e:
             logger.error(f"❌ Failed to initialize Cosmos DB for achievements: {e}")
             self.container = None
-            self._memory_store = {}
     
     def _generate_id(self, user_id: str) -> str:
         """Generate document ID from user_id"""
@@ -455,10 +454,10 @@ class AchievementService:
                 self._memory_store[data["id"]] = data
             
             # Invalidate cache after save
-            user_id = data.get("userId")
+            user_id = data.get("user_id")
             if user_id:
                 cache_key = f"achievements_{user_id}"
-                self._cache.invalidate(cache_key)
+                self._cache.delete(cache_key)
                 logger.debug(f"🗑️ Invalidated achievement cache: {user_id}")
         except Exception as e:
             logger.error(f"❌ Error saving achievement data: {e}")

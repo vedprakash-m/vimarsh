@@ -81,6 +81,7 @@ class EngagementService:
     def __init__(self):
         """Initialize engagement service with Cosmos DB connection"""
         self.container = None
+        self._memory_store: Dict[str, Dict] = {}
         self._cache = TTLCache(default_ttl=self.CACHE_TTL_SECONDS)
         self._init_cosmos_db()
     
@@ -94,7 +95,6 @@ class EngagementService:
             if not cosmos_endpoint or not cosmos_key:
                 logger.warning("⚠️ Cosmos DB credentials not found, engagement will use in-memory storage")
                 self.container = None
-                self._memory_store: Dict[str, Dict] = {}
                 return
             
             client = CosmosClient(cosmos_endpoint, cosmos_key)
