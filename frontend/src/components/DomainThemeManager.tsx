@@ -32,15 +32,27 @@ export const DomainThemeManager: React.FC = () => {
     };
 
     if (themePref === 'auto') {
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const mediaQuery = typeof window !== 'undefined' && window.matchMedia 
+        ? window.matchMedia('(prefers-color-scheme: dark)') 
+        : null;
+      
+      const isDark = mediaQuery ? mediaQuery.matches : false;
       applyTheme(isDark ? 'dark' : 'light');
       
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e: MediaQueryListEvent) => {
-        applyTheme(e.matches ? 'dark' : 'light');
-      };
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
+      if (mediaQuery) {
+        const handleChange = (e: MediaQueryListEvent | Event) => {
+          applyTheme((e as MediaQueryListEvent).matches ? 'dark' : 'light');
+        };
+        
+        if (mediaQuery.addEventListener) {
+          mediaQuery.addEventListener('change', handleChange);
+          return () => mediaQuery.removeEventListener('change', handleChange);
+        } else if ('addListener' in mediaQuery) {
+          // Fallback for older browsers
+          (mediaQuery as any).addListener(handleChange);
+          return () => (mediaQuery as any).removeListener(handleChange);
+        }
+      }
     } else {
       applyTheme(themePref);
     }

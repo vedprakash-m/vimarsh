@@ -107,7 +107,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 describe('Domain Theme System Integration', () => {
   beforeEach(() => {
     // Clear any existing theme classes
-    document.body.className = '';
+    document.documentElement.removeAttribute('data-domain');
     
     // Mock localStorage
     const localStorageMock = {
@@ -121,12 +121,7 @@ describe('Domain Theme System Integration', () => {
 
   afterEach(() => {
     // Clean up theme classes
-    document.body.classList.remove(
-      'spiritual-theme',
-      'scientific-theme',
-      'historical-theme',
-      'philosophical-theme'
-    );
+    document.documentElement.removeAttribute('data-domain');
   });
 
   it('should initialize with Krishna personality and spiritual theme', async () => {
@@ -142,7 +137,7 @@ describe('Domain Theme System Integration', () => {
     });
 
     // Check if spiritual theme is applied
-    expect(document.body.classList.contains('spiritual-theme')).toBe(true);
+    expect(document.documentElement.getAttribute('data-domain')).toBe('spiritual');
   });
 
   it('should switch to scientific theme when Einstein is selected', async () => {
@@ -163,8 +158,7 @@ describe('Domain Theme System Integration', () => {
     });
 
     // Check theme switching
-    expect(document.body.classList.contains('scientific-theme')).toBe(true);
-    expect(document.body.classList.contains('spiritual-theme')).toBe(false);
+    expect(document.documentElement.getAttribute('data-domain')).toBe('scientific');
   });
 
   it('should switch to historical theme when Lincoln is selected', async () => {
@@ -185,9 +179,7 @@ describe('Domain Theme System Integration', () => {
     });
 
     // Check theme switching
-    expect(document.body.classList.contains('historical-theme')).toBe(true);
-    expect(document.body.classList.contains('spiritual-theme')).toBe(false);
-    expect(document.body.classList.contains('scientific-theme')).toBe(false);
+    expect(document.documentElement.getAttribute('data-domain')).toBe('historical');
   });
 
   it('should switch to philosophical theme when Marcus Aurelius is selected', async () => {
@@ -208,10 +200,7 @@ describe('Domain Theme System Integration', () => {
     });
 
     // Check theme switching
-    expect(document.body.classList.contains('philosophical-theme')).toBe(true);
-    expect(document.body.classList.contains('spiritual-theme')).toBe(false);
-    expect(document.body.classList.contains('scientific-theme')).toBe(false);
-    expect(document.body.classList.contains('historical-theme')).toBe(false);
+    expect(document.documentElement.getAttribute('data-domain')).toBe('philosophical');
   });
 
   it('should persist personality selection to localStorage', async () => {
@@ -266,9 +255,7 @@ describe('Domain Theme System Integration', () => {
     });
 
     // Final theme should be philosophical
-    expect(document.body.classList.contains('philosophical-theme')).toBe(true);
-    expect(document.body.classList.contains('scientific-theme')).toBe(false);
-    expect(document.body.classList.contains('historical-theme')).toBe(false);
+    expect(document.documentElement.getAttribute('data-domain')).toBe('philosophical');
   });
 
   it('should handle missing domain gracefully', async () => {
@@ -281,37 +268,23 @@ describe('Domain Theme System Integration', () => {
     // Test with personality that has undefined domain (edge case)
     // This should not crash the application
     await waitFor(() => {
-      const hasAnyTheme = Array.from(document.body.classList).some(cls => 
-        cls.endsWith('-theme')
-      );
+      const domainAttr = document.documentElement.getAttribute('data-domain');
       // Either has no theme or has spiritual theme as fallback
-      expect(hasAnyTheme === false || document.body.classList.contains('spiritual-theme')).toBe(true);
+      expect(!domainAttr || domainAttr === 'spiritual').toBe(true);
     });
   });
 });
 
 // Theme validation test
 describe('Domain Theme CSS Validation', () => {
-  it('should have all required theme classes defined', () => {
-    // Create test elements to verify CSS classes exist
-    const testElement = document.createElement('div');
-    document.body.appendChild(testElement);
-
-    const themes = ['spiritual-theme', 'scientific-theme', 'historical-theme', 'philosophical-theme'];
+  it('should have all required theme domains applied to document.documentElement', () => {
+    const themes = ['spiritual', 'scientific', 'historical', 'philosophical'];
     
     themes.forEach(theme => {
-      // Apply theme to body
-      document.body.classList.add(theme);
-      
-      // Test that CSS variables are set (this would be done by checking computed styles in a real browser)
-      // For now, we just verify the theme class can be applied
-      expect(document.body.classList.contains(theme)).toBe(true);
-      
-      // Clean up
-      document.body.classList.remove(theme);
+      document.documentElement.setAttribute('data-domain', theme);
+      expect(document.documentElement.getAttribute('data-domain')).toBe(theme);
+      document.documentElement.removeAttribute('data-domain');
     });
-
-    document.body.removeChild(testElement);
   });
 });
 
