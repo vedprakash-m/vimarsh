@@ -32,7 +32,7 @@
     "vector_database_chunks": 8630,
     "embedding_model": "Gemini text-embedding-004",
     "embedding_dimensions": 768,
-    "production_url": "https://vimarsh.vedprakash.net",
+    "production_url": "https://vimarsh.vedmishra.com",
     "cosmos_db_container": "personality-vectors",
     "last_upload_date": "2025-07-29"
   },

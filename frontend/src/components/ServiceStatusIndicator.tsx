@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getApiBaseUrl } from '../config/environment';
-import '../styles/gap-remediation.css';
+
 
 interface ServiceHealth {
   available: boolean;

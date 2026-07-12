@@ -1,0 +1,302 @@
+{
+  "pipeline_id": "vimarsh-e2e-1783888196",
+  "environment": "production",
+  "validation_level": "comprehensive",
+  "start_time": "2026-07-12T13:28:30.689101",
+  "end_time": "2026-07-12T13:29:56.522629",
+  "duration": 85.8335280418396,
+  "total_tests": 21,
+  "passed_tests": 5,
+  "failed_tests": 7,
+  "warning_tests": 3,
+  "skipped_tests": 6,
+  "results": [
+    {
+      "test_name": "project_structure",
+      "category": "infrastructure",
+      "status": "passed",
+      "duration": 2.288818359375e-05,
+      "details": "All 7 essential files present",
+      "error_message": null,
+      "metrics": {
+        "total_files": 7,
+        "missing_files": 0
+      },
+      "timestamp": "2026-07-12T13:28:30.689364"
+    },
+    {
+      "test_name": "dependencies",
+      "category": "infrastructure",
+      "status": "warning",
+      "duration": 4.637234926223755,
+      "details": "Dependency issues: [\"Python dependency check failed: [Errno 2] No such file or directory: 'python'\", 'NPM security audit found issues']",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:28:35.326641"
+    },
+    {
+      "test_name": "configuration_files",
+      "category": "infrastructure",
+      "status": "passed",
+      "duration": 0.012878894805908203,
+      "details": "All 4 configuration files validated",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:28:35.339565"
+    },
+    {
+      "test_name": "secrets_scanning",
+      "category": "security",
+      "status": "failed",
+      "duration": 78.7107527256012,
+      "details": "Security issues found: ['Azure Account Keys in ./.env', 'Potential passwords in ./frontend/build/static/js/main.d10921d7.js', 'Secrets/tokens in ./frontend/build/static/js/main.d10921d7.js', 'Secrets/tokens in ./frontend/src/auth/msalConfig.ts', 'Secrets/tokens in ./frontend/src/utils/api.ts']",
+      "error_message": null,
+      "metrics": {
+        "total_findings": 6
+      },
+      "timestamp": "2026-07-12T13:29:54.050527"
+    },
+    {
+      "test_name": "dependency_vulnerabilities",
+      "category": "security",
+      "status": "warning",
+      "duration": 1.9377000331878662,
+      "details": "Vulnerabilities: ['68 NPM vulnerabilities found']",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:55.988265"
+    },
+    {
+      "test_name": "https_enforcement",
+      "category": "security",
+      "status": "failed",
+      "duration": 0.20391106605529785,
+      "details": "HTTPS issues: ['Backend HTTPS test failed: Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:80 ssl:default [nodename nor servname provided, or not known]']",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.192236"
+    },
+    {
+      "test_name": "security_headers",
+      "category": "security",
+      "status": "passed",
+      "duration": 0.25005388259887695,
+      "details": "All required security headers present",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.442310"
+    },
+    {
+      "test_name": "health_endpoints",
+      "category": "functionality",
+      "status": "failed",
+      "duration": 0.0026688575744628906,
+      "details": "Health endpoint not accessible",
+      "error_message": "Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:443 ssl:default [nodename nor servname provided, or not known]",
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.446086"
+    },
+    {
+      "test_name": "api_endpoints",
+      "category": "functionality",
+      "status": "failed",
+      "duration": 0.013876914978027344,
+      "details": "Multiple API endpoints failing: ['\u274c /api/health: Error - Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:443 ssl:default [nodename nor servname provided, or not known]', '\u274c /api/spiritual_guidance: Error - Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:443 ssl:default [nodename nor servname provided, or not known]']",
+      "error_message": null,
+      "metrics": {
+        "passed": 0,
+        "failed": 2
+      },
+      "timestamp": "2026-07-12T13:29:56.460020"
+    },
+    {
+      "test_name": "authentication",
+      "category": "functionality",
+      "status": "skipped",
+      "duration": 0.0,
+      "details": "Authentication testing requires test credentials setup",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.460033"
+    },
+    {
+      "test_name": "spiritual_guidance_api",
+      "category": "functionality",
+      "status": "failed",
+      "duration": 0.0038518905639648438,
+      "details": "All spiritual guidance queries failed",
+      "error_message": null,
+      "metrics": {
+        "successful_queries": 0,
+        "failed_queries": 3
+      },
+      "timestamp": "2026-07-12T13:29:56.463895"
+    },
+    {
+      "test_name": "response_times",
+      "category": "performance",
+      "status": "passed",
+      "duration": 0.0024721622467041016,
+      "details": "All endpoints respond within 5.0s threshold",
+      "error_message": null,
+      "metrics": {
+        "avg_response_time": 0,
+        "max_response_time": 0,
+        "threshold": 5.0
+      },
+      "timestamp": "2026-07-12T13:29:56.466438"
+    },
+    {
+      "test_name": "concurrent_load",
+      "category": "performance",
+      "status": "failed",
+      "duration": 0.0027039051055908203,
+      "details": "Poor performance under 10 concurrent requests: 0.0% success rate",
+      "error_message": null,
+      "metrics": {
+        "concurrent_users": 10,
+        "success_rate": 0.0,
+        "successful_requests": 0,
+        "failed_requests": 10
+      },
+      "timestamp": "2026-07-12T13:29:56.469197"
+    },
+    {
+      "test_name": "resource_usage",
+      "category": "performance",
+      "status": "skipped",
+      "duration": 0.0,
+      "details": "Resource usage monitoring requires Azure Application Insights integration",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.469224"
+    },
+    {
+      "test_name": "end_to_end_workflow",
+      "category": "integration",
+      "status": "failed",
+      "duration": 0.05226588249206543,
+      "details": "E2E workflow failed: ['\u2705 Frontend accessible', '\u274c Backend health check error: Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:443 ssl:default [nodename nor servname provided, or not known]', '\u274c Spiritual guidance workflow error: Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:443 ssl:default [nodename nor servname provided, or not known]']",
+      "error_message": null,
+      "metrics": {
+        "total_steps": 3,
+        "failed_steps": 2
+      },
+      "timestamp": "2026-07-12T13:29:56.521792"
+    },
+    {
+      "test_name": "database_connectivity",
+      "category": "integration",
+      "status": "skipped",
+      "duration": 9.5367431640625e-07,
+      "details": "Database connectivity testing requires Cosmos DB connection configuration",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.521815"
+    },
+    {
+      "test_name": "azure_services",
+      "category": "integration",
+      "status": "skipped",
+      "duration": 0.0,
+      "details": "Azure services testing requires proper authentication configuration",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.521819"
+    },
+    {
+      "test_name": "monitoring_integration",
+      "category": "integration",
+      "status": "skipped",
+      "duration": 0.0,
+      "details": "Monitoring integration testing requires Application Insights configuration",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.521823"
+    },
+    {
+      "test_name": "deployment_artifacts",
+      "category": "deployment",
+      "status": "passed",
+      "duration": 5.1975250244140625e-05,
+      "details": "All deployment artifacts present",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.522007"
+    },
+    {
+      "test_name": "rollback_capability",
+      "category": "deployment",
+      "status": "skipped",
+      "duration": 0.0,
+      "details": "Rollback capability testing requires deployment history and procedures",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.522014"
+    },
+    {
+      "test_name": "configuration_management",
+      "category": "deployment",
+      "status": "warning",
+      "duration": 3.2901763916015625e-05,
+      "details": "Missing configuration files: ['infrastructure/parameters/production.parameters.json', 'frontend/staticwebapp.config.json']",
+      "error_message": null,
+      "metrics": null,
+      "timestamp": "2026-07-12T13:29:56.522057"
+    }
+  ],
+  "summary": {
+    "success_rate": 33.33333333333333,
+    "total_executed_tests": 15,
+    "critical_failures": 7,
+    "warnings": 3,
+    "overall_status": "CRITICAL_ISSUES",
+    "deployment_ready": false,
+    "categories": {
+      "infrastructure": {
+        "passed": 2,
+        "failed": 0,
+        "warning": 1,
+        "skipped": 0
+      },
+      "security": {
+        "passed": 1,
+        "failed": 2,
+        "warning": 1,
+        "skipped": 0
+      },
+      "functionality": {
+        "passed": 0,
+        "failed": 3,
+        "warning": 0,
+        "skipped": 1
+      },
+      "performance": {
+        "passed": 1,
+        "failed": 1,
+        "warning": 0,
+        "skipped": 1
+      },
+      "integration": {
+        "passed": 0,
+        "failed": 1,
+        "warning": 0,
+        "skipped": 3
+      },
+      "deployment": {
+        "passed": 1,
+        "failed": 0,
+        "warning": 1,
+        "skipped": 1
+      }
+    }
+  },
+  "recommendations": [
+    "\ud83d\udd12 CRITICAL: Fix security vulnerabilities before deployment",
+    "   - secrets_scanning: Security issues found: ['Azure Account Keys in ./.env', 'Potential passwords in ./frontend/build/static/js/main.d10921d7.js', 'Secrets/tokens in ./frontend/build/static/js/main.d10921d7.js', 'Secrets/tokens in ./frontend/src/auth/msalConfig.ts', 'Secrets/tokens in ./frontend/src/utils/api.ts']",
+    "   - https_enforcement: HTTPS issues: ['Backend HTTPS test failed: Cannot connect to host vimarsh-backend-app-flex.azurewebsites.net:80 ssl:default [nodename nor servname provided, or not known]']",
+    "\u26a1 Performance issues detected - consider optimization",
+    "\ud83d\udea8 Core functionality failures - deployment not recommended",
+    "\ud83c\udfd7\ufe0f Infrastructure configuration needs attention"
+  ]
+}

@@ -22,10 +22,11 @@
 
 | Layer | File | Purpose |
 |---|---|---|
-| **Core Tokens** | `vimarsh-design-system.css` | Typography, spacing (8px grid), shadows, transitions, color primitives |
-| **Spiritual Theme** | `spiritual-design-system.css` | Specialized styles for spiritual domain content |
-| **Domain Themes** | `domain-themes.css` | CSS custom properties for 6 domain color palettes |
-| **Component Styles** | Per-component CSS files | `GuidanceInterface.css`, `MemoryDashboard.css`, `PrivacySettings.css` |
+| **Core Tokens** | `tokens.css` | Canonical semantic variables (typography, spacing, semantic colors) powering Tailwind |
+| **Component Styles** | Tailwind CSS | Tailwind utility classes |
+
+**Aurora Ink Aesthetic:** A dark-default (or warm-light) canvas where personality domains are expressed through subtle light/glows rather than flat color.
+**Ink Gathering:** The magical, domain-tinted 3-dot animation representing an AI's "thinking" state.
 
 ### Typography
 
@@ -108,8 +109,8 @@ vimarsh.vedmishra.com
 |---|---|
 | **Top Nav** | Persistent header on `/guidance` — Logo, personality badge, metrics, settings/logout |
 | **Personality Selector** | Modal overlay triggered from personality badge click |
-| **Settings** | Icon in top nav → `/settings` page with tabbed interface |
-| **Admin** | Icon in top nav (visible only to admin users) → `/admin` dashboard |
+| **Settings** | Profile tab in bottom nav (mobile) or top nav (desktop) → `/settings` page |
+| **Admin** | Icon in top nav (visible only to admin users) → `/admin` dashboard (Linear-style cockpit with Prompt Studio) |
 | **Back Navigation** | Browser back button + in-app navigation via React Router |
 
 ---

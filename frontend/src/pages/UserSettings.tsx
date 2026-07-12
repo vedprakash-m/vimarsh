@@ -7,8 +7,7 @@ import ExperienceTab from '../components/Settings/ExperienceTab';
 import NotificationsTab from '../components/Settings/NotificationsTab';
 import MemoryPrivacyTab from '../components/Settings/MemoryPrivacyTab';
 import AccountTab from '../components/Settings/AccountTab';
-import '../styles/vimarsh-design-system.css';
-import '../styles/settings-utilities.css';
+
 
 type TabType = 'profile' | 'experience' | 'notifications' | 'memory' | 'account';
 

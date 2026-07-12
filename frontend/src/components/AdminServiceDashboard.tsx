@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ServiceStatusIndicator from './ServiceStatusIndicator';
 import { getApiBaseUrl } from '../config/environment';
 import { getAuthHeaders } from '../auth/authService';
-import '../styles/gap-remediation.css';
+
 
 interface SystemCapability {
   available: boolean;

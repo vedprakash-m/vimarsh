@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../contexts/AdminProviderContext';
 import { adminService } from '../../services/adminService';
 import { RefreshCw, Play, Trash2, Database, CheckCircle, Clock, AlertTriangle, Filter } from 'lucide-react';
-import '../../styles/admin.css';
+
 
 interface PersonalityInfo {
   id: string;

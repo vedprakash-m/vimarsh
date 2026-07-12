@@ -18,7 +18,7 @@
 - **25 operational personalities** with domain-specific RAG pipelines and authentic voice preservation
 - **31,422 embedded documents** (migrated to Azure OpenAI text-embedding-3-large, 768-dim MRL)
 - **Enterprise-grade Azure infrastructure**: Serverless Functions (Flex Consumption), Cosmos DB, Static Web Apps, Microsoft Entra ID authentication
-- **PWA-enabled React 18 + TypeScript frontend** with "Invisible UI" design system (Inter/Merriweather typography)
+- **PWA-enabled React 18 + TypeScript frontend** with "Invisible UI" (Aurora Ink) design system (Inter/Merriweather typography)
 - **Multi-modal interaction**: Text and voice (Azure Neural TTS with 25 personality-matched voices, Web Speech API STT)
 - **Architectural Resilience**: Stateless serverless design with deterministic idempotency and structured AI outputs.
 - **Powered by**: Azure OpenAI **gpt-5.4-mini** and **text-embedding-3-large**.
@@ -128,7 +128,7 @@ Vimarsh distills **31,422 authentic source documents** into personality-specific
 | **PWA Experience** | Full offline functionality, install prompts, service worker, home screen icons, background sync | ✅ Live |
 | **Admin Dashboard** | Content management, user analytics, cost monitoring, and quality assurance interface | ✅ Live |
 | **Circuit Breaker Resilience** | Three-layer circuit breakers: PersonalityContext, LandingPage onboarding, ProtectedRoute redirect | ✅ Live |
-| **Domain Theming** | Apple-inspired design system with 6 domain-specific CSS themes (colors, typography, iconography) | ✅ Live |
+| **Domain Theming** | Aurora Ink design system with 6 domain-specific CSS themes powered by Tailwind (colors, typography, iconography) | ✅ Live |
 | **Voice Interface** | Azure Neural TTS with 25 personality-matched voices (SSML); Web Speech API for STT input | ✅ Live |
 
 ### 5.2 Should Have — Engagement & Growth (Implemented ✅)

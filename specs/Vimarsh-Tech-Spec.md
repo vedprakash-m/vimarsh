@@ -293,13 +293,11 @@ Rich response renderer:
 
 ### 3.5 Design System
 
-Three CSS design system layers:
+A single canonical CSS file provides semantic variables for Tailwind v3:
 
 | File | Purpose |
 |---|---|
-| `vimarsh-design-system.css` | Core tokens: typography, spacing, colors, shadows, transitions |
-| `spiritual-design-system.css` | Spiritual domain–specific styles and theming |
-| `domain-themes.css` | CSS custom properties for 6 domain color palettes |
+| `tokens.css` | Core semantic variables mapping to Tailwind classes |
 
 **Domain Color Mapping:**
 

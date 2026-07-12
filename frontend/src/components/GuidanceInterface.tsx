@@ -11,7 +11,6 @@ import { engagementApi } from './engagement/engagementApi';
 import { Message } from './chat';
 
 import '../styles/wisdom-typography.css';
-import '../styles/vimarsh-design-system.css';
 
 // Sample questions mapped to domains/personalities for "Wisdom Starters"
 const WISDOM_STARTERS: Record<string, string[]> = {
@@ -47,30 +46,35 @@ const WISDOM_STARTERS: Record<string, string[]> = {
   ]
 };
 
-const getDomainGradient = (domain?: string) => {
-  switch (domain) {
-    case 'spiritual': return 'linear-gradient(180deg, #fffcf0 0%, #ffffff 100%)';
-    case 'philosophical': return 'linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%)';
-    case 'scientific': return 'linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)';
-    case 'leadership': return 'linear-gradient(180deg, #fef2f2 0%, #ffffff 100%)';
-    case 'literary': return 'linear-gradient(180deg, #fdf2f8 0%, #ffffff 100%)';
-    case 'psychology': return 'linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)';
-    default: return 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)';
-  }
-};
+const InkGathering = () => (
+  <div className="flex items-center gap-2 px-4 py-3 opacity-80 transition-all duration-500 ease-in-out">
+    <div className="flex gap-1.5 drop-shadow-[0_0_8px_var(--domain-glow)]">
+      <div className="w-1.5 h-1.5 rounded-full bg-accent animate-bounce" style={{ animationDelay: '0ms' }} />
+      <div className="w-1.5 h-1.5 rounded-full bg-accent animate-bounce" style={{ animationDelay: '150ms' }} />
+      <div className="w-1.5 h-1.5 rounded-full bg-accent animate-bounce" style={{ animationDelay: '300ms' }} />
+    </div>
+    <span className="text-sm italic font-serif text-accent ml-2">Gathering thoughts...</span>
+  </div>
+);
 
 export default function GuidanceInterface() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { logout, account } = useAuth();
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  
+  // Non-Destructive Switching: Dictionary mapping personality_id -> messages
+  const [messageThreads, setMessageThreads] = useState<Record<string, Message[]>>(() => {
+    const saved = localStorage.getItem('vimarsh_threads_' + (account?.localAccountId || 'guest'));
+    return saved ? JSON.parse(saved) : {};
+  });
+
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPersonalitySelector, setShowPersonalitySelector] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
-  const { logout, account } = useAuth();
   const { isInitializing } = useAppLoading();
   const { 
     selectedPersonality, 
@@ -79,15 +83,29 @@ export default function GuidanceInterface() {
     personalityLoading 
   } = usePersonality();
 
-  // Get current effective user ID for API calls — Ensuring this matches MSAL and Backend format
+  // Current active messages
+  const messages = selectedPersonality ? (messageThreads[selectedPersonality.id] || []) : [];
+
+  // Update messages wrapper
+  const setMessages = (updater: React.SetStateAction<Message[]>) => {
+    if (!selectedPersonality) return;
+    setMessageThreads(prev => {
+      const current = prev[selectedPersonality.id] || [];
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      return { ...prev, [selectedPersonality.id]: next };
+    });
+  };
+
+  // Sync to local storage
+  useEffect(() => {
+    const key = 'vimarsh_threads_' + (account?.localAccountId || 'guest');
+    localStorage.setItem(key, JSON.stringify(messageThreads));
+  }, [messageThreads, account]);
+
   const effectiveUserId = useMemo(() => {
-    // Priority 1: localAccountId (stable ID used by back-end for Cosmos partition)
-    // Priority 2: homeAccountId (fallback)
-    // Priority 3: sessionId (for guests)
     return account?.localAccountId || account?.homeAccountId || sessionId;
   }, [account, sessionId]);
 
-  // Redirect if no personality and none available (safety)
   useEffect(() => {
     if (!personalityLoading && availablePersonalities.length > 0 && !selectedPersonality) {
       setShowPersonalitySelector(true);
@@ -99,10 +117,35 @@ export default function GuidanceInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
+  // Swipe events for personality switching
+  useEffect(() => {
+    const handleSwipeLeft = () => {
+      if (!selectedPersonality || availablePersonalities.length <= 1) return;
+      const currentIndex = availablePersonalities.findIndex(p => p.id === selectedPersonality.id);
+      const nextIndex = (currentIndex + 1) % availablePersonalities.length;
+      setSelectedPersonality(availablePersonalities[nextIndex]);
+    };
+
+    const handleSwipeRight = () => {
+      if (!selectedPersonality || availablePersonalities.length <= 1) return;
+      const currentIndex = availablePersonalities.findIndex(p => p.id === selectedPersonality.id);
+      const prevIndex = (currentIndex - 1 + availablePersonalities.length) % availablePersonalities.length;
+      setSelectedPersonality(availablePersonalities[prevIndex]);
+    };
+
+    window.addEventListener('device-swipe-left', handleSwipeLeft);
+    window.addEventListener('device-swipe-right', handleSwipeRight);
+    
+    return () => {
+      window.removeEventListener('device-swipe-left', handleSwipeLeft);
+      window.removeEventListener('device-swipe-right', handleSwipeRight);
+    };
+  }, [selectedPersonality, availablePersonalities, setSelectedPersonality]);
+
   const handlePersonalitySelect = (personality: Personality) => {
     setSelectedPersonality(personality);
     setShowPersonalitySelector(false);
-    setMessages([]); // Clear canvas for new personality
+    // Non-destructive: We no longer clear messages here!
   };
 
   const starters = useMemo(() => {
@@ -149,7 +192,7 @@ export default function GuidanceInterface() {
           query: question,
           language: 'English',
           include_citations: true,
-          voice_enabled: false,
+          voice_enabled: true,
           conversation_context: recentMessages,
           personality_id: selectedPersonality.id,
           user_id: effectiveUserId,
@@ -170,7 +213,6 @@ export default function GuidanceInterface() {
           ));
           setIsLoading(false);
           
-          // Headless engagement tracking
           engagementApi.recordActivityHeadless(
             effectiveUserId,
             'conversation',
@@ -205,130 +247,18 @@ export default function GuidanceInterface() {
 
   if (isInitializing || personalityLoading) {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
-        <div className="apple-spinner"></div>
+      <div className="h-screen w-full flex items-center justify-center bg-canvas">
+        <div className="w-6 h-6 border-2 border-elevated border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="wisdom-canvas-container" style={{ 
-      minHeight: '100vh', 
-      background: getDomainGradient(selectedPersonality?.domain), 
-      display: 'flex', 
-      flexDirection: 'column',
-      transition: 'background 1s ease'
-    }}>
-      <style>{`
-        .apple-spinner {
-          width: 24px;
-          height: 24px;
-          border: 2px solid #f3f4f6;
-          border-top: 2px solid #000;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .user-menu-dropdown {
-          position: absolute;
-          top: 100%;
-          right: 0;
-          margin-top: 0.5rem;
-          background: #fff;
-          border: 1px solid #eee;
-          border-radius: 12px;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-          width: 200px;
-          z-index: 100;
-          overflow: hidden;
-          animation: fadeIn 0.2s ease-out;
-        }
-        .user-menu-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          color: #333;
-          text-decoration: none;
-          cursor: pointer;
-          transition: background 0.2s;
-          font-size: 0.9rem;
-        }
-        .user-menu-item:hover {
-          background: #f5f5f7;
-        }
-        .wisdom-starter-card {
-          background: rgba(255, 255, 255, 0.7);
-          border: 1px solid rgba(0, 0, 0, 0.05);
-          border-radius: 16px;
-          padding: 1rem 1.25rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: left;
-          font-size: 0.95rem;
-          color: #444;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .wisdom-starter-card:hover {
-          background: #fff;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-          border-color: rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-          .wisdom-canvas-messages {
-            padding: 0 0.5rem 6rem 0.5rem !important;
-          }
-          .greeting-text {
-            font-size: 1.8rem !important;
-            margin-top: 4vh !important;
-            margin-bottom: 2rem !important;
-            padding: 0 1rem;
-          }
-          .wisdom-starter-grid {
-            grid-template-columns: 1fr !important;
-            gap: 0.75rem !important;
-            padding: 0 1rem;
-          }
-          .wisdom-starter-card {
-            padding: 0.85rem 1rem !important;
-            font-size: 0.85rem !important;
-          }
-          .nav-header {
-            margin-bottom: 2rem !important;
-            padding: 1rem 1rem 0 1rem !important;
-          }
-          .input-container {
-            bottom: 1rem !important;
-            padding: 0 1rem !important;
-          }
-          .message-user {
-            font-size: 1.1rem !important;
-            max-width: 90% !important;
-          }
-          .wisdom-ai-response {
-            padding: 0 0.5rem !important;
-            font-size: 1rem !important;
-          }
-        }
-      `}</style>
-
+    <div className="min-h-screen flex flex-col bg-canvas transition-colors duration-1000 ease-in-out relative">
       {showPersonalitySelector ? (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#fff', overflowY: 'auto' }}>
-          <div style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-            <h1 style={{ fontFamily: 'var(--font-wisdom-ui)', fontSize: '2rem', textAlign: 'center', marginBottom: '3rem', fontWeight: 400, letterSpacing: '-0.02em' }}>
+        <div className="fixed inset-0 z-50 bg-canvas overflow-y-auto">
+          <div className="max-w-6xl mx-auto py-16 px-8">
+            <h1 className="font-serif text-4xl text-center mb-12 font-medium tracking-tight text-primary">
               Whose wisdom do you seek?
             </h1>
             <PersonalitySelector 
@@ -340,112 +270,88 @@ export default function GuidanceInterface() {
           </div>
         </div>
       ) : (
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1.5rem', maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+        <main className="flex-1 flex flex-col w-full max-w-3xl mx-auto p-4 md:p-6 lg:p-8">
           
           {/* Navigation Bar */}
-          <header className="nav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
-            <div 
+          <header className="flex justify-between items-center mb-10 mt-2">
+            <button 
               onClick={() => setShowPersonalitySelector(true)}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '20px', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.05)', transition: 'all 0.2s' }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface/50 backdrop-blur-md border border-border-subtle hover:bg-surface/80 transition-all group"
             >
-              <Hash size={14} color="#666" />
-              <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#333' }}>{selectedPersonality?.display_name || 'Select Guide'}</span>
-              <ChevronRight size={14} color="#999" />
-            </div>
+              <Hash size={16} className="text-tertiary group-hover:text-accent transition-colors" />
+              <span className="text-sm font-medium text-primary">{selectedPersonality?.display_name || 'Select Guide'}</span>
+              <ChevronRight size={16} className="text-tertiary" />
+            </button>
 
-            <div style={{ position: 'relative' }}>
-              <div 
+            <div className="relative">
+              <button 
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                style={{ cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.2s' }}
+                className="w-10 h-10 rounded-full bg-surface/50 backdrop-blur-md border border-border-subtle flex items-center justify-center hover:bg-surface/80 transition-all"
               >
-                <User size={18} color="#333" />
-              </div>
+                <User size={18} className="text-primary" />
+              </button>
               
               {showUserMenu && (
-                <div className="user-menu-dropdown">
-                  <div className="user-menu-item" style={{ borderBottom: '1px solid #f0f0f0', padding: '1rem', cursor: 'default' }}>
-                    <div style={{ fontSize: '0.8rem', color: '#999', marginBottom: '0.25rem' }}>Signed in as</div>
-                    <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{account?.username || 'Guest Seeker'}</div>
+                <div className="absolute top-full right-0 mt-2 w-56 bg-surface border border-border-subtle rounded-xl shadow-lg z-40 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                  <div className="p-4 border-b border-border-subtle cursor-default">
+                    <div className="text-xs text-tertiary mb-1">Signed in as</div>
+                    <div className="font-medium text-sm text-primary truncate">{account?.username || 'Guest Seeker'}</div>
                   </div>
-                  <div className="user-menu-item" onClick={() => { setShowUserMenu(false); navigate('/settings'); }}>
+                  <button onClick={() => navigate('/settings')} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-primary hover:bg-elevated transition-colors text-left">
                     <Settings size={16} />
-                    <span>Settings</span>
-                  </div>
-                  <div className="user-menu-item" onClick={() => { logout(); navigate('/'); }}>
+                    Settings
+                  </button>
+                  <button onClick={() => { logout(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-primary hover:bg-elevated transition-colors text-left">
                     <LogOut size={16} />
-                    <span>Sign Out</span>
-                  </div>
+                    Sign Out
+                  </button>
                 </div>
               )}
             </div>
           </header>
 
-          {/* Conversation Canvas */}
-          <div className="wisdom-canvas-messages" style={{ flex: 1, overflowY: 'auto', paddingBottom: '4rem' }}>
+          {/* Conversation Canvas - Document Style */}
+          <div className="flex-1 overflow-y-auto pb-24 space-y-8">
             {messages.length === 0 ? (
-              <div style={{ marginTop: '8vh', animation: 'fadeIn 1s ease-out' }}>
-                <h2 className="greeting-text" style={{ 
-                  textAlign: 'center',
-                  fontFamily: 'var(--font-wisdom-ui)',
-                  fontSize: '2.5rem',
-                  fontWeight: 500,
-                  color: '#1d1d1f',
-                  letterSpacing: '-0.03em',
-                  marginBottom: '3rem',
-                  opacity: 0.9
-                }}>
+              <div className="mt-16 md:mt-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <h2 className="font-serif text-3xl md:text-4xl text-center font-medium text-primary tracking-tight mb-12">
                   What burdens your mind today?
                 </h2>
                 
-                <div className="wisdom-starter-grid" style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: '1fr', 
-                  gap: '1rem', 
-                  maxWidth: '500px', 
-                  margin: '0 auto' 
-                }}>
-                  <div style={{ fontSize: '0.8rem', color: '#999', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', textAlign: 'center' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  <div className="col-span-1 md:col-span-2 text-xs font-medium text-tertiary uppercase tracking-widest text-center mb-2">
                     Wisdom Starters for {selectedPersonality?.display_name}
                   </div>
                   {starters.map((starter, idx) => (
                     <button 
                       key={idx} 
-                      className="wisdom-starter-card"
+                      className="text-left p-4 rounded-2xl bg-surface border border-border-subtle hover:border-accent/30 hover:shadow-[0_4px_20px_var(--domain-glow)] transition-all flex items-start gap-3 group"
                       onClick={() => handleSubmit(undefined, starter)}
                     >
-                      <Sparkles size={16} style={{ color: '#f97316', flexShrink: 0 }} />
-                      <span>{starter}</span>
+                      <Sparkles size={18} className="text-accent shrink-0 mt-0.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+                      <span className="text-sm md:text-base text-secondary group-hover:text-primary transition-colors">{starter}</span>
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-                {messages.map(msg => (
-                  <div key={msg.id} style={{ 
-                    maxWidth: msg.isUser ? '85%' : '100%',
-                    alignSelf: msg.isUser ? 'flex-end' : 'flex-start',
-                    width: '100%'
-                  }}>
+              <div className="flex flex-col gap-8 md:gap-10">
+                {messages.map((msg, idx) => (
+                  <div key={msg.id} className={`w-full max-w-2xl ${msg.isUser ? 'self-end' : 'self-start'}`}>
                     {msg.isUser ? (
-                      <div className="message-user" style={{ 
-                        fontFamily: 'var(--font-wisdom-ui)', 
-                        fontSize: '1.25rem', 
-                        color: '#1d1d1f', 
-                        fontWeight: 500,
-                        textAlign: 'right',
-                        lineHeight: 1.4
-                      }}>
+                      <div className="text-lg md:text-xl font-sans text-primary text-right leading-relaxed pl-12 opacity-90">
                         {msg.text}
                       </div>
                     ) : (
-                      <div className="wisdom-ai-response" style={{ 
-                        animation: 'fadeIn 0.5s ease-out',
-                        padding: '0 1rem'
-                      }}>
-                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                      <div className="relative pl-6 md:pl-8 border-l-2 border-accent/20 bg-gradient-to-r from-[var(--domain-glow)] to-transparent rounded-r-xl py-2 animate-in fade-in duration-500">
+                        <div className="absolute -left-3.5 top-0 w-7 h-7 rounded-full bg-surface border-2 border-accent/30 flex items-center justify-center font-serif text-xs font-bold text-accent shadow-sm">
+                          {selectedPersonality?.display_name.charAt(0)}
+                        </div>
+                        <div className="font-serif text-[1.1rem] md:text-[1.2rem] leading-[1.8] text-primary prose prose-p:my-3 prose-strong:font-semibold prose-a:text-accent max-w-none">
+                          <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        </div>
                         {msg.metadata?.citations && msg.metadata.citations.length > 0 && (
-                          <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }}>
+                          <div className="mt-4 text-xs text-tertiary italic">
                             — Grounded in {msg.metadata.citations[0].source}
                           </div>
                         )}
@@ -457,45 +363,24 @@ export default function GuidanceInterface() {
             )}
             
             {isLoading && (
-              <div className="wisdom-ai-response" style={{ opacity: 0.4, padding: '2rem 1rem' }}>
-                 <div className="apple-spinner"></div>
+              <div className="self-start relative pl-6 md:pl-8 border-l-2 border-accent/20">
+                 <InkGathering />
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
-          <div className="input-container" style={{ position: 'sticky', bottom: '2rem', width: '100%', padding: '1rem 0' }}>
-            <form onSubmit={handleSubmit} style={{ position: 'relative' }}>
-              <div className="wisdom-canvas-input" style={{ 
-                background: 'rgba(245, 245, 247, 0.8)', 
-                backdropFilter: 'blur(20px)',
-                borderRadius: '24px', 
-                padding: '0.75rem 1.25rem',
-                border: '1px solid rgba(0,0,0,0.05)',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'flex-end',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
-              }}>
+          {/* Sticky Composer */}
+          <div className="sticky bottom-4 md:bottom-8 w-full">
+            <form onSubmit={handleSubmit} className="relative group">
+              <div className="bg-surface/80 backdrop-blur-xl rounded-3xl border border-border-subtle shadow-lg focus-within:border-accent/50 focus-within:shadow-[0_8px_30px_var(--domain-glow)] transition-all duration-300 flex items-end p-2 md:p-3">
                 <textarea
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={`Seek ${selectedPersonality?.display_name || 'wisdom'}'s perspective...`}
                   rows={1}
-                  style={{ 
-                    fontFamily: 'var(--font-wisdom-body)', 
-                    fontSize: '1.1rem',
-                    lineHeight: '1.5',
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    width: '100%',
-                    resize: 'none',
-                    padding: '0.25rem 0',
-                    color: '#1d1d1f'
-                  }}
+                  className="w-full bg-transparent border-none outline-none resize-none font-sans text-base md:text-lg text-primary placeholder:text-tertiary py-2 px-4 max-h-[200px]"
                   onInput={(e) => {
                     const target = e.target as HTMLTextAreaElement;
                     target.style.height = 'auto';
@@ -505,23 +390,13 @@ export default function GuidanceInterface() {
                 <button 
                   type="submit" 
                   disabled={!inputText.trim() || isLoading}
-                  style={{ 
-                    background: inputText.trim() ? '#000' : 'transparent',
-                    border: 'none',
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: inputText.trim() ? '#fff' : '#ccc',
-                    cursor: inputText.trim() ? 'pointer' : 'default',
-                    transition: 'all 0.2s',
-                    marginLeft: '0.5rem',
-                    flexShrink: 0
-                  }}
+                  className={`shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ml-2 ${
+                    inputText.trim() && !isLoading
+                      ? 'bg-primary text-canvas shadow-md hover:scale-105 active:scale-95' 
+                      : 'bg-elevated text-tertiary cursor-not-allowed'
+                  }`}
                 >
-                  <CornerDownLeft size={18} />
+                  <CornerDownLeft size={20} className={inputText.trim() ? "opacity-100" : "opacity-50"} />
                 </button>
               </div>
             </form>

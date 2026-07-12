@@ -2,9 +2,6 @@ import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { MsalProvider } from '@azure/msal-react';
 import { PublicClientApplication } from '@azure/msal-browser';
-import './styles/vimarsh-design-system.css';
-import './styles/spiritual-design-system.css';
-import './styles/domain-themes.css';
 
 // PWA utilities
 import { pwaManager } from './utils/pwa';
@@ -39,6 +36,7 @@ import { AuthProvider } from './auth/AuthProvider';
 import { AdminProvider } from './contexts/AdminProviderContext';
 import { AppLoadingProvider } from './contexts/AppLoadingContext';
 import AdminDashboard from './components/admin/AdminDashboard';
+import BottomTabBar from './components/BottomTabBar';
 
 // MSAL Configuration
 import { msalConfig } from './auth/msalConfig';
@@ -120,6 +118,7 @@ function App() {
                 <LanguageProvider>
                 <DomainThemeManager />
                 <Router>
+                  <BottomTabBar />
                   <Suspense fallback={<AppleLoadingSpinner />}>
                     <Routes>
                     {/* Landing Page - Public Route */}

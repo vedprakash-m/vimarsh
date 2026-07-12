@@ -8,7 +8,7 @@ import SecurityCompliance from './SecurityCompliance';
 import AdminServiceDashboard from '../AdminServiceDashboard';
 import { getApiBaseUrl } from '../../config/environment';
 import { getAuthHeaders } from '../../auth/authService';
-import '../../styles/admin.css';
+
 
 interface AdminUser {
   id: string;
@@ -393,10 +393,10 @@ const AdminDashboard: React.FC = () => {
   };
 
   const renderSidebarNav = () => (
-    <div className="admin-nav">
+    <div className="flex flex-col space-y-2 p-4 w-64 bg-surface border-r border-border-subtle shrink-0">
       <button
         onClick={() => navigate('/guidance')}
-        className="admin-nav-item"
+        className="flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:bg-elevated hover:text-primary transition-colors"
         title="Return to Spiritual Guidance"
       >
         <Home size={18} />
@@ -404,63 +404,63 @@ const AdminDashboard: React.FC = () => {
       </button>
       <button
         onClick={() => setActiveTab('overview')}
-        className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'overview' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <BarChart3 size={18} />
         {!sidebarCollapsed && <span>Overview</span>}
       </button>
       <button
         onClick={() => setActiveTab('users')}
-        className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'users' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <Users size={18} />
         {!sidebarCollapsed && <span>Users</span>}
       </button>
       <button
         onClick={() => setActiveTab('analytics')}
-        className={`admin-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'analytics' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <TrendingUp size={18} />
         {!sidebarCollapsed && <span>Analytics</span>}
       </button>
       <button
         onClick={() => setActiveTab('abuse')}
-        className={`admin-nav-item ${activeTab === 'abuse' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'abuse' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <AlertTriangle size={18} />
         {!sidebarCollapsed && <span>Abuse</span>}
       </button>
       <button
         onClick={() => setActiveTab('content')}
-        className={`admin-nav-item ${activeTab === 'content' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'content' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <FileText size={18} />
         {!sidebarCollapsed && <span>Content</span>}
       </button>
       <button
         onClick={() => setActiveTab('personalities')}
-        className={`admin-nav-item ${activeTab === 'personalities' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'personalities' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <Bot size={18} />
         {!sidebarCollapsed && <span>Personalities</span>}
       </button>
       <button
         onClick={() => setActiveTab('monitoring')}
-        className={`admin-nav-item ${activeTab === 'monitoring' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'monitoring' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <Activity size={18} />
         {!sidebarCollapsed && <span>Monitoring</span>}
       </button>
       <button
         onClick={() => setActiveTab('security')}
-        className={`admin-nav-item ${activeTab === 'security' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'security' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <Shield size={18} />
         {!sidebarCollapsed && <span>Security</span>}
       </button>
       <button
         onClick={() => setActiveTab('settings')}
-        className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'settings' ? 'bg-accent/10 text-accent font-medium' : 'text-secondary hover:bg-elevated hover:text-primary'}`}
       >
         <Settings size={18} />
         {!sidebarCollapsed && <span>Settings</span>}
@@ -469,112 +469,112 @@ const AdminDashboard: React.FC = () => {
   );
 
   const renderOverview = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
+    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-canvas w-full">
+      <div className="flex justify-between items-center mb-8">
         <h1>System Overview</h1>
-        <div className="system-status">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium">
           <Activity size={20} />
           <span>System Status: Healthy</span>
         </div>
       </div>
 
       {stats && (
-        <div className="vimarsh-admin-grid">
-          <div className="vimarsh-admin-card">
-            <div className="card-header">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
               <Users size={20} />
               <h3>Total Users</h3>
             </div>
-            <div className="card-value">{stats.totalUsers}</div>
+            <div className="text-3xl font-serif text-primary mt-2">{stats.totalUsers}</div>
           </div>
 
-          <div className="vimarsh-admin-card">
-            <div className="card-header">
+          <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
               <Activity size={20} />
               <h3>Active Users</h3>
             </div>
-            <div className="card-value">{stats.activeUsers}</div>
+            <div className="text-3xl font-serif text-primary mt-2">{stats.activeUsers}</div>
           </div>
 
-          <div className="vimarsh-admin-card">
-            <div className="card-header">
+          <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
               <DollarSign size={20} />
               <h3>Total Cost</h3>
             </div>
-            <div className="card-value">${stats.totalCost.toFixed(2)}</div>
+            <div className="text-3xl font-serif text-primary mt-2">${stats.totalCost.toFixed(2)}</div>
           </div>
 
-          <div className="vimarsh-admin-card">
-            <div className="card-header">
+          <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
               <MessageSquare size={20} />
               <h3>Total Tokens</h3>
             </div>
-            <div className="card-value">{stats.totalTokens.toLocaleString()}</div>
+            <div className="text-3xl font-serif text-primary mt-2">{stats.totalTokens.toLocaleString()}</div>
           </div>
 
-          <div className="vimarsh-admin-card">
-            <div className="card-header">
+          <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
               <Database size={20} />
               <h3>Foundational Texts</h3>
             </div>
-            <div className="card-value">{stats.totalTexts}</div>
+            <div className="text-3xl font-serif text-primary mt-2">{stats.totalTexts}</div>
           </div>
 
-          <div className="vimarsh-admin-card">
-            <div className="card-header">
+          <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+            <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
               <Shield size={20} />
               <h3>Personalities</h3>
             </div>
-            <div className="card-value">{stats.totalPersonalities}</div>
+            <div className="text-3xl font-serif text-primary mt-2">{stats.totalPersonalities}</div>
           </div>
         </div>
       )}
 
-      <div className="vimarsh-admin-grid">
-        <div className="vimarsh-admin-card vimarsh-admin-card-wide">
-          <div className="card-header">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm col-span-full">
+          <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
             <h3>System Health</h3>
           </div>
-          <div className="health-components">
-            <div className="health-component">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex flex-col gap-1 p-4 bg-elevated rounded-xl border border-border-subtle">
               <span>API Services</span>
               <span style={{ color: '#4CAF50' }}>✅ Healthy</span>
             </div>
-            <div className="health-component">
+            <div className="flex flex-col gap-1 p-4 bg-elevated rounded-xl border border-border-subtle">
               <span>Database</span>
               <span style={{ color: '#4CAF50' }}>✅ Healthy</span>
             </div>
-            <div className="health-component">
+            <div className="flex flex-col gap-1 p-4 bg-elevated rounded-xl border border-border-subtle">
               <span>Azure Functions</span>
               <span style={{ color: '#4CAF50' }}>✅ Healthy</span>
             </div>
-            <div className="health-component">
+            <div className="flex flex-col gap-1 p-4 bg-elevated rounded-xl border border-border-subtle">
               <span>LLM Services</span>
               <span style={{ color: '#4CAF50' }}>✅ Healthy</span>
             </div>
           </div>
         </div>
 
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
+        <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+          <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
             <h3>Performance Metrics</h3>
           </div>
           <div className="performance-metrics">
-            <div className="metric">
-              <span className="metric-label">Avg Response Time</span>
-              <span className="metric-value">{performanceMetrics.avg_response_time}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">Avg Response Time</span>
+              <span className="font-medium text-primary">{performanceMetrics.avg_response_time}</span>
             </div>
-            <div className="metric">
-              <span className="metric-label">Success Rate</span>
-              <span className="metric-value">{performanceMetrics.success_rate}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">Success Rate</span>
+              <span className="font-medium text-primary">{performanceMetrics.success_rate}</span>
             </div>
-            <div className="metric">
-              <span className="metric-label">Memory Usage</span>
-              <span className="metric-value">{performanceMetrics.memory_usage}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">Memory Usage</span>
+              <span className="font-medium text-primary">{performanceMetrics.memory_usage}</span>
             </div>
-            <div className="metric">
-              <span className="metric-label">CPU Usage</span>
-              <span className="metric-value">{performanceMetrics.cpu_usage}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">CPU Usage</span>
+              <span className="font-medium text-primary">{performanceMetrics.cpu_usage}</span>
             </div>
           </div>
         </div>
@@ -583,63 +583,63 @@ const AdminDashboard: React.FC = () => {
   );
 
   const renderUsers = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
+    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-canvas w-full">
+      <div className="flex justify-between items-center mb-8">
         <h1>User Management</h1>
-        <button className="vimarsh-btn-primary">
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-canvas rounded-lg hover:opacity-90 transition-opacity font-medium text-sm">
           <Users size={16} />
           Add User
         </button>
       </div>
 
-      <div className="vimarsh-admin-stats">
-        <div className="stat-card">
+      <div className="flex gap-6 mb-8">
+        <div className="flex items-center gap-4 bg-surface p-6 rounded-2xl border border-border-subtle flex-1 shadow-sm">
           <Users size={20} />
           <div>
-            <span className="stat-value">{users.length}</span>
-            <span className="stat-label">Total Users</span>
+            <span className="block text-3xl font-serif text-primary">{users.length}</span>
+            <span className="text-sm text-tertiary">Total Users</span>
           </div>
         </div>
-        <div className="stat-card">
+        <div className="flex items-center gap-4 bg-surface p-6 rounded-2xl border border-border-subtle flex-1 shadow-sm">
           <Activity size={20} />
           <div>
-            <span className="stat-value">{users.filter(u => u.status === 'active').length}</span>
-            <span className="stat-label">Active Users</span>
+            <span className="block text-3xl font-serif text-primary">{users.filter(u => u.status === 'active').length}</span>
+            <span className="text-sm text-tertiary">Active Users</span>
           </div>
         </div>
       </div>
 
-      <div className="vimarsh-admin-table">
-        <div className="table-header">
-          <div className="table-row">
-            <div className="table-cell">User</div>
-            <div className="table-cell">Role</div>
-            <div className="table-cell">Status</div>
-            <div className="table-cell">Last Login</div>
-            <div className="table-cell">Actions</div>
+      <div className="w-full bg-surface rounded-2xl border border-border-subtle overflow-hidden shadow-sm">
+        <div className="bg-elevated border-b border-border-subtle font-medium text-tertiary text-sm uppercase tracking-wider">
+          <div className="grid grid-cols-5 gap-4 p-4 items-center border-b border-border-subtle hover:bg-elevated transition-colors">
+            <div className="truncate text-sm text-primary">User</div>
+            <div className="truncate text-sm text-primary">Role</div>
+            <div className="truncate text-sm text-primary">Status</div>
+            <div className="truncate text-sm text-primary">Last Login</div>
+            <div className="truncate text-sm text-primary">Actions</div>
           </div>
         </div>
         {users.map(user => (
-          <div key={user.id} className="table-row">
-            <div className="table-cell">
-              <div className="user-info">
-                <span className="user-email">{user.email}</span>
-                <span className="user-meta">ID: {user.id}</span>
+          <div key={user.id} className="grid grid-cols-5 gap-4 p-4 items-center border-b border-border-subtle hover:bg-elevated transition-colors">
+            <div className="truncate text-sm text-primary">
+              <div className="flex flex-col">
+                <span className="font-medium text-primary truncate">{user.email}</span>
+                <span className="text-xs text-tertiary">ID: {user.id}</span>
               </div>
             </div>
-            <div className="table-cell">
-              <span className="role-badge">{user.role}</span>
+            <div className="truncate text-sm text-primary">
+              <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">{user.role}</span>
             </div>
-            <div className="table-cell">
-              <span className={`status-badge ${user.status}`}>
+            <div className="truncate text-sm text-primary">
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                 {user.status}
               </span>
             </div>
-            <div className="table-cell">
+            <div className="truncate text-sm text-primary">
               {user.last_request ? new Date(user.last_request).toLocaleDateString() : 'N/A'}
             </div>
-            <div className="table-cell">
-              <button className="vimarsh-btn-small vimarsh-btn-secondary">
+            <div className="truncate text-sm text-primary">
+              <button className="flex items-center gap-2 px-3 py-1.5 bg-elevated text-primary rounded-lg hover:bg-border-subtle transition-colors text-sm font-medium">
                 Edit
               </button>
             </div>
@@ -654,35 +654,35 @@ const AdminDashboard: React.FC = () => {
   const renderSecurity = () => <SecurityCompliance />;
 
   const renderSettings = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
+    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-canvas w-full">
+      <div className="flex justify-between items-center mb-8">
         <h1>System Settings</h1>
       </div>
 
-      <div className="vimarsh-admin-card">
-        <div className="card-header">
+      <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+        <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
           <h3>Administrator Information</h3>
         </div>
-        <div className="admin-info">
-          <div className="info-item">
+        <div className="space-y-4 max-w-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border-subtle">
             <span>Name</span>
             <span>{currentUser.name}</span>
           </div>
-          <div className="info-item">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border-subtle">
             <span>Email</span>
             <span>{currentUser.email}</span>
           </div>
-          <div className="info-item">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border-subtle">
             <span>Role</span>
-            <span className="role-badge">{currentUser.role}</span>
+            <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">{currentUser.role}</span>
           </div>
-          <div className="info-item">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border-subtle">
             <span>Permissions</span>
-            <div className="permissions-list">
-              <span className="permission">User Management</span>
-              <span className="permission">Content Management</span>
-              <span className="permission">System Configuration</span>
-              <span className="permission">Analytics</span>
+            <div className="flex flex-wrap gap-2 mt-2 sm:mt-0 justify-end">
+              <span className="px-2 py-1 bg-elevated text-secondary text-xs rounded-md border border-border-subtle">User Management</span>
+              <span className="px-2 py-1 bg-elevated text-secondary text-xs rounded-md border border-border-subtle">Content Management</span>
+              <span className="px-2 py-1 bg-elevated text-secondary text-xs rounded-md border border-border-subtle">System Configuration</span>
+              <span className="px-2 py-1 bg-elevated text-secondary text-xs rounded-md border border-border-subtle">Analytics</span>
             </div>
           </div>
         </div>
@@ -691,61 +691,61 @@ const AdminDashboard: React.FC = () => {
   );
 
   const renderAnalytics = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
+    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-canvas w-full">
+      <div className="flex justify-between items-center mb-8">
         <h1>Analytics Dashboard</h1>
-        <div className="system-status">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium">
           <TrendingUp size={20} />
           <span>Performance Insights</span>
         </div>
       </div>
 
-      <div className="vimarsh-admin-grid">
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+          <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
             <h3>User Engagement</h3>
           </div>
-          <div className="user-engagement-chart">
-            <div className="engagement-metric">
-              <span className="metric-label">Total Users</span>
-              <span className="metric-value">{stats?.totalUsers || 0}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl">
+              <span className="text-secondary text-sm">Total Users</span>
+              <span className="font-medium text-primary">{stats?.totalUsers || 0}</span>
             </div>
-            <div className="engagement-metric">
-              <span className="metric-label">Active Users</span>
-              <span className="metric-value">{stats?.activeUsers || 0}</span>
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl">
+              <span className="text-secondary text-sm">Active Users</span>
+              <span className="font-medium text-primary">{stats?.activeUsers || 0}</span>
             </div>
-            <div className="engagement-metric">
-              <span className="metric-label">Engagement Rate</span>
-              <span className="metric-value">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl">
+              <span className="text-secondary text-sm">Engagement Rate</span>
+              <span className="font-medium text-primary">
                 {stats?.totalUsers ? ((stats.activeUsers / stats.totalUsers) * 100).toFixed(1) : 0}%
               </span>
             </div>
           </div>
         </div>
 
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
+        <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+          <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
             <h3>Content Performance</h3>
           </div>
-          <div className="retention-metrics">
-            <div className="metric">
-              <span className="metric-label">Total Content</span>
-              <span className="metric-value">{stats?.totalTexts || 0}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">Total Content</span>
+              <span className="font-medium text-primary">{stats?.totalTexts || 0}</span>
             </div>
-            <div className="metric">
-              <span className="metric-label">Personalities</span>
-              <span className="metric-value">{stats?.totalPersonalities || 0}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">Personalities</span>
+              <span className="font-medium text-primary">{stats?.totalPersonalities || 0}</span>
             </div>
-            <div className="metric">
-              <span className="metric-label">Tokens Processed</span>
-              <span className="metric-value">{stats?.totalTokens?.toLocaleString() || 0}</span>
+            <div className="flex justify-between items-center py-2 border-b border-border-subtle last:border-0">
+              <span className="text-secondary text-sm">Tokens Processed</span>
+              <span className="font-medium text-primary">{stats?.totalTokens?.toLocaleString() || 0}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="vimarsh-admin-card vimarsh-admin-card-wide">
-        <div className="card-header">
+      <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm col-span-full">
+        <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
           <h3>System Usage Analytics</h3>
         </div>
         <p style={{ color: '#6b7280', padding: '1rem' }}>
@@ -757,50 +757,50 @@ const AdminDashboard: React.FC = () => {
   );
 
   const renderAbusePreventionTab = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
+    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-canvas w-full">
+      <div className="flex justify-between items-center mb-8">
         <h1>Abuse Prevention & Security</h1>
-        <div className="system-status">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium">
           <AlertTriangle size={20} />
           <span>Security Monitoring</span>
         </div>
       </div>
 
-      <div className="vimarsh-admin-grid">
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+          <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
             <h3>Security Overview</h3>
           </div>
-          <div className="threshold-settings">
-            <div className="threshold-item">
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl text-sm">
               <span>Blocked Users</span>
               <span>{users.filter(u => u.status === 'blocked').length}</span>
             </div>
-            <div className="threshold-item">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl text-sm">
               <span>Active Users</span>
               <span>{users.filter(u => u.status === 'active').length}</span>
             </div>
-            <div className="threshold-item">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl text-sm">
               <span>Total Cost</span>
               <span>${stats?.totalCost?.toFixed(2) || '0.00'}</span>
             </div>
           </div>
         </div>
 
-        <div className="vimarsh-admin-card">
-          <div className="card-header">
+        <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+          <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
             <h3>System Status</h3>
           </div>
-          <div className="threshold-settings">
-            <div className="threshold-item">
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl text-sm">
               <span>Security Status</span>
               <span style={{ color: '#10b981' }}>✅ Secure</span>
             </div>
-            <div className="threshold-item">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl text-sm">
               <span>Rate Limiting</span>
               <span style={{ color: '#10b981' }}>✅ Active</span>
             </div>
-            <div className="threshold-item">
+            <div className="flex justify-between items-center p-3 bg-elevated rounded-xl text-sm">
               <span>Content Filtering</span>
               <span style={{ color: '#10b981' }}>✅ Enabled</span>
             </div>
@@ -808,46 +808,46 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="vimarsh-admin-card vimarsh-admin-card-wide">
-        <div className="card-header">
+      <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm col-span-full">
+        <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
           <h3>User Activity Monitoring</h3>
         </div>
-        <div className="vimarsh-admin-table">
-          <div className="table-header">
-            <div className="table-row">
-              <div className="table-cell">User</div>
-              <div className="table-cell">Status</div>
-              <div className="table-cell">Last Activity</div>
-              <div className="table-cell">Risk Level</div>
-              <div className="table-cell">Actions</div>
+        <div className="w-full bg-surface rounded-2xl border border-border-subtle overflow-hidden shadow-sm">
+          <div className="bg-elevated border-b border-border-subtle font-medium text-tertiary text-sm uppercase tracking-wider">
+            <div className="grid grid-cols-5 gap-4 p-4 items-center border-b border-border-subtle hover:bg-elevated transition-colors">
+              <div className="truncate text-sm text-primary">User</div>
+              <div className="truncate text-sm text-primary">Status</div>
+              <div className="truncate text-sm text-primary">Last Activity</div>
+              <div className="truncate text-sm text-primary">Risk Level</div>
+              <div className="truncate text-sm text-primary">Actions</div>
             </div>
           </div>
           {users.slice(0, 10).map(user => (
-            <div key={user.id} className="table-row">
-              <div className="table-cell">
-                <span className="user-email">{user.email}</span>
+            <div key={user.id} className="grid grid-cols-5 gap-4 p-4 items-center border-b border-border-subtle hover:bg-elevated transition-colors">
+              <div className="truncate text-sm text-primary">
+                <span className="font-medium text-primary truncate">{user.email}</span>
               </div>
-              <div className="table-cell">
-                <span className={`status-badge ${user.status}`}>
+              <div className="truncate text-sm text-primary">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                   {user.status}
                 </span>
               </div>
-              <div className="table-cell">
+              <div className="truncate text-sm text-primary">
                 <span>{user.last_request ? new Date(user.last_request).toLocaleDateString() : 'N/A'}</span>
               </div>
-              <div className="table-cell">
+              <div className="truncate text-sm text-primary">
                 <span className="risk-score low">Low</span>
               </div>
-              <div className="table-cell">
-                <button className="vimarsh-btn-small vimarsh-btn-secondary">
+              <div className="truncate text-sm text-primary">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-elevated text-primary rounded-lg hover:bg-border-subtle transition-colors text-sm font-medium">
                   Monitor
                 </button>
               </div>
             </div>
           ))}
           {users.length === 0 && (
-            <div className="table-row">
-              <div className="table-cell" style={{ textAlign: 'center', padding: '2rem' }}>
+            <div className="grid grid-cols-5 gap-4 p-4 items-center border-b border-border-subtle hover:bg-elevated transition-colors">
+              <div className="truncate text-sm text-primary" style={{ textAlign: 'center', padding: '2rem' }}>
                 <p style={{ color: '#6b7280' }}>
                   🔒 No security incidents detected. All users are operating within normal parameters.
                 </p>
@@ -860,34 +860,34 @@ const AdminDashboard: React.FC = () => {
   );
 
   const renderContentManagement = () => (
-    <div className="vimarsh-admin-dashboard">
-      <div className="vimarsh-admin-header">
+    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-canvas w-full">
+      <div className="flex justify-between items-center mb-8">
         <h1>Content Management</h1>
-        <button className="vimarsh-btn-primary">
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-canvas rounded-lg hover:opacity-90 transition-opacity font-medium text-sm">
           <FileText size={16} />
           Upload Content
         </button>
       </div>
 
-      <div className="vimarsh-admin-stats">
-        <div className="stat-card">
+      <div className="flex gap-6 mb-8">
+        <div className="flex items-center gap-4 bg-surface p-6 rounded-2xl border border-border-subtle flex-1 shadow-sm">
           <FileText size={20} />
           <div>
-            <span className="stat-value">{stats?.totalTexts || 0}</span>
-            <span className="stat-label">Total Chunks</span>
+            <span className="block text-3xl font-serif text-primary">{stats?.totalTexts || 0}</span>
+            <span className="text-sm text-tertiary">Total Chunks</span>
           </div>
         </div>
-        <div className="stat-card">
+        <div className="flex items-center gap-4 bg-surface p-6 rounded-2xl border border-border-subtle flex-1 shadow-sm">
           <Database size={20} />
           <div>
-            <span className="stat-value">12</span>
-            <span className="stat-label">Content Sources</span>
+            <span className="block text-3xl font-serif text-primary">12</span>
+            <span className="text-sm text-tertiary">Content Sources</span>
           </div>
         </div>
       </div>
 
-      <div className="vimarsh-admin-card">
-        <div className="card-header">
+      <div className="bg-surface rounded-2xl p-6 border border-border-subtle shadow-sm">
+        <div className="flex items-center gap-3 mb-4 text-tertiary font-medium text-sm uppercase tracking-wider">
           <h3>Content Sources Overview</h3>
         </div>
         
@@ -948,8 +948,8 @@ const AdminDashboard: React.FC = () => {
   const renderTabContent = () => {
     if (loading) {
       return (
-        <div className="vimarsh-admin-loading">
-          <div className="loading-spinner"></div>
+        <div className="flex flex-col items-center justify-center h-screen w-full bg-canvas">
+          <div className="w-8 h-8 border-4 border-elevated border-t-accent rounded-full animate-spin mb-4"></div>
           <p>Loading admin dashboard...</p>
         </div>
       );
@@ -957,7 +957,7 @@ const AdminDashboard: React.FC = () => {
 
     if (error) {
       return (
-        <div className="vimarsh-admin-error" style={{
+        <div className="flex flex-col items-center justify-center h-screen w-full bg-canvas text-center p-8" style={{
           background: 'rgba(251, 191, 36, 0.1)',
           border: '1px solid rgba(251, 191, 36, 0.3)',
           borderRadius: '0.75rem',
@@ -972,7 +972,7 @@ const AdminDashboard: React.FC = () => {
             The main spiritual guidance system is working perfectly. Admin analytics are being set up.
           </p>
           <button 
-            className="vimarsh-btn-primary" 
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-canvas rounded-lg hover:opacity-90 transition-opacity font-medium text-sm" 
             onClick={loadSystemStats}
             style={{
               background: '#f59e0b',
@@ -1014,13 +1014,13 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="vimarsh-admin-container">
-      <div className={`vimarsh-admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-        <div className="admin-sidebar-header">
+    <div className="flex h-screen w-full overflow-hidden bg-canvas text-primary font-sans">
+      <div className={`flex flex-col h-full bg-surface border-r border-border-subtle transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        <div className="flex items-center gap-3 p-4 border-b border-border-subtle">
           <Shield size={24} />
           {!sidebarCollapsed && <h2>Admin Panel</h2>}
           <button
-            className="collapse-button"
+            className="ml-auto p-1.5 rounded-md hover:bg-elevated text-tertiary hover:text-primary transition-colors"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           >
             {sidebarCollapsed ? '→' : '←'}
@@ -1029,7 +1029,7 @@ const AdminDashboard: React.FC = () => {
         {renderSidebarNav()}
       </div>
 
-      <div className="vimarsh-admin-content">
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
         {renderTabContent()}
       </div>
     </div>

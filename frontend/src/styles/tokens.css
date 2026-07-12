@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Semantic Colors - Light Mode (Default) */
+    --bg-canvas: #FAF9F6;
+    --bg-surface: #FFFFFF;
+    --bg-elevated: #F3F4F6;
+    
+    --fg-primary: #111827;
+    --fg-secondary: #4B5563;
+    --fg-tertiary: #9CA3AF;
+    
+    --border-subtle: #E5E7EB;
+    --border-default: #D1D5DB;
+    --border-strong: #9CA3AF;
+
+    /* Canonical Domain Palette */
+    --domain-spiritual: #f59e0b;
+    --domain-philosophical: #6366f1;
+    --domain-leadership: #10b981;
+    --domain-scientific: #3b82f6;
+    --domain-literary: #f43f5e;
+    --domain-psychology: #14b8a6;
+
+    /* Default Domain Glow (Spiritual) */
+    --accent: var(--domain-spiritual);
+    --domain-glow: rgba(245, 158, 11, 0.15);
+  }
+
+  :root[data-theme="dark"] {
+    /* Semantic Colors - Dark Mode (Aurora Ink) */
+    --bg-canvas: #0B0B0F;
+    --bg-surface: #111827;
+    --bg-elevated: #1F2937;
+    
+    --fg-primary: #F9FAFB;
+    --fg-secondary: #D1D5DB;
+    --fg-tertiary: #6B7280;
+    
+    --border-subtle: #1F2937;
+    --border-default: #374151;
+    --border-strong: #4B5563;
+  }
+
+  /* Domain Modifiers */
+  :root[data-domain="spiritual"] {
+    --accent: var(--domain-spiritual);
+    --domain-glow: rgba(245, 158, 11, 0.15);
+  }
+  :root[data-domain="philosophical"] {
+    --accent: var(--domain-philosophical);
+    --domain-glow: rgba(99, 102, 241, 0.15);
+  }
+  :root[data-domain="leadership"] {
+    --accent: var(--domain-leadership);
+    --domain-glow: rgba(16, 185, 129, 0.15);
+  }
+  :root[data-domain="scientific"] {
+    --accent: var(--domain-scientific);
+    --domain-glow: rgba(59, 130, 246, 0.15);
+  }
+  :root[data-domain="literary"] {
+    --accent: var(--domain-literary);
+    --domain-glow: rgba(244, 63, 94, 0.15);
+  }
+  :root[data-domain="psychology"] {
+    --accent: var(--domain-psychology);
+    --domain-glow: rgba(20, 184, 166, 0.15);
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--fg-primary);
+    @apply font-sans;
+  }
+}

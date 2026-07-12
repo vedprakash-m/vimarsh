@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSpiritualGuidanceTest } from '../hooks/useABTest';
-import '../styles/gap-remediation.css';
+
 
 interface Citation {
   source: string;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell } from 'lucide-react';
 import { useSettings } from '../../contexts/SettingsContext';
-import '../../styles/settings-utilities.css';
+
 
 const NotificationsTab: React.FC = () => {
   const { settings, updateSettings } = useSettings();

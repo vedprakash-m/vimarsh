@@ -695,3 +695,9 @@ backend/archive/demo_*.py
 # Content moderation logs
 moderation_logs/
 content_flags/
+
+# Canonical Specs
+specs/*
+!specs/Vimarsh-PRD.md
+!specs/Vimarsh-Tech-Spec.md
+!specs/Vimarsh-UX-Spec.md
